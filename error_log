@@ -22,3 +22,5 @@
 [13-Dec-2021 05:45:50 UTC] PHP Notice:  Undefined index: EV in /home/ifduktdo/public_html/SaleM/TEST/EVregi.php on line 146
 [13-Dec-2021 05:45:53 UTC] PHP Notice:  Undefined index: EV in /home/ifduktdo/public_html/SaleM/TEST/index.php on line 35
 [13-Dec-2021 05:45:53 UTC] PHP Notice:  Undefined variable: i in /home/ifduktdo/public_html/SaleM/TEST/index.php on line 55
+[13-Dec-2021 06:25:28 UTC] PHP Notice:  Undefined index: EV in /home/ifduktdo/public_html/SaleM/TEST/index.php on line 35
+[13-Dec-2021 06:25:28 UTC] PHP Notice:  Undefined variable: i in /home/ifduktdo/public_html/SaleM/TEST/index.php on line 55
