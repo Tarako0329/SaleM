@@ -1,0 +1,191 @@
+html {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  font-size: 62.5%; /*ルートサイズ10px rem算出をしやすくするために*/
+}
+body {
+    padding-top: 70px; /* ヘッダーの後ろに要素が隠れないようにするため */
+    padding-bottom:150px; /* フッターーの後ろに要素が隠れないようにするため */
+    font-family: 'Kosugi Maru', sans-serif;
+}
+header{
+    height: 70px; /* 高さを70pxに指定 */
+    padding: 5px 40px; /* ヘッダーに上下左右それぞれ余白を指定 */
+    box-sizing: border-box; /* padding分を含んで幅を100%にするため */
+    background: #ff838b;
+    position: fixed; /* ウィンドウを基準に画面に固定 */
+    top: 0; /* 上下の固定位置を上から0pxにする */
+    left: 0; /* 左右の固定位置を左から0pxにする */
+    width: 100%;
+    z-index: 99;
+    display: flex;
+    font-size: 4.5rem;
+    font-weight: 700;
+}
+.yagou{
+    width: 80%;
+    height: 100%;
+}
+.event{
+    width: 20%;
+    height: 100%;
+}
+INPUT.ev{
+    /*INPUT 数量部*/
+    border-right:none;
+    border-left:none;
+    border-top:none;
+    border-color:#fff;
+    text-align:center;
+    font-size: 3rem;
+    font-weight: 600;
+    color: #fff;
+    height:80%;     
+    width:100%;
+    background: #ff838b;
+    padding:0;
+}
+
+
+.main{
+    display: flex;
+}
+.contentA{
+    background: #fff;
+    width: 100%;
+    height: 100%;
+}
+.contentB{
+    background: #6fb5ff;
+    width: 20%;
+    height: 100%;
+}
+
+
+.menu{
+   display:flex;
+   flex-wrap:wrap;
+   list-style:none;
+   margin:0;
+   padding:0;
+ }
+.items{
+   width:46%;
+   margin:5px 2%;
+   /*height:200px; */
+   height:150px; 
+   line-height:80%; 
+   /*background:#eb6100;*/
+   background:#fff;
+   text-align:center;
+   font-size: 0;
+    
+}
+.ordered{
+    width:100%;
+    margin:0; 
+    padding:0;
+    height:20%; /*itemsの下20％部分。上はメニューボタン*/
+    line-height:30px; 
+    background:#fff;
+    text-align:center;
+    font-size: 3rem;
+    font-weight: 700;
+   
+}
+.btn--orange,
+a.btn--orange {
+    /*メニューボタン*/
+    color: #fff;
+    background-color: #00bfff;
+    height:80%;     
+    font-size: 3.5rem;
+}
+INPUT.order{
+    border:none;
+    text-align:center;
+    font-size: 3rem;
+    font-weight: 700;
+    background:#fff;
+}
+INPUT.tanka{
+    /*INPUT 数量部*/
+    width:40%;
+}
+INPUT.su{
+    /*INPUT 数量部*/
+    width:10%;
+}
+
+
+footer{
+    background: #ffce5b;
+    height: 150px; /* 高さを50pxに指定 */
+    position: fixed; /* ウィンドウを基準に画面に固定 */
+    bottom: 0;
+    Right: 0;
+    width: 100%;
+    display: flex;    
+}
+
+.kaikei{
+    width:80%;
+    margin:3.5% auto; /*中央寄せ*/
+    text-align:center;
+    font-size: 5.0rem;
+    font-weight: 800;
+}
+.right{
+    background: #6fb5ff;
+    width:20%;
+    /*height:70px;*/
+}
+.btn--commit,
+a.btn--commit {
+    /*注文ボタン*/
+    color: #fff;
+    background-color: #eb6100;
+    height:100%; 
+    font-size: 3rem;
+}
+.btn--chk,
+a.btn--chk {
+    /*確認ボタン*/
+    color: #fff;
+    background-color: #9acd32;
+    height:100%; 
+    font-size: 3rem;
+}
+
+/*まずはお決まりのボックスサイズ算出をborer-boxに */
+*,
+*:before,
+*:after {
+  -webkit-box-sizing: inherit;
+  box-sizing: inherit;
+}
+
+.btn,
+a.btn,
+button.btn {
+    width:100%; /*親要素と同じ幅*/
+    font-weight: 700;
+    line-height: 1.5;
+    position: relative;
+    display: inline-block;
+    padding: 1rem; /*ボタン文字エリアとボタン外枠の間*/
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+    text-align: center;
+    vertical-align: middle;
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    color: #212529;
+    border-radius: 0.5rem;
+}
+
