@@ -2,8 +2,8 @@
 <?php
 
 // 設定ファイルインクルード【開発中】
-
-require "functions.php";
+$pass=dirname(__FILE__);
+require "../SQ/functions.php";
 
 if($_POST["btn"] == "登録"){
     $sqlstr="insert into ShouhinMS values(0,'".rot13encrypt($_POST["shouhinNM"]);
@@ -63,3 +63,7 @@ if($_POST["btn"] == "登録"){
     </form>
 
 </body>
+
+<?php
+    $mysqli->close();
+?>

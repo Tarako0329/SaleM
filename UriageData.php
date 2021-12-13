@@ -2,8 +2,8 @@
 <?php
 
 // 設定ファイルインクルード【開発中】
-
-require "functions.php";
+$pass=dirname(__FILE__);
+require "../SQ/functions.php";
 
 //売上実績の取得
 if($_POST["UriDate"]<>""){
@@ -109,3 +109,7 @@ echo "<tr><td></td><td></td><td></td><td></td><td>合計</td><td>".$Goukei."-</t
     </table>
     </div>
 </body>
+
+<?php
+    $mysqli->close();
+?>
