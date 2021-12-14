@@ -1,8 +1,10 @@
 <!DOCTYPE html>
+<html lang="ja">
 <?php
 
 // 設定ファイルインクルード【開発中】
 $pass=dirname(__FILE__);
+require "version.php";
 require "../SQ/functions.php";
 
 //売上登録
@@ -69,11 +71,24 @@ if($_POST["commit_btn"] <> ""){
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!--フォントCDN-->
     <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+    <!--ファビコンCDN-->
+    <link rel="apple-touch-icon" href="../favicons/GIfavi.png">
+    <link rel="icon" href="../favicons/GIfavi.png">
     
-    <link rel="stylesheet" href="css/style.css" >
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <!-- オリジナル CSS -->
+    <link rel="stylesheet" href="css/style_EVregi.css" >
 </head>
+<!-- Bootstrap Javascript(jQuery含む) -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
 <script>
+
 window.onload = function() {
 
      // オブジェクトと変数の準備
@@ -102,7 +117,6 @@ window.onload = function() {
         echo "        cnt_suryou_".$row["shouhinCD"]." += 1;\n";
         echo "        total_pay += ".$row["tanka"].";\n";
         echo "        suryou_".$row["shouhinCD"].".value = cnt_suryou_".$row["shouhinCD"].";\n";
-        /*echo "        items_".$row["shouhinCD"].".style.display = 'none';\n";*/
         echo "        kaikei_disp.innerHTML = total_pay;\n";
         echo "    };\n";
         echo "\n";
@@ -111,7 +125,11 @@ window.onload = function() {
     //確認・確定ボタン
     var order_chk = document.getElementById('order_chk');
     var btn_commit = document.getElementById('btn_commit');
+    //電卓表示ボタン
+    var dentaku = document.getElementById('dentaku');
+    
     order_chk.onclick = function(){
+        //注文確認ボタン。選択されてないメニューを消し、ボタンの表示を変更する。
         <?php
         $result->data_seek(0);
         while($row = $result->fetch_assoc()){
@@ -120,6 +138,22 @@ window.onload = function() {
         ?>
         order_chk.style.display = 'none';
         btn_commit.style.display = 'block';
+        dentaku.style.display = 'block';
+    }
+    
+    dentaku.onclick = function(){
+        //電卓モーダルに会計金額を表示
+        seikyuu.innerHTML = total_pay;
+    }
+
+    //計算ボタン
+    var keisan = document.getElementById('keisan');
+    var azukari = document.getElementById('azukari');
+    keisan.onclick = function(){
+        //電卓モーダルに会計金額を表示
+        var azukarikin = azukari.value;
+        var oturikin = azukarikin - total_pay;
+        oturi.innerHTML = oturikin;
     }
 
     // メニューボタンクリック処理
@@ -139,7 +173,7 @@ window.onload = function() {
 };    
 </script>
 
-<form method = "post" action="menu2.php">
+<form method = "post" action="EVregi.php">
     
 <header>
     <div class="yagou"><a href="">Cafe Presents</a></div>
@@ -186,14 +220,37 @@ window.onload = function() {
 
 <footer>
     <div class="kaikei">お会計　￥<span id="kaikei">0</span>円</div>
-    <div class="right">
+    <div class="right1">
+        <button type='button' class='btn btn--chk' style='display:none;' id='dentaku' data-toggle="modal" data-target="#testModal">電　卓</button>
+    </div>
+    <div class="right2">
         <button type='submit' class='btn btn--commit' style='display:none;' id='btn_commit' name='commit_btn' value="commit">登　録</button>
         <button type='button' class='btn btn--chk' id='order_chk'>確　認</button>
     </div>
 </footer>
 
+<!--モーダル電卓-->
+<div class="modal fade" id="testModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog  modal-dialog-centered">
+        <div class="modal-content" style="font-size: 5.0rem; font-weight: 800;">
+            <div class="modal-header">
+                <div class="modal-title" id="myModalLabel">電　卓</div>
+            </div>
+            <div class="modal-body">
+                <label>お預り</label><br>
+                <input type="number" id="azukari" value=0><br>
+                <p>お会計：￥<span id="seikyuu">0</span></p>
+                <button type="button" id="keisan">計　算</button>
+                <p>お釣り：￥<span id="oturi">0</span></p>    
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
 </form>
-
+</html>
 <?php
     $mysqli->close();
 ?>

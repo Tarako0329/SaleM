@@ -1,15 +1,19 @@
 <!DOCTYPE html>
+<html lang="ja">
 <?php
 
 // 設定ファイルインクルード【開発中】
 $pass=dirname(__FILE__);
+require "version.php";
 require "../SQ/functions.php";
 
 //売上実績の取得
 if($_POST["UriDate"]<>""){
     $wheresql="where UriDate = '".$_POST["UriDate"]."'";
+    $UriFrom = (string)$_POST["UriDate"];
 }else{
-    $wheresql="where UriDate like '%'";
+    $wheresql="where UriDate like '".(string)date("Y-m-d")."'";
+    $UriFrom = (string)date("Y-m-d");
 }
 if($_POST["Event"]<>""){
     $wheresql = $wheresql." AND Event='".$_POST["Event"]."'";
@@ -19,11 +23,17 @@ if($_POST["Tokui"]<>""){
 }
 
 if($_POST["Type"]=="rireki" || $_POST["Type"]==""){
+    //履歴取得
     $sql = "select * from UriageData ".$wheresql." order by UriageNO";
 }elseif($_POST["Type"]=="shubetu"){
-    $sql = "select UriDate,'-' as UriageNO,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin from UriageData ".$wheresql." group by UriDate,ShouhinNM,tanka order by UriageNO";
+    //商品別<!-- 何が売れてるか知りたい -->
+    $sql = "select '-' as UriDate,'-' as Event,'-' as TokuisakiNM,'-' as UriageNO,'-' as Event,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin from UriageData ".$wheresql." group by ShouhinNM,tanka order by ShouhinNM";
 }elseif($_POST["Type"]=="UriNO"){
-    $sql = "select UriDate,UriageNO,'-' as ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin from UriageData ".$wheresql." group by UriDate,ShouhinNM,tanka order by UriageNO";
+    //Event会計別<!-- イベントでの客単価を知りたい -->
+    $sql = "select '-' as UriDate,UriageNO,Event,'-' as TokuisakiNM,'-' as ShouhinNM,sum(su) as su,0 as tanka,sum(UriageKin) as UriageKin from UriageData ".$wheresql." group by Event,UriageNO order by Event,UriageNO";
+}elseif($_POST["Type"]=="EVTKshubetu"){
+    //顧客/Event別・種類別<!-- 顧客・イベントでの売れ筋を知りたい -->
+    $sql = "select '-' as UriDate,'-' as UriageNO,Event,TokuisakiNM,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin from UriageData ".$wheresql." group by Event,TokuisakiNM,ShouhinNM,tanka order by Event,TokuisakiNM,ShouhinNM";
 }else{
     echo "そんな！";
 }
@@ -63,13 +73,17 @@ $TKrow_cnt = $result->num_rows;
     <form method="post" action="UriageData.php">
     <div class="container-fluid" style="position: fixed;">
         <div>
-        売上日：<input type="date" name="UriDate" maxlength="10" value="<?php echo (string)date("Y-m-d"); ?>">
+        売上日：<input type="date" name="UriDate" maxlength="10" value="<?php echo $UriFrom; ?>">
         イベント名：
         <select name="Event">
             <option value=""></option>
             <?php
             while($row = $EVresult->fetch_assoc()){
-                echo "<option value='".$row["Event"]."'>".$row["Event"]."</option>\n";
+                if($_POST["Event"]==$row["Event"]){
+                    echo "<option value='".$row["Event"]."' selected>".$row["Event"]."</option>\n";
+                }else{
+                    echo "<option value='".$row["Event"]."'>".$row["Event"]."</option>\n";
+                }
             }
             ?>
         </select>
@@ -79,14 +93,19 @@ $TKrow_cnt = $result->num_rows;
             <option value=""></option>
             <?php
             while($row = $TKresult->fetch_assoc()){
-                echo "<option value='".$row["TokuisakiNM"]."'>".$row["TokuisakiNM"]."</option>\n";
+                 if($_POST["Tokui"]==$row["TokuisakiNM"]){
+                    echo "<option value='".$row["TokuisakiNM"]."' selected>".$row["TokuisakiNM"]."</option>\n";
+                }else{
+                    echo "<option value='".$row["TokuisakiNM"]."'>".$row["TokuisakiNM"]."</option>\n";
+                }
             }
             ?>
         </select>
         表示：<select name="Type">
-            <option value="rireki">履歴</option>
-            <option value="shubetu">種類別</option>
-            <option value="UriNO">顧客別</option>
+            <option value="rireki" <?php if($_POST["Type"]=="rireki"){echo "selected";}  ?> >履歴</option>
+            <option value="shubetu" <?php if($_POST["Type"]=="shubetu"){echo "selected";}  ?> >種類別</option>     <!-- 何が売れてるか知りたい -->
+            <option value="UriNO" <?php if($_POST["Type"]=="UriNO"){echo "selected";}  ?> >Event会計別</option>  <!-- イベントでの客単価を知りたい -->
+            <option value="EVTKshubetu" <?php if($_POST["Type"]=="EVTKshubetu"){echo "selected";}  ?> >顧客/Event別・種類別</option> <!-- 顧客・イベントでの売れ筋を知りたい -->
         </select>
         <input type="submit" value="決定" class="btn btn-primary">
         </div>
@@ -97,19 +116,21 @@ $TKrow_cnt = $result->num_rows;
 <body>    
     <div class="container-fluid">
     <table class="table-striped">
-        <tr><td>売上日</td><td>売上№</td><td>商品</td><td style="width:3rem;">個数</td><td style="width:3rem;">単価</td><td style="width:5rem;">売上</td></tr>
+        <tr><td>売上日</td><td>Event名</td><td>顧客名</td><td>売上№</td><td>商品</td><td style="width:3rem;">個数</td><td style="width:3rem;">単価</td><td style="width:5rem;">売上</td></tr>
 <?php    
 $Goukei=0;
 while($row = $result->fetch_assoc()){
-    echo "<tr><td>".$row["UriDate"]."</td><td class='text-center'>".$row["UriageNO"]."</td><td>".rot13decrypt($row["ShouhinNM"])."</td><td class='text-right'>".$row["su"]."</td><td class='text-right'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td></tr>\n";
+    echo "<tr><td>".$row["UriDate"]."</td><td>".$row["Event"]."</td><td>".$row["TokuisakiNM"]."</td><td class='text-center'>".$row["UriageNO"]."</td><td>".rot13decrypt($row["ShouhinNM"])."</td><td class='text-right'>".$row["su"]."</td><td class='text-right'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td></tr>\n";
     $Goukei = $Goukei + $row["UriageKin"];
 }
-echo "<tr><td></td><td></td><td></td><td></td><td>合計</td><td>".$Goukei."-</td></tr>\n";
+echo "<tr><td></td><td></td><td></td><td></td><td></td><td></td><td>合計</td><td>".$Goukei."-</td></tr>\n";
 ?>
     </table>
     </div>
 </body>
 
+<footer></footer>
+</html>
 <?php
     $mysqli->close();
 ?>

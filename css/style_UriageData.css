@@ -1,5 +1,7 @@
 html {
-  font-size: 62.5%; /*ルートサイズ10px=1rem*/
+    box-sizing: border-box;
+    font-size: 62.5%; /*ルートサイズ10px=1rem*/
+    touch-action: manipulation; /*スマフォのダブルタップによるズームを防ぐ*/
 }
 body {
     padding-top: 70px; /* ヘッダーの後ろに要素が隠れないようにするため */

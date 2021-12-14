@@ -1,8 +1,10 @@
 <!DOCTYPE html>
+<html lang="ja">
 <?php
 
 // 設定ファイルインクルード【開発中】
 $pass=dirname(__FILE__);
+require "version.php";
 require "../SQ/functions.php";
 
 if($_POST["btn"] == "登録"){
@@ -63,7 +65,7 @@ if($_POST["btn"] == "登録"){
     </form>
 
 </body>
-
+</html>
 <?php
     $mysqli->close();
 ?>

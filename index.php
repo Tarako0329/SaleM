@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+<html lang="ja">
 <?php
 
 // 設定ファイルインクルード【開発中】
 $pass=dirname(__FILE__);
+require "version.php";
 require "../SQ/functions.php";
-
 
 ?>
 <head>
@@ -14,6 +15,10 @@ require "../SQ/functions.php";
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+    <!--ファビコンCDN-->
+    <link rel="apple-touch-icon" href="../favicons/GIfavi.png">
+    <link rel="icon" href="../favicons/GIfavi.png">
+    
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <!-- オリジナル CSS -->
@@ -43,6 +48,7 @@ require "../SQ/functions.php";
 <?php
     $array = [
         'Eventレジ'=>['EVregi.php'],
+        '個別売上'=>['Kouri.php'],
         '売上実績'=>['UriageData.php'],
         '商品登録'=>['shouhinMSedit.php']
     ];
@@ -71,3 +77,4 @@ require "../SQ/functions.php";
 </footer>
 
 </form>
+</html>

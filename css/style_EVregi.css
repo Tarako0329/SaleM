@@ -1,7 +1,8 @@
 html {
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  font-size: 62.5%; /*ルートサイズ10px rem算出をしやすくするために*/
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    font-size: 62.5%; /*ルートサイズ10px rem算出をしやすくするために*/
+    touch-action: manipulation; /*スマフォのダブルタップによるズームを防ぐ*/
 }
 body {
     padding-top: 70px; /* ヘッダーの後ろに要素が隠れないようにするため */
@@ -63,22 +64,22 @@ INPUT.ev{
 
 
 .menu{
-   display:flex;
-   flex-wrap:wrap;
-   list-style:none;
-   margin:0;
-   padding:0;
+    display:flex;
+    flex-wrap:wrap;
+    list-style:none;
+    margin:0;
+    padding:0;
  }
 .items{
-   width:46%;
-   margin:5px 2%;
-   /*height:200px; */
-   height:150px; 
-   line-height:80%; 
-   /*background:#eb6100;*/
-   background:#fff;
-   text-align:center;
-   font-size: 0;
+    width:46%;
+    margin:5px 2%;
+    /*height:200px; */
+    height:150px; 
+    line-height:80%; 
+    /*background:#eb6100;*/
+    background:#fff;
+    text-align:center;
+    font-size: 0;
     
 }
 .ordered{
@@ -129,17 +130,25 @@ footer{
 }
 
 .kaikei{
-    width:80%;
+    width:60%;
     margin:3.5% auto; /*中央寄せ*/
     text-align:center;
     font-size: 5.0rem;
     font-weight: 800;
 }
-.right{
+.right2{
+    /*確認・登録ボタンエリア*/
     background: #6fb5ff;
     width:20%;
     /*height:70px;*/
 }
+.right1{
+    /*電卓ボタンエリア*/
+    background: #6fb5ff;
+    width:20%;
+    /*height:70px;*/
+}
+
 .btn--commit,
 a.btn--commit {
     /*注文ボタン*/
@@ -157,12 +166,27 @@ a.btn--chk {
     font-size: 3rem;
 }
 
-/*まずはお決まりのボックスサイズ算出をborer-boxに */
+#azukari{
+    /*INPUT 数量部*/
+    border-right:none;
+    border-left:none;
+    border-top:none;
+    border-color:#808080;
+    text-align:center;
+    font-size: 5rem;
+    font-weight: 600;
+    /*color: #fff;*/
+    /*height:80%;     */
+    width:90%;
+    background: #fff;
+    padding:0;
+}
+
 *,
 *:before,
 *:after {
-  -webkit-box-sizing: inherit;
-  box-sizing: inherit;
+    -webkit-box-sizing: inherit;
+    box-sizing: inherit;
 }
 
 .btn,
