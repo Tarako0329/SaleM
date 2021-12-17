@@ -123,13 +123,18 @@ while($row = $result->fetch_assoc()){
     echo "<tr><td>".$row["UriDate"]."</td><td>".$row["Event"]."</td><td>".$row["TokuisakiNM"]."</td><td class='text-center'>".$row["UriageNO"]."</td><td>".rot13decrypt($row["ShouhinNM"])."</td><td class='text-right'>".$row["su"]."</td><td class='text-right'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td></tr>\n";
     $Goukei = $Goukei + $row["UriageKin"];
 }
-echo "<tr><td></td><td></td><td></td><td></td><td></td><td></td><td>合計</td><td>".$Goukei."-</td></tr>\n";
+//echo "<tr><td></td><td></td><td></td><td></td><td></td><td></td><td>合計</td><td>".$Goukei."-</td></tr>\n";
+
 ?>
     </table>
     </div>
 </body>
 
-<footer></footer>
+<footer>
+<?php
+echo "<div class='container-fluid'>合計：￥".$Goukei."-</div>\n";
+?>
+</footer>
 </html>
 <?php
     $mysqli->close();

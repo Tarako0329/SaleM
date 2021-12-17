@@ -101,7 +101,7 @@ window.onload = function() {
 <?php     
 	$mysqli = new mysqli(sv, user, pass, dbname);
 	//商品M取得
-	$sql = "select * from ShouhinMS order by hyoujiNO";
+	$sql = "select * from ShouhinMS where hyoujiKBN1='on' order by hyoujiNO";
 	$result = $mysqli->query( $sql );
 	$row_cnt = $result->num_rows;
     while($row = $result->fetch_assoc()){
@@ -238,7 +238,7 @@ window.onload = function() {
             </div>
             <div class="modal-body">
                 <label>お預り</label><br>
-                <input type="number" id="azukari" value=0><br>
+                <input type="number" id="azukari"><br>
                 <p>お会計：￥<span id="seikyuu">0</span></p>
                 <button type="button" id="keisan">計　算</button>
                 <p>お釣り：￥<span id="oturi">0</span></p>    

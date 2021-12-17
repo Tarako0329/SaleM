@@ -50,7 +50,8 @@ require "../SQ/functions.php";
         'Eventレジ'=>['EVregi.php'],
         '個別売上'=>['Kouri.php'],
         '売上実績'=>['UriageData.php'],
-        '商品登録'=>['shouhinMSedit.php']
+        '商品登録'=>['shouhinMSedit.php'],
+        '商品一覧'=>['shouhinMSList.php']
     ];
  
 	foreach($array as $key=>$vals){
@@ -73,8 +74,9 @@ require "../SQ/functions.php";
     </div>
 </body>
 
+<!--
 <footer>
 </footer>
-
+-->
 </form>
 </html>

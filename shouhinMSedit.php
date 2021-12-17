@@ -27,17 +27,18 @@ if($_POST["btn"] == "登録"){
 	$stmt = $mysqli->prepare($sqlstr);
 	$stmt->execute();
 	$stmt = $mysqli->query("UNLOCK TABLES");
-    echo $_POST["shouhinNM"]."　が登録されました。";
+    echo $_POST["shouhinNM"]."　が登録されました。<br>";
+    //echo $_POST["hyoujiKBN1"];
 }
 ?>
 <head>
-    <!--<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <META http-equiv='Content-Type' content='text/html; charset=UTF-8'>
     <TITLE>Cafe Presents　取扱商品登録画面</TITLE>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <!-- オリジナル CSS -->
-    <!--<link rel="stylesheet" href="css/style.css" >-->
+    <link rel="stylesheet" href="css/style_ShouhinMSedit.css" >
 </head>
  
 <!-- Bootstrap Javascript(jQuery含む) -->
@@ -47,25 +48,112 @@ if($_POST["btn"] == "登録"){
 
 <header>取扱商品登録画面</header>
 <body>
-    <form method="post" action="shouhinMSedit.php">
-        <div>商品名   ：<input type="text" name="shouhinNM"></div>
-        <div>単価     ：<input type="text" name="tanka"></div>
-        <div>税率     ：<input type="text" name="zeiritu"></div>
-        <div>税区分　 ：<input type="text" name="zeikbn"></div>
-        <div>内容量   ：<input type="text" name="utisu"></div>
-        <div>単位     ：<input type="text" name="tani"></div>
-        <div>分類1    ：<input type="text" name="bunrui1"></div>
-        <div>分類2    ：<input type="text" name="bunrui2"></div>
-        <div>分類3    ：<input type="text" name="bunrui3"></div>
-        <div>表示区分1：<input type="text" name="hyoujiKBN1"></div>
-        <div>表示区分2：<input type="text" name="hyoujiKBN2"></div>
-        <div>表示区分3：<input type="text" name="hyoujiKBN3"></div>
-        <div>表示順   ：<input type="text" name="hyoujiNO"></div>
-        <button type="submit" name="btn" value="登録">登録</button>
+    <div class="container-fluid">
+    <form method="post" class="form-horizontal" action="shouhinMSedit.php">
+        <div class="form-group form-inline">
+            <label for="shouhinNM" class="col-2 col-md-1 control-label">商品名</label>
+            <div class=" col-10">
+                <input type="text" class="form-control" id="shouhinNM" name="shouhinNM">
+            </div>
+        </div>
+        <div class="form-group form-inline">
+            <label for="tanka" class="col-2 col-md-1 control-label">単価</label>
+            <div class=" col-10">
+                <input type="text" class="form-control" id="tanka" name="tanka">
+            </div>
+        </div>
+        <div class="form-group form-inline">
+            <label for="zeiritu" class="col-2 col-md-1 control-label">税率</label>
+            <div class=" col-10">
+                <input type="text" class="form-control" id="zeiritu" name="zeiritu">
+            </div>
+        </div>
+        <div class="form-group form-inline">
+            <label for="zeikbn" class="col-2 col-md-1 control-label">税区分</label>
+            <div class=" col-10">
+                <input type="text" class="form-control" id="zeikbn" name="zeikbn">
+            </div>
+        </div>
+        <div class="form-group form-inline">
+            <label for="utisu" class="col-2 col-md-1 control-label">内容量</label>
+            <div class=" col-10">
+                <input type="text" class="form-control" id="utisu" name="utisu">
+            </div>
+        </div>
+        <div class="form-group form-inline">
+            <label for="tani" class="col-2 col-md-1 control-label">単位</label>
+            <div class=" col-10">
+                <input type="text" class="form-control" id="tani" name="tani">
+            </div>
+        </div>
+        <div class="form-group form-inline">
+            <label for="bunrui1" class="col-2 col-md-1 control-label">分類1</label>
+            <div class=" col-10">
+                <input type="text" class="form-control" id="bunrui1" name="bunrui1">
+            </div>
+        </div>
+        <div class="form-group form-inline">
+            <label for="bunrui2" class="col-2 col-md-1 control-label">分類2</label>
+            <div class=" col-10">
+                <input type="text" class="form-control" id="bunrui2" name="bunrui2">
+            </div>
+        </div>
+        <div class="form-group form-inline">
+            <label for="bunrui3" class="col-2 col-md-1 control-label">分類3</label>
+            <div class=" col-10">
+                <input type="text" class="form-control" id="bunrui3" name="bunrui3">
+            </div>
+        </div>
+        <div class="form-group form-inline form-switch">
+            <label for="hyoujiKBN1" class="col-2 col-md-1 control-label">レジ対象</label>
+            <div class=" col-10">
+                <input type="checkbox" class="form-check-input" id="hyoujiKBN1" name="hyoujiKBN1">
+            </div>
+        </div>
+        <div class="form-group form-inline">
+            <label for="hyoujiKBN2" class="col-2 col-md-1 control-label">表示区分2</label>
+            <div class=" col-10">
+                <input type="text" class="form-control" id="hyoujiKBN2" name="hyoujiKBN2">
+            </div>
+        </div>
+        <div class="form-group form-inline">
+            <label for="hyoujiKBN3" class="col-2 col-md-1 control-label">表示区分3</label>
+            <div class=" col-10">
+                <input type="text" class="form-control" id="hyoujiKBN3" name="hyoujiKBN3">
+            </div>
+        </div>
+        <div class="form-group form-inline">
+            <label for="hyoujiNO" class="col-2 col-md-1 control-label">表示順</label>
+            <div class=" col-10">
+                <input type="text" class="form-control" id="hyoujiNO" name="hyoujiNO">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary" name="btn" value="登録">登録</button>
     </form>
+    </div>
 
 </body>
 </html>
 <?php
     $mysqli->close();
 ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
