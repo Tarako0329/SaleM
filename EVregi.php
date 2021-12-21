@@ -1,26 +1,33 @@
 <!DOCTYPE html>
 <html lang="ja">
 <?php
+session_start();
+require "./vendor/autoload.php";
 
-// 設定ファイルインクルード【開発中】
 $pass=dirname(__FILE__);
 require "version.php";
-require "../SQ/functions.php";
+require "functions.php";
+
+//.envの取得
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+//サイトタイトルの取得
+$title = $_ENV["TITLE"];
+//暗号化キー
+$key = $_ENV["KEY"];
+//PGバージョン差分補正
+updatedb($_ENV["SV"], $_ENV["USER"], $_ENV["PASS"], $_ENV["DBNAME"] ,$version);
+//DB接続
+$mysqli = new mysqli($_ENV["SV"], $_ENV["USER"], $_ENV["PASS"], $_ENV["DBNAME"]);
+//MySQLエラーレポート用共通宣言
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 //売上登録
 if($_POST["commit_btn"] <> ""){
-/*
-    print_r($_POST["ORDERS"]);
-    echo "<br>deta?<br>";
-    echo $_POST["ORDERS"][0]["CD"]."<br>";
-*/    
     $array = $_POST["ORDERS"];
     $sqlstr = "";
-/*    
-    echo "<br>";
-    print_r($array);
-    echo "<br>";
-*/    
+
     //売上番号の取得
     $sqlstr = "select max(UriageNO) as UriageNO from UriageData;";
     $result = $mysqli->query( $sqlstr );
@@ -66,26 +73,13 @@ if($_POST["commit_btn"] <> ""){
 
 ?>
 <head>
-    <META http-equiv='Content-Type' content='text/html; charset=UTF-8'>
-    <TITLE>Cafe Presentsメニュー</TITLE>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!--フォントCDN-->
-    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
-    <!--ファビコンCDN-->
-    <link rel="apple-touch-icon" href="../favicons/GIfavi.png">
-    <link rel="icon" href="../favicons/GIfavi.png">
-    
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <!-- オリジナル CSS -->
-    <link rel="stylesheet" href="css/style_EVregi.css" >
+    <?php 
+    //共通部分、bootstrap設定、フォントCND、ファビコン等
+    include "head.html" 
+    ?>
+    <!--ページ専用CSS--><link rel="stylesheet" href="css/style_EVregi.css" >
+    <TITLE><?php echo $title." レジ";?></TITLE>
 </head>
-<!-- Bootstrap Javascript(jQuery含む) -->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
 <script>
 
@@ -99,7 +93,7 @@ window.onload = function() {
      
      //PHPで繰り返し表示。メニューボタン数に応じて準備する
 <?php     
-	$mysqli = new mysqli(sv, user, pass, dbname);
+	//$mysqli = new mysqli(sv, user, pass, dbname);
 	//商品M取得
 	$sql = "select * from ShouhinMS where hyoujiKBN1='on' order by hyoujiNO";
 	$result = $mysqli->query( $sql );
@@ -176,7 +170,7 @@ window.onload = function() {
 <form method = "post" action="EVregi.php">
     
 <header>
-    <div class="yagou"><a href="">Cafe Presents</a></div>
+    <div class="yagou"><a href="index.php"><?php echo $title;?></a></div>
     <div class="event"><input type="text" class="ev" name="EV" value="<?php echo $_POST["EV"] ?>"</div>
 </header>
 
@@ -191,7 +185,7 @@ window.onload = function() {
 
 	while($row = $result->fetch_assoc()){
         echo "  <div class ='items' id='items_".$row["shouhinCD"]."'>\n";
-        echo "      <button type='button' class='btn btn--orange' id='btn_menu_".$row["shouhinCD"]."'>".rot13decrypt($row["shouhinNM"])."\n";
+        echo "      <button type='button' class='btn btn--menu' id='btn_menu_".$row["shouhinCD"]."'>".rot13decrypt($row["shouhinNM"])."\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][CD]' value = '".$row["shouhinCD"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][NM]' value = '".$row["shouhinNM"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][UTISU]' value = '".$row["utisu"]."'>\n";
@@ -219,22 +213,25 @@ window.onload = function() {
 </body>
 
 <footer>
-    <div class="kaikei">お会計　￥<span id="kaikei">0</span>円</div>
+    <div class="kaikei">お会計 ￥<span id="kaikei">0</span>-</div>
     <div class="right1">
-        <button type='button' class='btn btn--chk' style='display:none;' id='dentaku' data-toggle="modal" data-target="#testModal">電　卓</button>
+        <button type='button' class='btn btn--chk' style="border-radius:0;" id='dentaku' data-toggle="modal" data-target="#FcModal">釣　銭</button>
+    </div>
+    <div class="right3">
+        <button type='button' class='btn btn--chk' style="border:solid;border-top:none;border-bottom:none;border-color:#fff;border-radius: 0;" id='order_clear'>クリア</button>
     </div>
     <div class="right2">
-        <button type='submit' class='btn btn--commit' style='display:none;' id='btn_commit' name='commit_btn' value="commit">登　録</button>
-        <button type='button' class='btn btn--chk' id='order_chk'>確　認</button>
+        <button type='submit' class='btn btn--commit' style='display:none;border-radius:0;' id='btn_commit' name='commit_btn' value="commit">登　録</button>
+        <button type='button' class='btn btn--chk' style="border-radius:0;" id='order_chk'>確　認</button>
     </div>
 </footer>
 
 <!--モーダル電卓-->
-<div class="modal fade" id="testModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+<div class="modal fade" id="FcModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
     <div class="modal-dialog  modal-dialog-centered">
-        <div class="modal-content" style="font-size: 5.0rem; font-weight: 800;">
+        <div class="modal-content" style="font-size: 3.0rem; font-weight: 800;">
             <div class="modal-header">
-                <div class="modal-title" id="myModalLabel">電　卓</div>
+                <!--<div class="modal-title" id="myModalLabel">電　卓</div>-->
             </div>
             <div class="modal-body">
                 <label>お預り</label><br>

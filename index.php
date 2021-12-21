@@ -1,33 +1,38 @@
 <!DOCTYPE html>
 <html lang="ja">
 <?php
+session_start();
+require "./vendor/autoload.php";
 
-// 設定ファイルインクルード【開発中】
 $pass=dirname(__FILE__);
 require "version.php";
-require "../SQ/functions.php";
+require "functions.php";
+
+//.envの取得
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+//サイトタイトルの取得
+$title = $_ENV["TITLE"];
+//暗号化キー
+$key = $_ENV["KEY"];
+//PGバージョン差分補正
+updatedb($_ENV["SV"], $_ENV["USER"], $_ENV["PASS"], $_ENV["DBNAME"] ,$version);
+//DB接続
+$mysqli = new mysqli($_ENV["SV"], $_ENV["USER"], $_ENV["PASS"], $_ENV["DBNAME"]);
+//MySQLエラーレポート用共通宣言
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
 
 ?>
 <head>
-    <META http-equiv='Content-Type' content='text/html; charset=UTF-8'>
-    <TITLE>Cafe Presents</TITLE>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
-    <!--ファビコンCDN-->
-    <link rel="apple-touch-icon" href="../favicons/GIfavi.png">
-    <link rel="icon" href="../favicons/GIfavi.png">
-    
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <!-- オリジナル CSS -->
-    <link rel="stylesheet" href="css/style_index.css" >
+    <?php 
+    //共通部分、bootstrap設定、フォントCND、ファビコン等
+    include "head.html" 
+    ?>
+    <!--ページ専用CSS--><link rel="stylesheet" href="css/style_index.css" >
+    <TITLE><?php echo $title;?></TITLE>
 </head>
-<!-- Bootstrap Javascript(jQuery含む) -->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
 <script>
   
@@ -36,8 +41,7 @@ require "../SQ/functions.php";
 <form method = "post" action="menu2.php">
     
 <header>
-    <div class="yagou"><a href="">Cafe Presents</a></div>
-    <div class="event"><input type="text" class="ev" name="EV" value="<?php echo $_POST["EV"] ?>"</div>
+    <div class="yagou"><a href=""><?php echo $title;?></a></div>
 </header>
 
 <body>
@@ -80,3 +84,6 @@ require "../SQ/functions.php";
 -->
 </form>
 </html>
+<?php
+    $mysqli->close();
+?>

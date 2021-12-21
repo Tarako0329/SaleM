@@ -1,28 +1,4 @@
-html {
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    font-size: 62.5%; /*ルートサイズ10px rem算出をしやすくするために*/
-    touch-action: manipulation; /*スマフォのダブルタップによるズームを防ぐ*/
-}
-body {
-    padding-top: 70px; /* ヘッダーの後ろに要素が隠れないようにするため */
-    padding-bottom:150px; /* フッターーの後ろに要素が隠れないようにするため */
-    font-family: 'Kosugi Maru', sans-serif;
-}
-header{
-    height: 70px; /* 高さを70pxに指定 */
-    padding: 5px 40px; /* ヘッダーに上下左右それぞれ余白を指定 */
-    box-sizing: border-box; /* padding分を含んで幅を100%にするため */
-    background: #ff838b;
-    position: fixed; /* ウィンドウを基準に画面に固定 */
-    top: 0; /* 上下の固定位置を上から0pxにする */
-    left: 0; /* 左右の固定位置を左から0pxにする */
-    width: 100%;
-    z-index: 99;
-    display: flex;
-    font-size: 4.5rem;
-    font-weight: 700;
-}
+
 .yagou{
     width: 80%;
     height: 100%;
@@ -74,7 +50,7 @@ INPUT.ev{
     width:46%;
     margin:5px 2%;
     /*height:200px; */
-    height:150px; 
+    height:10rem; 
     line-height:80%; 
     /*background:#eb6100;*/
     background:#fff;
@@ -90,22 +66,22 @@ INPUT.ev{
     line-height:30px; 
     background:#fff;
     text-align:center;
-    font-size: 3rem;
+    font-size: 2rem;
     font-weight: 700;
    
 }
-.btn--orange,
-a.btn--orange {
+.btn--menu,
+a.btn--menu {
     /*メニューボタン*/
     color: #fff;
     background-color: #00bfff;
     height:80%;     
-    font-size: 3.5rem;
+    font-size: 2.0rem;
 }
 INPUT.order{
     border:none;
     text-align:center;
-    font-size: 3rem;
+    font-size: 2rem;
     font-weight: 700;
     background:#fff;
 }
@@ -127,26 +103,35 @@ footer{
     Right: 0;
     width: 100%;
     display: flex;    
+    flex-wrap:wrap
 }
 
 .kaikei{
-    width:60%;
-    margin:3.5% auto; /*中央寄せ*/
+    width:100%;
+    height:70px;
+    margin:10px 0 auto; /*中央寄せ*/
     text-align:center;
-    font-size: 5.0rem;
+    font-size: 3.0rem;
     font-weight: 800;
+}
+.right3{
+    /*クリアボタンエリア*/
+    background: #6fb5ff;
+    width:33%;
+    height:80px;
+    text-align:center;
 }
 .right2{
     /*確認・登録ボタンエリア*/
     background: #6fb5ff;
-    width:20%;
-    /*height:70px;*/
+    width:34%;
+    height:80px;
 }
 .right1{
     /*電卓ボタンエリア*/
     background: #6fb5ff;
-    width:20%;
-    /*height:70px;*/
+    width:33%;
+    height:80px;
 }
 
 .btn--commit,
@@ -155,7 +140,7 @@ a.btn--commit {
     color: #fff;
     background-color: #eb6100;
     height:100%; 
-    font-size: 3rem;
+    font-size: 2rem;
 }
 .btn--chk,
 a.btn--chk {
@@ -163,7 +148,7 @@ a.btn--chk {
     color: #fff;
     background-color: #9acd32;
     height:100%; 
-    font-size: 3rem;
+    font-size: 2rem;
 }
 
 #azukari{
@@ -211,5 +196,6 @@ button.btn {
     letter-spacing: 0.1em;
     color: #212529;
     border-radius: 0.5rem;
+    white-space: normal;
 }
 

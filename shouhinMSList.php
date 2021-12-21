@@ -45,6 +45,11 @@ $row_cnt = $result->num_rows;
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <META http-equiv='Content-Type' content='text/html; charset=UTF-8'>
     <TITLE>Cafe Presents　取扱商品 確認・編集</TITLE>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!--フォントCDN-->
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <!-- オリジナル CSS -->
@@ -56,7 +61,9 @@ $row_cnt = $result->num_rows;
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-<header>取扱商品 確認・編集 画面
+<header>
+    <div class="yagou"><a href="index.php">Cafe Presents</a></div>
+    <p style="font-size:1rem;">  取扱商品 確認・編集 画面</p>
 </header>
 
 <body>    

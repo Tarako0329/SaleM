@@ -1,19 +1,43 @@
 <!DOCTYPE html>
 <html lang="ja">
 <?php
+session_start();
+require "./vendor/autoload.php";
 
-// 設定ファイルインクルード【開発中】
 $pass=dirname(__FILE__);
 require "version.php";
-require "../SQ/functions.php";
+require "functions.php";
+
+//.envの取得
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+//サイトタイトルの取得
+$title = $_ENV["TITLE"];
+//暗号化キー
+$key = $_ENV["KEY"];
+//PGバージョン差分補正
+updatedb($_ENV["SV"], $_ENV["USER"], $_ENV["PASS"], $_ENV["DBNAME"] ,$version);
+//DB接続
+$mysqli = new mysqli($_ENV["SV"], $_ENV["USER"], $_ENV["PASS"], $_ENV["DBNAME"]);
+//MySQLエラーレポート用共通宣言
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
 
 //売上実績の取得
 if($_POST["UriDate"]<>""){
-    $wheresql="where UriDate = '".$_POST["UriDate"]."'";
+    $wheresql="where UriDate >= '".$_POST["UriDate"]."'";
     $UriFrom = (string)$_POST["UriDate"];
 }else{
-    $wheresql="where UriDate like '".(string)date("Y-m-d")."'";
+    $wheresql="where UriDate >= '".(string)date("Y-m-d")."'";
     $UriFrom = (string)date("Y-m-d");
+}
+if($_POST["UriDateTo"]<>""){
+    $wheresql=$wheresql." AND UriDate <= '".$_POST["UriDateTo"]."'";
+    $UriTo = (string)$_POST["UriDateTo"];
+}else{
+    $wheresql=$wheresql." AND UriDate <= '".$UriFrom."'";
+    $UriTo = $UriFrom;
 }
 if($_POST["Event"]<>""){
     $wheresql = $wheresql." AND Event='".$_POST["Event"]."'";
@@ -54,63 +78,18 @@ $TKrow_cnt = $result->num_rows;
 
 ?>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <META http-equiv='Content-Type' content='text/html; charset=UTF-8'>
-    <TITLE>Cafe Presents　売上実績</TITLE>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <!-- オリジナル CSS -->
-    <link rel="stylesheet" href="css/style_UriageData.css" >
+    <?php 
+    //共通部分、bootstrap設定、フォントCND、ファビコン等
+    include "head.html" 
+    ?>
+    <!--ページ専用CSS--><link rel="stylesheet" href="css/style_UriageData.css" >
+    <TITLE><?php echo $title." 売上実績";?></TITLE>
 </head>
  
-<!-- Bootstrap Javascript(jQuery含む) -->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<header style="flex-wrap:wrap">
+    <div style="width: 100%;"><a href="index.php"><?php echo $title;?></a></div>
+    <div style="font-size:1rem;"> 期間：<?php echo $UriFrom."～".$UriTo;?>　顧客：<?php echo $_POST["Tokui"];?>　EVENT：<?php echo $_POST["Event"];?></div>
 
-<header>売上実績画面
-
-    <form method="post" action="UriageData.php">
-    <div class="container-fluid" style="position: fixed;">
-        <div>
-        売上日：<input type="date" name="UriDate" maxlength="10" value="<?php echo $UriFrom; ?>">
-        イベント名：
-        <select name="Event">
-            <option value=""></option>
-            <?php
-            while($row = $EVresult->fetch_assoc()){
-                if($_POST["Event"]==$row["Event"]){
-                    echo "<option value='".$row["Event"]."' selected>".$row["Event"]."</option>\n";
-                }else{
-                    echo "<option value='".$row["Event"]."'>".$row["Event"]."</option>\n";
-                }
-            }
-            ?>
-        </select>
-        </div>
-        <div>
-        得意先：<select name="Tokui">
-            <option value=""></option>
-            <?php
-            while($row = $TKresult->fetch_assoc()){
-                 if($_POST["Tokui"]==$row["TokuisakiNM"]){
-                    echo "<option value='".$row["TokuisakiNM"]."' selected>".$row["TokuisakiNM"]."</option>\n";
-                }else{
-                    echo "<option value='".$row["TokuisakiNM"]."'>".$row["TokuisakiNM"]."</option>\n";
-                }
-            }
-            ?>
-        </select>
-        表示：<select name="Type">
-            <option value="rireki" <?php if($_POST["Type"]=="rireki"){echo "selected";}  ?> >履歴</option>
-            <option value="shubetu" <?php if($_POST["Type"]=="shubetu"){echo "selected";}  ?> >種類別</option>     <!-- 何が売れてるか知りたい -->
-            <option value="UriNO" <?php if($_POST["Type"]=="UriNO"){echo "selected";}  ?> >Event会計別</option>  <!-- イベントでの客単価を知りたい -->
-            <option value="EVTKshubetu" <?php if($_POST["Type"]=="EVTKshubetu"){echo "selected";}  ?> >顧客/Event別・種類別</option> <!-- 顧客・イベントでの売れ筋を知りたい -->
-        </select>
-        <input type="submit" value="決定" class="btn btn-primary">
-        </div>
-    </div>
-    </form>
 </header>
 
 <body>    
@@ -123,7 +102,6 @@ while($row = $result->fetch_assoc()){
     echo "<tr><td>".$row["UriDate"]."</td><td>".$row["Event"]."</td><td>".$row["TokuisakiNM"]."</td><td class='text-center'>".$row["UriageNO"]."</td><td>".rot13decrypt($row["ShouhinNM"])."</td><td class='text-right'>".$row["su"]."</td><td class='text-right'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td></tr>\n";
     $Goukei = $Goukei + $row["UriageKin"];
 }
-//echo "<tr><td></td><td></td><td></td><td></td><td></td><td></td><td>合計</td><td>".$Goukei."-</td></tr>\n";
 
 ?>
     </table>
@@ -131,10 +109,82 @@ while($row = $result->fetch_assoc()){
 </body>
 
 <footer>
-<?php
-echo "<div class='container-fluid'>合計：￥".$Goukei."-</div>\n";
-?>
+    <div class='kaikei'>合計：￥<?php echo $Goukei ?>-</div>
+
+    <div class="right1">
+        <button type='button' class='btn btn--chk' style="border-radius:0;" id='dentaku' data-toggle="modal" data-target="#UriModal">検　索</button>
+    </div>
+
 </footer>
+
+<!--売上実績検索条件-->
+<div class="modal fade" id="UriModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog  modal-dialog-centered">
+        <div class="modal-content" style="font-size: 1.0rem; font-weight: 600;">
+            
+            <form class="form-horizontal" method="post" action="UriageData.php">
+                <div class="modal-header">
+                    <div class="modal-title" id="myModalLabel">表示条件変更</div>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <label for="uridate" class="control-label">売上日～：</label>
+                        <input type="date" name="UriDate" maxlength="10" id="uridate" class="form-control" value="<?php echo $UriFrom; ?>">
+                    </div>
+                    <div>
+                        <label for="uridateto" class="control-label">～売上日：</label>
+                        <input type="date" name="UriDateTo" maxlength="10" id="uridateto" class="form-control" value="<?php echo $UriTo; ?>">
+                    </div>
+                    <div>
+                        <label for="Event" class="control-label">イベント名：</label>
+                        <select name="Event" id="Event" class="form-control">
+                            <option value=""></option>
+                            <?php
+                            while($row = $EVresult->fetch_assoc()){
+                                if($_POST["Event"]==$row["Event"]){
+                                    echo "<option value='".$row["Event"]."' selected>".$row["Event"]."</option>\n";
+                                }else{
+                                    echo "<option value='".$row["Event"]."'>".$row["Event"]."</option>\n";
+                                }
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="Tokui" class="control-label">得意先：</label>
+                        <select name="Tokui" id="Tokui" class="form-control">
+                            <option value=""></option>
+                            <?php
+                            while($row = $TKresult->fetch_assoc()){
+                                 if($_POST["Tokui"]==$row["TokuisakiNM"]){
+                                    echo "<option value='".$row["TokuisakiNM"]."' selected>".$row["TokuisakiNM"]."</option>\n";
+                                }else{
+                                    echo "<option value='".$row["TokuisakiNM"]."'>".$row["TokuisakiNM"]."</option>\n";
+                                }
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="Type" class="control-label">表示：</label>
+                        <select name="Type" id="Type" class="form-control">
+                            <option value="rireki" <?php if($_POST["Type"]=="rireki"){echo "selected";}  ?> >履歴</option>
+                            <option value="shubetu" <?php if($_POST["Type"]=="shubetu"){echo "selected";}  ?> >種類別</option>     <!-- 何が売れてるか知りたい -->
+                            <option value="UriNO" <?php if($_POST["Type"]=="UriNO"){echo "selected";}  ?> >Event会計別</option>  <!-- イベントでの客単価を知りたい -->
+                            <option value="EVTKshubetu" <?php if($_POST["Type"]=="EVTKshubetu"){echo "selected";}  ?> >顧客/Event別・種類別</option> <!-- 顧客・イベントでの売れ筋を知りたい -->
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" >決定</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
 </html>
 <?php
     $mysqli->close();
