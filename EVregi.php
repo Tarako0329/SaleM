@@ -133,12 +133,12 @@ window.onload = function() {
         order_chk.style.display = 'none';
         btn_commit.style.display = 'block';
         dentaku.style.display = 'block';
-    }
+    };
     
     dentaku.onclick = function(){
         //電卓モーダルに会計金額を表示
         seikyuu.innerHTML = total_pay;
-    }
+    };
 
     //計算ボタン
     var keisan = document.getElementById('keisan');
@@ -148,8 +148,8 @@ window.onload = function() {
         var azukarikin = azukari.value;
         var oturikin = azukarikin - total_pay;
         oturi.innerHTML = oturikin;
-    }
-
+    };
+/*
     // メニューボタンクリック処理
     btn_menu_002.onclick = function (){
         cnt_suryou_2 += 1;
@@ -157,13 +157,18 @@ window.onload = function() {
         suryou_2.value = cnt_suryou_2;
         kaikei_disp.innerHTML = total_pay;
     };
+*/
 
-
-     var reset_btn = document.getElementById("btn_reset");
+     var su = document.getElementsByClassName("su");
+     var reset_btn = document.getElementById("order_clear");
      // リセットボタンのクリック処理
      reset_btn.onclick = function (){
-          cnt_suryou_001 = 0; count_disp.innerHTML = cnt_suryou_001;
-     }
+        for (let i = 0; i < su.length; i++) {
+            su.item(i).value = 0;
+        }
+        kaikei_disp.innerHTML = 0;
+        total_pay = 0;
+     };
 };    
 </script>
 
@@ -194,7 +199,7 @@ window.onload = function() {
         echo "      </button>\n";
         echo "      <div class ='ordered'>\n";
         echo "          ￥<input type='number' readonly='readonly' class='order tanka' name='ORDERS[".$i."][tanka]' value=".$row["tanka"]."> \n";
-        echo "          × <input type = 'number' name ='ORDERS[".$i."][su]' id='suryou_".$row["shouhinCD"]."' class='order su' value = 0 style='display: inline'>\n";
+        echo "          × <input type='number' readonly='readonly' name ='ORDERS[".$i."][su]' id='suryou_".$row["shouhinCD"]."' class='order su' value = 0 style='display: inline'>\n";
         echo "      </div>\n";
         echo "  </div>\n";
         $i = $i+1;
