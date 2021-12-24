@@ -1,28 +1,3 @@
-html {
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    font-size: 62.5%; /*ルートサイズ10px=1rem算出をしやすくするために*/
-    touch-action: manipulation; /*スマフォのダブルタップによるズームを防ぐ*/
-}
-body {
-    padding-top: 45px; /* ヘッダーの後ろに要素が隠れないようにするため */
-    /*padding-bottom:150px;  フッターーの後ろに要素が隠れないようにするため */
-    font-family: 'Kosugi Maru', sans-serif;
-}
-header{
-    height: 40px; /* 高さを70pxに指定 */
-    padding: 5px 40px; /* ヘッダーに上下左右それぞれ余白を指定 */
-    box-sizing: border-box; /* padding分を含んで幅を100%にするため */
-    background: #ff838b;
-    position: fixed; /* ウィンドウを基準に画面に固定 */
-    top: 0; /* 上下の固定位置を上から0pxにする */
-    left: 0; /* 左右の固定位置を左から0pxにする */
-    width: 100%;
-    z-index: 99;
-    display: flex;
-    font-size: 2rem;
-    font-weight: 700;
-}
 .form-group{
     margin-bottom:1px;
 }

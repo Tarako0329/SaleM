@@ -61,7 +61,7 @@ function updatedb($SV, $USER, $PASS, $DBNAME,$version){
 	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
     }
     
-    if((double)$row["version"]<1.02 && (double)$row["version"]<(double)$version){//DBのバージョン＜PGのバージョン
+    if((double)$row["version"]<1.020 && (double)$row["version"]<(double)$version){//DBのバージョン＜PGのバージョン
         //差分SQL実行
         //echo (string)$version."<br>";
         
@@ -83,6 +83,17 @@ function updatedb($SV, $USER, $PASS, $DBNAME,$version){
 	    $stmt->execute();
 	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
 	    echo (string)$version." version up complete!! <br>";
+    }
+
+    if((double)$row["version"]<1.030 && (double)$row["version"]<(double)$version){//DBのバージョン＜PGのバージョン
+        //差分SQL実行
+        echo $row["version"]." now version no<br>";
+        echo (string)$version." version up complete!! <br>";
+        $sqlstr = "insert into version values(1.03,'セキュリティ向上　デザインの統一　メンテナンス性向上　他');";
+	    $stmt = $mysqli_fc->query("LOCK TABLES version WRITE");
+	    $stmt = $mysqli_fc->prepare($sqlstr);
+	    $stmt->execute();
+	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
     }
 
     $ver="version ".(string)$row["version"];

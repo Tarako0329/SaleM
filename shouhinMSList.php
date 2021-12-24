@@ -3,7 +3,6 @@
 <?php
 require "php_header.php";
 
-
 if($_POST["commit_btn"] <> ""){
     $array = $_POST["ORDERS"];
     $sqlstr = "";
