@@ -96,6 +96,17 @@ function updatedb($SV, $USER, $PASS, $DBNAME,$version){
 	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
     }
 
+    if((double)$row["version"]<1.031 && (double)$row["version"]<(double)$version){//DBのバージョン＜PGのバージョン
+        //差分SQL実行
+        echo $row["version"]." now version no<br>";
+        echo (string)$version." version up complete!! <br>";
+        $sqlstr = "insert into version values(1.031,'".$comment."');";
+	    $stmt = $mysqli_fc->query("LOCK TABLES version WRITE");
+	    $stmt = $mysqli_fc->prepare($sqlstr);
+	    $stmt->execute();
+	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
+    }
+
     $ver="version ".(string)$row["version"];
     //echo $ver."<br>";
     

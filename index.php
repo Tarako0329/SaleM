@@ -24,10 +24,8 @@ require "php_header.php";
 </header>
 
 <body>
-    <div class="main">
-        <div class="contentA">
-            <div class="menu">
-                
+    <div class="container-fluid">
+
 <?php
     $array = [
         'Eventレジ'=>['EVregi.php'],
@@ -36,24 +34,19 @@ require "php_header.php";
         '商品登録'=>['shouhinMSedit.php'],
         '商品一覧'=>['shouhinMSList.php']
     ];
- 
+    $i=0;
+    echo "<div class='row'>";
 	foreach($array as $key=>$vals){
-        echo "  <div class ='items' >\n";
+        echo "  <div class ='col-md-3 col-sm-6 col-6' style='padding:5px;' >\n";
         echo "      <a href='".$vals[0]."' class='btn btn--orange'>".$key."\n";
         echo "      </a>\n";
         echo "  </div>\n";
         $i++;
 	}
+    echo "</div>";
+	
 ?> 
               
-            </div>
-        </div>
-        <!--今のところサイドコンテンツ不要
-        <div class="contentB">
-            ORDER LIST
-            
-        </div>
-        -->
     </div>
 </body>
 

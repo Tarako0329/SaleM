@@ -100,7 +100,7 @@ if($_POST["btn"] == "登録"){
         <div class="form-group form-inline form-switch">
             <label for="hyoujiKBN1" class="col-2 col-md-1 control-label">レジ対象</label>
             <div class=" col-10">
-                <input type="checkbox" class="form-check-input" id="hyoujiKBN1" name="hyoujiKBN1">
+                <input type="checkbox" style="vertical-align:middle;" class="form-check-input" id="hyoujiKBN1" name="hyoujiKBN1">
             </div>
         </div>
         <div class="form-group form-inline">

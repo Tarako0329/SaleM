@@ -140,14 +140,22 @@ window.onload = function() {
 */
 
      var su = document.getElementsByClassName("su");
+     var items = document.getElementsByClassName("items");
      var reset_btn = document.getElementById("order_clear");
      // リセットボタンのクリック処理
      reset_btn.onclick = function (){
         for (let i = 0; i < su.length; i++) {
             su.item(i).value = 0;
+            items.item(i).style.display = 'block';
         }
         kaikei_disp.innerHTML = 0;
         total_pay = 0;
+        <?php
+        $result->data_seek(0);
+        while($row = $result->fetch_assoc()){
+            echo "cnt_suryou_".$row["shouhinCD"]." = 0;\n";
+        }
+        ?>
      };
 };    
 </script>
@@ -160,16 +168,14 @@ window.onload = function() {
 </header>
 
 <body>
-    <div class="main">
-        <div class="contentA">
-            <div class="menu">
-                
+    <div class="container-fluid">
+        <div class="row">
 <?php
     $result->data_seek(0);
     $i=0;
 
 	while($row = $result->fetch_assoc()){
-        echo "  <div class ='items' id='items_".$row["shouhinCD"]."'>\n";
+        echo "  <div class ='col-md-3 col-sm-6 col-6 items' id='items_".$row["shouhinCD"]."'>\n";
         echo "      <button type='button' class='btn btn--menu' id='btn_menu_".$row["shouhinCD"]."'>".rot13decrypt($row["shouhinNM"])."\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][CD]' value = '".$row["shouhinCD"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][NM]' value = '".$row["shouhinNM"]."'>\n";
@@ -178,22 +184,14 @@ window.onload = function() {
         echo "      <input type='hidden' name ='ORDERS[".$i."][ZEIKBN]' value = '".$row["zeiKBN"]."'>\n";
         echo "      </button>\n";
         echo "      <div class ='ordered'>\n";
-        echo "          ￥<input type='number' readonly='readonly' class='order tanka' name='ORDERS[".$i."][tanka]' value=".$row["tanka"]."> \n";
-        echo "          × <input type='number' readonly='readonly' name ='ORDERS[".$i."][su]' id='suryou_".$row["shouhinCD"]."' class='order su' value = 0 style='display: inline'>\n";
+        echo "          ￥<input type='number' readonly='readonly' class='order tanka' name='ORDERS[".$i."][tanka]' value=".$row["tanka"].">\n";
+        echo "× <input type='number' readonly='readonly' name ='ORDERS[".$i."][su]' id='suryou_".$row["shouhinCD"]."' class='order su' value = 0 style='display: inline'>\n";
         echo "      </div>\n";
         echo "  </div>\n";
         $i = $i+1;
 	}
 ?> 
-              
-            </div>
         </div>
-        <!--今のところサイドコンテンツ不要
-        <div class="contentB">
-            ORDER LIST
-            
-        </div>
-        -->
     </div>
 </body>
 
