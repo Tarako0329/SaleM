@@ -74,7 +74,7 @@ while($row = $result->fetch_assoc()){
     echo "<td style='width:3rem;'>".$row["shouhinCD"]."</td>";
     echo "<td style='width:auto;padding:0px 5px 0px 0px;'>".rot13decrypt($row["shouhinNM"])."</td>";
     echo "<td><input type='number'   name ='ORDERS[".$i."][tanka]' style='width:6rem;' value='".$row["tanka"]."'></td>";
-    echo "<td><select name ='ORDERS[".$i."][zeikbn]' class='d-none d-sm-table-cell' style='width:10rem;height:30px;'>";
+    echo "<td class='d-none d-sm-table-cell'><select name ='ORDERS[".$i."][zeikbn]' style='width:10rem;height:30px;'>";
         $result2->data_seek(0);
         while($row2 = $result2->fetch_assoc()){
             if($row["zeiKBN"]==$row2["zeiKBN"]){
