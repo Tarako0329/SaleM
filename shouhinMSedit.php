@@ -4,11 +4,16 @@
 require "php_header.php";
 
 if($_POST["btn"] == "登録"){
+    $sqlstr="select * from ZeiMS where zeiKBN='".$_POST["zeikbn"]."';";
+    $result = $mysqli->query( $sqlstr );
+    $row_cnt = $result->num_rows;
+    $row = $result->fetch_assoc();
+
     $sqlstr="insert into ShouhinMS values(0,'".rot13encrypt($_POST["shouhinNM"]);
     $sqlstr=$sqlstr."','".$_POST["tanka"];
-    $sqlstr=$sqlstr."','".$_POST["zeiritu"];
-    $sqlstr=$sqlstr."','".$_POST["zeikbn"];
-    $sqlstr=$sqlstr."','".$_POST["utisu"];
+    $sqlstr=$sqlstr."',".$row["zeiritu"];
+    $sqlstr=$sqlstr.",".$row["zeiKBN"];
+    $sqlstr=$sqlstr.",'".$_POST["utisu"];
     $sqlstr=$sqlstr."','".$_POST["tani"];
     $sqlstr=$sqlstr."','".$_POST["bunrui1"];
     $sqlstr=$sqlstr."','".$_POST["bunrui2"];
@@ -17,7 +22,8 @@ if($_POST["btn"] == "登録"){
     $sqlstr=$sqlstr."','".$_POST["hyoujiKBN2"];
     $sqlstr=$sqlstr."','".$_POST["hyoujiKBN3"];
     $sqlstr=$sqlstr."','".$_POST["hyoujiNO"]."');";
-
+    
+    //echo $sqlstr;
 
 	$stmt = $mysqli->query("LOCK TABLES ShouhinMS WRITE");
 	$stmt = $mysqli->prepare($sqlstr);
@@ -26,6 +32,11 @@ if($_POST["btn"] == "登録"){
     echo $_POST["shouhinNM"]."　が登録されました。<br>";
     //echo $_POST["hyoujiKBN1"];
 }
+
+$sqlstr="select * from ZeiMS order by zeiKBN;";
+$result = $mysqli->query( $sqlstr );
+$row_cnt = $result->num_rows;
+
 ?>
 <head>
     <?php 
@@ -41,30 +52,40 @@ if($_POST["btn"] == "登録"){
 </header>
 
 <body>
-    <div class="container-fluid">
-    <form method="post" class="form-horizontal" action="shouhinMSedit.php">
+    <div class="container-fluid" style="padding-top:15px;">
+    <form method="post" class="form" action="shouhinMSedit.php">
         <div class="form-group form-inline">
             <label for="shouhinNM" class="col-2 col-md-1 control-label">商品名</label>
             <div class=" col-10">
-                <input type="text" class="form-control" id="shouhinNM" name="shouhinNM">
+                <input type="text" class="form-control" id="shouhinNM" name="shouhinNM" required="required">
             </div>
         </div>
         <div class="form-group form-inline">
-            <label for="tanka" class="col-2 col-md-1 control-label">単価</label>
+            <label for="tanka" class="col-2 col-md-1 control-label">単価(税抜)</label>
             <div class=" col-10">
-                <input type="text" class="form-control" id="tanka" name="tanka">
+                <input type="text" class="form-control" id="tanka" name="tanka" required="required">
             </div>
         </div>
+        <!--
         <div class="form-group form-inline">
             <label for="zeiritu" class="col-2 col-md-1 control-label">税率</label>
             <div class=" col-10">
                 <input type="text" class="form-control" id="zeiritu" name="zeiritu">
             </div>
         </div>
+        -->
         <div class="form-group form-inline">
             <label for="zeikbn" class="col-2 col-md-1 control-label">税区分</label>
             <div class=" col-10">
-                <input type="text" class="form-control" id="zeikbn" name="zeikbn">
+                <!--<input type="text" class="form-control" id="zeikbn" name="zeikbn">-->
+                <select class="form-control" id="zeikbn" name="zeikbn" required="required">
+                    <option value=""></option>
+                    <?php
+                    while($row = $result->fetch_assoc()){
+                        echo "<option value='".$row["zeiKBN"]."'>".$row["hyoujimei"]."</option>\n";
+                    }
+                    ?>
+                </select>
             </div>
         </div>
         <div class="form-group form-inline">
@@ -98,9 +119,11 @@ if($_POST["btn"] == "登録"){
             </div>
         </div>
         <div class="form-group form-inline form-switch">
-            <label for="hyoujiKBN1" class="col-2 col-md-1 control-label">レジ対象</label>
-            <div class=" col-10">
-                <input type="checkbox" style="vertical-align:middle;" class="form-check-input" id="hyoujiKBN1" name="hyoujiKBN1">
+            <label class="col-2 col-md-1 control-label">レジ対象</label>
+            <div class="col-10">
+                <label for="hyoujiKBN1" style="float:left;">
+                     <input type="checkbox" style="vertical-align:middle;" id="hyoujiKBN1" name="hyoujiKBN1">（表示する）
+                </label>
             </div>
         </div>
         <div class="form-group form-inline">
@@ -121,7 +144,9 @@ if($_POST["btn"] == "登録"){
                 <input type="text" class="form-control" id="hyoujiNO" name="hyoujiNO">
             </div>
         </div>
-        <button type="submit" class="btn btn-primary" name="btn" value="登録">登録</button>
+        <div class="col-2 col-md-1" style=" padding:0; margin-top:10px;">
+            <button type="submit" class="btn btn-primary" style="width:100%;" name="btn" value="登録">登録</button>
+        </div>
     </form>
     </div>
 

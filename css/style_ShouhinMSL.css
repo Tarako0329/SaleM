@@ -1,6 +1,6 @@
 body {
-    padding-bottom:30px; /*フッターーの後ろに要素が隠れないようにするため */
-    font-size:1.1rem;
+    padding-bottom:50px; /*フッターーの後ろに要素が隠れないようにするため */
+    font-size:1.5rem;
     font-family: 'Kosugi Maru', sans-serif;
 }
 .yagou{
@@ -8,12 +8,12 @@ body {
     height: 80%;
 }
 INPUT{
-    height:20px;
+    height:30px;
 }
 
 footer{
     background: #ffce5b;
-    height: 30px; /* 高さを50pxに指定 */
+    height: 50px; /* 高さを50pxに指定 */
     position: fixed; /* ウィンドウを基準に画面に固定 */
     bottom: 0;
     Right: 0;
@@ -21,4 +21,13 @@ footer{
     display: flex;    
     font-size:3rem;
     z-index: 99;
+}
+.btn--chk,
+a.btn--chk {
+    /*登録ボタン*/
+    color: #fff;
+    background-color: #9acd32;
+    height:100%; 
+    width: 100%;
+    font-size: 2rem;
 }

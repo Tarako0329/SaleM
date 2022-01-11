@@ -35,7 +35,7 @@ function rot13decrypt ($str) {
 // =========================================================
 // バージョン差分修正SQL実行
 // =========================================================
-function updatedb($SV, $USER, $PASS, $DBNAME,$version){
+function updatedb($SV, $USER, $PASS, $DBNAME,$version,$comment){
     //引数；サーバ、ID、パス、DB名、PGバージョン
     //版管理ルール
     //1.000
@@ -96,11 +96,29 @@ function updatedb($SV, $USER, $PASS, $DBNAME,$version){
 	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
     }
 
-    if((double)$row["version"]<1.031 && (double)$row["version"]<(double)$version){//DBのバージョン＜PGのバージョン
+    if((double)$row["version"]<1.032 && (double)$row["version"]<(double)$version){//DBのバージョン＜PGのバージョン
         //差分SQL実行
         echo $row["version"]." now version no<br>";
         echo (string)$version." version up complete!! <br>";
         $sqlstr = "insert into version values(1.031,'".$comment."');";
+	    $stmt = $mysqli_fc->query("LOCK TABLES version WRITE");
+	    $stmt = $mysqli_fc->prepare($sqlstr);
+	    $stmt->execute();
+	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
+    }
+
+    if((double)$row["version"]<1.04 && (double)$row["version"]<(double)$version){//DBのバージョン＜PGのバージョン
+        //差分SQL実行
+        //商品マスタの税区分桁数増
+        $sqlstr = "ALTER TABLE `ShouhinMS` CHANGE `zeiKBN` `zeiKBN` INT(5) NOT NULL;";
+	    $stmt = $mysqli_fc->query("LOCK TABLES ShouhinMS WRITE");
+	    $stmt = $mysqli_fc->prepare($sqlstr);
+	    $stmt->execute();
+	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
+	    
+        echo $row["version"]." now version no<br>";
+        echo (string)$version." version up complete!! <br>";
+        $sqlstr = "insert into version values(1.04,'".$comment."');";
 	    $stmt = $mysqli_fc->query("LOCK TABLES version WRITE");
 	    $stmt = $mysqli_fc->prepare($sqlstr);
 	    $stmt->execute();
