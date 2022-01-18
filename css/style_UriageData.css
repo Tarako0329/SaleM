@@ -1,5 +1,5 @@
 body {
-    padding-bottom:50px; /*フッターーの後ろに要素が隠れないようにするため */
+    padding-bottom:70px; /*フッターーの後ろに要素が隠れないようにするため */
     font-size:1.1rem;
 /*    font-family: 'Kosugi Maru', sans-serif;*/
 }
@@ -9,27 +9,30 @@ INPUT{
 
 footer{
     background: #ffce5b;
-    height: 50px; /* 高さを50pxに指定 */
+    height: 70px; /* 高さを70pxに指定 */
     position: fixed; /* ウィンドウを基準に画面に固定 */
     bottom: 0;
     Right: 0;
     width: 100%;
     display: flex;    
-    font-size:3rem;
+    font-size:1.8rem;
     z-index: 99;
+}
+td,th{
+    padding-right:5px;
 }
 .kaikei{
     width:70%;
-    height:50px;
-    margin:10px 0 auto; /*中央寄せ*/
-    text-align:center;
+    height:100%;
+    margin:5px 10px auto; /*中央寄せ*/
+    text-align:left;
     font-weight: 800;
 }
 .right1{
     /*クリアボタンエリア*/
     background: #6fb5ff;
     width:30%;
-    height:50;
+    height:100%;
     text-align:center;
 }
 .btn--chk,

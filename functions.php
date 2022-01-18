@@ -9,7 +9,8 @@
 // 不可逆暗号化
 // =========================================================
 function passEx($str,$uid,$key){
-	if(strlen($str)<=8 and !empty($uid)){
+//	if(strlen($str)<=8 and !empty($uid)){
+	if(strlen($str)>0 and !empty($uid)){
 		$rtn = crypt($str,$key);
 		for($i = 0; $i < 1000; $i++){
 			$rtn = substr(crypt($rtn.$uid,$key),2);
@@ -31,6 +32,31 @@ function rot13decrypt ($str) {
 	//暗号化解除
     return base64_decode(str_rot13($str));
 }
+// =========================================================
+// Mysqliのプリペアドステートメントで連想配列で結果を受け取る
+// =========================================================
+function fetch_all(& $stmt) {
+    $hits = array();
+    $params = array();
+    $meta = $stmt->result_metadata();
+    while ($field = $meta->fetch_field()) {
+        $params[] = &$row[$field->name];
+    }
+    call_user_func_array(array($stmt, 'bind_result'), $params);
+    while ($stmt->fetch()) {
+        $c = array();
+        foreach($row as $key => $val) {
+            $c[$key] = $val;
+        }
+        $hits[] = $c;
+    }
+    return $hits;
+}
+
+
+
+
+
 
 // =========================================================
 // バージョン差分修正SQL実行
@@ -43,6 +69,7 @@ function updatedb($SV, $USER, $PASS, $DBNAME,$version,$comment){
     //0.01～0.99：小規模改善
     //0.001～0.009：バグ改修
     $mysqli_fc = new mysqli($SV, $USER, $PASS, $DBNAME);
+    $mysqli_fc->set_charset('utf8');
     
     $sqlstr="select max(version) as version from version;";
     $result = $mysqli_fc->query( $sqlstr );
@@ -124,7 +151,11 @@ function updatedb($SV, $USER, $PASS, $DBNAME,$version,$comment){
 	    $stmt->execute();
 	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
     }
-
+    if((double)$row["version"]<1.05 && (double)$row["version"]<(double)$version){//DBのバージョン＜PGのバージョン
+        //差分SQL実行
+        //ユーザテーブルの作成
+        //各種テーブルにユーザIDの項目を追加
+    }
     $ver="version ".(string)$row["version"];
     //echo $ver."<br>";
     

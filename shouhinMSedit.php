@@ -47,7 +47,7 @@ $row_cnt = $result->num_rows;
     <TITLE><?php echo $title." 取扱商品登録画面";?></TITLE>
 </head>
 <header style="flex-wrap:wrap">
-    <div style="width: 100%;"><a href="index.php"><?php echo $title;?></a></div>
+    <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></div>
     <p style="font-size:1rem;">  取扱商品登録画面</p>
 </header>
 
@@ -57,13 +57,13 @@ $row_cnt = $result->num_rows;
         <div class="form-group form-inline">
             <label for="shouhinNM" class="col-2 col-md-1 control-label">商品名</label>
             <div class=" col-10">
-                <input type="text" class="form-control" id="shouhinNM" name="shouhinNM" required="required">
+                <input type="text" class="form-control" id="shouhinNM" name="shouhinNM" required="required" placeholder="必須">
             </div>
         </div>
         <div class="form-group form-inline">
             <label for="tanka" class="col-2 col-md-1 control-label">単価(税抜)</label>
             <div class=" col-10">
-                <input type="text" class="form-control" id="tanka" name="tanka" required="required">
+                <input type="number" class="form-control" id="tanka" name="tanka" required="required" placeholder="必須">
             </div>
         </div>
         <!--
@@ -78,7 +78,7 @@ $row_cnt = $result->num_rows;
             <label for="zeikbn" class="col-2 col-md-1 control-label">税区分</label>
             <div class=" col-10">
                 <!--<input type="text" class="form-control" id="zeikbn" name="zeikbn">-->
-                <select class="form-control" id="zeikbn" name="zeikbn" required="required">
+                <select class="form-control" id="zeikbn" name="zeikbn" required="required" placeholder="必須">
                     <option value=""></option>
                     <?php
                     while($row = $result->fetch_assoc()){
@@ -91,31 +91,31 @@ $row_cnt = $result->num_rows;
         <div class="form-group form-inline">
             <label for="utisu" class="col-2 col-md-1 control-label">内容量</label>
             <div class=" col-10">
-                <input type="text" class="form-control" id="utisu" name="utisu">
+                <input type="number" class="form-control" id="utisu" name="utisu" placeholder="1箱12個入りの場合「12」等">
             </div>
         </div>
         <div class="form-group form-inline">
             <label for="tani" class="col-2 col-md-1 control-label">単位</label>
             <div class=" col-10">
-                <input type="text" class="form-control" id="tani" name="tani">
+                <input type="text" class="form-control" id="tani" name="tani" placeholder="内容量の単位（g,個）等">
             </div>
         </div>
         <div class="form-group form-inline">
-            <label for="bunrui1" class="col-2 col-md-1 control-label">分類1</label>
+            <label for="bunrui1" class="col-2 col-md-1 control-label">大カテゴリー</label>
             <div class=" col-10">
-                <input type="text" class="form-control" id="bunrui1" name="bunrui1">
+                <input type="text" class="form-control" id="bunrui1" name="bunrui1" placeholder="例：物販">
             </div>
         </div>
         <div class="form-group form-inline">
-            <label for="bunrui2" class="col-2 col-md-1 control-label">分類2</label>
+            <label for="bunrui2" class="col-2 col-md-1 control-label">中カテゴリー</label>
             <div class=" col-10">
-                <input type="text" class="form-control" id="bunrui2" name="bunrui2">
+                <input type="text" class="form-control" id="bunrui2" name="bunrui2" placeholder="例：食品">
             </div>
         </div>
         <div class="form-group form-inline">
-            <label for="bunrui3" class="col-2 col-md-1 control-label">分類3</label>
+            <label for="bunrui3" class="col-2 col-md-1 control-label">小カテゴリー</label>
             <div class=" col-10">
-                <input type="text" class="form-control" id="bunrui3" name="bunrui3">
+                <input type="text" class="form-control" id="bunrui3" name="bunrui3" placeholder="例：惣菜">
             </div>
         </div>
         <div class="form-group form-inline form-switch">
@@ -126,6 +126,11 @@ $row_cnt = $result->num_rows;
                 </label>
             </div>
         </div>
+        
+        <input type="hidden" class="form-control" id="hyoujiKBN2" name="hyoujiKBN2" value=0>
+        <input type="hidden" class="form-control" id="hyoujiKBN3" name="hyoujiKBN3" value=0>
+
+        <!--用途が未定なので非表示
         <div class="form-group form-inline">
             <label for="hyoujiKBN2" class="col-2 col-md-1 control-label">表示区分2</label>
             <div class=" col-10">
@@ -138,10 +143,11 @@ $row_cnt = $result->num_rows;
                 <input type="text" class="form-control" id="hyoujiKBN3" name="hyoujiKBN3">
             </div>
         </div>
+        -->
         <div class="form-group form-inline">
             <label for="hyoujiNO" class="col-2 col-md-1 control-label">表示順</label>
             <div class=" col-10">
-                <input type="text" class="form-control" id="hyoujiNO" name="hyoujiNO">
+                <input type="text" class="form-control" id="hyoujiNO" name="hyoujiNO" placeholder="レジ表示順。未指定の場合は「カテゴリー大>中>小>商品名」の五十音順">
             </div>
         </div>
         <div class="col-2 col-md-1" style=" padding:0; margin-top:10px;">

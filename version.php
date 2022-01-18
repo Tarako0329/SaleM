@@ -11,6 +11,8 @@
     $version = 1.03;    //機能拡張その３　セキュリティ向上　デザインの統一　メンテナンス性向上　他
     $version = 1.031;    $comment="レジ画面クリアボタンのバグ修正 bootstrap対応";
     $version = 1.032;    $comment="コメントの有効化";
-    $version = 1.04;    $comment="商品マスタ登録関連の清書";
+    $version = 1.04;    $comment="商品マスタ登録関連の清書・文字コード";
+    //$version = 1.05;    $comment="消費税対応";
+    
 ?>
     

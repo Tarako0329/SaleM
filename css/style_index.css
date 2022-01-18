@@ -1,137 +1,141 @@
-
-.yagou{
-    width: 100%;
+/*
+ * Specific styles of signin component
+ */
+/*
+ * General styles
+ */
+body, html {
     height: 100%;
+    background-repeat: no-repeat;
+    background-image: linear-gradient(rgb(104, 145, 162), rgb(12, 97, 33));
 }
 
-.main{
-    display: flex;
-}
-.contentA{
-    background: #fff;
-    width: 100%;
-    height: 100%;
-}
-.contentB{
-    background: #6fb5ff;
-    width: 20%;
-    height: 100%;
+.card-container.card {
+    max-width: 350px;
+    padding: 40px 40px;
 }
 
-
-.menu{
-   display:flex;
-   flex-wrap:wrap;
-   list-style:none;
-   margin:0;
-   padding:0;
- }
-.items{
-   width:46%;
-   margin:5px 2%;
-   /*height:200px; */
-   height:120px; 
-   line-height:80%; 
-   /*background:#eb6100;*/
-   background:#fff;
-   text-align:center;
-   font-size: 0;
-    
-}
-
-.btn--orange,
-a.btn--orange {
-    /*メニューボタン*/
-    color: #fff;
-    background-color: #00bfff;
-    height:100%;     
-    font-size: 2.2rem;
-}
-INPUT.order{
-    border:none;
-    text-align:center;
-    font-size: 3rem;
+.btn {
     font-weight: 700;
-    background:#fff;
-}
-INPUT.tanka{
-    /*INPUT 数量部*/
-    width:40%;
-}
-INPUT.su{
-    /*INPUT 数量部*/
-    width:10%;
-}
-
-
-footer{
-    background: #ffce5b;
-    height: 150px; /* 高さを50pxに指定 */
-    position: fixed; /* ウィンドウを基準に画面に固定 */
-    bottom: 0;
-    Right: 0;
-    width: 100%;
-    display: flex;    
-}
-
-.kaikei{
-    width:80%;
-    margin:3.5% auto; /*中央寄せ*/
-    text-align:center;
-    font-size: 5.0rem;
-    font-weight: 800;
-}
-.right{
-    background: #6fb5ff;
-    width:20%;
-    /*height:70px;*/
-}
-.btn--commit,
-a.btn--commit {
-    /*注文ボタン*/
-    color: #fff;
-    background-color: #eb6100;
-    height:100%; 
-    font-size: 3rem;
-}
-.btn--chk,
-a.btn--chk {
-    /*確認ボタン*/
-    color: #fff;
-    background-color: #9acd32;
-    height:100%; 
-    font-size: 3rem;
-}
-
-/*まずはお決まりのボックスサイズ算出をborer-boxに */
-*,
-*:before,
-*:after {
-  -webkit-box-sizing: inherit;
-  box-sizing: inherit;
-}
-
-.btn,
-a.btn,
-button.btn {
-    width:100%; /*親要素と同じ幅*/
-    font-weight: 700;
-    line-height: 1.5;
-    position: relative;
-    display: inline-block;
-    padding: 1rem; /*ボタン文字エリアとボタン外枠の間*/
-    cursor: pointer;
-    -webkit-user-select: none;
+    height: 36px;
     -moz-user-select: none;
-    -ms-user-select: none;
+    -webkit-user-select: none;
     user-select: none;
-    -webkit-transition: all 0.3s;
-    transition: all 0.3s;
-    text-align: center;
-    vertical-align: middle;
-    text-decoration: none;
-    letter-spacing: 0.1em;
-    color: #212529;
-    border-radius: 0.5rem;
+    cursor: default;
 }
 
+/*
+ * Card component
+ */
+.card {
+    background-color: #F7F7F7;
+    /* just in case there no content*/
+    padding: 20px 25px 30px;
+    margin: 0 auto 25px;
+    margin-top: 50px;
+    /* shadows and rounded borders */
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+.profile-img-card {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 10px;
+    display: block;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+}
+
+/*
+ * Form styles
+ */
+.profile-name-card {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    margin: 10px 0 0;
+    min-height: 1em;
+}
+
+.reauth-email {
+    display: block;
+    color: #404040;
+    line-height: 2;
+    margin-bottom: 10px;
+    font-size: 14px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.form-signin #inputEmail,
+.form-signin #inputPassword {
+    direction: ltr;
+    height: 44px;
+    font-size: 16px;
+}
+
+.form-signin input[type=email],
+.form-signin input[type=password],
+.form-signin input[type=text],
+.form-signin button {
+    width: 100%;
+    display: block;
+    margin-bottom: 10px;
+    z-index: 1;
+    position: relative;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.form-signin .form-control:focus {
+    border-color: rgb(104, 145, 162);
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgb(104, 145, 162);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgb(104, 145, 162);
+}
+
+.btn.btn-signin {
+    /*background-color: #4d90fe; */
+    background-color: rgb(104, 145, 162);
+    /* background-color: linear-gradient(rgb(104, 145, 162), rgb(12, 97, 33));*/
+    padding: 0px;
+    font-weight: 700;
+    font-size: 14px;
+    height: 36px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    border: none;
+    -o-transition: all 0.218s;
+    -moz-transition: all 0.218s;
+    -webkit-transition: all 0.218s;
+    transition: all 0.218s;
+}
+
+.btn.btn-signin:hover,
+.btn.btn-signin:active,
+.btn.btn-signin:focus {
+    background-color: rgb(12, 97, 33);
+}
+
+.forgot-password {
+    color: rgb(104, 145, 162);
+}
+
+.forgot-password:hover,
+.forgot-password:active,
+.forgot-password:focus{
+    color: rgb(12, 97, 33);
+}

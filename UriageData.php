@@ -31,13 +31,13 @@ if($_POST["Type"]=="rireki" || $_POST["Type"]==""){
     $sql = "select * from UriageData ".$wheresql." order by UriageNO";
 }elseif($_POST["Type"]=="shubetu"){
     //商品別<!-- 何が売れてるか知りたい -->
-    $sql = "select '-' as UriDate,'-' as Event,'-' as TokuisakiNM,'-' as UriageNO,'-' as Event,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin from UriageData ".$wheresql." group by ShouhinNM,tanka order by ShouhinNM";
+    $sql = "select '-' as UriDate,'-' as Event,'-' as TokuisakiNM,'-' as UriageNO,'-' as Event,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ".$wheresql." group by ShouhinNM,tanka order by ShouhinNM";
 }elseif($_POST["Type"]=="UriNO"){
     //Event会計別<!-- イベントでの客単価を知りたい -->
-    $sql = "select '-' as UriDate,UriageNO,Event,'-' as TokuisakiNM,'-' as ShouhinNM,sum(su) as su,0 as tanka,sum(UriageKin) as UriageKin from UriageData ".$wheresql." group by Event,UriageNO order by Event,UriageNO";
+    $sql = "select '-' as UriDate,UriageNO,Event,'-' as TokuisakiNM,'-' as ShouhinNM,sum(su) as su,0 as tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ".$wheresql." group by Event,UriageNO order by Event,UriageNO";
 }elseif($_POST["Type"]=="EVTKshubetu"){
     //顧客/Event別・種類別<!-- 顧客・イベントでの売れ筋を知りたい -->
-    $sql = "select '-' as UriDate,'-' as UriageNO,Event,TokuisakiNM,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin from UriageData ".$wheresql." group by Event,TokuisakiNM,ShouhinNM,tanka order by Event,TokuisakiNM,ShouhinNM";
+    $sql = "select '-' as UriDate,'-' as UriageNO,Event,TokuisakiNM,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ".$wheresql." group by Event,TokuisakiNM,ShouhinNM,tanka order by Event,TokuisakiNM,ShouhinNM";
 }else{
     echo "そんな！";
 }
@@ -62,25 +62,28 @@ $TKrow_cnt = $result->num_rows;
     //共通部分、bootstrap設定、フォントCND、ファビコン等
     include "head.html" 
     ?>
-    <!--ページ専用CSS--><link rel="stylesheet" href="css/style_UriageData.css" >
+    <!--ページ専用CSS-->
+    <link rel="stylesheet" href="css/style_UriageData.css" >
     <TITLE><?php echo $title." 売上実績";?></TITLE>
 </head>
  
 <header style="flex-wrap:wrap">
-    <div style="width: 100%;"><a href="index.php"><?php echo $title;?></a></div>
+    <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></div>
     <div style="font-size:1rem;"> 期間：<?php echo $UriFrom."～".$UriTo;?>　顧客：<?php echo $_POST["Tokui"];?>　EVENT：<?php echo $_POST["Event"];?></div>
 
 </header>
 
 <body>    
     <div class="container-fluid">
-    <table class="table-striped">
-        <tr><td>売上日</td><td>Event名</td><td>顧客名</td><td>売上№</td><td>商品</td><td style="width:3rem;">個数</td><td style="width:3rem;">単価</td><td style="width:5rem;">売上</td></tr>
+    <table class="table-striped table-bordered">
+        <thead><tr><th>売上日</th><th>Event名</th><th>顧客名</th><th>売上№</th><th>商品</th><th style="width:3rem;">個数</th><th style="width:3rem;">単価</th><th style="width:5rem;">売上</th><th style="width:4rem;">消費税</th></tr></thead>
 <?php    
 $Goukei=0;
+$GoukeiZei=0;
 while($row = $result->fetch_assoc()){
-    echo "<tr><td>".$row["UriDate"]."</td><td>".$row["Event"]."</td><td>".$row["TokuisakiNM"]."</td><td class='text-center'>".$row["UriageNO"]."</td><td>".rot13decrypt($row["ShouhinNM"])."</td><td class='text-right'>".$row["su"]."</td><td class='text-right'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td></tr>\n";
+    echo "<tr><td>".$row["UriDate"]."</td><td>".$row["Event"]."</td><td>".$row["TokuisakiNM"]."</td><td class='text-center'>".$row["UriageNO"]."</td><td>".rot13decrypt($row["ShouhinNM"])."</td><td class='text-right'>".$row["su"]."</td><td class='text-right'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td><td class='text-right'>".$row["zei"]."</td></tr>\n";
     $Goukei = $Goukei + $row["UriageKin"];
+    $GoukeiZei = $GoukeiZei + $row["zei"];
 }
 
 ?>
@@ -89,8 +92,10 @@ while($row = $result->fetch_assoc()){
 </body>
 
 <footer>
-    <div class='kaikei'>合計：￥<?php echo $Goukei ?>-</div>
-
+    <div class='kaikei'>
+        合計(税抜)：￥<?php echo $Goukei ?>-<br>
+        税：￥<?php echo $GoukeiZei ?>-
+    </div>
     <div class="right1">
         <button type='button' class='btn btn--chk' style="border-radius:0;" id='dentaku' data-toggle="modal" data-target="#UriModal">検　索</button>
     </div>

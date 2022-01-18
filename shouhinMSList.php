@@ -54,7 +54,7 @@ $result2 = $mysqli->query( $sqlstr );
     <TITLE><?php echo $title." 取扱商品 確認・編集";?></TITLE>
 </head>
 <header style="flex-wrap:wrap">
-    <div style="width: 100%;"><a href="index.php"><?php echo $title;?></a></div>
+    <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></div>
     <p style="font-size:1rem;">  取扱商品 確認・編集 画面</p>
 </header>
 

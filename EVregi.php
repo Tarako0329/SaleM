@@ -23,7 +23,7 @@ if($_POST["commit_btn"] <> ""){
 //    echo (string)$UriageNO;
     
     foreach($array as $row){
-        if($row["su"]==0){
+        if($row["SU"]==0){
             continue;
         }
         $sqlstr = "insert into UriageData values(";
@@ -34,22 +34,28 @@ if($_POST["commit_btn"] <> ""){
         $sqlstr = $sqlstr."'',";
         $sqlstr = $sqlstr."'".$row["CD"]."',";
         $sqlstr = $sqlstr."'".$row["NM"]."',";
-        $sqlstr = $sqlstr.(string)$row["su"].",";
+        $sqlstr = $sqlstr.(string)$row["SU"].",";
         $sqlstr = $sqlstr.(string)$row["UTISU"].",";
-        $sqlstr = $sqlstr.(string)$row["tanka"].",";
-        $sqlstr = $sqlstr.(string)($row["su"] * $row["tanka"]).",";
-        $sqlstr = $sqlstr.(string)$row["ZEI"].",";
+        $sqlstr = $sqlstr.(string)$row["TANKA"].",";
+        $sqlstr = $sqlstr.(string)($row["SU"] * $row["TANKA"]).",";
+        $sqlstr = $sqlstr.(string)($row["SU"] * $row["ZEI"]).",";
         $sqlstr = $sqlstr.(string)$row["ZEIKBN"].");";
         
-  //      echo $sqlstr."<br>";
-	    $stmt = $mysqli->query("LOCK TABLES UriageData WRITE");
-	    $stmt = $mysqli->prepare($sqlstr);
-	    $stmt->execute();
-	    $stmt = $mysqli->query("UNLOCK TABLES");
+//        echo $sqlstr."<br>";
+    
+        $stmt = $mysqli->query("LOCK TABLES UriageData WRITE");
+        $stmt = $mysqli->prepare($sqlstr);
+        $stmt->execute();
+        $stmt = $mysqli->query("UNLOCK TABLES");
     
     }
 
 }
+
+//商品M取得
+$sql = "select * from ShouhinMS where hyoujiKBN1='on' order by hyoujiNO,bunrui1,bunrui2,bunrui3,shouhinNM";
+$result = $mysqli->query( $sql );
+$row_cnt = $result->num_rows;
 
 ?>
 <head>
@@ -57,7 +63,8 @@ if($_POST["commit_btn"] <> ""){
     //共通部分、bootstrap設定、フォントCND、ファビコン等
     include "head.html" 
     ?>
-    <!--ページ専用CSS--><link rel="stylesheet" href="css/style_EVregi.css" >
+    <!--ページ専用CSS-->
+    <link rel="stylesheet" href="css/style_EVregi.css" >
     <TITLE><?php echo $title." レジ";?></TITLE>
 </head>
 
@@ -69,15 +76,12 @@ window.onload = function() {
      
      //合計金額を保持
      var kaikei_disp = document.getElementById("kaikei");
+     var zei_disp = document.getElementById("utizei");
      var total_pay = 0;
+     var total_zei = 0;
      
      //PHPで繰り返し表示。メニューボタン数に応じて準備する
 <?php     
-	//$mysqli = new mysqli(sv, user, pass, dbname);
-	//商品M取得
-	$sql = "select * from ShouhinMS where hyoujiKBN1='on' order by hyoujiNO";
-	$result = $mysqli->query( $sql );
-	$row_cnt = $result->num_rows;
     while($row = $result->fetch_assoc()){
         echo "\n";
         echo "    var suryou_".$row["shouhinCD"]."  = document.getElementById('suryou_".$row["shouhinCD"]."');\n" ;         //ボタンの注文数
@@ -86,12 +90,14 @@ window.onload = function() {
         echo "    var cnt_suryou_".$row["shouhinCD"]." = 0;\n";                                                             //ボタンのカウンタ
         echo "\n";
         //ボタンクリック時の動作関数
-        echo "    //".$row["shouhinNM"]."ボタンクリック時\n";
+        echo "    //".rot13decrypt($row["shouhinNM"])."ボタンクリック時\n";
         echo "    btn_menu_".$row["shouhinCD"].".onclick = function (){\n";
         echo "        cnt_suryou_".$row["shouhinCD"]." += 1;\n";
-        echo "        total_pay += ".$row["tanka"].";\n";
+        echo "        total_pay += ".$row["tanka"]*(($row["zeiritu"]/100)+1).";\n";
+        echo "        total_zei += ".$row["tanka"]*($row["zeiritu"]/100).";\n";
         echo "        suryou_".$row["shouhinCD"].".value = cnt_suryou_".$row["shouhinCD"].";\n";
         echo "        kaikei_disp.innerHTML = total_pay;\n";
+        echo "        zei_disp.innerHTML = total_zei;\n";
         echo "    };\n";
         echo "\n";
     }
@@ -150,6 +156,8 @@ window.onload = function() {
         }
         kaikei_disp.innerHTML = 0;
         total_pay = 0;
+        zei_disp.innerHTML = 0;
+        total_zei = 0;
         <?php
         $result->data_seek(0);
         while($row = $result->fetch_assoc()){
@@ -163,8 +171,8 @@ window.onload = function() {
 <form method = "post" action="EVregi.php">
     
 <header>
-    <div class="yagou"><a href="index.php"><?php echo $title;?></a></div>
-    <div class="event"><input type="text" class="ev" name="EV" value="<?php echo $_POST["EV"] ?>"</div>
+    <div class="title yagou"><a href="menu.php"><?php echo $title;?></a></div>
+    <div class="event" style="font-family:inherit;"><input type="text" class="ev" name="EV" value="<?php echo $_POST["EV"] ?>" placeholder="イベント名等"></div>
 </header>
 
 <body>
@@ -180,12 +188,14 @@ window.onload = function() {
         echo "      <input type='hidden' name ='ORDERS[".$i."][CD]' value = '".$row["shouhinCD"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][NM]' value = '".$row["shouhinNM"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][UTISU]' value = '".$row["utisu"]."'>\n";
-        echo "      <input type='hidden' name ='ORDERS[".$i."][ZEI]' value = '".(string)($row["zeiritu"]*$row["tanka"])."'>\n";
+        echo "      <input type='hidden' name ='ORDERS[".$i."][ZEI]' value = '".(string)(($row["zeiritu"]/100)*$row["tanka"])."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][ZEIKBN]' value = '".$row["zeiKBN"]."'>\n";
+        echo "      <input type='hidden' name ='ORDERS[".$i."][TANKA]' value = '".$row["tanka"]."'>\n";
         echo "      </button>\n";
         echo "      <div class ='ordered'>\n";
-        echo "          ￥<input type='number' readonly='readonly' class='order tanka' name='ORDERS[".$i."][tanka]' value=".$row["tanka"].">\n";
-        echo "× <input type='number' readonly='readonly' name ='ORDERS[".$i."][su]' id='suryou_".$row["shouhinCD"]."' class='order su' value = 0 style='display: inline'>\n";
+//        echo "          ￥<input type='number' readonly='readonly' class='order tanka' name='ORDERS[".$i."][TANKA]' value=".$row["tanka"].">\n";
+        echo "          ￥<input type='number' readonly='readonly' class='order tanka' value=".$row["tanka"]*(($row["zeiritu"]/100)+1).">\n";
+        echo "× <input type='number' readonly='readonly' name ='ORDERS[".$i."][SU]' id='suryou_".$row["shouhinCD"]."' class='order su' value = 0 style='display: inline'>\n";
         echo "      </div>\n";
         echo "  </div>\n";
         $i = $i+1;
@@ -196,7 +206,7 @@ window.onload = function() {
 </body>
 
 <footer>
-    <div class="kaikei">お会計 ￥<span id="kaikei">0</span>-</div>
+    <div class="kaikei">お会計 ￥<span id="kaikei">0</span>- 内税(<span id="utizei">0</span>)</div>
     <div class="right1">
         <button type='button' class='btn btn--chk' style="border-radius:0;" id='dentaku' data-toggle="modal" data-target="#FcModal">釣　銭</button>
     </div>
