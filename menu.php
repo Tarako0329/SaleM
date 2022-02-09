@@ -2,7 +2,15 @@
 <html lang="ja">
 <?php
 require "php_header.php";
-
+$rtn=check_session_userid();
+$token = csrf_create();
+$logoff=false;
+if($_GET["action"]=="logout"){
+    setCookie("webrez_token", 'a', -1, "/", null, TRUE, TRUE); 
+    session_destroy();
+    session_start();
+    $logoff=true;
+}
 ?>
 <head>
     <?php 
@@ -21,21 +29,29 @@ require "php_header.php";
 <form method = "post" action="menu2.php">
     
 <header>
-    <div class="yagou title"><a href=""><?php echo $title;?></a></div>
+    <div class="yagou title"><a href=""><?php echo $title;?></a></div></a></div><span style="font-size:1.5rem;"><a href="menu.php?action=logout">LogOut</a></span>
 </header>
 
 <body>
+<?php
+    if($logoff){
+        echo "ログオフしました。<br>";
+        echo "<a href='index.php'>再ログインする</a>";
+        //echo $_COOKIE["webrez_token"];
+        exit;
+    }
+?>
     <div class="container-fluid">
 
 <?php
     $array = [
-        'Eventレジ'=>['EVregi.php'],
-        '個別売上'=>['Kouri.php'],
-        '売上実績'=>['UriageData.php'],
-        '商品登録'=>['shouhinMSedit.php'],
-        '商品一覧'=>['shouhinMSList.php'],
-        'ユーザ情報修正'=>['account_create.php?mode=1'],
-        '改定履歴'=>['system_update_log.php']
+        'レジ'=>['EVregi.php?csrf_token='.$token],
+        '個別売上'=>['xxx.php?csrf_token='.$token],
+        '売上実績'=>['UriageData.php?csrf_token='.$token],
+        '商品登録'=>['shouhinMSedit.php?csrf_token='.$token],
+        '商品一覧'=>['shouhinMSList.php?csrf_token='.$token],
+        'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token],
+        'お知らせ'=>['system_update_log.php']
     ];
     $i=0;
     echo "<div class='row'>";
@@ -60,5 +76,5 @@ require "php_header.php";
 </form>
 </html>
 <?php
-    $mysqli->close();
+    $pdo_h=null;
 ?>

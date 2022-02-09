@@ -2,59 +2,115 @@
 <html lang="ja">
 <?php
 require "php_header.php";
+if(isset($_GET["csrf_token"]) || empty($_POST)){
+    if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
+        $_SESSION["EMSG"]="セッションが正しくありませんでした。";
+        header("HTTP/1.1 301 Moved Permanently");
+        header("Location: index.php");
+        exit();
+    }
+}elseif(csrf_chk()==false){
+    $_SESSION["EMSG"]="セッションが正しくありませんでした";
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: index.php");
+}
 
+$rtn=check_session_userid();
+$csrf_create = csrf_create();
 
-//売上実績の取得
-if($_POST["UriDate"]<>""){
-    $wheresql="where UriDate >= '".$_POST["UriDate"]."'";
-    $UriFrom = (string)$_POST["UriDate"];
+if(isset($_POST["cd"]) && isset($_POST["urino"])){
+    //削除モード(実行)
+    $mode="del";
+    $sql="delete from UriageData where uid = :user_id and UriageNO = :UriNO and ShouhinCD = :ShouhinCD";
+    $stmt = $pdo_h->prepare( $sql );
+    $stmt->bindValue("UriNO", $_POST["urino"], PDO::PARAM_INT);
+    $stmt->bindValue("ShouhinCD", $_POST["cd"], PDO::PARAM_INT);
+    $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
+    $status = $stmt->execute();
+    if($status){
+        $msg = "売上を削除しました<br><br>";
+    }else{
+        $msg = "売り上げ削除失敗<br><br>";
+    }
+}
+if(isset($_GET["cd"]) && isset($_GET["urino"])){
+    //削除モード(確認)
+    $mode="del";
+    $msg ="この売上を削除しますか？<br><br>";
+    $sql = "select * from UriageData where uid = :user_id and UriageNO = :UriNO and ShouhinCD = :ShouhinCD order by UriageNO";
+    $stmt = $pdo_h->prepare( $sql );
+    $stmt->bindValue("UriNO", $_GET["urino"], PDO::PARAM_INT);
+    $stmt->bindValue("ShouhinCD", $_GET["cd"], PDO::PARAM_INT);
 }else{
+    //売上実績の取得
+    if($_POST["UriDate"]<>""){
+    $wheresql="where UriDate >= :UriDate ";
+    $UriFrom = (string)$_POST["UriDate"];
+    }else{
     $wheresql="where UriDate >= '".(string)date("Y-m-d")."'";
     $UriFrom = (string)date("Y-m-d");
 }
-if($_POST["UriDateTo"]<>""){
-    $wheresql=$wheresql." AND UriDate <= '".$_POST["UriDateTo"]."'";
+    
+    $wheresql=$wheresql." AND UriDate <= :UriDateTo ";
+    if($_POST["UriDateTo"]<>""){
     $UriTo = (string)$_POST["UriDateTo"];
-}else{
-    $wheresql=$wheresql." AND UriDate <= '".$UriFrom."'";
+    }else{
     $UriTo = $UriFrom;
 }
-if($_POST["Event"]<>""){
-    $wheresql = $wheresql." AND Event='".$_POST["Event"]."'";
+    if($_POST["Event"]<>""){
+        $wheresql = $wheresql." AND Event=:Event ";
+    }
+    if($_POST["Tokui"]<>""){
+        $wheresql= $wheresql." AND TokuisakiNM=:Tokui ";
+    }
+    $wheresql= $wheresql." AND uid = :user_id ";
+    if($_POST["Type"]=="rireki" || $_POST["Type"]==""){
+        //履歴取得
+        $sql = "select * from UriageData ".$wheresql." order by UriageNO";
+    }elseif($_POST["Type"]=="shubetu"){
+        //商品別<!-- 何が売れてるか知りたい -->
+        $sql = "select '-' as UriDate,'-' as Event,'-' as TokuisakiNM,'-' as UriageNO,'-' as Event,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ".$wheresql." group by ShouhinNM,tanka order by ShouhinNM";
+    }elseif($_POST["Type"]=="UriNO"){
+        //Event会計別<!-- イベントでの客単価を知りたい -->
+        $sql = "select '-' as UriDate,UriageNO,Event,'-' as TokuisakiNM,'-' as ShouhinNM,sum(su) as su,0 as tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ".$wheresql." group by Event,UriageNO order by Event,UriageNO";
+    }elseif($_POST["Type"]=="EVTKshubetu"){
+        //顧客/Event別・種類別<!-- 顧客・イベントでの売れ筋を知りたい -->
+        $sql = "select '-' as UriDate,'-' as UriageNO,Event,TokuisakiNM,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ".$wheresql." group by Event,TokuisakiNM,ShouhinNM,tanka order by Event,TokuisakiNM,ShouhinNM";
+    }else{
+        echo "そんな！";
+    }
+    //echo $sql;
+    $stmt = $pdo_h->prepare( $sql );
+    if($_POST["UriDate"]<>""){
+        $stmt->bindValue("UriDate", $_POST["UriDate"], PDO::PARAM_STR);
+    }
+    if($_POST["UriDateTo"]<>""){
+        $stmt->bindValue("UriDateTo", $_POST["UriDateTo"], PDO::PARAM_STR);
+    }else{
+        $stmt->bindValue("UriDateTo", $UriFrom, PDO::PARAM_STR);
+    }
+    if($_POST["Event"]<>""){
+        $stmt->bindValue("Event", $_POST["Event"], PDO::PARAM_STR);
+    }
+    if($_POST["Tokui"]<>""){
+        $stmt->bindValue("Tokui", $_POST["Tokui"], PDO::PARAM_STR);
+    }
 }
-if($_POST["Tokui"]<>""){
-    $wheresql= $wheresql." AND TokuisakiNM='".$_POST["Tokui"]."'";
-}
-
-if($_POST["Type"]=="rireki" || $_POST["Type"]==""){
-    //履歴取得
-    $sql = "select * from UriageData ".$wheresql." order by UriageNO";
-}elseif($_POST["Type"]=="shubetu"){
-    //商品別<!-- 何が売れてるか知りたい -->
-    $sql = "select '-' as UriDate,'-' as Event,'-' as TokuisakiNM,'-' as UriageNO,'-' as Event,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ".$wheresql." group by ShouhinNM,tanka order by ShouhinNM";
-}elseif($_POST["Type"]=="UriNO"){
-    //Event会計別<!-- イベントでの客単価を知りたい -->
-    $sql = "select '-' as UriDate,UriageNO,Event,'-' as TokuisakiNM,'-' as ShouhinNM,sum(su) as su,0 as tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ".$wheresql." group by Event,UriageNO order by Event,UriageNO";
-}elseif($_POST["Type"]=="EVTKshubetu"){
-    //顧客/Event別・種類別<!-- 顧客・イベントでの売れ筋を知りたい -->
-    $sql = "select '-' as UriDate,'-' as UriageNO,Event,TokuisakiNM,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ".$wheresql." group by Event,TokuisakiNM,ShouhinNM,tanka order by Event,TokuisakiNM,ShouhinNM";
-}else{
-    echo "そんな！";
-}
-//echo $sql;
-$result = $mysqli->query( $sql );
-$row_cnt = $result->num_rows;
+$stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
+$stmt->execute();
 
 
 //Eventリスト
-$EVsql = "select Event from UriageData group by Event order by Event";
-$EVresult = $mysqli->query( $EVsql );
-$EVrow_cnt = $result->num_rows;
+$EVsql = "select Event from UriageData where uid =? group by Event order by Event";
+$EVresult = $pdo_h->prepare($EVsql);
+$EVresult->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+$EVresult->execute();
 
 //顧客リスト
-$TKsql = "select TokuisakiNM from UriageData group by TokuisakiNM order by TokuisakiNM";
-$TKresult = $mysqli->query( $TKsql );
-$TKrow_cnt = $result->num_rows;
+$TKsql = "select TokuisakiNM from UriageData where uid =? group by TokuisakiNM order by TokuisakiNM";
+$TKresult = $pdo_h->prepare($TKsql);
+$TKresult->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+$TKresult->execute();
 
 ?>
 <head>
@@ -75,20 +131,35 @@ $TKrow_cnt = $result->num_rows;
 
 <body>    
     <div class="container-fluid">
+    <?php
+    if($mode=="del"){echo secho($msg);}?>
     <table class="table-striped table-bordered">
         <thead><tr><th>売上日</th><th>Event名</th><th>顧客名</th><th>売上№</th><th>商品</th><th style="width:3rem;">個数</th><th style="width:3rem;">単価</th><th style="width:5rem;">売上</th><th style="width:4rem;">消費税</th></tr></thead>
 <?php    
 $Goukei=0;
 $GoukeiZei=0;
-while($row = $result->fetch_assoc()){
-    echo "<tr><td>".$row["UriDate"]."</td><td>".$row["Event"]."</td><td>".$row["TokuisakiNM"]."</td><td class='text-center'>".$row["UriageNO"]."</td><td>".rot13decrypt($row["ShouhinNM"])."</td><td class='text-right'>".$row["su"]."</td><td class='text-right'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td><td class='text-right'>".$row["zei"]."</td></tr>\n";
+foreach($stmt as $row){
+    echo "<tr><td>".$row["UriDate"]."</td><td>".$row["Event"]."</td><td>".$row["TokuisakiNM"]."</td><td class='text-center'>".$row["UriageNO"]."</td><td>".rot13decrypt($row["ShouhinNM"])."</td><td class='text-right'>".$row["su"]."</td><td class='text-right'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td><td class='text-right'>".$row["zei"]."</td><td style='width:4rem;text-align:center;'><a href='UriageData.php?cd=".$row["ShouhinCD"]."&urino=".$row["UriageNO"]."&csrf_token=".$csrf_create."'><i class='fa-regular fa-trash-can'></i></a></td></tr>\n";
     $Goukei = $Goukei + $row["UriageKin"];
     $GoukeiZei = $GoukeiZei + $row["zei"];
 }
-
 ?>
     </table>
+<?php
+if($mode=="del"){
+?>
+    <br>
+    <form method="post" action="UriageData.php">
+        <input type="hidden" name="mode" value="del">
+        <input type="hidden" name="urino" value=<?php echo secho($_GET["urino"]);?>>
+        <input type="hidden" name="cd" value=<?php echo secho($_GET["cd"]);?>>
+        <input type="submit" class="btn btn-primary" style="width:5rem;padding:0;" value="削除">
+    </form>
     </div>
+    
+<?php
+}
+?>
 </body>
 
 <footer>
@@ -108,6 +179,7 @@ while($row = $result->fetch_assoc()){
         <div class="modal-content" style="font-size: 1.0rem; font-weight: 600;">
             
             <form class="form-horizontal" method="post" action="UriageData.php">
+                <input type="hidden" name="csrf_token" value="<?php echo $csrf_create; ?>">
                 <div class="modal-header">
                     <div class="modal-title" id="myModalLabel">表示条件変更</div>
                 </div>
@@ -125,7 +197,8 @@ while($row = $result->fetch_assoc()){
                         <select name="Event" id="Event" class="form-control">
                             <option value=""></option>
                             <?php
-                            while($row = $EVresult->fetch_assoc()){
+                            //while($row = $EVresult->fetch_assoc()){
+                            foreach($EVresult as $row){
                                 if($_POST["Event"]==$row["Event"]){
                                     echo "<option value='".$row["Event"]."' selected>".$row["Event"]."</option>\n";
                                 }else{
@@ -140,7 +213,8 @@ while($row = $result->fetch_assoc()){
                         <select name="Tokui" id="Tokui" class="form-control">
                             <option value=""></option>
                             <?php
-                            while($row = $TKresult->fetch_assoc()){
+                            //while($row = $TKresult->fetch_assoc()){
+                            foreach($TKresult as $row){
                                  if($_POST["Tokui"]==$row["TokuisakiNM"]){
                                     echo "<option value='".$row["TokuisakiNM"]."' selected>".$row["TokuisakiNM"]."</option>\n";
                                 }else{
@@ -172,5 +246,8 @@ while($row = $result->fetch_assoc()){
 
 </html>
 <?php
-    $mysqli->close();
+$EVresult  = null;
+$TKresult = null;
+$stmt = null;
+$pdo_h = null;
 ?>

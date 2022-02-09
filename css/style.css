@@ -7,8 +7,10 @@ html {
 }
 body {
     padding-top: 70px; /* ヘッダーの後ろに要素が隠れないようにするため */
-    /*padding-bottom:150px;  フッターーの後ろに要素が隠れないようにするため */
-    font-family: 'Kosugi Maru', sans-serif;
+    /*メインのフォント 下が有効*/
+    /*font-family: 'Kosugi Maru', sans-serif;*/ 
+    font-family: 'Zen Kurenaido', sans-serif;
+    font-size:1.3rem;
 }
 header{
     height: 70px; /* 高さを70pxに指定 */
