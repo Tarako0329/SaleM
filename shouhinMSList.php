@@ -33,9 +33,9 @@ if($_POST["commit_btn"] <> ""){
         $stmt->bindValue(2, $row3[0]["zeiritu"], PDO::PARAM_INT);
         $stmt->bindValue(3, $row["zeikbn"], PDO::PARAM_STR);
         $stmt->bindValue(4, $row["tani"], PDO::PARAM_STR);
-        $stmt->bindValue(5, $row["bunrui1"], PDO::PARAM_INT);
-        $stmt->bindValue(6, $row["bunrui2"], PDO::PARAM_INT);
-        $stmt->bindValue(7, $row["bunrui3"], PDO::PARAM_INT);
+        $stmt->bindValue(5, $row["bunrui1"], PDO::PARAM_STR);
+        $stmt->bindValue(6, $row["bunrui2"], PDO::PARAM_STR);
+        $stmt->bindValue(7, $row["bunrui3"], PDO::PARAM_STR);
         $stmt->bindValue(8, $row["hyoujiKBN1"], PDO::PARAM_STR);
         $stmt->bindValue(9, $row["hyoujiNO"], PDO::PARAM_INT);
         $stmt->bindValue(10,$row["shouhinCD"], PDO::PARAM_INT);
@@ -110,9 +110,9 @@ foreach($stmt as $row){
     
     echo "<td><input type='number'   name ='ORDERS[".$i."][utisu]' style='width:6rem;' value='".$row["utisu"]."'></td>";
     echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][tani]' style='width:3rem;' value='".$row["tani"]."'></td>";
-    echo "<td class='d-none d-sm-table-cell'><input type='number'   name ='ORDERS[".$i."][bunrui1]' style='width:4rem;' value='".$row["bunrui1"]."'></td>";
-    echo "<td class='d-none d-sm-table-cell'><input type='number'   name ='ORDERS[".$i."][bunrui2]' style='width:4rem;' value='".$row["bunrui2"]."'></td>";
-    echo "<td class='d-none d-sm-table-cell'><input type='number'   name ='ORDERS[".$i."][bunrui3]' style='width:4rem;' value='".$row["bunrui3"]."'></td>";
+    echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][bunrui1]' style='width:4rem;' value='".$row["bunrui1"]."'></td>";
+    echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][bunrui2]' style='width:4rem;' value='".$row["bunrui2"]."'></td>";
+    echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][bunrui3]' style='width:4rem;' value='".$row["bunrui3"]."'></td>";
     echo "<td><input type='checkbox' name ='ORDERS[".$i."][hyoujiKBN1]' style='width:4rem;' ".$chk."></td>";
 //    echo "<td class='d-none d-sm-table-cell'><input type='number'   name ='ORDERS[".$i."][hyoujiKBN2]' style='width:4rem;' value='".$row["hyoujiKBN2"]."'></td>";
 //    echo "<td class='d-none d-sm-table-cell'><input type='number'   name ='ORDERS[".$i."][hyoujiKBN3]' style='width:4rem;' value='".$row["hyoujiKBN3"]."'></td>";

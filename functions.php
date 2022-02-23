@@ -72,8 +72,8 @@ function csrf_chk(){
 
     if ($cookie_token != $csrf_token || $csrf_token != $session_token) {
         //不正アクセス
-        //return false;
-        return true;
+        return false;
+        //return true;
     }else{
         //echo "通った [".$cookie_token."::".$csrf_token."::".$session_token."] csrf_chk<br>";
         return true;
@@ -90,8 +90,8 @@ function csrf_chk_nonsession(){
 
     if ($csrf_token != $cookie_token) {
         //不正アクセス
-        //return false;
-        return true;
+        return false;
+        //return true;
     }else{
         //echo "通った [".$cookie_token."::".$csrf_token."] csrf_chk_nonsession<br>";
         return true;
@@ -107,8 +107,8 @@ function csrf_chk_nonsession_get($csrf_token){
 
     if ($csrf_token != $cookie_token) {
         //不正アクセス
-        //return false;
-        return true;
+        return false;
+        //return true;
     }else{
         //echo "通った [".$cookie_token."::".$csrf_token."] csrf_chk_nonsession_get<br>";
         return true;
@@ -175,7 +175,8 @@ function get_pdo_options() {
 function touroku_mail($mail){
 $mail2=rot13encrypt($mail);
 // 送信元
-$from = "From: テスト送信者<no-reply@webrez.com>";
+$from = "From: テスト送信者<information@green-island.mixh.jp>";
+$from = "From: テスト送信者<green.green.midori@gmail.com>";
  
 // メールタイトル
 $subject = "WEBREZ＋ 登録案内";
@@ -212,75 +213,12 @@ function updatedb($SV, $USER, $PASS, $DBNAME,$version,$comment){
     $row = $result->fetch_assoc(); 
 
 
-    if((double)$row["version"]<1.010 && (double)$row["version"]<(double)$version){//DBのバージョン＜PGのバージョン
+    if((double)$row["version"]<1.00 && (double)$row["version"]<(double)$version){//DBのバージョン＜PGのバージョン
         //差分SQL実行
+
         echo $row["version"]." now version no<br>";
         echo (string)$version." version up complete!! <br>";
-        $sqlstr = "insert into version values(1.01,'index.php追加/nセキュリティ向上/nメンテナンス性向上/nお釣り電卓機能追加 他');";
-	    $stmt = $mysqli_fc->query("LOCK TABLES version WRITE");
-	    $stmt = $mysqli_fc->prepare($sqlstr);
-	    $stmt->execute();
-	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
-    }
-    
-    if((double)$row["version"]<1.020 && (double)$row["version"]<(double)$version){//DBのバージョン＜PGのバージョン
-        //差分SQL実行
-        //echo (string)$version."<br>";
-        
-        $sqlstr = "ALTER TABLE `ShouhinMS` CHANGE `hyoujiKBN1` `hyoujiKBN1` VARCHAR(2) NULL DEFAULT NULL COMMENT 'レジ表示';";
-	    $stmt = $mysqli_fc->query("LOCK TABLES ShouhinMS WRITE");
-	    $stmt = $mysqli_fc->prepare($sqlstr);
-	    $stmt->execute();
-	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
-        
-        $sqlstr = "update ShouhinMS set hyoujiKBN1='';";
-	    $stmt = $mysqli_fc->query("LOCK TABLES ShouhinMS WRITE");
-	    $stmt = $mysqli_fc->prepare($sqlstr);
-	    $stmt->execute();
-	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
-
-        $sqlstr = "insert into version values(1.02,'売上確認画面、商品登録画面の改善　他');";
-	    $stmt = $mysqli_fc->query("LOCK TABLES version WRITE");
-	    $stmt = $mysqli_fc->prepare($sqlstr);
-	    $stmt->execute();
-	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
-	    echo (string)$version." version up complete!! <br>";
-    }
-
-    if((double)$row["version"]<1.030 && (double)$row["version"]<(double)$version){//DBのバージョン＜PGのバージョン
-        //差分SQL実行
-        echo $row["version"]." now version no<br>";
-        echo (string)$version." version up complete!! <br>";
-        $sqlstr = "insert into version values(1.03,'セキュリティ向上　デザインの統一　メンテナンス性向上　他');";
-	    $stmt = $mysqli_fc->query("LOCK TABLES version WRITE");
-	    $stmt = $mysqli_fc->prepare($sqlstr);
-	    $stmt->execute();
-	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
-    }
-
-    if((double)$row["version"]<1.032 && (double)$row["version"]<(double)$version){//DBのバージョン＜PGのバージョン
-        //差分SQL実行
-        echo $row["version"]." now version no<br>";
-        echo (string)$version." version up complete!! <br>";
-        $sqlstr = "insert into version values(1.031,'".$comment."');";
-	    $stmt = $mysqli_fc->query("LOCK TABLES version WRITE");
-	    $stmt = $mysqli_fc->prepare($sqlstr);
-	    $stmt->execute();
-	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
-    }
-
-    if((double)$row["version"]<1.04 && (double)$row["version"]<(double)$version){//DBのバージョン＜PGのバージョン
-        //差分SQL実行
-        //商品マスタの税区分桁数増
-        $sqlstr = "ALTER TABLE `ShouhinMS` CHANGE `zeiKBN` `zeiKBN` INT(5) NOT NULL;";
-	    $stmt = $mysqli_fc->query("LOCK TABLES ShouhinMS WRITE");
-	    $stmt = $mysqli_fc->prepare($sqlstr);
-	    $stmt->execute();
-	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
-	    
-        echo $row["version"]." now version no<br>";
-        echo (string)$version." version up complete!! <br>";
-        $sqlstr = "insert into version values(1.04,'".$comment."');";
+        $sqlstr = "insert into version values(1.00,'".$comment."');";
 	    $stmt = $mysqli_fc->query("LOCK TABLES version WRITE");
 	    $stmt = $mysqli_fc->prepare($sqlstr);
 	    $stmt->execute();
