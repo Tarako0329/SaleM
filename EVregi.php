@@ -164,6 +164,8 @@ window.onload = function() {
         order_chk.style.display = 'none';
         btn_commit.style.display = 'block';
         dentaku.style.display = 'block';
+        order_return.style.display = 'block';
+        order_clear.style.display = 'none';
     };
     
     dentaku.onclick = function(){
@@ -193,6 +195,7 @@ window.onload = function() {
      var su = document.getElementsByClassName("su");
      var items = document.getElementsByClassName("items");
      var reset_btn = document.getElementById("order_clear");
+     var return_btn = document.getElementById("order_return");
      // リセットボタンのクリック処理
      reset_btn.onclick = function (){
         for (let i = 0; i < su.length; i++) {
@@ -208,7 +211,19 @@ window.onload = function() {
             echo "cnt_suryou_".$row["shouhinCD"]." = 0;\n";
         }
         ?>
+        order_chk.style.display = 'block';
+        btn_commit.style.display = 'none';
      };
+     //戻るボタン
+     return_btn.onclick = function(){
+        for (let i = 0; i < su.length; i++) {
+            items.item(i).style.display = 'block';
+        }
+        order_return.style.display = 'none';
+        order_clear.style.display = 'block';
+        btn_commit.style.display = 'none';
+        order_chk.style.display = 'block';
+     }
 };    
 </script>
 
@@ -253,12 +268,15 @@ window.onload = function() {
 </body>
 
 <footer>
-    <div class="kaikei"><span style="font-size:1.6rem;">お会計</span> ￥<span id="kaikei">0</span>- <span style="font-size:1.6rem;">内税</span>(<span id="utizei">0</span>)</div>
+    <div class="kaikei">
+        <span style="font-size:1.6rem;">お会計</span> ￥<span id="kaikei">0</span>- <span style="font-size:1.6rem;">内税</span>(<span id="utizei">0</span>)
+    </div>
     <div class="right1">
         <button type='button' class='btn btn--chk' style="border-radius:0;" id='dentaku' data-toggle="modal" data-target="#FcModal">釣　銭</button>
     </div>
     <div class="right3">
         <button type='button' class='btn btn--chk' style="border:solid;border-top:none;border-bottom:none;border-color:#fff;border-radius: 0;" id='order_clear'>クリア</button>
+        <button type='button' class='btn btn--chk' style="display:none;border:solid;border-top:none;border-bottom:none;border-color:#fff;border-radius: 0;" id='order_return'>戻　る</button>
     </div>
     <div class="right2">
         <button type='submit' class='btn btn--commit' style='display:none;border-radius:0;' id='btn_commit' name='commit_btn' value="commit">登　録</button>

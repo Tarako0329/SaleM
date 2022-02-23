@@ -122,6 +122,13 @@ $csrf_token=csrf_create();
             </div>
         </div>
         <div class="form-group form-inline">
+            <label for="tanka" class="col-2 col-md-1 control-label">税込み価格</label></label>
+            <div class=" col-10">
+                <input type="number" class="form-control" style="width:80%" id="zkomitanka" >
+            </div>
+        </div>
+
+        <div class="form-group form-inline">
             <label for="utisu" class="col-2 col-md-1 control-label">内容量</label>
             <div class=" col-10">
                 <input type="number" class="form-control" style="width:80%" id="utisu" name="utisu" placeholder="1箱12個入りの場合「12」等">
