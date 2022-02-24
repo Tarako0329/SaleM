@@ -4,23 +4,25 @@
 require "php_header.php";
 if(isset($_GET["csrf_token"]) || empty($_POST)){
     if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
-        $_SESSION["EMSG"]="セッションが正しくありませんでした。";
+        $_SESSION["EMSG"]="セッションが正しくありませんでした。①";
         header("HTTP/1.1 301 Moved Permanently");
         header("Location: index.php");
         exit();
     }
 }elseif(csrf_chk()==false){
-    $_SESSION["EMSG"]="セッションが正しくありませんでした";
+    $_SESSION["EMSG"]="セッションが正しくありませんでした②";
     header("HTTP/1.1 301 Moved Permanently");
     header("Location: index.php");
+    exit();
 }
 
 $rtn=check_session_userid();
 $csrf_create = csrf_create();
 
+$msg = "";
+
 if(isset($_POST["cd"]) && isset($_POST["urino"])){
     //削除モード(実行)
-    $mode="del";
     $sql="delete from UriageData where uid = :user_id and UriageNO = :UriNO and ShouhinCD = :ShouhinCD";
     $stmt = $pdo_h->prepare( $sql );
     $stmt->bindValue("UriNO", $_POST["urino"], PDO::PARAM_INT);
@@ -28,7 +30,7 @@ if(isset($_POST["cd"]) && isset($_POST["urino"])){
     $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
     $status = $stmt->execute();
     if($status){
-        $msg = "売上を削除しました<br><br>";
+        $msg = "売上を削除しました<br>";
     }else{
         $msg = "売り上げ削除失敗<br><br>";
     }
@@ -132,7 +134,9 @@ $TKresult->execute();
 <body>    
     <div class="container-fluid">
     <?php
-    if($mode=="del"){echo secho($msg);}?>
+//    if($mode=="del"){echo $msg;}
+    echo $msg;
+    ?>
     <table class="table-striped table-bordered">
         <thead><tr><th>売上日</th><th>Event名</th><th>顧客名</th><th>売上№</th><th>商品</th><th style="width:3rem;">個数</th><th style="width:3rem;">単価</th><th style="width:5rem;">売上</th><th style="width:4rem;">消費税</th></tr></thead>
 <?php    
@@ -153,6 +157,7 @@ if($mode=="del"){
         <input type="hidden" name="mode" value="del">
         <input type="hidden" name="urino" value=<?php echo secho($_GET["urino"]);?>>
         <input type="hidden" name="cd" value=<?php echo secho($_GET["cd"]);?>>
+        <input type="hidden" name="csrf_token" value="<?php echo $csrf_create; ?>">
         <input type="submit" class="btn btn-primary" style="width:5rem;padding:0;" value="削除">
     </form>
     </div>

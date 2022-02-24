@@ -39,6 +39,7 @@ if($_POST["btn"] == "削除"){
         $_SESSION["EMSG"]="セッションが正しくありませんでした";
         header("HTTP/1.1 301 Moved Permanently");
         header("Location: index.php");
+        exit();
     }
     $sqlstr="delete from ShouhinMS where shouhinCD=? and uid=?";
     $stmt = $pdo_h->prepare($sqlstr);
@@ -70,7 +71,7 @@ if($_POST["btn"] == "削除"){
 //税区分MSリスト取得
 $sqlstr="select * from ZeiMS order by zeiKBN;";
 $stmt = $pdo_h->query($sqlstr);
-$csrf_token=csrf_create();
+$csrf_token = csrf_create();
 
 ?>
 <head>
@@ -92,7 +93,7 @@ $csrf_token=csrf_create();
     <?php 
     if($msg<>""){
         echo $msg;
-        echo "<a href='shouhinMSList.php?csrf_token='".$csrf_token."'>商品一覧に戻る</a>";
+        echo "<a href='shouhinMSList.php?csrf_token=".$csrf_token."'>商品一覧に戻る</a>";
         exit;
     } ?>
     <p>以下の商品を削除しますか？</p>
