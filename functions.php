@@ -172,12 +172,14 @@ function get_pdo_options() {
 // =========================================================
 //登録メール
 // =========================================================
-function touroku_mail($mail){
-$mail2=rot13encrypt($mail);
+function touroku_mail($to,$subject,$body){
+$mail2=rot13encrypt($to);
+$s_name=$_SERVER['SCRIPT_NAME'];
+$dir_a=explode("/",$s_name,-1);
+
 // 送信元
-$from = "From: テスト送信者<information@green-island.mixh.jp>";
-$from = "From: テスト送信者<green.green.midori@gmail.com>";
- 
+$from = "From: テスト送信者<information@WEBREZ.jp>";
+
 // メールタイトル
 $subject = "WEBREZ＋ 登録案内";
  
@@ -186,13 +188,58 @@ $body = <<< "EOM"
 WEBREZ+（ウェブレジプラス）にご興味をもっていただきありがとうございます。
 こちらのURLから登録をお願いいたします。
 
-https://green-island.mixh.jp/SaleM/TEST/account_create.php?mode=0&acc=$mail2
+https://green-island.mixh.jp/SaleM/$dir_a[2]/account_create.php?mode=0&acc=$mail2
 EOM;
  
 // メール送信
-mail($mail, $subject, $body, $from);
-return 0;
+mail($to, $subject, $body, $from);
+return 1;
 }
+
+// =========================================================
+// メール送信
+// =========================================================
+function send_mail($to,$subject,$body){
+	//$to		: 送信先アドレス
+	//$subject	: 件名
+	//$body		: 本文
+
+	//SMTP送信
+    require_once('qdmail.php');
+    require_once('qdsmtp.php');
+
+    $mail = new Qdmail();
+    $mail -> smtp(true);
+    $param = array(
+        'host'=> HOST,
+        'port'=> PORT ,
+        'from'=> FROM,
+        'protocol'=>PROTOCOL,
+    	'pop_host'=>POP_HOST,
+    	'pop_user'=>POP_USER,
+    	'pop_pass'=>POP_PASS,
+    );
+    $mail->smtpServer($param);
+    $mail->charsetBody('UTF-8','base64');
+    $mail->kana(true);
+    $mail->errorDisplay(false);
+    $mail->smtpObject()->error_display = false;
+    $mail->logLevel(1);
+	//$mail->logPath('./log/');
+	//$mail->logFilename('anpi.log');
+	//$smtp ->timeOut(10);
+	
+    $mail ->to($to);
+    $mail ->from('information@green-island.mixh.jp' , 'WEBREZ-info');
+    $mail ->subject($subject);
+    $mail ->text($body);
+
+    //送信
+    $return_flag = $mail ->send();
+    return $return_flag;
+}
+
+
 
 // =========================================================
 // バージョン差分修正SQL実行

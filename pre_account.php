@@ -15,11 +15,32 @@ if($_POST["BTN"] == "send"){
     $stmt->execute();
     $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $col1 = $row[0]["kensu"];
+
     if($col1>0){
         $choufuku_flg=1;
     }else{
-        $rtn=touroku_mail($_POST["MAIL"]);
-        $okflg=1;
+        //登録用メール送信
+        $to = $_POST["MAIL"];
+        $subject = "WEBREZ登録のご案内";
+        $mail2=rot13encrypt($to);
+        
+        $s_name=$_SERVER['SCRIPT_NAME'];
+        $dir_a=explode("/",$s_name,-1);
+
+        $body = <<< "EOM"
+            WEBREZ+（ウェブレジプラス）にご興味をもっていただきありがとうございます。
+            こちらのURLから登録をお願いいたします。
+            
+            https://green-island.mixh.jp/SaleM/$dir_a[2]/account_create.php?mode=0&acc=$mail2
+            EOM;
+        if(FROM==""){
+            //.env にメールアカウント情報が設定されてない場合、phpのsendmailで送付
+            define("FROM", "information@WEBREZ.jp");
+            $okflg=touroku_mail($to,$subject,$body);
+        }else{
+            //qdmailでメール送付
+            $okflg = send_mail($to,$subject,$body);
+        }
     }
 }else{
     //echo "登録が失敗しました。";
@@ -46,7 +67,7 @@ if($_POST["BTN"] == "send"){
         //メールアドレスの検索結果が１件以上の場合
         echo "このメールアドレスは登録済みです。<a href='index.php'>TOP画面</a>に戻ってログインして下さい。<br>パスワードを忘れた場合は再発行してログインして下さい。<br>";
     }elseif($okflg==1){
-        echo $_POST['MAIL']." へ登録用のURLを記載したメールを送信いたしました。メールが届いてない場合、メールアドレスが間違えているか、迷惑メールになっている可能性があります。";
+        echo $_POST['MAIL']." へ登録用のURLを記載したメールを送信いたしました。メールが届いてない場合、メールアドレスが間違えているか、迷惑メールになっている可能性があります。<br>送信元アドレスは ".FROM. "となります。";
     }
     ?>
     <div class="container" style="padding-top:15px;">

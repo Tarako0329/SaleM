@@ -18,7 +18,13 @@ define("DNS","mysql:host=".$_ENV["SV"].";dbname=".$_ENV["DBNAME"].";charset=utf8
 define("USER_NAME", $_ENV["USER"]);
 define("PASSWORD", $_ENV["PASS"]);
 
-
+define("HOST", $_ENV["HOST"]);
+define("PORT", $_ENV["PORT"]);
+define("FROM", $_ENV["FROM"]);
+define("PROTOCOL", $_ENV["PROTOCOL"]);
+define("POP_HOST", $_ENV["POP_HOST"]);
+define("POP_USER", $_ENV["POP_USER"]);
+define("POP_PASS", $_ENV["POP_PASS"]);
 
 //サイトタイトルの取得
 $title = $_ENV["TITLE"];
