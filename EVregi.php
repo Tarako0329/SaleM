@@ -15,7 +15,8 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
 $rtn=check_session_userid();
 
 
-//売上登録
+//売上登録(F5・更新による2重登録を防ぐため、登録処理をEVregiInsert.phpに分離)
+/*
 if($_POST["commit_btn"] <> ""){
     if(csrf_chk_nonsession()==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。";
@@ -75,7 +76,7 @@ if($_POST["commit_btn"] <> ""){
     }
 
 }
-
+*/
 
 //商品M取得
 $sql = "select * from ShouhinMS where hyoujiKBN1='on' and uid = ? order by hyoujiNO,bunrui1,bunrui2,bunrui3,shouhinNM";
@@ -227,7 +228,7 @@ window.onload = function() {
 };    
 </script>
 
-<form method = "post" action="EVregi.php">
+<form method = "post" action="EVregiInsert.php">
     <input type="hidden" name="csrf_token" value='<?php echo $token;?>'>
     
 <header>

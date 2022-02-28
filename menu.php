@@ -45,13 +45,13 @@ if($_GET["action"]=="logout"){
 
 <?php
     $array = [
-        'レジ'=>['EVregi.php?csrf_token='.$token],
-        '個別売上'=>['xxx.php?csrf_token='.$token],
-        '売上実績'=>['UriageData.php?csrf_token='.$token],
-        '商品登録'=>['shouhinMSedit.php?csrf_token='.$token],
-        '商品一覧'=>['shouhinMSList.php?csrf_token='.$token],
-        'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token],
-        'お知らせ'=>['system_update_log.php']
+        'レジ'=>['EVregi.php?csrf_token='.$token]
+        //,'個別売上'=>['xxx.php?csrf_token='.$token]
+        ,'売上実績'=>['UriageData.php?csrf_token='.$token]
+        ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token]
+        ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token]
+        ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]
+        //,'お知らせ'=>['system_update_log.php']
     ];
     $i=0;
     echo "<div class='row'>";
