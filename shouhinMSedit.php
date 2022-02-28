@@ -111,7 +111,7 @@ $csrf_token=csrf_create();
             <label for="zeikbn" class="col-2 col-md-1 control-label">税区分</label>
             <div class=" col-10">
                 <!--<input type="text" class="form-control" id="zeikbn" name="zeikbn">-->
-                <select class="form-control" style="width:80%" id="zeikbn" name="zeikbn" required="required" placeholder="必須">
+                <select class="form-control" style="width:80%;padding-top:0;" id="zeikbn" name="zeikbn" required="required" placeholder="必須" >
                     <option value=""></option>
                     <?php
                     foreach($stmt as $row){
@@ -124,7 +124,7 @@ $csrf_token=csrf_create();
         <div class="form-group form-inline">
             <label for="tanka" class="col-2 col-md-1 control-label">税込み価格</label></label>
             <div class=" col-10">
-                <input type="number" class="form-control" style="width:80%" id="zkomitanka" >
+                <input type="number" readonly='readonly' class="form-control" style="width:80%;border:none;" id="zkomitanka" >
             </div>
         </div>
 
@@ -198,6 +198,26 @@ $csrf_token=csrf_create();
         </div>
     </form>
     </div>
+
+    <script type="text/javascript" language="javascript">
+        var select = document.getElementById('zeikbn');
+        var tanka = document.getElementById('tanka');
+        var zkomitanka = document.getElementById('zkomitanka');
+        
+        select.onchange = function(){
+            switch(this.value){
+                case '0':
+                    zkomitanka.value=tanka.value;
+                    break;
+                case '1001':
+                    zkomitanka.value=Math.round(tanka.value * (1 + 8 / 100));
+                    break;
+                case '1101':
+                    zkomitanka.value=Math.round(tanka.value * (1 + 10 / 100));
+                    break;
+            }
+        }
+    </script>
 
 </body>
 </html>
