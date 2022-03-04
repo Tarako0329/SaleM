@@ -11,6 +11,12 @@ if($_GET["action"]=="logout"){
     session_start();
     $logoff=true;
 }
+$_SESSION["PK"]=PKEY;
+$_SESSION["SK"]=SKEY;
+$s_name=$_SERVER['SCRIPT_NAME'];
+$dir_a=explode("/",$s_name,-1);
+$_SESSION["URL"]="../SaleM/$dir_a[2]/subscription.php";
+
 ?>
 <head>
     <?php 
@@ -51,6 +57,7 @@ if($_GET["action"]=="logout"){
         ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token]
         ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token]
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]
+        ,'契約・解除'=>['../../PAY/index.php?system=webrez']
         //,'お知らせ'=>['system_update_log.php']
     ];
     $i=0;

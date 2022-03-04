@@ -26,17 +26,16 @@ define("POP_HOST", $_ENV["POP_HOST"]);
 define("POP_USER", $_ENV["POP_USER"]);
 define("POP_PASS", $_ENV["POP_PASS"]);
 
+define("SKEY", $_ENV["SKey"]);
+define("PKEY", $_ENV["PKey"]);
+
+
 //サイトタイトルの取得
 $title = $_ENV["TITLE"];
 //暗号化キー
 $key = $_ENV["KEY"];
 //PGバージョン差分補正
 updatedb($_ENV["SV"], $_ENV["USER"], $_ENV["PASS"], $_ENV["DBNAME"] ,$version,$comment);
-//MySQLエラーレポート用共通宣言
-//mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-//DB接続
-//$mysqli = new mysqli($_ENV["SV"], $_ENV["USER"], $_ENV["PASS"], $_ENV["DBNAME"]);
-//$mysqli->set_charset('utf8');
 
 // DBとの接続
 $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());

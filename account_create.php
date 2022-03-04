@@ -2,10 +2,10 @@
 <html lang="ja">
 <?php
 //ユーザ登録、登録情報の修正画面
-//mode 0:新規　1:更新　3:確認(新規) 4:確認(更新)
-
+//$mode 0:新規　1:更新　3:確認(新規) 4:確認(更新) 5:登録完了（更新・新規共通）6:登録失敗
 require "php_header.php";
 
+//GET or POST からモード値を取得。無い場合は不正アクセス
 if($_GET["mode"]<>""){
     $mode=$_GET["mode"];
 }elseif($_POST["MODE"]<>""){
@@ -13,59 +13,80 @@ if($_GET["mode"]<>""){
 }else{
     //必ずモード値が渡される
     echo "不正アクセス";
-    exit;
+    exit();
 }
 
-if((isset($_GET["csrf_token"]) || empty($_POST)) && $mode<>0){
+//GETのセッションチェック
+if($mode==5 || $mode==6){
+}elseif((isset($_GET["csrf_token"]) || empty($_POST)) && $mode<>0){
     if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。";
         header("HTTP/1.1 301 Moved Permanently");
         header("Location: index.php");
         exit();
     }
+}elseif(csrf_chk()==false && $mode>=3){
+    //POSTのセッションチェック
+    $_SESSION["EMSG"]="セッションが正しくありませんでした";
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: index.php");
+    exit();
 }
-
-//unset($_SESSION["user_id"]);
 
 if($mode==1 || $mode==4){
     //更新モードの場合、session[usr_id]のチェック
     $rtn=check_session_userid();
 }
 
-if(csrf_chk()==false && $mode>=3){
-    $_SESSION["EMSG"]="セッションが正しくありませんでした";
-    header("HTTP/1.1 301 Moved Permanently");
-    header("Location: index.php");
+if($mode==0){
+    //新規の場合メールアドレスの重複チェック不要
+    $_SESSION["MAIL"]=rot13decrypt($_GET["acc"]);
+    $next_mode=3;
 }
 
+if($mode==1){
+    //更新モード：ユーザ情報取得
+    $sqlstr="select * from Users where uid=?";
+    $stmt = $pdo_h->prepare($sqlstr);
+    $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    $_SESSION["MAIL"] = $row[0]["mail"];
+    $_SESSION["moto_MAIL"] = $row[0]["mail"]; //メールアドレスを変更したかどうか比較するための元ｱﾄﾞﾚｽ
+    //$_SESSION["PASS"] = passEX($_POST["PASS"],$_POST["MAIL"],$key);　パスワードは表示しない（不可逆で登録してるので出来ないｗ）
+    $_SESSION["QUESTION"] = $row[0]["question"];
+    $_SESSION["ANSWER"] = $row[0]["answer"];
+    $_SESSION["LOGINREZ"] = $row[0]["loginrez"];
+    $_SESSION["NAME"] = $row[0]["name"];
+    $_SESSION["YAGOU"] = $row[0]["yagou"];
+    $_SESSION["zip11"] = $row[0]["yubin"];
+    $_SESSION["addr11"] = $row[0]["address1"];
+    $_SESSION["ADD2"] = $row[0]["address2"];
+    $_SESSION["ADD3"] = $row[0]["address3"];
+    $next_mode=4;
+}
 
-
-//新規登録時の重複フラグ
-$choufuku_flg=0;
-
-$btnname = "確　認";
-
-if($_POST["BTN"] == "確　認"){
+if($mode==3 || $mode==4){
     //入力内容の確認モード
-    if($mode==0){
-        //新規の場合メールアドレスの重複チェック
+    if($mode==4 && $_SESSION["moto_MAIL"] <> $_POST["MAIL"]){
+        //更新の場合メールアドレスの重複チェック
         $sqlstr="select count(*) as kensu from Users where mail=?";
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $_POST["MAIL"], PDO::PARAM_STR);
         $stmt->execute();
         $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $col1 = $row[0]["kensu"];
+        
+        //新規登録時の重複フラグ
         if($col1>0){
             $choufuku_flg=1;
+            $mode=1;
+            $next_mode=4;
+        }else{
+            $choufuku_flg=0;
         }
-        $btnname = "登　録";
-        $mode=3;
-    }elseif($mode==1){
-        $btnname = "更　新";
-        $mode=4;
     }
-    
-    
     //POSTをSESSIONに格納
     $_SESSION["MAIL"] = $_POST["MAIL"];
     $_SESSION["PASS"] = passEX($_POST["PASS"],$_POST["MAIL"],$key);
@@ -78,85 +99,25 @@ if($_POST["BTN"] == "確　認"){
     $_SESSION["addr11"] = $_POST["addr11"];
     $_SESSION["ADD2"] = $_POST["ADD2"];
     $_SESSION["ADD3"] = $_POST["ADD3"];
-
-}elseif($_POST["BTN"] == "登　録"){
-    $sqlstr="insert into Users values(0,?,?,?,?,?,?,?,?,?,?,?,null,null,null,null,null,null,null,null,null,null)";
-    $stmt = $pdo_h->prepare($sqlstr);
-    $stmt->bindValue(1, $_SESSION["MAIL"], PDO::PARAM_STR);
-    $stmt->bindValue(2, $_SESSION["PASS"], PDO::PARAM_STR);
-    $stmt->bindValue(3, $_SESSION["QUESTION"], PDO::PARAM_STR);
-    $stmt->bindValue(4, $_SESSION["ANSWER"], PDO::PARAM_STR);
-    $stmt->bindValue(5, $_SESSION["LOGINREZ"], PDO::PARAM_STR);
-    $stmt->bindValue(6, $_SESSION["NAME"], PDO::PARAM_STR);
-    $stmt->bindValue(7, $_SESSION["YAGOU"], PDO::PARAM_STR);
-    $stmt->bindValue(8, $_SESSION["zip11"], PDO::PARAM_STR);
-    $stmt->bindValue(9, $_SESSION["addr11"], PDO::PARAM_STR);
-    $stmt->bindValue(10, $_SESSION["ADD2"], PDO::PARAM_STR);
-    $stmt->bindValue(11, $_SESSION["ADD3"], PDO::PARAM_STR);
-    $flg=$stmt->execute();
-    
-    if($flg){
-        $stmt2 = $pdo_h->prepare("select uid from Users where mail=?");
-        $stmt2->bindValue(1, $_SESSION["MAIL"], PDO::PARAM_STR);
-        $stmt2->execute();
-        $tmp = $stmt2->fetchAll(PDO::FETCH_ASSOC);
-        $_SESSION["user_id"]=$tmp[0]["uid"];
-        echo "<meta http-equiv='refresh' content=' 5; url=./menu.php'>";
-        echo secho($_POST["MAIL"])."　が登録されました。<br>5秒後、メニュー画面に遷移します。";
-        exit();
-    }else{
-        echo "登録が失敗しました。";
-    }
-    //echo $_POST["hyoujiKBN1"];
-    //リダイレクトTOP画面へ
-}elseif($_POST["BTN"] == "更　新"){
-    $sqlstr="update Users set mail=?,password=?,question=?,answer=?,loginrez=?,name=?,yagou=?,yubin=?,address1=?,address2=?,address3=? where uid=?";
-    $stmt = $pdo_h->prepare($sqlstr);
-    $stmt->bindValue(1, $_SESSION["MAIL"], PDO::PARAM_STR);
-    $stmt->bindValue(2, $_SESSION["PASS"], PDO::PARAM_STR);
-    $stmt->bindValue(3, $_SESSION["QUESTION"], PDO::PARAM_STR);
-    $stmt->bindValue(4, $_SESSION["ANSWER"], PDO::PARAM_STR);
-    $stmt->bindValue(5, $_SESSION["LOGINREZ"], PDO::PARAM_STR);
-    $stmt->bindValue(6, $_SESSION["NAME"], PDO::PARAM_STR);
-    $stmt->bindValue(7, $_SESSION["YAGOU"], PDO::PARAM_STR);
-    $stmt->bindValue(8, $_SESSION["zip11"], PDO::PARAM_STR);
-    $stmt->bindValue(9, $_SESSION["addr11"], PDO::PARAM_STR);
-    $stmt->bindValue(10, $_SESSION["ADD2"], PDO::PARAM_STR);
-    $stmt->bindValue(11, $_SESSION["ADD3"], PDO::PARAM_STR);
-    $stmt->bindValue(12, $_SESSION["user_id"], PDO::PARAM_INT);
-    $flg=$stmt->execute();
-    
-    if($flg){
-        echo "<meta http-equiv='refresh' content=' 5; url=./menu.php'>";
-        echo "更新されました。";
-        $mode=1;
-        //exit();
-    }else{
-        echo "登録が失敗しました。";
-    }
 }
 
-if($mode==1){
-    $sqlstr="select * from Users where uid=?";
-    $stmt = $pdo_h->prepare($sqlstr);
-    $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
-    $stmt->execute();
-    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    $_SESSION["MAIL"] = $row[0]["mail"];
-    //$_SESSION["PASS"] = passEX($_POST["PASS"],$_POST["MAIL"],$key);
-    $_SESSION["QUESTION"] = $row[0]["question"];
-    $_SESSION["ANSWER"] = $row[0]["answer"];
-    $_SESSION["LOGINREZ"] = $row[0]["loginrez"];
-    $_SESSION["NAME"] = $row[0]["name"];
-    $_SESSION["YAGOU"] = $row[0]["yagou"];
-    $_SESSION["zip11"] = $row[0]["yubin"];
-    $_SESSION["addr11"] = $row[0]["address1"];
-    $_SESSION["ADD2"] = $row[0]["address2"];
-    $_SESSION["ADD3"] = $row[0]["address3"];
-}
 $token=csrf_create();
 
+//ボタン名のセット
+if($mode==0 || $mode==1){
+    $btnname = "確　認";
+}elseif($mode==3){
+    $btnname = "登　録";
+}elseif($mode==4){
+    $btnname = "更　新";
+}elseif($mode==5 || $mode==6){
+    //ボタン表示等なし。
+}else{
+    $_SESSION["EMSG"]="モード値が不正です。（mode=".$mode."）";
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: index.php");
+    exit();
+}
 ?>
 <head>
     <?php 
@@ -179,17 +140,29 @@ $token=csrf_create();
     if($choufuku_flg==1){
         //メールアドレスの検索結果が１件以上の場合
         echo "このメールアドレスは登録済みです。<a href='index.php'>TOP画面</a>に戻ってログインして下さい。<br>パスワードを忘れた場合は再発行してログインして下さい。<br>";
-        exit;
+    }
+    if($mode==5){
+        echo "<meta http-equiv='refresh' content=' 5; url=./menu.php'>";
+        echo "情報が登録されました。<br>5秒後、メニュー画面に遷移します。";
+        exit();
+    }elseif($mode==6){
+        echo "登録が失敗しました。<br>";
+        echo "システム管理者へ";
+        exit();
     }
     ?>
     <div class="container" style="padding-top:15px;">
     <div class="col-12 col-md-8">
-    <form method="post" action="account_create.php" style="font-size:1.5rem">
+    <?php   if($mode==0 || $mode==1){ ?>
+        <form method="post" action="account_create.php" style="font-size:1.5rem">
+    <?php   }else{ ?>
+        <form method="post" action="account_sql.php" style="font-size:1.5rem">
+    <?php   } ?>
         <input type="hidden" name="csrf_token" value="<?php echo $token; ?>">
-        <input type="hidden" name="MODE" value=<?php echo $mode; ?>>
+        <input type="hidden" name="MODE" value=<?php echo $next_mode; ?>>
         <div class="form-group">
             <label for="mail" >メールアドレス</label>
-            <input type="email" maxlength="40" class="form-control" id="mail" name="MAIL" required="required" placeholder="必須" <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["MAIL"])."'";}elseif($mode==0){echo "value='".secho(rot13decrypt($_GET["acc"]))."'";}  ?>>
+            <input type="email" maxlength="40" class="form-control" id="mail" name="MAIL" required="required" placeholder="必須" <?php if($mode>=3){echo "readonly='readonly' ";} echo "value='".secho($_SESSION["MAIL"])."'"; ?>>
         </div>
         <div class="form-group">
             <label for="pass" >パスワード(6桁以上)</label>
@@ -248,7 +221,7 @@ $token=csrf_create();
     }
 ?>
         <div class="col-2 col-md-1" style=" padding:0; margin-top:10px;">
-            <button type="submit" class="btn btn-primary" style="width:150%;hight:150%;font-size:1.5rem" name="BTN" value="<?php echo $btnname; ?>"><?php echo secho($btnname); ?></button>
+            <button type="submit" class="btn btn-primary" style="width:180%;hight:150%;font-size:1.5rem" name="BTN" value="<?php echo $btnname; ?>"><?php echo secho($btnname); ?></button>
         </div>
         <br>
     </form>

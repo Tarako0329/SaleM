@@ -15,7 +15,7 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
 $rtn=check_session_userid();
 
 
-//売上登録(F5・更新による2重登録を防ぐため、登録処理をEVregiInsert.phpに分離)
+//売上登録(F5・更新による2重登録を防ぐため、登録処理をEVregi_sql.phpに分離)
 /*
 if($_POST["commit_btn"] <> ""){
     if(csrf_chk_nonsession()==false){
@@ -228,7 +228,7 @@ window.onload = function() {
 };    
 </script>
 
-<form method = "post" action="EVregiInsert.php">
+<form method = "post" action="EVregi_sql.php">
     <input type="hidden" name="csrf_token" value='<?php echo $token;?>'>
     
 <header>

@@ -23,7 +23,7 @@ header{
     width: 100%;
     z-index: 99;
     display: flex;
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 700;
 }
 .title{
