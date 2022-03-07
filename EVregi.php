@@ -21,10 +21,10 @@ $stmt->execute();
 $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
 if($row[0]["yuukoukigen"]==""){
     //本契約済み
-}elseif($row[0]["yuukoukigen"] < date("Y-M-D")){
+}elseif($row[0]["yuukoukigen"] < date("Y-m-d")){
     //お試し期間終了
-    echo row[0]["yuukoukigen"] ;
-    $emsg="お試し期間、もしくは解約後有効期間が終了しました。<br>継続してご利用頂ける場合は<a href='../../PAY/index.php?system='.$title.'&mode='.MODE_DIR'>こちらから本契約をお願い致します </a>";
+    echo row[0]["yuukoukigen"] ;    
+    $emsg="お試し期間、もしくは解約後有効期間が終了しました。<br>継続してご利用頂ける場合は<a href='../../PAY/index.php?system=".$title."&mode=".MODE_DIR."'>こちらから本契約をお願い致します </a>";
 }
 
 //売上登録(F5・更新による2重登録を防ぐため、登録処理をEVregi_sql.phpに分離)
