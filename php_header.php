@@ -28,6 +28,8 @@ define("POP_PASS", $_ENV["POP_PASS"]);
 
 define("SKEY", $_ENV["SKey"]);
 define("PKEY", $_ENV["PKey"]);
+define("PLAN_M", $_ENV["PLAN_M"]);
+define("PLAN_Y", $_ENV["PLAN_Y"]);
 
 //サイトタイトルの取得
 $title = $_ENV["TITLE"];

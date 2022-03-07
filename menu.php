@@ -14,6 +14,8 @@ if($_GET["action"]=="logout"){
 $_SESSION["PK"]=PKEY;
 $_SESSION["SK"]=SKEY;
 $_SESSION["URL"]="../SaleM/".MODE_DIR."/subscription.php";
+$_SESSION["PLAN_M"]=PLAN_M;
+$_SESSION["PLAN_Y"]=PLAN_Y;
 
 //有効期限の取得
 $sql="select * from Users where uid=?";
