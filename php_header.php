@@ -29,9 +29,14 @@ define("POP_PASS", $_ENV["POP_PASS"]);
 define("SKEY", $_ENV["SKey"]);
 define("PKEY", $_ENV["PKey"]);
 
-
 //サイトタイトルの取得
 $title = $_ENV["TITLE"];
+
+//ディレクトリ・テストモード本番モードのURL切り分け用
+$s_name=$_SERVER['SCRIPT_NAME'];
+$dir_a=explode("/",$s_name,-1);
+define("MODE_DIR",$dir_a[2]);
+
 //暗号化キー
 $key = $_ENV["KEY"];
 //PGバージョン差分補正

@@ -13,9 +13,31 @@ if($_GET["action"]=="logout"){
 }
 $_SESSION["PK"]=PKEY;
 $_SESSION["SK"]=SKEY;
-$s_name=$_SERVER['SCRIPT_NAME'];
-$dir_a=explode("/",$s_name,-1);
-$_SESSION["URL"]="../SaleM/$dir_a[2]/subscription.php";
+$_SESSION["URL"]="../SaleM/".MODE_DIR."/subscription.php";
+
+//有効期限の取得
+$sql="select * from Users where uid=?";
+$stmt = $pdo_h->prepare($sql);
+$stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
+$stmt->execute();
+$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+if($row[0]["yuukoukigen"]<>""){
+    if(strtotime($row[0]["yuukoukigen"]) < strtotime(date("Y-m-d"))){
+        //有効期限切れ。申込日から即課金
+        $_SESSION["KIGEN"] = strtotime("+3 day");
+        echo "有効期限切れ";
+    }else{
+        //試用期間、もしくは支払済み期間の翌日から課金
+        $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
+        echo "有効期限付き(".$row[0]["yuukoukigen"]." まで)";
+        //echo "有効期限付き(".date("Y-m-d",$_SESSION["KIGEN"])." まで)";
+    }
+    $plan=0;
+}else{
+    //契約済
+    $plan=1;
+    //echo "本契約済み";
+}
 
 ?>
 <head>
@@ -57,12 +79,19 @@ $_SESSION["URL"]="../SaleM/$dir_a[2]/subscription.php";
         ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token]
         ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token]
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]
-        ,'契約・解除'=>['../../PAY/index.php?system=webrez']
+        //,'契約・解除'=>['../../PAY/index.php?system='.$title.'&mode='.MODE_DIR]
         //,'お知らせ'=>['system_update_log.php']
     ];
+    
+    if($plan==0){
+        $array2 = ['本契約'=>['../../PAY/index.php?system='.$title.'&mode='.MODE_DIR]];
+    }else{
+        $array2 = ['契約解除'=>['../../PAY/cancel.php?system='.$title.'&mode='.MODE_DIR]];
+    }
+    
     $i=0;
     echo "<div class='row'>";
-	foreach($array as $key=>$vals){
+	foreach(array_merge($array,$array2) as $key=>$vals){
         echo "  <div class ='col-md-3 col-sm-6 col-6' style='padding:5px;' >\n";
         echo "      <a href='".$vals[0]."' class='btn btn--orange'>".$key."\n";
         echo "      </a>\n";

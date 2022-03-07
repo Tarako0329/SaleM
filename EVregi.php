@@ -2,7 +2,7 @@
 <html lang="ja">
 <?php
 require "php_header.php";
-/*
+
 if(isset($_GET["csrf_token"]) || empty($_POST)){
     if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。".$_GET["csrf_token"];
@@ -11,9 +11,21 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
         exit();
     }
 }
-*/
-$rtn=check_session_userid();
 
+$rtn=check_session_userid();
+//有効期限チェック
+$sql="select yuukoukigen from Users where uid=?";
+$stmt = $pdo_h->prepare($sql);
+$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+$stmt->execute();
+$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+if($row[0]["yuukoukigen"]==""){
+    //本契約済み
+}elseif($row[0]["yuukoukigen"] < date("Y-M-D")){
+    //お試し期間終了
+    echo row[0]["yuukoukigen"] ;
+    $emsg="お試し期間、もしくは解約後有効期間が終了しました。<br>継続してご利用頂ける場合は<a href='../../PAY/index.php?system='.$title.'&mode='.MODE_DIR'>こちらから本契約をお願い致します </a>";
+}
 
 //売上登録(F5・更新による2重登録を防ぐため、登録処理をEVregi_sql.phpに分離)
 /*
@@ -237,6 +249,12 @@ window.onload = function() {
 </header>
 
 <body>
+<?php
+if(isset($emsg)){
+    echo $emsg;
+    exit();
+}
+?>
     <div class="container-fluid">
         <div class="row">
 <?php

@@ -22,8 +22,6 @@ if($_POST["commit_btn"] <> ""){
     $stmt->execute();
     
     $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-
     if(is_null($row[0]["UriageNO"])){
         //初回売上時は売上NO[1]をセット
         $UriageNO = 1;

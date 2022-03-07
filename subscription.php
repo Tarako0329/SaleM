@@ -10,11 +10,13 @@ if($_GET["sid"]<>""){
     exit();
 }
 
-$sqlstr="update Users set yuukoukigen=?,stripe_id=? where uid=?";
+$sqlstr="update Users set yuukoukigen=?,stripe_id=?,keiyakudate=?,plan=? where uid=?";
 $stmt = $pdo_h->prepare($sqlstr);
-$stmt->bindValue(1, "", PDO::PARAM_STR);
+$stmt->bindValue(1, NULL, PDO::PARAM_STR);
 $stmt->bindValue(2, $_GET["sid"], PDO::PARAM_STR);
-$stmt->bindValue(3, $_SESSION["user_id"], PDO::PARAM_INT);
+$stmt->bindValue(3, date("Y-m-d"), PDO::PARAM_STR);
+$stmt->bindValue(4, $_GET["M"], PDO::PARAM_INT);
+$stmt->bindValue(5, $_SESSION["user_id"], PDO::PARAM_INT);
 $flg=$stmt->execute();
 
 if($flg){
@@ -38,7 +40,7 @@ $token=csrf_create();
     <TITLE><?php echo secho($title)." ユーザー登録";?></TITLE>
 </head>
 <header style="flex-wrap:wrap">
-    <div class="title" style="width: 100%;"><a href="<?php if($mode==1 || $mode==4){echo "menu.php";}else{echo "index.php";}?>"><?php echo secho($title);?></a></div>
+    <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></a></div>
     <p style="font-size:1rem;">  ユーザー登録</p>
 </header>
 
