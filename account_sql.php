@@ -21,7 +21,7 @@ if($_POST["BTN"] == "登　録"){
     $kigen=date('Y-m-d', strtotime('last day of next month' . date("Y-m-d")));
     
     //$sqlstr="insert into Users values(0,?,?,?,?,?,?,?,?,?,?,?,null,null,null,null,null,null,null,null,null,null,?,?,null)";
-    $sqlstr="insert into Users(uid,mail,password,question,answer,loginrez,insdate,yuukoukigen) values(0,?,?,?,?,?)";
+    $sqlstr="insert into Users(uid,mail,password,question,answer,loginrez,insdate,yuukoukigen) values(0,?,?,?,?,?,?,?)";
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $_SESSION["MAIL"], PDO::PARAM_STR);
     $stmt->bindValue(2, $_SESSION["PASS"], PDO::PARAM_STR);
