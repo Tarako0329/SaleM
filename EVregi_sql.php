@@ -1,8 +1,8 @@
 <?php
 require "php_header.php";
+$token = csrf_create();
 
 $rtn=check_session_userid();
-$token = csrf_create();
 
 //売上登録
 if($_POST["commit_btn"] <> ""){
@@ -77,7 +77,8 @@ if($_POST["commit_btn"] <> ""){
     }catch (Exception $e) {
         $pdo_h->rollBack();
         echo "登録が失敗しました。<br>" . $e->getMessage()."<br>";
-        echo "<a href='UriageData.php?csrf_token=".$token."'>レジ画面</a>より再度登録をお願いします。<br>再三失敗するようでしたら制作者へご連絡ください。";
+        echo "<a href='UriageData.php?csrf_token=".$token."'>レジ画面</a>より再度登録をお願いします。<br>再三失敗するようでしたら制作者へご連絡ください。<br>";
+        echo "UriNO::".$UriageNO."<br>uid::".$_SESSION['user_id'];
         exit();
     }
         

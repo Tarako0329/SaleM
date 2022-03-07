@@ -2,7 +2,7 @@
 <html lang="ja">
 <?php
 require "php_header.php";
-
+/*
 if(isset($_GET["csrf_token"]) || empty($_POST)){
     if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。".$_GET["csrf_token"];
@@ -11,7 +11,7 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
         exit();
     }
 }
-
+*/
 $rtn=check_session_userid();
 //有効期限チェック
 $sql="select yuukoukigen from Users where uid=?";
