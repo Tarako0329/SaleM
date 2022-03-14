@@ -4,6 +4,16 @@ $token = csrf_create();
 
 $rtn=check_session_userid();
 
+//入力画面の前回値を記録
+$_SESSION["EV"] = $_POST["EV"];
+$stmt = $pdo_h->prepare ( 'call PageDefVal_update(?,?,?,?,?)' );
+$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+$stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
+$stmt->bindValue(3, "EVregi.php", PDO::PARAM_STR);
+$stmt->bindValue(4, "EV", PDO::PARAM_STR);
+$stmt->bindValue(5, $_POST["EV"], PDO::PARAM_STR);
+$stmt->execute();
+
 //売上登録
 if($_POST["commit_btn"] <> ""){
     if(csrf_chk_nonsession()==false){
@@ -50,8 +60,16 @@ if($_POST["commit_btn"] <> ""){
             $stmt->bindValue(8,  $row["NM"], PDO::PARAM_STR);
             $stmt->bindValue(9,  $row["SU"], PDO::PARAM_INT);
             $stmt->bindValue(10, $row["UTISU"], PDO::PARAM_INT);
-            $stmt->bindValue(11, $row["TANKA"], PDO::PARAM_INT);
-            $stmt->bindValue(12, ($row["SU"] * $row["TANKA"]), PDO::PARAM_INT);
+            //$stmt->bindValue(11, $row["TANKA"], PDO::PARAM_INT);
+            if(substr(strval($row["ZEIKBN"]),3,1) =="1" || $row["ZEIKBN"]==0){
+                //外税（マスタは税抜単価）
+                $stmt->bindValue(11, $row["TANKA"], PDO::PARAM_INT);
+                $stmt->bindValue(12, ($row["SU"] * $row["TANKA"]), PDO::PARAM_INT);
+            }else{
+                //内税（マスタは税込単価）
+                $stmt->bindValue(11, $row["TANKA"] - $row["ZEI"], PDO::PARAM_INT);
+                $stmt->bindValue(12, ($row["SU"] * ($row["TANKA"] - $row["ZEI"])), PDO::PARAM_INT);
+            }
             $stmt->bindValue(13, ($row["SU"] * $row["ZEI"]), PDO::PARAM_INT);
             $stmt->bindValue(14, $row["ZEIKBN"], PDO::PARAM_INT);
             

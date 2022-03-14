@@ -6,7 +6,7 @@ session_start();
 require "./vendor/autoload.php";
 
 $pass=dirname(__FILE__);
-require "version.php";
+//require "version.php";
 require "functions.php";
 
 
@@ -42,11 +42,20 @@ define("MODE_DIR",$dir_a[2]);
 //暗号化キー
 $key = $_ENV["KEY"];
 //PGバージョン差分補正
-updatedb($_ENV["SV"], $_ENV["USER"], $_ENV["PASS"], $_ENV["DBNAME"] ,$version,$comment);
+//updatedb($_ENV["SV"], $_ENV["USER"], $_ENV["PASS"], $_ENV["DBNAME"] ,$version,$comment);
 
 // DBとの接続
 $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
+//端末IDを発行し、１ヶ月の有効期限でCookieにセット
+if(!isset($_COOKIE['machin_id'])){
+    $machin_id = getGUID();
+    setCookie("machin_id", $machin_id, time()+60*60*24*30, "/", null, TRUE, TRUE); 
+}else{
+    $machin_id = $_COOKIE['machin_id'];
+}
+define("MACHIN_ID", $machin_id);
 
+deb_echo(MACHIN_ID);
 
 ?>

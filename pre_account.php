@@ -76,7 +76,7 @@ if($_POST["BTN"] == "send"){
         <input type="hidden" name="csrf_token" value="<?php echo $token; ?>">
         <input type="hidden" name="MODE" value=<?php echo $mode; ?>>
         <div class="form-group">
-            <label for="mail" >メールアドレス</label>
+            <label for="mail" >メールアドレスを入力し、送信ボタンを押してください。<br>入力されたメールアドレスに登録用URLが送信されます。</label>
             <input type="email" maxlength="40" class="form-control" id="mail" name="MAIL" required="required" placeholder="必須" <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["MAIL"])."'";}  ?>>
         </div>
         <div class="col-2 col-md-1" style=" padding:0; margin-top:10px;">

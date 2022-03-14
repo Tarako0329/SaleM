@@ -72,14 +72,17 @@ function csrf_chk(){
 
     if ($cookie_token != $csrf_token || $csrf_token != $session_token) {
         //不正アクセス
+        deb_echo("NG [".$cookie_token."::".$csrf_token."::".$session_token."] csrf_chk<br>");
         return false;
         //return true;
     }else{
         //echo "通った [".$cookie_token."::".$csrf_token."::".$session_token."] csrf_chk<br>";
         return true;
     }
-
 }
+// =========================================================
+// データ更新時のセキュリティ対応（クッキー・ポストのチェック）
+// =========================================================
 function csrf_chk_nonsession(){
     //長期滞在できるページはセッション切れを許す
     $csrf_token = $_POST['csrf_token'];
@@ -97,15 +100,35 @@ function csrf_chk_nonsession(){
         return true;
     }
 }
+// =========================================================
+// データ更新時のセキュリティ対応（クッキー・ゲットのチェック）
+// =========================================================
 function csrf_chk_nonsession_get($csrf_token){
     //長期滞在できるページはセッション切れを許すGET版 引数にGETを渡す
-    
     $cookie_token = $_COOKIE['csrf_token'];
 
     unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
     setCookie("csrf_token", '', -1, "/", null, TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
 
     if ($csrf_token != $cookie_token) {
+        //不正アクセス
+        return false;
+        //return true;
+    }else{
+        //echo "通った [".$cookie_token."::".$csrf_token."] csrf_chk_nonsession_get<br>";
+        return true;
+    }
+}
+// =========================================================
+// データ更新時のセキュリティ対応（セッション・ゲットのチェック）
+// =========================================================
+function csrf_chk_redirect($csrf_token){
+    //リダイレクト用GET版 引数にGETを渡す
+    $session_token = $_SESSION['csrf_token'];
+    unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
+    setCookie("csrf_token", '', -1, "/", null, TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
+
+    if ($csrf_token != $session_token) {
         //不正アクセス
         return false;
         //return true;
@@ -160,6 +183,15 @@ function rot13decrypt ($str) {
 function secho($s) {
     return htmlspecialchars($s, ENT_QUOTES, "UTF-8");
 }
+
+// =========================================================
+// テスト環境のみ出力
+// =========================================================
+function deb_echo($s){
+    if(MODE_DIR=="TEST"){
+        echo $s."<br>";
+    }
+}
 // =========================================================
 // PDO の接続オプション取得
 // =========================================================
@@ -173,27 +205,27 @@ function get_pdo_options() {
 //登録メール
 // =========================================================
 function touroku_mail($to,$subject,$body){
-$mail2=rot13encrypt($to);
-$s_name=$_SERVER['SCRIPT_NAME'];
-$dir_a=explode("/",$s_name,-1);
-
-// 送信元
-$from = "From: テスト送信者<information@WEBREZ.jp>";
-
-// メールタイトル
-$subject = "WEBREZ＋ 登録案内";
- 
-// メール本文
-$body = <<< "EOM"
-WEBREZ+（ウェブレジプラス）にご興味をもっていただきありがとうございます。
-こちらのURLから登録をお願いいたします。
-
-https://green-island.mixh.jp/SaleM/$dir_a[2]/account_create.php?mode=0&acc=$mail2
-EOM;
- 
-// メール送信
-mail($to, $subject, $body, $from);
-return 1;
+    $mail2=rot13encrypt($to);
+    $s_name=$_SERVER['SCRIPT_NAME'];
+    $dir_a=explode("/",$s_name,-1);
+    
+    // 送信元
+    $from = "From: テスト送信者<information@WEBREZ.jp>";
+    
+    // メールタイトル
+    $subject = "WEBREZ＋ 登録案内";
+     
+    // メール本文
+    $body = <<< "EOM"
+    WEBREZ+（ウェブレジプラス）にご興味をもっていただきありがとうございます。
+    こちらのURLから登録をお願いいたします。
+    
+    https://green-island.mixh.jp/SaleM/$dir_a[2]/account_create.php?mode=0&acc=$mail2
+    EOM;
+     
+    // メール送信
+    mail($to, $subject, $body, $from);
+    return 1;
 }
 
 // =========================================================
@@ -242,8 +274,9 @@ function send_mail($to,$subject,$body){
 
 
 // =========================================================
-// バージョン差分修正SQL実行
+// バージョン差分修正SQL実行 廃止
 // =========================================================
+/*
 function updatedb($SV, $USER, $PASS, $DBNAME,$version,$comment){
     //引数；サーバ、ID、パス、DB名、PGバージョン
     //版管理ルール
@@ -281,7 +314,28 @@ function updatedb($SV, $USER, $PASS, $DBNAME,$version,$comment){
     
     $mysqli_fc->close();
 }
-
+*/
+// =========================================================
+// GUID取得
+// =========================================================
+function getGUID(){
+    if (function_exists('com_create_guid')){
+        return com_create_guid();
+    }
+    else {
+        mt_srand((double)microtime()*10000);//optional for php 4.2.0 and up.
+        $charid = strtoupper(md5(uniqid(rand(), true)));
+        $hyphen = chr(45);// "-"
+        $uuid = chr(123)// "{"
+            .substr($charid, 0, 8).$hyphen
+            .substr($charid, 8, 4).$hyphen
+            .substr($charid,12, 4).$hyphen
+            .substr($charid,16, 4).$hyphen
+            .substr($charid,20,12)
+            .chr(125);// "}"
+        return $uuid;
+    }
+}
 
 ?>
 

@@ -1,9 +1,23 @@
 <!DOCTYPE html>
 <html lang="ja">
 <?php
+/*関数メモ
+check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
+
+【想定して無いページからの遷移チェック】
+csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容を返す。(POSTorGETで遷移先に渡す)
+　　　　　　　 headerでリダイレクトされた場合、COOKIEにセットされないので注意。
+
+遷移先のチェック
+csrf_chk()                              ：COOKIE・SESSION・POSTのトークンチェック。
+csrf_chk_nonsession()                   ：COOKIE・POSTのトークンチェック。
+csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェック。
+*/
+
 require "php_header.php";
 
 if(isset($_GET["csrf_token"]) || empty($_POST)){
+    //トップメニューからの遷移チェック。リンクから飛ぶのでPOSTなし
     if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。";
         header("HTTP/1.1 301 Moved Permanently");
@@ -11,7 +25,7 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
         exit();
     }
 }
-
+/*
 if(!($_SESSION['user_id']<>"")){
     //セッションのIDがクリアされた場合の再取得処理。
     if(check_auto_login($_COOKIE['webrez_token'],$pdo_h)==false){
@@ -20,6 +34,9 @@ if(!($_SESSION['user_id']<>"")){
         header("Location: index.php");
     }
 }
+*/
+//セッションのIDがクリアされた場合の再取得処理。
+$rtn=check_session_userid();
 
 if($_POST["btn"] == "登録"){
     if(csrf_chk()==false){
@@ -101,7 +118,7 @@ $csrf_token=csrf_create();
             </div>
         </div>
         <div class="form-group form-inline">
-            <label for="tanka" class="col-2 col-md-1 control-label">単価(税抜)</label>
+            <label for="tanka" class="col-2 col-md-1 control-label">単価</label>
             <div class=" col-10">
                 <input type="number" class="form-control" style="width:80%" id="tanka" name="tanka" required="required" placeholder="必須">
             </div>
@@ -122,7 +139,7 @@ $csrf_token=csrf_create();
             </div>
         </div>
         <div class="form-group form-inline">
-            <label for="tanka" class="col-2 col-md-1 control-label">税込み価格</label></label>
+            <label for="tanka" class="col-2 col-md-1 control-label">税込価格</label></label>
             <div class=" col-10">
                 <input type="number" readonly='readonly' class="form-control" style="width:80%;border:none;" id="zkomitanka" >
             </div>
@@ -207,7 +224,13 @@ $csrf_token=csrf_create();
         select.onchange = function(){
             switch(this.value){
                 case '0':
-                    zkomitanka.value=tanka.value;
+                    zkomitanka.value=tanka.value * 1;
+                    break;
+                case '1002':
+                    zkomitanka.value=tanka.value * 1;
+                    break;
+                case '1102':
+                    zkomitanka.value=tanka.value * 1;
                     break;
                 case '1001':
                     zkomitanka.value=Math.round(tanka.value * (1 + 8 / 100));

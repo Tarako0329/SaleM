@@ -12,7 +12,9 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
     }
 }
 */
+//セッションのIDがクリアされた場合の再取得処理。
 $rtn=check_session_userid();
+
 //有効期限チェック
 $sql="select yuukoukigen from Users where uid=?";
 $stmt = $pdo_h->prepare($sql);
@@ -100,15 +102,29 @@ $shouhiMS = $stmt->fetchAll();
 $token = csrf_create();
 
 //イベント名の取得
-if(isset($_POST["EV"])){
-    $event = secho($_POST["EV"]);
-    if($event<>$_COOKIE["EVENT"]){
-        setCookie("EVENT", $event, time()+60*60*24*2, "/", null, TRUE, TRUE);   
-    }
-}elseif(isset($_COOKIE["EVENT"])){
-    $event=$_COOKIE["EVENT"];
+//セッション->クッキー->DB
+if($_SESSION["EV"] != "" ){
+    $event = $_SESSION["EV"];
+    deb_echo("session");
 }else{
-    $event="";
+    $sql = "select value from PageDefVal where uid=? and machin=? and page=? and item=?";
+    $stmt = $pdo_h->prepare($sql);
+    $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+    $stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
+    $stmt->bindValue(3, "EVregi.php", PDO::PARAM_STR);
+    $stmt->bindValue(4, "EV", PDO::PARAM_STR);//name属性を指定
+    $stmt->execute();
+
+    if($stmt->rowCount()==0){
+        $event = "";
+        deb_echo("NULL");
+    }else{
+        $buf = $stmt->fetch();
+        $_SESSION["EV"] = $buf["value"];
+        $event = $buf["value"];
+        //setCookie("EV", $event, time()+60*60*24*2, "/", null, TRUE, TRUE); 
+        deb_echo("DB".$event);
+    } 
 }
 
 
@@ -150,8 +166,16 @@ window.onload = function() {
         echo "        cnt_suryou_".$row["shouhinCD"]." += 1;\n";
         
         //小数の計算はBC関数を使用
-        echo "        total_pay += ".bcadd($row["tanka"] , bcmul($row["tanka"], bcdiv($row["zeiritu"],100,2),0),0).";\n";
-        echo "        total_zei += ".bcmul($row["tanka"], bcdiv($row["zeiritu"],100,2),0).";\n";
+        //税区分末尾１：外税　２：内税
+        if(substr(strval($row["zeiKBN"]),3,1) =="1" || $row["zeiKBN"]==0){
+            //外税もしくは非課税の場合
+            echo "        total_pay += ".bcadd($row["tanka"] , bcmul($row["tanka"], bcdiv($row["zeiritu"],100,2),0),0).";\n";
+            echo "        total_zei += ".bcmul($row["tanka"], bcdiv($row["zeiritu"],100,2),0).";\n";
+        }else{
+            //内税の場合
+            echo "        total_pay += ".$row["tanka"].";\n";
+            echo "        total_zei += ".bcsub($row["tanka"],bcdiv($row["tanka"], bcdiv(bcadd(100,$row["zeiritu"]),100,2),0),0).";\n";
+        }
         echo "        suryou_".$row["shouhinCD"].".value = cnt_suryou_".$row["shouhinCD"].";\n";
         echo "        kaikei_disp.innerHTML = total_pay;\n";
         echo "        zei_disp.innerHTML = total_zei;\n";
@@ -266,15 +290,20 @@ if(isset($emsg)){
         echo "      <input type='hidden' name ='ORDERS[".$i."][CD]' value = '".$row["shouhinCD"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][NM]' value = '".$row["shouhinNM"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][UTISU]' value = '".$row["utisu"]."'>\n";
-        echo "      <input type='hidden' name ='ORDERS[".$i."][ZEI]' value = '".(string)(($row["zeiritu"]/100)*$row["tanka"])."'>\n";
+        //echo "      <input type='hidden' name ='ORDERS[".$i."][ZEI]' value = '".(string)(($row["zeiritu"]/100)*$row["tanka"])."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][ZEIKBN]' value = '".$row["zeiKBN"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][TANKA]' value = '".$row["tanka"]."'>\n";
         echo "      </button>\n";
         echo "      <div class ='ordered'>\n";
-//        echo "          ￥<input type='number' readonly='readonly' class='order tanka' name='ORDERS[".$i."][TANKA]' value=".$row["tanka"].">\n";
-//        echo "          ￥<input type='number' readonly='readonly' class='order tanka' value=".$row["tanka"]*(($row["zeiritu"]/100)+1).">\n";
-
-        echo "          ￥<input type='number' readonly='readonly' class='order tanka' value=".bcadd($row["tanka"] , bcmul($row["tanka"], bcdiv($row["zeiritu"],100,2),0),0).">\n";
+        if(substr(strval($row["zeiKBN"]),3,1) =="1" || $row["zeiKBN"]==0){
+            //外税（マスタは税抜単価）
+            echo "          ￥<input type='number' readonly='readonly' class='order tanka' value=".bcadd($row["tanka"] , bcmul($row["tanka"], bcdiv($row["zeiritu"],100,2),0),0).">\n";
+            echo "            <input type='hidden' name ='ORDERS[".$i."][ZEI]' value = '".(string)(bcmul($row["tanka"], bcdiv($row["zeiritu"],100,2),0))."'>\n";    //消費税：本体×税率
+        }else{
+            //内税（マスタは税込単価）
+            echo "          ￥<input type='number' readonly='readonly' class='order tanka' value=".$row["tanka"].">\n";
+            echo "            <input type='hidden' name ='ORDERS[".$i."][ZEI]' value = '".(string)(bcsub($row["tanka"],bcdiv($row["tanka"], bcdiv(bcadd(100,$row["zeiritu"]),100,2),0),0))."'>\n";  //税込価格-(税込価格÷1.1or1.08)
+        }
 
         echo "× <input type='number' readonly='readonly' name ='ORDERS[".$i."][SU]' id='suryou_".$row["shouhinCD"]."' class='order su' value = 0 style='display: inline'>\n";
         echo "      </div>\n";

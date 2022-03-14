@@ -6,7 +6,9 @@ body {
 INPUT{
     height:20px;
 }
-
+.form-control{
+    font-size:1.5rem;
+}
 footer{
     background: #ffce5b;
     height: 70px; /* 高さを70pxに指定 */
