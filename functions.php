@@ -42,7 +42,7 @@ function check_auto_login($cookie_token, $pdo) {
 }
 
 
-function check_session_userid(){
+function check_session_userid($pdo_h){
     if(empty($_SESSION["user_id"])){
         //セッションのIDがクリアされた場合の再取得処理。
         if(empty($_COOKIE['webrez_token'])){

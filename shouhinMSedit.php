@@ -36,7 +36,7 @@ if(!($_SESSION['user_id']<>"")){
 }
 */
 //セッションのIDがクリアされた場合の再取得処理。
-$rtn=check_session_userid();
+$rtn=check_session_userid($pdo_h);
 
 if($_POST["btn"] == "登録"){
     if(csrf_chk()==false){
@@ -127,7 +127,6 @@ $csrf_token=csrf_create();
         <div class="form-group form-inline">
             <label for="zeikbn" class="col-2 col-md-1 control-label">税区分</label>
             <div class=" col-10">
-                <!--<input type="text" class="form-control" id="zeikbn" name="zeikbn">-->
                 <select class="form-control" style="width:80%;padding-top:0;" id="zeikbn" name="zeikbn" required="required" placeholder="必須" >
                     <option value=""></option>
                     <?php
@@ -141,7 +140,8 @@ $csrf_token=csrf_create();
         <div class="form-group form-inline">
             <label for="tanka" class="col-2 col-md-1 control-label">税込価格</label></label>
             <div class=" col-10">
-                <input type="number" readonly='readonly' class="form-control" style="width:80%;border:none;" id="zkomitanka" >
+                <input type="number" readonly='readonly' class="form-control" style="width:80%;border:none;" id="zkomitanka" aria-describedby="zkomitankaHelp">
+                <small id="zkomitankaHelp" class="form-text text-muted">レジ画面に表示される金額は税込価格です。</small>
             </div>
         </div>
 
@@ -179,7 +179,7 @@ $csrf_token=csrf_create();
             <label class="col-2 col-md-1 control-label">レジ対象</label>
             <div class="col-10" style="text-align:left">
                 <label for="hyoujiKBN1" style="float:left;width:8rem;">
-                     <input type="checkbox" style="vertical-align:middle;" id="hyoujiKBN1" name="hyoujiKBN1">表示する
+                     <input type="checkbox" style="vertical-align:middle;" id="hyoujiKBN1" name="hyoujiKBN1" checked="checked">表示する
                 </label>
             </div>
         </div>

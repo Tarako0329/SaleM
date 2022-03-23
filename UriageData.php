@@ -2,7 +2,7 @@
 <html lang="ja">
 <?php
 require "php_header.php";
-if($_GET["sts"]=="redirect"){
+if($_GET["mode"]=="redirect"){
     if(csrf_chk_redirect($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。③";
         header("HTTP/1.1 301 Moved Permanently");
@@ -24,67 +24,180 @@ if($_GET["sts"]=="redirect"){
     exit();
 }
 
-$rtn=check_session_userid();
+$rtn=check_session_userid($pdo_h);
 $csrf_create = csrf_create();
+
+deb_echo("UID：".$_SESSION["user_id"]);
 
 $msg = "";
 
-if(!isset($_GET["csrf_token"])){
-    deb_echo ("保存");
-    $_SESSION["UriDate"]=$_POST["UriDate"];
-    $_SESSION["UriDateTo"]=$_POST["UriDateTo"];
-    $_SESSION["Event"]=$_POST["Event"];
-    $_SESSION["Tokui"]=$_POST["Tokui"];
+if($_GET["mode"]<>""){
+    $mode=$_GET["mode"];
+}elseif($_POST["mode"]<>""){
+    $mode=$_POST["mode"];
+}else{
+    $_SESSION["EMSG"]="セッションが正しくありませんでした：モード指定なし";
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: index.php");
+    exit();
 }
 
-/*UriageData_sql.phpに移行
-if(isset($_POST["cd"]) && isset($_POST["urino"])){
-    //削除モード(実行)
-    $sql="delete from UriageData where uid = :user_id and UriageNO = :UriNO and ShouhinCD = :ShouhinCD";
-    $stmt = $pdo_h->prepare( $sql );
-    $stmt->bindValue("UriNO", $_POST["urino"], PDO::PARAM_INT);
-    $stmt->bindValue("ShouhinCD", $_POST["cd"], PDO::PARAM_INT);
-    $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
-    $status = $stmt->execute();
-    if($status){
-        $msg = "売上を削除しました<br>";
-    }else{
-        $msg = "売り上げ削除失敗<br><br>";
-    }
-}
-*/
-if(isset($_GET["cd"]) && isset($_GET["urino"])){
+
+if($mode=="del"){
     //削除モード(確認)
-    $mode="del";
+    $btnm = "削　除";
     $msg ="この売上を削除しますか？<br><br>";
+    $_SESSION["cd"]=$_GET["cd"];
+    $_SESSION["urino"]=$_GET["urino"];
     $sql = "select * from UriageData where uid = :user_id and UriageNO = :UriNO and ShouhinCD = :ShouhinCD order by UriageNO";
     $stmt = $pdo_h->prepare( $sql );
     $stmt->bindValue("UriNO", $_GET["urino"], PDO::PARAM_INT);
     $stmt->bindValue("ShouhinCD", $_GET["cd"], PDO::PARAM_INT);
-}else{
+    deb_echo($_SESSION["wheresql"]);
+    
+}elseif($mode=="UpdateEv" || $mode=="UpdateTk"){
+    $btnm = "更　新";
+    if($mode=="UpdateEv"){
+        $msg = "この売上のイベント名を『".$_POST["UpNM"]."』に変更しますか？<br><br>";
+    }else{
+        $msg = "この売上の顧客名を『".$_POST["UpNM"]."』に変更しますか？<br><br>";
+    }
+    $_SESSION["UpNM"] = $_POST["UpNM"];
+    if($_POST["UpUriDateFrom"]<>""){
+        if($_POST["UpUriDateTo"]<>""){
+            $UpUriDateTo=$_POST["UpUriDateTo"];
+        }else{
+            $UpUriDateTo=$_POST["UpUriDateFrom"];
+        }
+        $sql = "select * from UriageData where uid = :user_id and UriDate between :From and :To order by UriageNO";
+        $_SESSION["wheresql"] = " where uid = :user_id and UriDate between '".$_POST["UpUriDateFrom"]."' and '".$UpUriDateTo."' ";
+        
+        $stmt = $pdo_h->prepare( $sql );
+        $stmt->bindValue("From", $_POST["UpUriDateFrom"], PDO::PARAM_STR);
+        $stmt->bindValue("To", $UpUriDateTo, PDO::PARAM_STR);
+    }elseif($_POST["UpUriNoFrom"]<>""){
+        $UpUriNoFrom=$_POST["UpUriNoFrom"];
+        if($_POST["UpUriNoTo"]<>""){
+            $UpUriNoTo=$_POST["UpUriNoTo"];
+        }else{
+            $UpUriNoTo=$_POST["UpUriNoFrom"];
+        }
+        $sql = "select * from UriageData where uid = :user_id and UriageNo between :From and :To order by UriageNO";
+        $_SESSION["wheresql"] = " where uid = :user_id and UriageNo between '".$UpUriNoFrom."' and '".$UpUriNoTo."' ";
+
+        $stmt = $pdo_h->prepare( $sql );
+        $stmt->bindValue("From", $UpUriNoFrom, PDO::PARAM_INT);
+        $stmt->bindValue("To", $UpUriNoTo, PDO::PARAM_INT);
+    }elseif($_POST["UpUriNo01"]<>""){
+        if($_POST["UpUriNo01"]<>""){$UpUriNo01=$_POST["UpUriNo01"];}else{$UpUriNo01=0;}
+        if($_POST["UpUriNo02"]<>""){$UpUriNo02=$_POST["UpUriNo02"];}else{$UpUriNo02=0;}
+        if($_POST["UpUriNo03"]<>""){$UpUriNo03=$_POST["UpUriNo03"];}else{$UpUriNo03=0;}
+        if($_POST["UpUriNo04"]<>""){$UpUriNo04=$_POST["UpUriNo04"];}else{$UpUriNo04=0;}
+        if($_POST["UpUriNo05"]<>""){$UpUriNo05=$_POST["UpUriNo05"];}else{$UpUriNo05=0;}
+        if($_POST["UpUriNo06"]<>""){$UpUriNo06=$_POST["UpUriNo06"];}else{$UpUriNo06=0;}
+        if($_POST["UpUriNo07"]<>""){$UpUriNo07=$_POST["UpUriNo07"];}else{$UpUriNo07=0;}
+        if($_POST["UpUriNo08"]<>""){$UpUriNo08=$_POST["UpUriNo08"];}else{$UpUriNo08=0;}
+        if($_POST["UpUriNo09"]<>""){$UpUriNo09=$_POST["UpUriNo09"];}else{$UpUriNo09=0;}
+        if($_POST["UpUriNo10"]<>""){$UpUriNo10=$_POST["UpUriNo10"];}else{$UpUriNo10=0;}
+        $sql = "select * from UriageData where uid = :user_id and UriageNo in (:uri01,:uri02,:uri03,:uri04,:uri05,:uri06,:uri07,:uri08,:uri09,:uri10) order by UriageNO";
+        $_SESSION["wheresql"] = " where uid = :user_id and UriageNo in (".$UpUriNo01.",".$UpUriNo02.",".$UpUriNo03.",".$UpUriNo04.",".$UpUriNo05.",".$UpUriNo06.",".$UpUriNo07.",".$UpUriNo08.",".$UpUriNo09.",".$UpUriNo10.") ";
+
+        $stmt = $pdo_h->prepare( $sql );
+        $stmt->bindValue("uri01", $UpUriNo01, PDO::PARAM_INT);
+        $stmt->bindValue("uri02", $UpUriNo02, PDO::PARAM_INT);
+        $stmt->bindValue("uri03", $UpUriNo03, PDO::PARAM_INT);
+        $stmt->bindValue("uri04", $UpUriNo04, PDO::PARAM_INT);
+        $stmt->bindValue("uri05", $UpUriNo05, PDO::PARAM_INT);
+        $stmt->bindValue("uri06", $UpUriNo06, PDO::PARAM_INT);
+        $stmt->bindValue("uri07", $UpUriNo07, PDO::PARAM_INT);
+        $stmt->bindValue("uri08", $UpUriNo08, PDO::PARAM_INT);
+        $stmt->bindValue("uri09", $UpUriNo09, PDO::PARAM_INT);
+        $stmt->bindValue("uri10", $UpUriNo10, PDO::PARAM_INT);
+    }
+
+}elseif($mode=="UpdateKin"){
+    $btnm = "更　新";
+    $msg = "この商品の売上単価を以下に変更しますか？<br>税抜単価：".$_POST["UpUriTanka"]." 消費税：".$_POST["UpZei"]." 税込単価：".$_POST["UpUriZei"]." <br><br>";
     //売上実績の取得
-    $mode="select";
-    if($_SESSION["UriDate"]<>""){
+    
+    $_SESSION["zeinukiTanka"] = $_POST["UpUriTanka"];
+    $_SESSION["shouhizei"] = $_POST["UpZei"];
+    $_SESSION["zeikbn"] = $_POST["Upzeikbn"];
+
+    $wheresql="where ShouhinCD = :ShouhinCD ";
+    $_SESSION["wheresql"]="where ShouhinCD = ".$_POST["UpShouhinCD"];
+
+    if($_POST["UpUriDateFrom"]<>""){
+        $wheresql= $wheresql." AND UriDate >= :UriDate ";
+        $UriFrom = (string)$_POST["UpUriDateFrom"];
+        $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND UriDate >= '".$UriFrom."' ";
+    }
+
+    if($_POST["UpUriDateTo"]<>""){
+        $UriTo = (string)$_POST["UpUriDateTo"];
+        $wheresql=$wheresql." AND UriDate <= :UriDateTo ";
+        $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND UriDate <= '".$UriTo."' ";
+    }
+
+    if($_POST["UpEvent"]<>""){
+        $wheresql = $wheresql." AND Event=:Event ";
+        $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND Event='".$_POST["UpEvent"]."' ";
+    }
+    if($_POST["UpTokui"]<>""){
+        $wheresql= $wheresql." AND TokuisakiNM=:Tokui ";
+        $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND TokuisakiNM='".$_POST["UpTokui"]."' ";
+    }
+    $wheresql= $wheresql." AND uid = :user_id ";
+    $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND uid = :user_id ";
+    
+    $sql = "select * from UriageData ".$wheresql." order by UriageNO";
+
+    $stmt = $pdo_h->prepare( $sql );
+    $stmt->bindValue("ShouhinCD", $_POST["UpShouhinCD"], PDO::PARAM_INT);
+    
+    if($_POST["UpUriDateFrom"]<>""){
+        $stmt->bindValue("UriDate", $_POST["UpUriDateFrom"], PDO::PARAM_STR);
+    }
+    if($_POST["UpUriDateTo"]<>""){
+        $stmt->bindValue("UriDateTo", $_POST["UpUriDateTo"], PDO::PARAM_STR);
+    }
+    if($_POST["UpEvent"]<>""){
+        $stmt->bindValue("Event", $_POST["UpEvent"], PDO::PARAM_STR);
+    }
+    if($_POST["UpTokui"]<>""){
+        $stmt->bindValue("Tokui", $_POST["UpTokui"], PDO::PARAM_STR);
+    }
+}elseif($mode=="select"){
+    //売上実績の取得
+    if($_POST["UriDate"]<>""){
         $wheresql="where UriDate >= :UriDate ";
-        $UriFrom = (string)$_SESSION["UriDate"];
+        $UriFrom = (string)$_POST["UriDate"];
+        $_SESSION["wheresql"]="where UriDate >= '".$UriFrom."' ";
     }else{
         $wheresql="where UriDate >= '".(string)date("Y-m-d")."'";
         $UriFrom = (string)date("Y-m-d");
+        $_SESSION["wheresql"]=$wheresql;
     }
     
     $wheresql=$wheresql." AND UriDate <= :UriDateTo ";
-    if($_SESSION["UriDateTo"]<>""){
-        $UriTo = (string)$_SESSION["UriDateTo"];
+    if($_POST["UriDateTo"]<>""){
+        $UriTo = (string)$_POST["UriDateTo"];
     }else{
         $UriTo = $UriFrom;
     }
-    if($_SESSION["Event"]<>""){
+    $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND UriDate <= '".$UriTo."' ";
+    
+    if($_POST["Event"]<>""){
         $wheresql = $wheresql." AND Event=:Event ";
+        $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND Event='".$_POST["Event"]."' ";
     }
-    if($_SESSION["Tokui"]<>""){
+    if($_POST["Tokui"]<>""){
         $wheresql= $wheresql." AND TokuisakiNM=:Tokui ";
+        $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND TokuisakiNM='".$_POST["Tokui"]."' ";
     }
     $wheresql= $wheresql." AND uid = :user_id ";
+    $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND uid = :user_id ";
+    
     if($_POST["Type"]=="rireki" || $_POST["Type"]==""){
         //履歴取得
         $sql = "select * from UriageData ".$wheresql." order by UriageNO";
@@ -102,36 +215,78 @@ if(isset($_GET["cd"]) && isset($_GET["urino"])){
     }
     //echo $sql;
     $stmt = $pdo_h->prepare( $sql );
-    if($_SESSION["UriDate"]<>""){
-        $stmt->bindValue("UriDate", $_SESSION["UriDate"], PDO::PARAM_STR);
+    if($_POST["UriDate"]<>""){
+        $stmt->bindValue("UriDate", $_POST["UriDate"], PDO::PARAM_STR);
     }
-    if($_SESSION["UriDateTo"]<>""){
-        $stmt->bindValue("UriDateTo", $_SESSION["UriDateTo"], PDO::PARAM_STR);
+    if($_POST["UriDateTo"]<>""){
+        $stmt->bindValue("UriDateTo", $_POST["UriDateTo"], PDO::PARAM_STR);
     }else{
         $stmt->bindValue("UriDateTo", $UriFrom, PDO::PARAM_STR);
     }
-    if($_SESSION["Event"]<>""){
-        $stmt->bindValue("Event", $_SESSION["Event"], PDO::PARAM_STR);
+    if($_POST["Event"]<>""){
+        $stmt->bindValue("Event", $_POST["Event"], PDO::PARAM_STR);
     }
-    if($_SESSION["Tokui"]<>""){
-        $stmt->bindValue("Tokui", $_SESSION["Tokui"], PDO::PARAM_STR);
+    if($_POST["Tokui"]<>""){
+        $stmt->bindValue("Tokui", $_POST["Tokui"], PDO::PARAM_STR);
     }
+}elseif($mode=="redirect"){
+    //更新結果の表示
+    $msg = $_SESSION["MSG"];
+    deb_echo($_SESSION["wheresql"]);
+    $sql = "select * from UriageData ".$_SESSION["wheresql"]." order by UriageNO";
+    $stmt = $pdo_h->prepare( $sql );
+    //更新後は破棄
+    $_SESSION["wheresql"]="";
+}else{
+    echo "想定外エラー";
+    exit();
 }
 $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
-$stmt->execute();
+$rtn=$stmt->execute();
+if($rtn==false){
+    deb_echo("失敗した場合は不正値が渡されたとみなし、wheresqlを破棄<br>");
+    $_SESSION["wheresql"]="";
+}
 $result=$stmt->fetchAll();
 
-//Eventリスト
+//Eventリスト（検索モーダル用）
 $EVsql = "select Event from UriageData where uid =? group by Event order by Event";
-$EVresult = $pdo_h->prepare($EVsql);
-$EVresult->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-$EVresult->execute();
+$stmt = $pdo_h->prepare($EVsql);
+$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+$stmt->execute();
+$EVresult = $stmt->fetchAll();
 
-//顧客リスト
+//顧客リスト（検索モーダル用）
 $TKsql = "select TokuisakiNM from UriageData where uid =? group by TokuisakiNM order by TokuisakiNM";
-$TKresult = $pdo_h->prepare($TKsql);
-$TKresult->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-$TKresult->execute();
+$stmt = $pdo_h->prepare($TKsql);
+$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+$stmt->execute();
+$TKresult = $stmt->fetchAll();
+
+//売上実績商品リスト（修正モーダル用）
+$SHsql = "select ShouhinCD,ShouhinNM from UriageData where uid =? group by ShouhinCD,ShouhinNM order by ShouhinCD,ShouhinNM";
+$stmt = $pdo_h->prepare($SHsql);
+$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+$stmt->execute();
+$SHresult = $stmt->fetchAll();
+
+//税区分M
+$ZEIsql="select * from ZeiMS order by zeiKBN;";
+$ZEIresult = $pdo_h->query($ZEIsql);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ?>
 <head>
@@ -140,7 +295,25 @@ $TKresult->execute();
     include "head.html" 
     ?>
     <!--ページ専用CSS-->
-    <link rel="stylesheet" href="css/style_UriageData.css" >
+    <link rel="stylesheet" href="css/style_UriageData.css?<?php echo date('Ymd-Hi'); ?>" >
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script>
+    $(function() {
+        $('.hamburger').click(function() {
+            $(this).toggleClass('active');
+     
+            if ($(this).hasClass('active')) {
+                $('.globalMenuSp').addClass('active');
+            } else {
+                $('.globalMenuSp').removeClass('active');
+            }
+        });
+        $('.globalMenuSp').click(function() {
+            $('.hamburger').toggleClass('active');
+            $('.globalMenuSp').removeClass('active');
+        });
+    });
+    </script>    
     <TITLE><?php echo $title." 売上実績";?></TITLE>
 </head>
  
@@ -148,13 +321,27 @@ $TKresult->execute();
     <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></div>
     <div style="font-size:1rem;"> 期間：<?php echo $UriFrom."～".$UriTo;?>　顧客：<?php echo $_POST["Tokui"];?>　EVENT：<?php echo $_POST["Event"];?></div>
 
+    <div class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    
+    <nav class="globalMenuSp" style="font-size:2rem;">
+        <ul>
+            <li><a style="font-weight:900">≪一括修正ﾒﾆｭｰ≫</a></li>
+            <li><a data-toggle="modal" data-target="#UriUpEvModal" onclick="modechange_EV()">イベント名</a></li>
+            <li><a data-toggle="modal" data-target="#UriUpEvModal" onclick="modechange_TK()">顧客名</a></li>
+            <li><a data-toggle="modal" data-target="#UriUpKinModal">金額</a></li>
+        </ul>
+    </nav>
+
 </header>
 
-<body>    
+<body>
     <div class="container-fluid">
     <?php
-//    if($mode=="del"){echo $msg;}
-    echo $msg;
+        echo $msg;
     ?>
     <table class="table-striped table-bordered">
         <thead><tr><th>売上日</th><th>Event名</th><th>顧客名</th><th>売上№</th><th>商品</th><th style="width:3rem;">個数</th><th style="width:3rem;">単価</th><th style="width:5rem;">売上</th><th style="width:4rem;">消費税</th></tr></thead>
@@ -163,52 +350,58 @@ $Goukei=0;
 $GoukeiZei=0;
 foreach($result as $row){
     echo "<tr><td>".$row["UriDate"]."</td><td>".$row["Event"]."</td><td>".$row["TokuisakiNM"]."</td><td class='text-center'>".$row["UriageNO"]."</td><td>".rot13decrypt($row["ShouhinNM"])."</td><td class='text-right'>".$row["su"]."</td><td class='text-right'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td><td class='text-right'>".$row["zei"]."</td><td style='width:4rem;text-align:center;'>";
-    if($_POST["Type"]=="rireki" || $_POST["Type"]==""){
+    if(($_POST["Type"]=="rireki" || $_POST["Type"]=="") && ($mode == "select" || $mode=="redirect")){
         //履歴表示の時だけ削除可能
-        echo "<a href='UriageData.php?cd=".$row["ShouhinCD"]."&urino=".$row["UriageNO"]."&csrf_token=".$csrf_create."'><i class='fa-regular fa-trash-can'></i></a>";
+        echo "<a href='UriageData.php?cd=".$row["ShouhinCD"]."&urino=".$row["UriageNO"]."&csrf_token=".$csrf_create."&mode=del'><i class='fa-regular fa-trash-can'></i></a>";
     }
     echo "</td></tr>\n";
     $Goukei = $Goukei + $row["UriageKin"];
     $GoukeiZei = $GoukeiZei + $row["zei"];
+    $GoukeiZeikomi = $GoukeiZeikomi + $row["UriageKin"] + $row["zei"];
 }
 ?>
     </table>
 <?php
-if($mode=="del"){
+if($mode<>"select" && $mode<>"redirect"){
 ?>
     <br>
     <form method="post" action="UriageData_sql.php">
-        <input type="hidden" name="mode" value="del">
-        <input type="hidden" name="urino" value=<?php echo secho($_GET["urino"]);?>>
-        <input type="hidden" name="cd" value=<?php echo secho($_GET["cd"]);?>>
+        <input type="hidden" name="mode" value="<?php echo $mode;?>">
         <input type="hidden" name="csrf_token" value="<?php echo $csrf_create; ?>">
-        <input type="submit" class="btn btn-primary" style="width:5rem;padding:0;" value="削除">
+        <input type="submit" class="btn btn-primary" style="width:20rem;padding:0;font-size:1.3rem;color:#fff" value="<?php echo $btnm;?>">
     </form>
     </div>
     
 <?php
 }
 ?>
+<br>
 </body>
 
 <footer>
     <div class='kaikei'>
-        合計(税抜)：￥<?php echo $Goukei ?>-<br>
-        税：￥<?php echo $GoukeiZei ?>-
+        合計(税込)：￥<?php echo $GoukeiZeikomi ?>-<br>
+        <span style="font-size:1.3rem;">内訳(本体+税)：￥<?php echo $Goukei." + ".$GoukeiZei ?></span>
     </div>
     <div class="right1">
-        <button type='button' class='btn btn--chk' style="border-radius:0;" id='dentaku' data-toggle="modal" data-target="#UriModal">検　索</button>
+        <button type='button' class='btn btn--chk' style="border-radius:0;" data-toggle="modal" data-target="#UriModal">検　索</button>
     </div>
+    <!--
+    <div class="right1">
+        <button type='button' class='btn btn--chk' style="border-radius:0;" data-toggle="modal" data-target="#**">出店料</button>
+    </div>
+    -->
 
 </footer>
 
 <!--売上実績検索条件-->
 <div class="modal fade" id="UriModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
     <div class="modal-dialog  modal-dialog-centered">
-        <div class="modal-content" style="font-size:1.5rem; font-weight: 600;">
+        <div class="modal-content" style="font-size:1.5rem; font-weight: 600;background-color:rgba(255,255,255,0.55);">
             
             <form class="form-horizontal" method="post" action="UriageData.php">
                 <input type="hidden" name="csrf_token" value="<?php echo $csrf_create; ?>">
+                <input type="hidden" name="mode" value="select">
                 <div class="modal-header">
                     <div class="modal-title" id="myModalLabel">表示条件変更</div>
                 </div>
@@ -223,10 +416,9 @@ if($mode=="del"){
                     </div>
                     <div>
                         <label for="Event" class="control-label">イベント名：</label>
-                        <select name="Event" style="font-size:1.5rem; id="Event" class="form-control">
+                        <select name="Event" style="font-size:1.5rem;padding-top:0;" id="Event" class="form-control">
                             <option value=""></option>
                             <?php
-                            //while($row = $EVresult->fetch_assoc()){
                             foreach($EVresult as $row){
                                 if($_POST["Event"]==$row["Event"]){
                                     echo "<option value='".$row["Event"]."' selected>".$row["Event"]."</option>\n";
@@ -239,10 +431,9 @@ if($mode=="del"){
                     </div>
                     <div>
                         <label for="Tokui" class="control-label">得意先：</label>
-                        <select name="Tokui" style="font-size:1.5rem;" id="Tokui" class="form-control">
+                        <select name="Tokui" style="font-size:1.5rem;padding-top:0;" id="Tokui" class="form-control">
                             <option value=""></option>
                             <?php
-                            //while($row = $TKresult->fetch_assoc()){
                             foreach($TKresult as $row){
                                  if($_POST["Tokui"]==$row["TokuisakiNM"]){
                                     echo "<option value='".$row["TokuisakiNM"]."' selected>".$row["TokuisakiNM"]."</option>\n";
@@ -255,7 +446,7 @@ if($mode=="del"){
                     </div>
                     <div>
                         <label for="Type" class="control-label">表示：</label>
-                        <select name="Type" style="font-size:1.5rem;" id="Type" class="form-control">
+                        <select name="Type" style="font-size:1.5rem;padding-top:0;" id="Type" class="form-control">
                             <option value="rireki" <?php if($_POST["Type"]=="rireki"){echo "selected";}  ?> >履歴</option>
                             <option value="shubetu" <?php if($_POST["Type"]=="shubetu"){echo "selected";}  ?> >種類別</option>     <!-- 何が売れてるか知りたい -->
                             <option value="UriNO" <?php if($_POST["Type"]=="UriNO"){echo "selected";}  ?> >Event会計別</option>  <!-- イベントでの客単価を知りたい -->
@@ -271,7 +462,259 @@ if($mode=="del"){
     </div>
 </div>
 
+<!--売上修正・イベント名・顧客名共通・Javascriptでmodeと表示のみ変更-->
+<!--<div class="modal fade" id="UriUpEvModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true"> modal-dialog-centered-->
+<div class="modal fade" id="UriUpEvModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog  ">
+        <div class="modal-content" style="font-size:1.5rem; font-weight: 600;background-color:rgba(255,255,255,0.55);">
+            
+            <form class="form-horizontal" method="post" action="UriageData.php">
+                <input type="hidden" name="csrf_token" value="<?php echo $csrf_create; ?>">
+                <input type="hidden" name="mode" value="UpdateEv" id="mode">
+                <div class="modal-header">
+                    <div class="modal-title" id="myModalLabel">修正対象指定</div>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <table>
+                        <tr><td>売上日範囲指定</td></tr>
+                        <tr>
+                            <td><input type="date" style="font-size:1.5rem;width:90%;" name="UpUriDateFrom" maxlength="10" class="form-control" id="M_EV01" value="<?php echo $UriFrom; ?>" onchange="del1()"></td><td>～</td>
+                            <td><input type="date" style="font-size:1.5rem;width:90%;" name="UpUriDateTo" maxlength="10" class="form-control" id="M_EV02" value="<?php echo $UriTo; ?>" onchange="del1()"></td>
+                        </tr>
+                        </table>
+                    <div>
+                        <table>
+                        <tr><td>売上No範囲指定</td></tr>
+                        <tr><td><input type="number" style="font-size:1.5rem;width:90%;" name="UpUriNoFrom" maxlength="10" class="form-control" id="M_EV11" onchange="del2()"></td><td>～</td>
+                        <td><input type="number" style="font-size:1.5rem;width:90%;" name="UpUriNoTo" maxlength="10" class="form-control" id="M_EV12" onchange="del2()"></td></tr>
+                        </table>
+                    </div>
+                    <div>
+                        <table>
+                        <tr><td colspan="4">売上No複数指定</td></tr>
+                        <tr>
+                            <td><input type="number" style="font-size:1.5rem;width:90%;" name="UpUriNo01" maxlength="10" class="form-control" id="M_EV20" onchange="del3()"></td>
+                            <td><input type="number" style="font-size:1.5rem;width:90%;" name="UpUriNo02" maxlength="10" class="form-control" id="M_EV21" onchange="del3()"></td>
+                            <td><input type="number" style="font-size:1.5rem;width:90%;" name="UpUriNo03" maxlength="10" class="form-control" id="M_EV22" onchange="del3()"></td>
+                            <td><input type="number" style="font-size:1.5rem;width:90%;" name="UpUriNo04" maxlength="10" class="form-control" id="M_EV23" onchange="del3()"></td>
+                            <td><input type="number" style="font-size:1.5rem;width:90%;" name="UpUriNo05" maxlength="10" class="form-control" id="M_EV24" onchange="del3()"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="number" style="font-size:1.5rem;width:90%;" name="UpUriNo06" maxlength="10" class="form-control" id="M_EV25" onchange="del3()"></td>
+                            <td><input type="number" style="font-size:1.5rem;width:90%;" name="UpUriNo07" maxlength="10" class="form-control" id="M_EV26" onchange="del3()"></td>
+                            <td><input type="number" style="font-size:1.5rem;width:90%;" name="UpUriNo08" maxlength="10" class="form-control" id="M_EV27" onchange="del3()"></td>
+                            <td><input type="number" style="font-size:1.5rem;width:90%;" name="UpUriNo09" maxlength="10" class="form-control" id="M_EV28" onchange="del3()"></td>
+                            <td><input type="number" style="font-size:1.5rem;width:90%;" name="UpUriNo10" maxlength="10" class="form-control" id="M_EV29" onchange="del3()"></td>
+                        </tr>
+                        </table>
+                    </div>
+                    <hr>
+                    <div>
+                        <label for="upevent" class="control-label" id="lbl">修正後イベント名：</label>
+                        <input type="text" style="font-size:1.5rem;" name="UpNM" maxlength="10" id="upevent" class="form-control" required="required">
+                    </div>
+                </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" style="font-size:1.5rem;color:#fff" class="btn btn-primary" >確  認</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
+
+<!--売上修正・金額-->
+<!--<div class="modal fade" id="UriUpEvModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true"> modal-dialog-centered-->
+<div class="modal fade" id="UriUpKinModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog  ">
+        <div class="modal-content" style="font-size:1.5rem; font-weight: 600;background-color:rgba(255,255,255,0.55);">
+            
+            <form class="form-horizontal" method="post" action="UriageData.php">
+                <input type="hidden" name="csrf_token" value="<?php echo $csrf_create; ?>">
+                <input type="hidden" name="mode" value="UpdateKin">
+                <div class="modal-header">
+                    <div class="modal-title" id="myModalLabel">修正対象指定</div>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <label for="ShouhinCD" class="control-label">修正対象商品名：</label>
+                        <select name="UpShouhinCD" style="font-size:1.5rem;padding-top:0;" id="ShouhinCD" class="form-control" required="required" placeholder="必須">
+                            <option value=""></option>
+                            <?php
+                            foreach($SHresult as $row){
+                                echo "<option value='".$row["ShouhinCD"]."'>商品ID(".$row["ShouhinCD"].")：".rot13decrypt($row["ShouhinNM"])."</option>\n";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div>
+                        <table>
+                        <tr><td>売上日範囲指定</td></tr>
+                        <tr>
+                            <td><input type="date" style="font-size:1.5rem;width:90%;" name="UpUriDateFrom" maxlength="10" class="form-control" value="<?php echo $UriFrom; ?>"></td><td>～</td>
+                            <td><input type="date" style="font-size:1.5rem;width:90%;" name="UpUriDateTo" maxlength="10" class="form-control" value="<?php echo $UriTo; ?>"></td>
+                        </tr>
+                        </table>
+                    </div>
+                    <div>
+                        <label for="Event" class="control-label">イベント名：</label>
+                        <select name="UpEvent" style="font-size:1.5rem;padding-top:0;" id="Event" class="form-control">
+                            <option value=""></option>
+                            <?php
+                            foreach($EVresult as $row){
+                                if($_POST["Event"]==$row["Event"]){
+                                    echo "<option value='".$row["Event"]."' selected>".$row["Event"]."</option>\n";
+                                }else{
+                                    echo "<option value='".$row["Event"]."'>".$row["Event"]."</option>\n";
+                                }
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="Tokui" class="control-label">得意先：</label>
+                        <select name="UpTokui" style="font-size:1.5rem;padding-top:0;" id="Tokui" class="form-control">
+                            <option value=""></option>
+                            <?php
+                            foreach($TKresult as $row){
+                                 if($_POST["Tokui"]==$row["TokuisakiNM"]){
+                                    echo "<option value='".$row["TokuisakiNM"]."' selected>".$row["TokuisakiNM"]."</option>\n";
+                                }else{
+                                    echo "<option value='".$row["TokuisakiNM"]."'>".$row["TokuisakiNM"]."</option>\n";
+                                }
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <hr>
+                    <div>
+                        <table>
+                        <tr><td>修正後金額</td></tr>
+                        <tr><td>単価</td><td>税区分</td><td>消費税</td><td>税込単価</td></tr>
+                        <tr>
+                            <td><input type="number" style="font-size:1.5rem;width:90%;" name="UpUriTanka" id="UpUriTanka" maxlength="10" class="form-control" required="required" placeholder="必須"></td>
+                            <td>
+                                <select class="form-control" style="padding-top:0;" id="zeikbn" name="Upzeikbn" required="required" placeholder="必須" >
+                                    <option value=""></option>
+                                    <?php
+                                    foreach($ZEIresult as $row){
+                                        echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
+                                    }
+                                    ?>
+                                </select>
+                            </td>
+                            <td><input type="number" required="required" style="font-size:1.5rem;width:90%;" name="UpZei" id="UpZei" maxlength="10" class="form-control" ></td>
+                            <td><input type="number" required="required" style="font-size:1.5rem;width:90%;" name="UpUriZei" id="UpUriZei" maxlength="10" class="form-control" ></td>
+                        </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" style="font-size:1.5rem;color:#fff" class="btn btn-primary" >確  認</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" language="javascript">
+    var select = document.getElementById('zeikbn');
+    var tanka = document.getElementById('UpUriTanka');
+    var zei = document.getElementById('UpZei');
+    var zkomitanka = document.getElementById('UpUriZei');
+    
+    select.onchange = function(){
+        var zeinuki;
+        switch(this.value){
+            case '0'://非課税
+                zei.value=0;
+                zkomitanka.value=tanka.value * 1;
+                break;
+            case '1002'://内税8%
+                zkomitanka.value=tanka.value * 1;
+                zeinuki=Math.round(tanka.value/1.08);
+                zei.value=tanka.value - zeinuki;
+                tanka.value=zeinuki;
+                break;
+            case '1102'://内税10%
+                zkomitanka.value=tanka.value * 1;
+                zeinuki=Math.round(tanka.value/1.1);
+                zei.value=tanka.value - zeinuki;
+                tanka.value=zeinuki;
+                break;
+            case '1001'://外税8%
+                zei.value=Math.round(tanka.value * ( 8 / 100));
+                zkomitanka.value=Math.round(tanka.value * (1 + 8 / 100));
+                break;
+            case '1101'://外税10%
+                zei.value=Math.round(tanka.value * (10 / 100));
+                zkomitanka.value=Math.round(tanka.value * (1 + 10 / 100));
+                break;
+        }
+    }
+    var M_EV29 = document.getElementById('M_EV29');
+    var M_EV28 = document.getElementById('M_EV28');
+    var M_EV27 = document.getElementById('M_EV27');
+    var M_EV26 = document.getElementById('M_EV26');
+    var M_EV25 = document.getElementById('M_EV25');
+    var M_EV24 = document.getElementById('M_EV24');
+    var M_EV23 = document.getElementById('M_EV23');
+    var M_EV22 = document.getElementById('M_EV22');
+    var M_EV21 = document.getElementById('M_EV21');
+    var M_EV20 = document.getElementById('M_EV20');
+
+    var M_EV11 = document.getElementById('M_EV11');
+    var M_EV12 = document.getElementById('M_EV12');
+
+    var M_EV01 = document.getElementById('M_EV01');
+    var M_EV02 = document.getElementById('M_EV02');
+    function del1(){//日付指定時
+        M_EV11.value='';
+        M_EV12.value='';
+        M_EV29.value='';
+        M_EV28.value='';
+        M_EV27.value='';
+        M_EV26.value='';
+        M_EV25.value='';
+        M_EV24.value='';
+        M_EV23.value='';
+        M_EV22.value='';
+        M_EV21.value='';
+        M_EV20.value='';
+    }
+    function del2(){//売上NO範囲指定
+        M_EV01.value='';
+        M_EV02.value='';
+        M_EV29.value='';
+        M_EV28.value='';
+        M_EV27.value='';
+        M_EV26.value='';
+        M_EV25.value='';
+        M_EV24.value='';
+        M_EV23.value='';
+        M_EV22.value='';
+        M_EV21.value='';
+        M_EV20.value='';
+    }
+    function del3(){//売上No複数指定
+        M_EV01.value='';
+        M_EV02.value='';
+        M_EV11.value='';
+        M_EV12.value='';
+    }
+    var mode=document.getElementById('mode');
+    var lbl=document.getElementById('lbl');
+    function modechange_TK(){
+        lbl.innerText='修正後顧客名'
+        mode.value='UpdateTk'
+    }
+    function modechange_EV(){
+        lbl.innerText='修正後イベント名';
+        mode.value='UpdateEv';
+    }
+</script>
 
 </html>
 <?php
@@ -280,3 +723,5 @@ $TKresult = null;
 $stmt = null;
 $pdo_h = null;
 ?>
+
+

@@ -2,7 +2,7 @@
 require "php_header.php";
 $token = csrf_create();
 
-$rtn=check_session_userid();
+$rtn=check_session_userid($pdo_h);
 
 //入力画面の前回値を記録
 $_SESSION["EV"] = $_POST["EV"];
@@ -47,7 +47,8 @@ if($_POST["commit_btn"] <> ""){
             if($row["SU"]==0){
                 continue;
             }
-            $sqlstr = "insert into UriageData values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            //$sqlstr = "insert into UriageData values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)";
+            $sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)";
             $stmt = $pdo_h->prepare($sqlstr);
     
             $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
@@ -88,15 +89,17 @@ if($_POST["commit_btn"] <> ""){
             //1件でも失敗したらロールバック
             $pdo_h->rollBack();
             echo "登録が失敗しました。<br>";
-            echo "<a href='UriageData.php?csrf_token=".$token."'>レジ画面</a>より再度登録をお願いします。<br>再三失敗するようでしたら制作者へご連絡ください。";
+            echo "<a href='UriageData.php?csrf_token=".$token."'>レジ画面</a>より再度登録してみて下さい。<br>何度も失敗するようでしたら制作者へご連絡ください。";
             exit();
         }
         
     }catch (Exception $e) {
         $pdo_h->rollBack();
         echo "登録が失敗しました。<br>" . $e->getMessage()."<br>";
-        echo "<a href='UriageData.php?csrf_token=".$token."'>レジ画面</a>より再度登録をお願いします。<br>再三失敗するようでしたら制作者へご連絡ください。<br>";
+        echo "<a href='UriageData.php?csrf_token=".$token."'>レジ画面</a>より再度登録してみて下さい。<br>再三失敗するようでしたら制作者へご連絡ください。<br>";
         echo "UriNO::".$UriageNO."<br>uid::".$_SESSION['user_id'];
+        $emsg = "レジ登録でERRORが発生しました。：".$e->getMessage();
+        send_mail("green.green.midori@gmail.com","EVregi_sql.phpでシステム停止",$emsg);
         exit();
     }
         

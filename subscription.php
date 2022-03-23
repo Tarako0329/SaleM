@@ -2,7 +2,7 @@
 <html lang="ja">
 <?php
 require "php_header.php";
-$rtn=check_session_userid();
+$rtn=check_session_userid($pdo_h);
 
 if($_GET["sid"]<>""){
 }else{

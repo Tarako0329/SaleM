@@ -87,7 +87,7 @@ $ZKMS = $stmt2->fetchAll();
         <!--表示区分２，３はまだ使わない
         <thead><tr><th scope="col" style='width:3rem;'>ID</th><th scope="col">商品名</th><th scope="col">単価(税抜)</th><th scope="col" class='d-none d-sm-table-cell'>税区分</th><th scope="col">内容量</th><th scope="col" class="d-none d-sm-table-cell">単位</th><th scope="col" class="d-none d-sm-table-cell">分類1</th><th scope="col" class="d-none d-sm-table-cell">分類2</th><th scope="col" class="d-none d-sm-table-cell">分類3</th><th scope="col">レジ</th><th scope="col" class="d-none d-sm-table-cell">区分2</th><th scope="col" class="d-none d-sm-table-cell">区分3</th><th scope="col">並順</th></tr></thead>
         -->
-        <thead><tr><th scope="col" style='width:3rem;'>ID</th><th scope="col">商品名</th><th scope="col">単価(税抜)</th><th scope="col" class='d-none d-sm-table-cell'>税区分</th><th scope="col">内容量</th><th scope="col" class="d-none d-sm-table-cell">単位</th><th scope="col" class="d-none d-sm-table-cell">分類1</th><th scope="col" class="d-none d-sm-table-cell">分類2</th><th scope="col" class="d-none d-sm-table-cell">分類3</th><th scope="col">レジ</th><th scope="col">並順</th></tr></thead>
+        <thead><tr><th scope="col" style='width:3rem;'>ID</th><th scope="col">商品名</th><th scope="col">単価</th><th scope="col" class='d-none d-sm-table-cell'>税区分</th><th scope="col">内容量</th><th scope="col" class="d-none d-sm-table-cell">単位</th><th scope="col" class="d-none d-sm-table-cell">分類1</th><th scope="col" class="d-none d-sm-table-cell">分類2</th><th scope="col" class="d-none d-sm-table-cell">分類3</th><th scope="col">レジ</th><th scope="col">並順</th></tr></thead>
         <tbody>
 <?php    
 $i=0;

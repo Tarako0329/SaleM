@@ -35,8 +35,9 @@ if($mode==5 || $mode==6){
 
 if($mode==1 || $mode==4){
     //更新モードの場合、session[usr_id]のチェック
-    $rtn=check_session_userid();
+    $rtn=check_session_userid($pdo_h);
 }
+
 
 if($mode==0){
     //新規の場合メールアドレスの重複チェック不要
@@ -247,8 +248,8 @@ if($mode==0 || $mode==1){
 </script>
 </html>
 <?php
-    $stmt=null;
-    $pdo_h=null;
+$stmt=null;
+$pdo_h=null;
 ?>
 
 

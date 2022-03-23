@@ -2,7 +2,7 @@
 <html lang="ja">
 <?php
 require "php_header.php";
-$rtn=check_session_userid();
+$rtn=check_session_userid($pdo_h);
 $token = csrf_create();
 $logoff=false;
 if($_GET["action"]=="logout"){
@@ -59,7 +59,19 @@ if($row[0]["yuukoukigen"]<>""){
 <form method = "post" action="menu2.php">
     
 <header>
-    <div class="yagou title"><a href=""><?php echo $title;?></a></div></a></div><span style="font-size:1.5rem;"><a href="menu.php?action=logout">LogOut</a></span>
+    
+    <?php
+    if($logoff==false){
+    ?>
+        <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div></a></div>
+        <span style="font-size:1.5rem;"><a href="menu.php?action=logout"><i class="fa-solid fa-right-from-bracket"></i></a></span>
+    <?php
+    }else{
+    ?>
+        <div class="yagou title"><a href="index.php"><?php echo $title;?></a></div></a></div>
+    <?php
+    }
+    ?>
 </header>
 
 <body>
@@ -77,7 +89,7 @@ if($row[0]["yuukoukigen"]<>""){
     $array = [
         'レジ'=>['EVregi.php?csrf_token='.$token]
         //,'個別売上'=>['xxx.php?csrf_token='.$token]
-        ,'売上実績'=>['UriageData.php?csrf_token='.$token]
+        ,'売上実績'=>['UriageData.php?mode=select&csrf_token='.$token]
         ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token]
         ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token]
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]

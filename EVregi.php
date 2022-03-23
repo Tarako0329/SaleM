@@ -13,7 +13,7 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
 }
 */
 //セッションのIDがクリアされた場合の再取得処理。
-$rtn=check_session_userid();
+$rtn=check_session_userid($pdo_h);
 
 //有効期限チェック
 $sql="select yuukoukigen from Users where uid=?";
@@ -28,69 +28,6 @@ if($row[0]["yuukoukigen"]==""){
     echo row[0]["yuukoukigen"] ;    
     $emsg="お試し期間、もしくは解約後有効期間が終了しました。<br>継続してご利用頂ける場合は<a href='../../PAY/index.php?system=".$title."&mode=".MODE_DIR."'>こちらから本契約をお願い致します </a>";
 }
-
-//売上登録(F5・更新による2重登録を防ぐため、登録処理をEVregi_sql.phpに分離)
-/*
-if($_POST["commit_btn"] <> ""){
-    if(csrf_chk_nonsession()==false){
-        $_SESSION["EMSG"]="セッションが正しくありませんでした。";
-        header("HTTP/1.1 301 Moved Permanently");
-        header("Location: index.php");
-        exit();
-    }
-    $array = $_POST["ORDERS"];
-    $sqlstr = "";
-
-    //売上番号の取得
-    $sqlstr = "select max(UriageNO) as UriageNO from UriageData where uid=?";
-    $stmt = $pdo_h->prepare($sqlstr);
-    $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-    $stmt->execute();
-    
-    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-
-    if(is_null($row[0]["UriageNO"])){
-        //初回売上時は売上NO[1]をセット
-        $UriageNO = 1;
-    }else{
-        $UriageNO = $row[0]["UriageNO"]+1;
-    }
-    //echo (string)$UriageNO;
-    
-    foreach($array as $row){
-        if($row["SU"]==0){
-            continue;
-        }
-        $sqlstr = "insert into UriageData values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        $stmt = $pdo_h->prepare($sqlstr);
-
-        $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
-        $stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
-        $stmt->bindValue(3,  date("Y/m/d"), PDO::PARAM_STR);
-        $stmt->bindValue(4,  date("Y/m/d H:i:s"), PDO::PARAM_STR);
-        $stmt->bindValue(5,  $_POST["EV"], PDO::PARAM_INT);
-        $stmt->bindValue(6,  '', PDO::PARAM_STR);
-        $stmt->bindValue(7,  $row["CD"], PDO::PARAM_INT);
-        $stmt->bindValue(8,  $row["NM"], PDO::PARAM_STR);
-        $stmt->bindValue(9,  $row["SU"], PDO::PARAM_INT);
-        $stmt->bindValue(10, $row["UTISU"], PDO::PARAM_INT);
-        $stmt->bindValue(11, $row["TANKA"], PDO::PARAM_INT);
-        $stmt->bindValue(12, ($row["SU"] * $row["TANKA"]), PDO::PARAM_INT);
-        $stmt->bindValue(13, ($row["SU"] * $row["ZEI"]), PDO::PARAM_INT);
-        $stmt->bindValue(14, $row["ZEIKBN"], PDO::PARAM_INT);
-        
-        
-        $flg=$stmt->execute();
-        
-        if($flg){
-        }else{
-            echo "登録が失敗しました。<br>";
-        }
-    }
-
-}
-*/
 
 //商品M取得
 $sql = "select * from ShouhinMS where hyoujiKBN1='on' and uid = ? order by hyoujiNO,bunrui1,bunrui2,bunrui3,shouhinNM";
@@ -347,7 +284,8 @@ if(isset($emsg)){
                 <p>お釣り：￥<span id="oturi">0</span></p>    
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+                <!--<button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>-->
+                <button type="button"  data-dismiss="modal">閉じる</button>
             </div>
         </div>
     </div>
