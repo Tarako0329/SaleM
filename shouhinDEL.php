@@ -80,7 +80,7 @@ $csrf_token = csrf_create();
     include "head.html" 
     ?>
     <!--ページ専用CSS-->
-    <link rel="stylesheet" href="css/style_ShouhinMSedit.css" >
+    <link rel="stylesheet" href="css/style_ShouhinMSedit.css?<?php echo $time; ?>" >
     <TITLE><?php echo secho($title)." 取扱商品削除画面";?></TITLE>
 </head>
 <header style="flex-wrap:wrap">

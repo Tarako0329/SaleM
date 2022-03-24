@@ -69,7 +69,7 @@ $ZKMS = $stmt2->fetchAll();
     //共通部分、bootstrap設定、フォントCND、ファビコン等
     include "head.html" 
     ?>
-    <!--ページ専用CSS--><link rel="stylesheet" href="css/style_ShouhinMSL.css" >
+    <!--ページ専用CSS--><link rel="stylesheet" href="css/style_ShouhinMSL.css?<?php echo $time; ?>" >
     <TITLE><?php echo $title." 取扱商品 確認・編集";?></TITLE>
 </head>
 <header style="flex-wrap:wrap">

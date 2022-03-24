@@ -53,7 +53,7 @@ if($_POST["BTN"] == "send"){
     include "head.html" 
     ?>
     <!--ページ専用CSS-->
-    <link rel="stylesheet" href="css/style_account_create.css" >
+    <link rel="stylesheet" href="css/style_account_create.css?<?php echo $time; ?>" >
     <TITLE><?php echo secho($title)." ユーザー登録";?></TITLE>
 </head>
 <header style="flex-wrap:wrap">

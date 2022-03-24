@@ -100,7 +100,7 @@ $csrf_token=csrf_create();
     //共通部分、bootstrap設定、フォントCND、ファビコン等
     include "head.html" 
     ?>
-    <!--ページ専用CSS--><link rel="stylesheet" href="css/style_ShouhinMSedit.css" >
+    <!--ページ専用CSS--><link rel="stylesheet" href="css/style_ShouhinMSedit.css?<?php echo $time; ?>" >
     <TITLE><?php echo secho($title)." 取扱商品登録画面";?></TITLE>
 </head>
 <header style="flex-wrap:wrap">

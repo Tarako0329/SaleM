@@ -126,7 +126,7 @@ if($mode==0 || $mode==1){
     include "head.html" 
     ?>
     <!--ページ専用CSS-->
-    <link rel="stylesheet" href="css/style_account_create.css" >
+    <link rel="stylesheet" href="css/style_account_create.css?<?php echo $time; ?>" >
     <TITLE><?php echo secho($title)." ユーザー登録";?></TITLE>
     <!--郵便場号から住所取得-->
     <script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
