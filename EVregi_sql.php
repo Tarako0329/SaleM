@@ -86,19 +86,26 @@ if($_POST["commit_btn"] <> ""){
         }
         
         if($_POST["CHOUSEI_GAKU"]>0 && $E_Flg!=1){
-            $sqlstr="SELECT ZeiMS.zeiKBN as ZEIKBN ,1+ZeiMS.zeiritu/100 as zei_per ,sum(UriageKin+Zei) as uriage,SUM(UriageKin+Zei) OVER () AS total ";
-            $sqlstr=$sqlstr."FROM UriageData inner join ZeiMS on UriageData.zeiKBN = ZeiMS.zeiKBN ";
-            $sqlstr=$sqlstr."WHERE uid=? and UriageNO=? ";
-            $sqlstr=$sqlstr."group by ZeiMS.zeiKBN,ZeiMS.zeiritu";
+            $sqlstr="SELECT ZeiMS.zeiKBN as ZEIKBN ,1+ZeiMS.zeiritu/100 as zei_per ,sum(UriageKin+Zei) as uriage,T.total ";
+            $sqlstr=$sqlstr."FROM UriageData Umei inner join ZeiMS on Umei.zeiKBN = ZeiMS.zeiKBN ";
+            $sqlstr=$sqlstr."inner join (select UriageNO,sum(UriageKin+Zei) as total from UriageData WHERE uid=? and UriageNO=? group by UriageNO) as T on Umei.UriageNO = T.UriageNO ";
+            $sqlstr=$sqlstr."WHERE uid=? and Umei.UriageNO=? ";
+            $sqlstr=$sqlstr."group by ZeiMS.zeiKBN,1+ZeiMS.zeiritu/100";
             $stmt = $pdo_h->prepare($sqlstr);
             $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
             $stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
+            $stmt->bindValue(3,  $_SESSION['user_id'], PDO::PARAM_INT);
+            $stmt->bindValue(4,  $UriageNO, PDO::PARAM_INT);
             $flg=$stmt->execute();
             
             $result = $stmt->fetchAll();
             $goukei = 0;
             foreach($result as $row){
                 $chouseigaku = $_POST["CHOUSEI_GAKU"] - $row["total"];
+                echo "売上合計:".$row["total"]."<br>";
+                echo "調整売上:".$_POST["CHOUSEI_GAKU"]."<br>";
+                
+                echo $chouseigaku."<br>";
 
                 $chousei_hon = bcdiv(bcmul($chouseigaku , bcdiv($row["uriage"] , $row["total"],5),5),$row["zei_per"],0);//調整額×税率割合÷消費税率
                 $chousei_zei = bcsub(bcmul($chouseigaku , bcdiv($row["uriage"] , $row["total"],5),5) ,$chousei_hon,0);

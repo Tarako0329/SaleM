@@ -238,7 +238,7 @@ window.onload = function() {
 
 <body>
 <?php
-if(isset($emsg)){//width:100%;
+if(isset($emsg)){//
     echo $emsg;
     exit();
 }
@@ -246,9 +246,9 @@ if(isset($emsg)){//width:100%;
     <div class="container-fluid">
         <div class="row" style="display:none" id="CHOUSEI">
             <div class="col-1 col-md-0" ></div>
-            <div class="col-10 col-md-3" style="font-size: 2.2rem;">
+            <div class="col-10 col-md-7" style="font-size: 2.2rem;">
                 割引／割増後　お会計額：
-                <input type="number" class='order tanka' style=" border:solid;border-top:none;border-right:none;border-left:none;" name="CHOUSEI_GAKU" id="CHOUSEI_GAKU">
+                <input type="number" class='order tanka' style=" width:100%;border:solid;border-top:none;border-right:none;border-left:none;" name="CHOUSEI_GAKU" id="CHOUSEI_GAKU">
                 <br>
             </div>
             <div class="col-1" ></div>
