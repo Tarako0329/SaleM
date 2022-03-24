@@ -72,7 +72,7 @@ if($_SESSION["EV"] != "" ){
     include "head.html" 
     ?>
     <!--ページ専用CSS-->
-    <link rel="stylesheet" href="css/style_EVregi.css" >
+    <link rel="stylesheet" href="css/style_EVregi.css?<?php echo $time; ?>" >
     <TITLE><?php echo $title." レジ";?></TITLE>
 </head>
 
@@ -87,6 +87,7 @@ window.onload = function() {
      var zei_disp = document.getElementById("utizei");
      var total_pay = 0;
      var total_zei = 0;
+     var total_pay_bk = 0;
      
      //PHPで繰り返し表示。メニューボタン数に応じて準備する
 <?php     
@@ -123,6 +124,9 @@ window.onload = function() {
     //確認・確定ボタン
     var order_chk = document.getElementById('order_chk');
     var btn_commit = document.getElementById('btn_commit');
+    //調整額入力エリア
+    var CHOUSEI = document.getElementById("CHOUSEI");
+    var CHOUSEI_GAKU = document.getElementById("CHOUSEI_GAKU");
     //電卓表示ボタン
     var dentaku = document.getElementById('dentaku');
     
@@ -140,6 +144,7 @@ window.onload = function() {
         dentaku.style.display = 'block';
         order_return.style.display = 'block';
         order_clear.style.display = 'none';
+        CHOUSEI.style.display = 'block';
     };
     
     dentaku.onclick = function(){
@@ -197,27 +202,60 @@ window.onload = function() {
         order_clear.style.display = 'block';
         btn_commit.style.display = 'none';
         order_chk.style.display = 'block';
-     }
+        CHOUSEI.style.display = 'none';
+        CHOUSEI_GAKU.value='';
+        kaikei_disp.innerHTML = total_pay_bk;
+        total_pay=total_pay_bk;
+     };
+    CHOUSEI_GAKU.onchange = function(){
+        total_pay_bk = total_pay; //調整前金額を保存
+        total_pay = CHOUSEI_GAKU.value;
+        kaikei_disp.innerHTML = total_pay;
+    }
 };    
 </script>
 
 <form method = "post" action="EVregi_sql.php">
     <input type="hidden" name="csrf_token" value='<?php echo $token;?>'>
+    <input type="hidden" name="mode" value='<?php echo $_GET["mode"];?>'>
     
 <header>
     <div class="title yagou"><a href="menu.php"><?php echo $title;?></a></div>
-    <div class="event" style="font-family:inherit;"><input type="text" class="ev" name="EV" value="<?php echo $event ?>" placeholder="イベント名等"></div>
+    <?php
+    if($_GET["mode"]=="kobetu"){
+    ?>
+        <div class="event" style="font-family:inherit;"><input type="text" class="ev" name="KOKYAKU" required="required" placeholder="(必須)顧客名"></div>
+        <input type="hidden" name="EV" value="">
+    <?php
+    }else{
+    ?>
+        <div class="event" style="font-family:inherit;"><input type="text" class="ev" name="EV" value="<?php echo $event ?>" placeholder="イベント名等"></div>
+        <input type="hidden" name="KOKYAKU" value="">
+    <?php
+    }
+    ?>
 </header>
 
 <body>
 <?php
-if(isset($emsg)){
+if(isset($emsg)){//width:100%;
     echo $emsg;
     exit();
 }
 ?>
     <div class="container-fluid">
+        <div class="row" style="display:none" id="CHOUSEI">
+            <div class="col-1 col-md-0" ></div>
+            <div class="col-10 col-md-3" style="font-size: 2.2rem;">
+                割引／割増後　お会計額：
+                <input type="number" class='order tanka' style=" border:solid;border-top:none;border-right:none;border-left:none;" name="CHOUSEI_GAKU" id="CHOUSEI_GAKU">
+                <br>
+            </div>
+            <div class="col-1" ></div>
+        </div>
+        <hr>
         <div class="row">
+            
 <?php
     $i=0;
 

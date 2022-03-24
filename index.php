@@ -29,13 +29,13 @@ if(isset($_SESSION["EMSG"])){
     include "head.html" 
     ?>
     <!--ページ専用CSS-->
-    <link rel="stylesheet" href="css/style_index.css" >
+    <link rel="stylesheet" href="css/style_index.css?<?php echo $time; ?>" >
     <script src="script/index.js"></script>
     <TITLE><?php echo secho($title)." ようこそ";?></TITLE>
 </head>
  
 <header style="flex-wrap:wrap">
-    <div class="title" style="width: 100%;"><a href="index.php"><?php echo secho($title);?></a>
+    <div class="title" style="width: 100%;"><a href="index.php" ><?php echo secho($title);?></a></div>
     <div style="font-size:1rem;"> ようこそWEBREZへ</div>
 </header>
 

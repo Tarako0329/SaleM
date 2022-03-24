@@ -38,15 +38,19 @@
    font-size: 0;
     
 }
-
+/*共通CSSに移管
 .btn--orange,
 a.btn--orange {
     /*メニューボタン*/
     color: #fff;
-    background-color: #00bfff;
+    /*background-color: #00bfff;*/
+    background-color: #e29676;
     height:100%;     
     font-size: 2.2rem;
+    /*border:thick double #47266e ;*/
+    border:solid #47266e 0.5px;
 }
+*/
 INPUT.order{
     border:none;
     text-align:center;

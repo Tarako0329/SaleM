@@ -50,12 +50,21 @@ function check_session_userid($pdo_h){
             $_SESSION["EMSG"]="セッションが切れてます。";
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: index.php");
+            exit();
         }elseif(check_auto_login($_COOKIE['webrez_token'],$pdo_h)==false){
             $_SESSION["EMSG"]="自動ログインの有効期限が切れてます";
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: index.php");
+            exit();
         }
         
+    }
+    if(!($_SESSION["user_id"]<>"")){
+        //念のための最終チェック
+        $_SESSION["EMSG"]="ユーザーＩＤの再取得に失敗しました。";
+        header("HTTP/1.1 301 Moved Permanently");
+        header("Location: index.php");
+        exit();
     }
     return true;
 }

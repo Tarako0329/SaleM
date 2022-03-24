@@ -48,7 +48,7 @@ if($row[0]["yuukoukigen"]<>""){
     include "head.html" 
     ?>
     <!--ページ専用CSS-->
-    <link rel="stylesheet" href="css/style_menu.css" >
+    <link rel="stylesheet" href="css/style_menu.css?<?php echo $time; ?>" >
     <TITLE><?php echo $title;?></TITLE>
 </head>
 
@@ -88,7 +88,7 @@ if($row[0]["yuukoukigen"]<>""){
 <?php
     $array = [
         'レジ'=>['EVregi.php?csrf_token='.$token]
-        //,'個別売上'=>['xxx.php?csrf_token='.$token]
+        ,'個別売上'=>['EVregi.php?mode=kobetu&csrf_token='.$token]
         ,'売上実績'=>['UriageData.php?mode=select&csrf_token='.$token]
         ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token]
         ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token]

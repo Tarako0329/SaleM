@@ -41,11 +41,16 @@ define("MODE_DIR",$dir_a[2]);
 
 //暗号化キー
 $key = $_ENV["KEY"];
-//PGバージョン差分補正
-//updatedb($_ENV["SV"], $_ENV["USER"], $_ENV["PASS"], $_ENV["DBNAME"] ,$version,$comment);
 
 // DBとの接続
 $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
+
+//CSSスーパーリロード頻度
+if(MODE_DIR=="TEST"){
+    $time=date('Ymd-Hi');
+}else{
+    $time=date('Ymd');
+}
 
 //端末IDを発行し、１ヶ月の有効期限でCookieにセット
 if(!isset($_COOKIE['machin_id'])){
@@ -56,6 +61,6 @@ if(!isset($_COOKIE['machin_id'])){
 }
 define("MACHIN_ID", $machin_id);
 
-deb_echo(MACHIN_ID);
+deb_echo("端末ID：".MACHIN_ID);
 
 ?>

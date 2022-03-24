@@ -14,22 +14,49 @@ body {
 }
 header{
     height: 70px; /* 高さを70pxに指定 */
-    padding: 5px 5px; /* ヘッダーに上下左右それぞれ余白を指定 */
+    padding: 2px 2px; /* ヘッダーに上下左右それぞれ余白を指定 */
     box-sizing: border-box; /* padding分を含んで幅を100%にするため */
-    background: #ff838b;
+    /*background: #ff838b; ピンク*/
+    background: #ed6d35;
+    background-image:linear-gradient(to left top, #e4007f, #ed6d35);
     position: fixed; /* ウィンドウを基準に画面に固定 */
     top: 0; /* 上下の固定位置を上から0pxにする */
     left: 0; /* 左右の固定位置を左から0pxにする */
     width: 100%;
     z-index: 99;
     display: flex;
-    font-size: 2.5rem;
     font-weight: 700;
 }
+
 .title{
-    font-family: 'Reggae One', cursive;   
+    font-family: 'Kranky', cursive;
+    color:#47266e;
+    font-size: 3.0rem;
+    font-weight: 700;
 }
-.font_Reggae_One{
-    font-family: 'Reggae One', cursive;    
+.title > a{
+    color:inherit;
 }
 
+/*使えるフォント
+font-family: 'Allerta Stencil', sans-serif;
+font-family: 'Cabin Sketch', cursive;
+font-family: 'Chewy', cursive;
+font-family: 'Fredericka the Great', cursive;
+font-family: 'Kranky', cursive;
+font-family: 'Londrina Outline', cursive;
+font-family: 'Rye', cursive;
+*/
+
+/*トップメニューボタン*/
+.btn--orange,
+a.btn--orange {
+    /*メニューボタン*/
+    color: #fff;
+    /*background-color: #00bfff;*/
+    background-color: #e29676;
+    height:100%;     
+    font-size: 2.2rem;
+    /*border:thick double #47266e ;*/
+    border:solid #47266e 0.5px;
+}

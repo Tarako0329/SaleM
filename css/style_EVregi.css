@@ -74,11 +74,14 @@ INPUT.ev{
     font-weight: 700;
    
 }
+/*レジボタン*/
 .btn--menu,
 a.btn--menu {
     /*メニューボタン*/
     color: #fff;
-    background-color: #00bfff;
+    /*background-color: #00bfff;*/
+    background-color: #e29676;
+    border:solid #47266e 0.5px;
     height:70%;     
     font-size: 2.0rem;
 }

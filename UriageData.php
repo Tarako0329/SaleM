@@ -236,7 +236,7 @@ if($mode=="del"){
     $sql = "select * from UriageData ".$_SESSION["wheresql"]." order by UriageNO";
     $stmt = $pdo_h->prepare( $sql );
     //更新後は破棄
-    $_SESSION["wheresql"]="";
+    //$_SESSION["wheresql"]="";
 }else{
     echo "想定外エラー";
     exit();
@@ -295,7 +295,7 @@ $ZEIresult = $pdo_h->query($ZEIsql);
     include "head.html" 
     ?>
     <!--ページ専用CSS-->
-    <link rel="stylesheet" href="css/style_UriageData.css?<?php echo date('Ymd-Hi'); ?>" >
+    <link rel="stylesheet" href="css/style_UriageData.css?<?php echo $time; ?>" >
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script>
     $(function() {
