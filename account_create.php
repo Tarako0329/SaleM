@@ -55,7 +55,6 @@ if($mode==1){
     
     $_SESSION["MAIL"] = $row[0]["mail"];
     $_SESSION["moto_MAIL"] = $row[0]["mail"]; //メールアドレスを変更したかどうか比較するための元ｱﾄﾞﾚｽ
-    //$_SESSION["PASS"] = passEX($_POST["PASS"],$_POST["MAIL"],$key);　パスワードは表示しない（不可逆で登録してるので出来ないｗ）
     $_SESSION["QUESTION"] = $row[0]["question"];
     $_SESSION["ANSWER"] = $row[0]["answer"];
     $_SESSION["LOGINREZ"] = $row[0]["loginrez"];

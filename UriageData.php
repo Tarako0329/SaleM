@@ -360,7 +360,7 @@ $ZEIresult = $pdo_h->query($ZEIsql);
     <div class="container-fluid">
     <?php
         if($_SESSION["MSG"]!=""){
-            echo "<div class='container'><div class='row'><div class='col-12'><div style='text-align:center;font-size:1.5rem;' id='alert-1' class='lead'></div></div></div></div>";
+            echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-1' class='lead'></div></div></div></div>";
         }
         $_SESSION["MSG"]="";
         echo $msg;

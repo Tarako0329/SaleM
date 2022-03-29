@@ -285,9 +285,9 @@ window.onload = function() {
         exit();
     }
     if($_GET["status"]=="success"){
-        echo "<div class='container'><div class='row'><div class='col-12'><div style='text-align:center;font-size:1.5rem;' id='alert-s' class='lead'></div></div></div></div>";
+        echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-s' class='lead'></div></div></div></div>";
     }elseif($_GET["status"]=="failed"){
-        echo "<div class='container'><div class='row'><div class='col-12'><div style='text-align:center;font-size:1.5rem;' id='alert-e' class='lead'></div></div></div></div>";
+        echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-e' class='lead'></div></div></div></div>";
     }
 ?>
     <div class="container-fluid">
