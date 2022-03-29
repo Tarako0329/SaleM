@@ -16,9 +16,6 @@ header{
     height: 70px; /* 高さを70pxに指定 */
     padding: 2px 2px; /* ヘッダーに上下左右それぞれ余白を指定 */
     box-sizing: border-box; /* padding分を含んで幅を100%にするため */
-    /*background: #ff838b; ピンク*/
-    background: #ed6d35;
-    background-image:linear-gradient(to left top, #e4007f, #ed6d35);
     position: fixed; /* ウィンドウを基準に画面に固定 */
     top: 0; /* 上下の固定位置を上から0pxにする */
     left: 0; /* 左右の固定位置を左から0pxにする */
@@ -49,14 +46,67 @@ font-family: 'Rye', cursive;
 */
 
 /*トップメニューボタン*/
-.btn--orange,
-a.btn--orange {
-    /*メニューボタン*/
-    color: #fff;
-    /*background-color: #00bfff;*/
-    background-color: #e29676;
+.btn--topmenu{
     height:100%;     
+    width:100%; 
     font-size: 2.2rem;
-    /*border:thick double #47266e ;*/
-    border:solid #47266e 0.5px;
 }
+/*レジボタン*/
+.btn--rezi{
+    height:70%;     
+    width:100%; 
+    font-size: 2.0rem;
+}
+
+/*ボタンの見た目*/
+.btn-view{
+    color: #212529;                 /*文字色*/
+    background-color: #e29676;      /*背景色*/
+    border:solid #47266e 0.5px;     /*枠線*/
+
+    font-weight: 700;
+    line-height: 1.5;
+    position: relative;
+    display: inline-block;
+    padding: 1rem; /*ボタン文字エリアとボタン外枠の間*/
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+    text-align: center;
+    vertical-align: middle;
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    border-radius: 0.5rem;
+    white-space: normal;  
+}
+/*割引割増ボタンの色など*/
+.btn-changeVal{
+    color: #212529;                 /*文字色*/
+    background-color: #ffce5b;      /*背景色*/
+    width:100%; 
+    font-weight: 600;
+}
+.header-color{
+    /*background: #ff838b; ピンク*/
+    background: #ed6d35;
+    background-image:linear-gradient(to left top, #e4007f, #ed6d35);
+    
+}
+footer{
+    background: #ffce5b;
+}
+.btn--commit{
+    /*レジ画面の登録ボタン*/
+    color: #fff;
+    background-color: #eb6100;
+}
+.btn--chk{
+    /*レジ画面の釣銭・クリア・確認ボタン*/
+    color: #fff;
+    background-color: #9acd32;
+}
+

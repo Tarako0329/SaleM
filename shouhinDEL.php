@@ -83,7 +83,7 @@ $csrf_token = csrf_create();
     <link rel="stylesheet" href="css/style_ShouhinMSedit.css?<?php echo $time; ?>" >
     <TITLE><?php echo secho($title)." 取扱商品削除画面";?></TITLE>
 </head>
-<header style="flex-wrap:wrap">
+<header class="header-color" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="menu.php"><?php echo secho($title);?></a></div>
     <p style="font-size:1rem;">  取扱商品削除画面</p>
 </header>
@@ -97,7 +97,7 @@ $csrf_token = csrf_create();
         exit;
     } ?>
     <p>以下の商品を削除しますか？</p>
-    <form method="post" class="form" action="shouhinDEL.php">
+    <form method="post" class="form" id="form1" action="shouhinDEL.php">
         <div class="form-group form-inline">
             <label for="shouhinNM" class="col-2 col-md-1 control-label">商品名</label>
             <div class="col-10">
@@ -115,7 +115,7 @@ $csrf_token = csrf_create();
             <label for="zeikbn" class="col-2 col-md-1 control-label">税区分</label>
             <div class=" col-10">
                 <!--<input type="text" class="form-control" id="zeikbn" name="zeikbn">-->
-                <select class="form-control" style="width:80%" id="zeikbn" name="zeikbn" required="required" placeholder="必須">
+                <select class="form-control" style="width:80%;padding-top:0;" id="zeikbn" name="zeikbn" required="required" placeholder="必須">
                     <option value=""></option>
                     <?php
                     foreach($stmt as $row2){
@@ -203,6 +203,22 @@ $csrf_token = csrf_create();
     </div>
 
 </body>
+<script>
+window.onload = function() {
+    // Enterキーが押された時にSubmitされるのを抑制する
+    document.getElementById("form1").onkeypress = (e) => {
+        // form1に入力されたキーを取得
+        const key = e.keyCode || e.charCode || 0;
+        // 13はEnterキーのキーコード
+        if (key == 13) {
+            // アクションを行わない
+            e.preventDefault();
+        }
+    }    
+    
+};    
+
+</script>
 </html>
 
 <?php

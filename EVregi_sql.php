@@ -14,8 +14,13 @@ $stmt->bindValue(4, "EV", PDO::PARAM_STR);
 $stmt->bindValue(5, $_POST["EV"], PDO::PARAM_STR);
 $stmt->execute();
 
+$E_Flg=0;
+$_SESSION["msg"]="登録処理が実行されませんでした。";
+$emsg="";
+
 //売上登録
 if($_POST["commit_btn"] <> ""){
+//if(0){
     if(csrf_chk_nonsession()==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。";
         header("HTTP/1.1 301 Moved Permanently");
@@ -40,16 +45,12 @@ if($_POST["commit_btn"] <> ""){
     }
     //echo (string)$UriageNO;
     
-    $E_Flg=0;
-    $hontai=0;
-    $zei=0;
     try{
         $pdo_h->beginTransaction();
         foreach($array as $row){
             if($row["SU"]==0){
                 continue;
             }
-            //$sqlstr = "insert into UriageData values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)";
             $sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)";
             $stmt = $pdo_h->prepare($sqlstr);
     
@@ -63,16 +64,8 @@ if($_POST["commit_btn"] <> ""){
             $stmt->bindValue(8,  $row["NM"], PDO::PARAM_STR);
             $stmt->bindValue(9,  $row["SU"], PDO::PARAM_INT);
             $stmt->bindValue(10, $row["UTISU"], PDO::PARAM_INT);
-            
-            if(substr(strval($row["ZEIKBN"]),3,1) =="1" || $row["ZEIKBN"]==0){
-                //外税（マスタは税抜単価）
-                $stmt->bindValue(11, $row["TANKA"], PDO::PARAM_INT);
-                $stmt->bindValue(12, ($row["SU"] * $row["TANKA"]), PDO::PARAM_INT);
-            }else{
-                //内税（マスタは税込単価）
-                $stmt->bindValue(11, $row["TANKA"] - $row["ZEI"], PDO::PARAM_INT);
-                $stmt->bindValue(12, ($row["SU"] * ($row["TANKA"] - $row["ZEI"])), PDO::PARAM_INT);
-            }
+            $stmt->bindValue(11, $row["TANKA"], PDO::PARAM_INT);
+            $stmt->bindValue(12, ($row["SU"] * $row["TANKA"]), PDO::PARAM_INT);
             $stmt->bindValue(13, ($row["SU"] * $row["ZEI"]), PDO::PARAM_INT);
             $stmt->bindValue(14, $row["ZEIKBN"], PDO::PARAM_INT);
             
@@ -80,6 +73,7 @@ if($_POST["commit_btn"] <> ""){
             
             if($flg){
             }else{
+                $emsg="売上げのINSERTでエラー";
                 $E_Flg=1;
                 break;
             }
@@ -125,7 +119,7 @@ if($_POST["commit_btn"] <> ""){
                 $stmt->bindValue(5,  $_POST["EV"], PDO::PARAM_INT);
                 $stmt->bindValue(6,  $_POST["KOKYAKU"], PDO::PARAM_STR);
                 $stmt->bindValue(7,  $row["ZEIKBN"], PDO::PARAM_INT);
-                $stmt->bindValue(8,  rot13encrypt("割引・割増:".(($row["zei_per"]-1)*100)."%分"), PDO::PARAM_STR);
+                $stmt->bindValue(8,  rot13encrypt("割引・割増:税率".(($row["zei_per"]-1)*100)."%分"), PDO::PARAM_STR);
                 $stmt->bindValue(9,  0, PDO::PARAM_INT);
                 $stmt->bindValue(10, 0, PDO::PARAM_INT);
                 $stmt->bindValue(11, 0, PDO::PARAM_INT);
@@ -137,6 +131,7 @@ if($_POST["commit_btn"] <> ""){
                 if($flg){
                 }else{
                     $E_Flg=1;
+                    $emsg=$emsg."/割引割増のINSERTでエラー";
                     break;
                 }
             }
@@ -160,39 +155,61 @@ if($_POST["commit_btn"] <> ""){
                 $stmt->bindValue(13, 0, PDO::PARAM_INT);
                 $stmt->bindValue(14, 0, PDO::PARAM_INT);//非課税
                 $flg=$stmt->execute();
-                
+                 if($flg){
+                }else{
+                    $E_Flg=1;
+                    $emsg=$emsg."/割引割増の端数調整のINSERTでエラー";
+                }
+               
             }
             //exit();
         }
         
-        if(E_Flg==0){
-            $pdo_h->commit();    
+        if($E_Flg==0){
+            $pdo_h->commit();
+            $_SESSION["msg"]="売上が登録されました。（売上№：".$UriageNO."）";
+            header("HTTP/1.1 301 Moved Permanently");
+            header("Location: EVregi.php?status=success&mode=".$_POST["mode"]."&csrf_token=".$token);
+            $stmt = null;
+            $pdo_h = null;
+            exit();
         }else{
             //1件でも失敗したらロールバック
             $pdo_h->rollBack();
-            echo "登録が失敗しました。<br>";
-            echo "<a href='UriageData.php?csrf_token=".$token."'>レジ画面</a>より再度登録してみて下さい。<br>何度も失敗するようでしたら制作者へご連絡ください。";
-            exit();
+            
+            $emsg=$emsg."/insert処理が失敗し、rollBackが発生しました。";
+            $stmt = null;
+            $pdo_h = null;
+            //exit();
         }
         
     }catch (Exception $e) {
         $pdo_h->rollBack();
-        echo "登録が失敗しました。<br>" . $e->getMessage()."<br>";
-        echo "<a href='UriageData.php?csrf_token=".$token."'>レジ画面</a>より再度登録してみて下さい。<br>再三失敗するようでしたら制作者へご連絡ください。<br>";
-        echo "UriNO::".$UriageNO."<br>uid::".$_SESSION['user_id'];
-        $emsg = "レジ登録でERRORが発生しました。：".$e->getMessage();
-        send_mail("green.green.midori@gmail.com","EVregi_sql.phpでシステム停止",$emsg);
-        exit();
+        $emsg = $emsg."/レジ登録でERRORをCATHCしました。：".$e->getMessage();
+        $E_Flg=1;
+        $stmt = null;
+        $pdo_h = null;
+        //exit();
+    }catch(Throwable $t){
+        $pdo_h->rollBack();
+        $emsg = $emsg."/レジ登録でFATAL ERRORをCATHCしました。：".$t->getMessage();
+        $E_Flg=1;
+        $stmt = null;
+        $pdo_h = null;        
     }
-        
+}
 
+if($E_Flg==1){
+    $_SESSION["msg"]= "登録が失敗しました。再度実行してもエラーとなる場合は、ご迷惑をおかけしますが復旧までお待ちください。エラーは管理者へ自動通知されました。";
+    $emsg = $emsg."/UriNO::".$UriageNO."　uid::".$_SESSION['user_id'];
+    send_mail("green.green.midori@gmail.com","【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
 }
 
 $stmt = null;
 $pdo_h = null;
-
+//Failure
 header("HTTP/1.1 301 Moved Permanently");
-header("Location: EVregi.php?mode=".$_POST["mode"]."&csrf_token=".$token);
+header("Location: EVregi.php?status=failed&mode=".$_POST["mode"]."&csrf_token=".$token);
 exit();
 
 ?>

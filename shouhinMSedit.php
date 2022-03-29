@@ -12,84 +12,24 @@ csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容
 csrf_chk()                              ：COOKIE・SESSION・POSTのトークンチェック。
 csrf_chk_nonsession()                   ：COOKIE・POSTのトークンチェック。
 csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェック。
+csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
 */
 
 require "php_header.php";
 
 if(isset($_GET["csrf_token"]) || empty($_POST)){
     //トップメニューからの遷移チェック。リンクから飛ぶのでPOSTなし
-    if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
+    if(csrf_chk_nonsession_get($_GET["csrf_token"])==false && csrf_chk_redirect($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。";
         header("HTTP/1.1 301 Moved Permanently");
         header("Location: index.php");
         exit();
     }
 }
-/*
-if(!($_SESSION['user_id']<>"")){
-    //セッションのIDがクリアされた場合の再取得処理。
-    if(check_auto_login($_COOKIE['webrez_token'],$pdo_h)==false){
-        $_SESSION["EMSG"]="ログイン有効期限が切れてます";
-        header("HTTP/1.1 301 Moved Permanently");
-        header("Location: index.php");
-    }
-}
-*/
+
 //セッションのIDがクリアされた場合の再取得処理。
 $rtn=check_session_userid($pdo_h);
 
-if($_POST["btn"] == "登録"){
-    if(csrf_chk()==false){
-        $_SESSION["EMSG"]="セッションが正しくありませんでした";
-        header("HTTP/1.1 301 Moved Permanently");
-        header("Location: index.php");
-    }
-
-    //税区分MSから税率の取得
-    $sqlstr="select * from ZeiMS where zeiKBN=?";
-    $stmt = $pdo_h->prepare($sqlstr);
-    $stmt->bindValue(1, $_POST["zeikbn"], PDO::PARAM_INT);
-    $stmt->execute();
-    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $zeikbn = $row[0]["zeiKBN"];
-    $zeiritu= $row[0]["zeiritu"];
-
-
-    //商品CDの取得
-    $sqlstr="select max(shouhinCD) as MCD from ShouhinMS where uid=? group by uid";
-    $stmt = $pdo_h->prepare($sqlstr);
-    $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-    $stmt->execute();
-    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $new_shouhinCD = $row[0]["MCD"]+1;
-
-    $sqlstr="insert into ShouhinMS values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    $stmt = $pdo_h->prepare($sqlstr);
-    $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-    $stmt->bindValue(2, $new_shouhinCD, PDO::PARAM_INT);
-    $stmt->bindValue(3, rot13encrypt($_POST["shouhinNM"]), PDO::PARAM_STR);
-    $stmt->bindValue(4, $_POST["tanka"], PDO::PARAM_INT);
-    $stmt->bindValue(5, $zeiritu, PDO::PARAM_INT);
-    $stmt->bindValue(6, $zeikbn, PDO::PARAM_INT);
-    $stmt->bindValue(7, $_POST["utisu"], PDO::PARAM_INT);
-    $stmt->bindValue(8, $_POST["tani"], PDO::PARAM_STR);
-    $stmt->bindValue(9, $_POST["bunrui1"], PDO::PARAM_STR);
-    $stmt->bindValue(10, $_POST["bunrui2"], PDO::PARAM_STR);
-    $stmt->bindValue(11, $_POST["bunrui3"], PDO::PARAM_STR);
-    $stmt->bindValue(12, $_POST["hyoujiKBN1"], PDO::PARAM_STR);
-    $stmt->bindValue(13, $_POST["hyoujiKBN2"], PDO::PARAM_STR);
-    $stmt->bindValue(14, $_POST["hyoujiKBN3"], PDO::PARAM_STR);
-    $stmt->bindValue(15, $_POST["hyoujiNO"], PDO::PARAM_INT);
-    
-    $status=$stmt->execute();
-    if($status==true){
-        echo secho($_POST["shouhinNM"])."　が登録されました。<br>";
-    }else{
-        echo "登録が失敗しました。<br>";
-    }
-
-    //echo $_POST["hyoujiKBN1"];
-}
 //税区分MSリスト取得
 $sqlstr="select * from ZeiMS order by zeiKBN;";
 $stmt = $pdo_h->query($sqlstr);
@@ -103,86 +43,95 @@ $csrf_token=csrf_create();
     <!--ページ専用CSS--><link rel="stylesheet" href="css/style_ShouhinMSedit.css?<?php echo $time; ?>" >
     <TITLE><?php echo secho($title)." 取扱商品登録画面";?></TITLE>
 </head>
-<header style="flex-wrap:wrap">
+<script>
+    window.onload = function() {
+        //アラート用
+        function alert(msg) {
+          return $('<div class="alert" role="alert"></div>')
+            .text(msg);
+        }
+        (function($){
+          const e = alert('<?php echo $_SESSION["MSG"]; ?>').addClass('alert-success');
+          // アラートを表示する
+          $('#alert-1').append(e);
+          /* 2秒後にアラートを消す
+          setTimeout(() => {
+            e.alert('close');
+          }, 3000);
+          */
+        })(jQuery);
+        // Enterキーが押された時にSubmitされるのを抑制する
+        document.getElementById("form1").onkeypress = (e) => {
+            // form1に入力されたキーを取得
+            const key = e.keyCode || e.charCode || 0;
+            // 13はEnterキーのキーコード
+            if (key == 13) {
+                // アクションを行わない
+                e.preventDefault();
+            }
+        }    
+    };    
+</script>
+
+<header class="header-color" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="menu.php"><?php echo secho($title);?></a></div>
     <p style="font-size:1rem;">  取扱商品登録画面</p>
 </header>
 
 <body>
     <div class="container-fluid" style="padding-top:15px;">
-    <form method="post" class="form" action="shouhinMSedit.php">
-        <div class="form-group form-inline">
-            <label for="shouhinNM" class="col-2 col-md-1 control-label">商品名</label>
-            <div class="col-10">
-                <input type="text" class="form-control" style="width:80%" id="shouhinNM" name="shouhinNM" required="required" placeholder="必須">
-            </div>
-        </div>
-        <div class="form-group form-inline">
-            <label for="tanka" class="col-2 col-md-1 control-label">単価</label>
-            <div class=" col-10">
-                <input type="number" class="form-control" style="width:80%" id="tanka" name="tanka" required="required" placeholder="必須">
-            </div>
-        </div>
-
-        <div class="form-group form-inline">
-            <label for="zeikbn" class="col-2 col-md-1 control-label">税区分</label>
-            <div class=" col-10">
-                <select class="form-control" style="width:80%;padding-top:0;" id="zeikbn" name="zeikbn" required="required" placeholder="必須" >
+    <?php
+        //echo $_SESSION["MSG"]."<br>";
+        if($_SESSION["MSG"]!=""){
+            echo "<div class='container'><div class='row'><div class='col-12'><div style='text-align:center;font-size:1.5rem;' id='alert-1' class='lead'></div></div></div></div>";
+        }
+        $_SESSION["MSG"]="";
+    ?>
+    <form method="post" id="form1" class="form" action="shouhinMSedit_sql.php">
+        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+        <table>
+            <tr><td>商品名</td><td><input type="text" class="form-control" style="width:95%" id="shouhinNM" name="shouhinNM" required="required" placeholder="必須"></td></tr>
+            <tr><td>単価</td><td><input type="number" onchange="zei_math()" class="form-control" style="width:95%" id="new_tanka" required="required" placeholder="必須"></td>
+                <td>
+                    <div class="btn-group btn-group-toggle" style="font-size:1rem;padding:0" data-toggle="buttons">
+                        <label class="btn btn-primary active">
+                            <input type="radio" onchange="zei_math()" name="options" id="option1" value="zeikomi" autocomplete="off" checked> 税込み
+                        </label>
+                        <label class="btn btn-primary">
+                            <input type="radio" onchange="zei_math()" name="options" id="option2" value="zeinuki" autocomplete="off"> 税抜き
+                        </label>
+                    </div>                    
+                </td></tr>
+            <tr><td>税区分</td>
+                <td>
+                    <select class="form-control" onchange="zei_math()" style="width:80%;padding-top:0;" id="zeikbn" name="zeikbn" required="required" placeholder="必須" >
                     <option value=""></option>
                     <?php
                     foreach($stmt as $row){
                         echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
                     }
                     ?>
-                </select>
-            </div>
-        </div>
-        <div class="form-group form-inline">
-            <label for="tanka" class="col-2 col-md-1 control-label">税込価格</label></label>
-            <div class=" col-10">
-                <input type="number" readonly='readonly' class="form-control" style="width:80%;border:none;" id="zkomitanka" aria-describedby="zkomitankaHelp">
-                <small id="zkomitankaHelp" class="form-text text-muted">レジ画面に表示される金額は税込価格です。</small>
-            </div>
-        </div>
-
-        <div class="form-group form-inline">
-            <label for="utisu" class="col-2 col-md-1 control-label">内容量</label>
-            <div class=" col-10">
-                <input type="number" class="form-control" style="width:80%" id="utisu" name="utisu" placeholder="1箱12個入りの場合「12」等">
-            </div>
-        </div>
-        <div class="form-group form-inline">
-            <label for="tani" class="col-2 col-md-1 control-label">単位</label>
-            <div class=" col-10">
-                <input type="text" class="form-control" style="width:80%" id="tani" name="tani" placeholder="内容量の単位（g,個）等">
-            </div>
-        </div>
-        <div class="form-group form-inline">
-            <label for="bunrui1" class="col-2 col-md-1 control-label">大カテゴリー</label>
-            <div class=" col-10">
-                <input type="text" class="form-control" style="width:80%" id="bunrui1" name="bunrui1" placeholder="例：物販">
-            </div>
-        </div>
-        <div class="form-group form-inline">
-            <label for="bunrui2" class="col-2 col-md-1 control-label">中カテゴリー</label>
-            <div class=" col-10">
-                <input type="text" class="form-control" style="width:80%" id="bunrui2" name="bunrui2" placeholder="例：食品">
-            </div>
-        </div>
-        <div class="form-group form-inline">
-            <label for="bunrui3" class="col-2 col-md-1 control-label">小カテゴリー</label>
-            <div class=" col-10">
-                <input type="text" class="form-control" style="width:80%" id="bunrui3" name="bunrui3" placeholder="例：惣菜">
-            </div>
-        </div>
-        <div class="form-group form-inline form-switch">
-            <label class="col-2 col-md-1 control-label">レジ対象</label>
-            <div class="col-10" style="text-align:left">
-                <label for="hyoujiKBN1" style="float:left;width:8rem;">
+                    </select>
+                </td></tr>
+            <tr><td>税抜単価</td><td><input type="number" readonly='readonly' class="form-control" style="width:95%" id="tanka" name="tanka" ></td>
+            <tr><td>消費税</td><td><input type="number" readonly='readonly' class="form-control" style="width:95%" id="shouhizei" name="shouhizei" ></td></tr>
+            <tr><td>税込単価</td>
+                <td>
+                    <input type="number" readonly='readonly' class="form-control" style="width:95%;border:none;" id="zkomitanka" aria-describedby="zkomitankaHelp">
+                    <small id="zkomitankaHelp" class="form-text text-muted">レジ画面に表示される金額は税込価格です。</small>
+                </td>
+            </tr>
+            <tr><td>内容量</td><td><input type="number" class="form-control" style="width:95%" id="utisu" name="utisu" placeholder="1箱12個入りの場合「12」等"></td></tr>
+            <tr><td>単位</td><td><input type="text" class="form-control" style="width:95%" id="tani" name="tani" placeholder="内容量の単位（g,個）等"></td></tr>
+            <tr><td>大カテゴリー</td><td><input type="text" class="form-control" style="width:95%" id="bunrui1" name="bunrui1" placeholder="例：物販"></td></tr>
+            <tr><td>中カテゴリー</td><td><input type="text" class="form-control" style="width:95%" id="bunrui2" name="bunrui2" placeholder="例：食品"></td></tr>
+            <tr><td>小カテゴリー</td><td><input type="text" class="form-control" style="width:95%" id="bunrui3" name="bunrui3" placeholder="例：惣菜"></td></tr>
+            <tr><td>レジ対象</td><td><label for="hyoujiKBN1" style="float:left;width:8rem;">
                      <input type="checkbox" style="vertical-align:middle;" id="hyoujiKBN1" name="hyoujiKBN1" checked="checked">表示する
-                </label>
-            </div>
-        </div>
+                </label></td></tr>
+            <tr><td>表示順</td><td><input type="text" class="form-control" style="width:50%" id="hyoujiNO" name="hyoujiNO" placeholder="レジ表示順。未指定の場合は「カテゴリー大>中>小>商品名」の五十音順" value=0></td></tr>
+        </table>
+
         
         <input type="hidden" class="form-control" id="hyoujiKBN2" name="hyoujiKBN2" value="">
         <input type="hidden" class="form-control" id="hyoujiKBN3" name="hyoujiKBN3" value="">
@@ -201,14 +150,6 @@ $csrf_token=csrf_create();
             </div>
         </div>
         -->
-        <div class="form-group form-inline">
-            <label for="hyoujiNO" class="col-2 col-md-1 control-label">表示順</label>
-            <div class=" col-10">
-                <input type="text" class="form-control" style="width:50%" id="hyoujiNO" name="hyoujiNO" placeholder="レジ表示順。未指定の場合は「カテゴリー大>中>小>商品名」の五十音順" value=0>
-            </div>
-        </div>
-        
-        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
         <br>
         <div class="col-2 col-md-1" style=" padding:0; margin-top:10px;">
             <button type="submit" class="btn btn-primary" style="width:100%;" name="btn" value="登録">登  録</button>
@@ -219,25 +160,43 @@ $csrf_token=csrf_create();
     <script type="text/javascript" language="javascript">
         var select = document.getElementById('zeikbn');
         var tanka = document.getElementById('tanka');
+        var new_tanka = document.getElementById('new_tanka');
+        var shouhizei = document.getElementById('shouhizei');
         var zkomitanka = document.getElementById('zkomitanka');
-        
-        select.onchange = function(){
-            switch(this.value){
-                case '0':
-                    zkomitanka.value=tanka.value * 1;
-                    break;
-                case '1002':
-                    zkomitanka.value=tanka.value * 1;
-                    break;
-                case '1102':
-                    zkomitanka.value=tanka.value * 1;
-                    break;
-                case '1001':
-                    zkomitanka.value=Math.round(tanka.value * (1 + 8 / 100));
-                    break;
-                case '1101':
-                    zkomitanka.value=Math.round(tanka.value * (1 + 10 / 100));
-                    break;
+        var kominuki = document.getElementsByName('options')
+        var zei_math = function(){
+            if(select.value=='0'){//非課税
+                zkomitanka.value=new_tanka.value;
+                tanka.value = new_tanka.value;
+                shouhizei.value=0;
+            }else if(kominuki[0].checked){//税込
+                switch(select.value){
+                    case '1001':
+                        zkomitanka.value=new_tanka.value;
+                        shouhizei.value=new_tanka.value - Math.round(new_tanka.value / (1 + 8 / 100));
+                        tanka.value = Math.round(new_tanka.value / (1 + 8 / 100));
+                        break;
+                    case '1101':
+                        zkomitanka.value=new_tanka.value;
+                        shouhizei.value=new_tanka.value - Math.round(new_tanka.value / (1 + 10 / 100));
+                        tanka.value = Math.round(new_tanka.value / (1 + 10 / 100));
+                        break;
+                }
+            }else if(kominuki[1].checked){//税抜
+                switch(select.value){
+                    case '1001':
+                        zkomitanka.value=Math.round(new_tanka.value * (1 + 8 / 100));
+                        tanka.value = new_tanka.value;
+                        shouhizei.value=Math.round(new_tanka.value * (8 / 100));
+                        break;
+                    case '1101':
+                        zkomitanka.value=Math.round(new_tanka.value * (1 + 10 / 100));
+                        tanka.value = new_tanka.value;
+                        shouhizei.value=Math.round(new_tanka.value * (10 / 100));
+                        break;
+                }
+            }else{
+                //
             }
         }
     </script>

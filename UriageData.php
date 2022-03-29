@@ -9,7 +9,7 @@ if($_GET["mode"]=="redirect"){
         header("Location: index.php");
         exit();
     }
-    $msg=$_SESSION["MSG"];
+
 }elseif(isset($_GET["csrf_token"]) || empty($_POST)){
     if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。①";
@@ -117,10 +117,10 @@ if($mode=="del"){
 
 }elseif($mode=="UpdateKin"){
     $btnm = "更　新";
-    $msg = "この商品の売上単価を以下に変更しますか？<br>税抜単価：".$_POST["UpUriTanka"]." 消費税：".$_POST["UpZei"]." 税込単価：".$_POST["UpUriZei"]." <br><br>";
+    $msg = "この商品の売上単価を以下に変更しますか？<br>税抜単価：".$_POST["UpTanka"]." 消費税：".$_POST["UpZei"]." 税込単価：".$_POST["UpUriZei"]." <br><br>";
     //売上実績の取得
     
-    $_SESSION["zeinukiTanka"] = $_POST["UpUriTanka"];
+    $_SESSION["zeinukiTanka"] = $_POST["UpTanka"];
     $_SESSION["shouhizei"] = $_POST["UpZei"];
     $_SESSION["zeikbn"] = $_POST["Upzeikbn"];
 
@@ -231,7 +231,8 @@ if($mode=="del"){
     }
 }elseif($mode=="redirect"){
     //更新結果の表示
-    $msg = $_SESSION["MSG"];
+    //$msg = $_SESSION["MSG"];
+    //$_SESSION["MSG"]="";
     deb_echo($_SESSION["wheresql"]);
     $sql = "select * from UriageData ".$_SESSION["wheresql"]." order by UriageNO";
     $stmt = $pdo_h->prepare( $sql );
@@ -298,6 +299,23 @@ $ZEIresult = $pdo_h->query($ZEIsql);
     <link rel="stylesheet" href="css/style_UriageData.css?<?php echo $time; ?>" >
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script>
+    window.onload = function() {
+        //アラート用
+        function alert(msg) {
+          return $('<div class="alert" role="alert"></div>')
+            .text(msg);
+        }
+        (function($){
+          const e = alert('<?php echo $_SESSION["MSG"]; ?>').addClass('alert-success');
+          // アラートを表示する
+          $('#alert-1').append(e);
+          /* 2秒後にアラートを消す
+          setTimeout(() => {
+            e.alert('close');
+          }, 3000);
+          */
+        })(jQuery);
+    };
     $(function() {
         $('.hamburger').click(function() {
             $(this).toggleClass('active');
@@ -317,14 +335,14 @@ $ZEIresult = $pdo_h->query($ZEIsql);
     <TITLE><?php echo $title." 売上実績";?></TITLE>
 </head>
  
-<header style="flex-wrap:wrap">
+<header class="header-color" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></div>
     <div style="font-size:1rem;"> 期間：<?php echo $UriFrom."～".$UriTo;?>　顧客：<?php echo $_POST["Tokui"];?>　EVENT：<?php echo $_POST["Event"];?></div>
 
     <div class="hamburger">
-      <span></span>
-      <span></span>
-      <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
     </div>
     
     <nav class="globalMenuSp" style="font-size:2rem;">
@@ -341,6 +359,10 @@ $ZEIresult = $pdo_h->query($ZEIsql);
 <body>
     <div class="container-fluid">
     <?php
+        if($_SESSION["MSG"]!=""){
+            echo "<div class='container'><div class='row'><div class='col-12'><div style='text-align:center;font-size:1.5rem;' id='alert-1' class='lead'></div></div></div></div>";
+        }
+        $_SESSION["MSG"]="";
         echo $msg;
     ?>
     <table class="table-striped table-bordered">
@@ -348,6 +370,7 @@ $ZEIresult = $pdo_h->query($ZEIsql);
 <?php    
 $Goukei=0;
 $GoukeiZei=0;
+$GoukeiZeikomi=0;
 foreach($result as $row){
     echo "<tr><td>".$row["UriDate"]."</td><td>".$row["Event"]."</td><td>".$row["TokuisakiNM"]."</td><td class='text-center'>".$row["UriageNO"]."</td><td>".rot13decrypt($row["ShouhinNM"])."</td><td class='text-right'>".$row["su"]."</td><td class='text-right'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td><td class='text-right'>".$row["zei"]."</td><td style='width:4rem;text-align:center;'>";
     if(($_POST["Type"]=="rireki" || $_POST["Type"]=="") && ($mode == "select" || $mode=="redirect")){
@@ -591,12 +614,24 @@ if($mode<>"select" && $mode<>"redirect"){
                     <hr>
                     <div>
                         <table>
-                        <tr><td>修正後金額</td></tr>
-                        <tr><td>単価</td><td>税区分</td><td>消費税</td><td>税込単価</td></tr>
+                        <tr><td>修正後金額</td>
+                        <td colspan="4">
+                                <div class="btn-group btn-group-toggle" style="font-size:1rem;" data-toggle="buttons">
+                                    <label class="btn btn-primary active" style="padding:1px;" onchange="zei_math()" >
+                                        <input type="radio" name="options" id="option1" value="zeikomi" autocomplete="off" checked> 税込み
+                                    </label>
+                                    <label class="btn btn-primary" style="padding:1px;" onchange="zei_math()" >
+                                        <input type="radio" name="options" id="option2" value="zeinuki" autocomplete="off"> 税抜き
+                                    </label>
+                                    
+                                </div>
+                                <div style="font-size:0.75rem;">※単価変更欄に入力する金額</div>
+                        </td></tr>
+                        <tr><td style="width:9rem">単価変更</td><td style="width:9.5rem" >税区分</td><td style="width:9rem">税抜単価</td><td style="width:7rem">消費税</td><td style="width:9rem">税込単価</td></tr>
                         <tr>
-                            <td><input type="number" style="font-size:1.5rem;width:90%;" name="UpUriTanka" id="UpUriTanka" maxlength="10" class="form-control" required="required" placeholder="必須"></td>
+                            <td><input type="number" style="font-size:1.5rem;width:90%;" name="UpUriTanka" id="UpUriTanka" maxlength="10" class="form-control" required="required" placeholder="必須" onchange="zei_math()" ></td>
                             <td>
-                                <select class="form-control" style="padding-top:0;" id="zeikbn" name="Upzeikbn" required="required" placeholder="必須" >
+                                <select class="form-control" style="padding-top:0;" id="zeikbn" name="Upzeikbn" required="required" placeholder="必須" onchange="zei_math()" >
                                     <option value=""></option>
                                     <?php
                                     foreach($ZEIresult as $row){
@@ -605,6 +640,7 @@ if($mode<>"select" && $mode<>"redirect"){
                                     ?>
                                 </select>
                             </td>
+                            <td><input type="number" required="required" style="font-size:1.5rem;width:90%;" name="UpTanka" id="UpTanka" maxlength="10" class="form-control" ></td>
                             <td><input type="number" required="required" style="font-size:1.5rem;width:90%;" name="UpZei" id="UpZei" maxlength="10" class="form-control" ></td>
                             <td><input type="number" required="required" style="font-size:1.5rem;width:90%;" name="UpUriZei" id="UpUriZei" maxlength="10" class="form-control" ></td>
                         </tr>
@@ -622,38 +658,48 @@ if($mode<>"select" && $mode<>"redirect"){
 <script type="text/javascript" language="javascript">
     var select = document.getElementById('zeikbn');
     var tanka = document.getElementById('UpUriTanka');
-    var zei = document.getElementById('UpZei');
+    var UpTanka = document.getElementById('UpTanka');
+    var shouhizei = document.getElementById('UpZei');
     var zkomitanka = document.getElementById('UpUriZei');
-    
-    select.onchange = function(){
-        var zeinuki;
-        switch(this.value){
-            case '0'://非課税
-                zei.value=0;
-                zkomitanka.value=tanka.value * 1;
-                break;
-            case '1002'://内税8%
-                zkomitanka.value=tanka.value * 1;
-                zeinuki=Math.round(tanka.value/1.08);
-                zei.value=tanka.value - zeinuki;
-                tanka.value=zeinuki;
-                break;
-            case '1102'://内税10%
-                zkomitanka.value=tanka.value * 1;
-                zeinuki=Math.round(tanka.value/1.1);
-                zei.value=tanka.value - zeinuki;
-                tanka.value=zeinuki;
-                break;
-            case '1001'://外税8%
-                zei.value=Math.round(tanka.value * ( 8 / 100));
-                zkomitanka.value=Math.round(tanka.value * (1 + 8 / 100));
-                break;
-            case '1101'://外税10%
-                zei.value=Math.round(tanka.value * (10 / 100));
-                zkomitanka.value=Math.round(tanka.value * (1 + 10 / 100));
-                break;
+    var kominuki = document.getElementsByName('options')
+    var zei_math = function(){
+        if(select.value=='0'){
+            zkomitanka.value=tanka.value;
+            shouhizei.value=0;
+            UpTanka.value = tanka.value;
+        }else if(kominuki[0].checked){//税込
+            switch(select.value){
+                case '1001':
+                    zkomitanka.value=tanka.value * 1;
+                    shouhizei.value=tanka.value - Math.round(tanka.value / (1 + 8 / 100));
+                    UpTanka.value = Math.round(tanka.value / (1 + 8 / 100));
+                    break;
+                case '1101':
+                    zkomitanka.value=tanka.value * 1;
+                    shouhizei.value=tanka.value - Math.round(tanka.value / (1 + 10 / 100));
+                    UpTanka.value = Math.round(tanka.value / (1 + 10 / 100));
+                    break;
+            }
+        }else if(kominuki[1].checked){//税抜
+            switch(select.value){
+                case '1001':
+                    zkomitanka.value=Math.round(tanka.value * (1 + 8 / 100));
+                    shouhizei.value=Math.round(tanka.value * (8 / 100));
+                    UpTanka.value = tanka.value;
+                    break;
+                case '1101':
+                    zkomitanka.value=Math.round(tanka.value * (1 + 10 / 100));
+                    shouhizei.value=Math.round(tanka.value * (10 / 100));
+                    UpTanka.value = tanka.value;
+                    break;
+            }
+        }else{
+            //
         }
     }
+
+
+
     var M_EV29 = document.getElementById('M_EV29');
     var M_EV28 = document.getElementById('M_EV28');
     var M_EV27 = document.getElementById('M_EV27');

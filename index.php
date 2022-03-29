@@ -34,7 +34,7 @@ if(isset($_SESSION["EMSG"])){
     <TITLE><?php echo secho($title)." ようこそ";?></TITLE>
 </head>
  
-<header style="flex-wrap:wrap">
+<header  class="header-color" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="index.php" ><?php echo secho($title);?></a></div>
     <div style="font-size:1rem;"> ようこそWEBREZへ</div>
 </header>
@@ -48,7 +48,7 @@ if(isset($_SESSION["EMSG"])){
             <p id="profile-name" class="profile-name-card"></p>
             -->
             <?php echo $errmsg; ?>
-            <form class="form-signin" method="post" action="logincheck.php">
+            <form class="form-signin" id="form1" method="post" action="logincheck.php">
                 <span id="reauth-email" class="reauth-email"></span>
                 <input type="email" id="inputEmail" class="form-control" placeholder="Email address" name="LOGIN_EMAIL" required autofocus>
                 <input type="password" id="inputPassword" class="form-control" name="LOGIN_PASS" placeholder="Password" required>
@@ -58,7 +58,7 @@ if(isset($_SESSION["EMSG"])){
                     </label>
                 </div>
 
-                <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">ロ グ イ ン</button>
+                <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit"  >ロ グ イ ン</button>
                 <input type="hidden" name="csrf_token" value="<?php echo secho($_SESSION['csrf_token']) ?>">
             </form><!-- /form -->
             <a href="#" class="forgot-password">
@@ -70,4 +70,20 @@ if(isset($_SESSION["EMSG"])){
         </div><!-- /card-container -->
     </div><!-- /container -->    
 </body>
+<script>
+window.onload = function() {
+    // Enterキーが押された時にSubmitされるのを抑制する
+    document.getElementById("form1").onkeypress = (e) => {
+        // form1に入力されたキーを取得
+        const key = e.keyCode || e.charCode || 0;
+        // 13はEnterキーのキーコード
+        if (key == 13) {
+            // アクションを行わない
+            e.preventDefault();
+        }
+    }    
+    
+};    
+
+</script>
 </html>

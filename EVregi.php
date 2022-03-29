@@ -59,7 +59,6 @@ if($_SESSION["EV"] != "" ){
         $buf = $stmt->fetch();
         $_SESSION["EV"] = $buf["value"];
         $event = $buf["value"];
-        //setCookie("EV", $event, time()+60*60*24*2, "/", null, TRUE, TRUE); 
         deb_echo("DB".$event);
     } 
 }
@@ -77,7 +76,6 @@ if($_SESSION["EV"] != "" ){
 </head>
 
 <script>
-
 window.onload = function() {
 
      // オブジェクトと変数の準備
@@ -102,7 +100,7 @@ window.onload = function() {
         echo "    //".rot13decrypt($row["shouhinNM"])."ボタンクリック時\n";
         echo "    btn_menu_".$row["shouhinCD"].".onclick = function (){\n";
         echo "        cnt_suryou_".$row["shouhinCD"]." += 1;\n";
-        
+        /*
         //小数の計算はBC関数を使用
         //税区分末尾１：外税　２：内税
         if(substr(strval($row["zeiKBN"]),3,1) =="1" || $row["zeiKBN"]==0){
@@ -114,6 +112,9 @@ window.onload = function() {
             echo "        total_pay += ".$row["tanka"].";\n";
             echo "        total_zei += ".bcsub($row["tanka"],bcdiv($row["tanka"], bcdiv(bcadd(100,$row["zeiritu"]),100,2),0),0).";\n";
         }
+        */
+        echo "        total_pay += ".($row["tanka"] + $row["tanka_zei"]).";\n";
+        echo "        total_zei += ".$row["tanka_zei"].";\n";
         echo "        suryou_".$row["shouhinCD"].".value = cnt_suryou_".$row["shouhinCD"].";\n";
         echo "        kaikei_disp.innerHTML = total_pay;\n";
         echo "        zei_disp.innerHTML = total_zei;\n";
@@ -133,8 +134,6 @@ window.onload = function() {
     order_chk.onclick = function(){
         //注文確認ボタン。選択されてないメニューを消し、ボタンの表示を変更する。
         <?php
-        //$result->data_seek(0);
-        //while($row = $result->fetch_assoc()){
         foreach($shouhiMS as $row){
             echo "if(cnt_suryou_".$row["shouhinCD"]."==0){items_".$row["shouhinCD"].".style.display = 'none';}";
         }
@@ -144,7 +143,8 @@ window.onload = function() {
         dentaku.style.display = 'block';
         order_return.style.display = 'block';
         order_clear.style.display = 'none';
-        CHOUSEI.style.display = 'block';
+        CHOUSEI_AREA.style.display = 'block';
+        total_pay_bk = total_pay; //調整前金額を保存
     };
     
     dentaku.onclick = function(){
@@ -194,7 +194,7 @@ window.onload = function() {
         btn_commit.style.display = 'none';
      };
      //戻るボタン
-     return_btn.onclick = function(){
+    return_btn.onclick = function(){
         for (let i = 0; i < su.length; i++) {
             items.item(i).style.display = 'block';
         }
@@ -202,24 +202,66 @@ window.onload = function() {
         order_clear.style.display = 'block';
         btn_commit.style.display = 'none';
         order_chk.style.display = 'block';
+        CHOUSEI_AREA.style.display = 'none';
         CHOUSEI.style.display = 'none';
         CHOUSEI_GAKU.value='';
         kaikei_disp.innerHTML = total_pay_bk;
         total_pay=total_pay_bk;
      };
+    CHOUSEI_AREA.onclick = function(){
+        CHOUSEI_AREA.style.display = 'none';
+        CHOUSEI.style.display = 'block';
+        return_btn = document.getElementById("maekin");
+        maekin.innerHTML = total_pay_bk;
+    }
     CHOUSEI_GAKU.onchange = function(){
-        total_pay_bk = total_pay; //調整前金額を保存
         total_pay = CHOUSEI_GAKU.value;
         kaikei_disp.innerHTML = total_pay;
     }
+    
+    //アラート用
+    function alert(msg) {
+      return $('<div class="alert" role="alert"></div>')
+        .text(msg);
+    }
+    (function($){
+      const s = alert('<?php echo $_SESSION["msg"]; ?> ').addClass('alert-success');
+      const e = alert('<?php echo $_SESSION["msg"]; ?> ').addClass('alert-danger');
+      // アラートを表示する
+      $('#alert-s').append(s);
+      // 5秒後にアラートを消す
+      setTimeout(() => {
+        s.alert('close');
+      }, 5000);
+      $('#alert-e').append(e);
+      /* アラートを消さない
+      setTimeout(() => {
+        e.alert('close');
+      }, 5000);
+      */
+    })(jQuery);
+    
+    // Enterキーが押された時にSubmitされるのを抑制する
+    document.getElementById("form1").onkeypress = (e) => {
+        // form1に入力されたキーを取得
+        const key = e.keyCode || e.charCode || 0;
+        // 13はEnterキーのキーコード
+        if (key == 13) {
+            // アクションを行わない
+            alert('test');
+            e.preventDefault();
+        }
+    }    
+    
 };    
+
 </script>
 
-<form method = "post" action="EVregi_sql.php">
+<form method = "post" id="form1" action="EVregi_sql.php">
     <input type="hidden" name="csrf_token" value='<?php echo $token;?>'>
     <input type="hidden" name="mode" value='<?php echo $_GET["mode"];?>'>
     
-<header>
+<header class="header-color">
     <div class="title yagou"><a href="menu.php"><?php echo $title;?></a></div>
     <?php
     if($_GET["mode"]=="kobetu"){
@@ -238,17 +280,30 @@ window.onload = function() {
 
 <body>
 <?php
-if(isset($emsg)){//
-    echo $emsg;
-    exit();
-}
+    if(isset($emsg)){//
+        echo $emsg;
+        exit();
+    }
+    if($_GET["status"]=="success"){
+        echo "<div class='container'><div class='row'><div class='col-12'><div style='text-align:center;font-size:1.5rem;' id='alert-s' class='lead'></div></div></div></div>";
+    }elseif($_GET["status"]=="failed"){
+        echo "<div class='container'><div class='row'><div class='col-12'><div style='text-align:center;font-size:1.5rem;' id='alert-e' class='lead'></div></div></div></div>";
+    }
 ?>
     <div class="container-fluid">
+        <div class="row" >
+            <div class="col-1 col-lg-0" ></div>
+            <div class="col-10 col-lg-3" style="font-size: 2.2rem;">
+                <button type='button' class='btn-view btn-changeVal' style="display:none;padding:0.1rem;" id="CHOUSEI_AREA" >割引・割増</button>
+            </div>
+            <div class="col-1" ></div>
+        </div>
+
         <div class="row" style="display:none" id="CHOUSEI">
             <div class="col-1 col-md-0" ></div>
             <div class="col-10 col-md-7" style="font-size: 2.2rem;">
-                割引／割増後　お会計額：
-                <input type="number" class='order tanka' style=" width:100%;border:solid;border-top:none;border-right:none;border-left:none;" name="CHOUSEI_GAKU" id="CHOUSEI_GAKU">
+                お会計額：￥<span id="maekin">0</span> ⇒
+                <input type="number" placeholder="変更後の金額を入力。"　class='order tanka' style=" width:100%;border:solid;border-top:none;border-right:none;border-left:none;" name="CHOUSEI_GAKU" id="CHOUSEI_GAKU">
                 <br>
             </div>
             <div class="col-1" ></div>
@@ -261,7 +316,7 @@ if(isset($emsg)){//
 
 	foreach($shouhiMS as $row){
         echo "  <div class ='col-md-3 col-sm-6 col-6 items' id='items_".$row["shouhinCD"]."'>\n";
-        echo "      <button type='button' class='btn btn--menu' id='btn_menu_".$row["shouhinCD"]."'>".rot13decrypt($row["shouhinNM"])."\n";
+        echo "      <button type='button' class='btn-view btn--rezi' id='btn_menu_".$row["shouhinCD"]."'>".rot13decrypt($row["shouhinNM"])."\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][CD]' value = '".$row["shouhinCD"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][NM]' value = '".$row["shouhinNM"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][UTISU]' value = '".$row["utisu"]."'>\n";
@@ -270,6 +325,7 @@ if(isset($emsg)){//
         echo "      <input type='hidden' name ='ORDERS[".$i."][TANKA]' value = '".$row["tanka"]."'>\n";
         echo "      </button>\n";
         echo "      <div class ='ordered'>\n";
+        /*
         if(substr(strval($row["zeiKBN"]),3,1) =="1" || $row["zeiKBN"]==0){
             //外税（マスタは税抜単価）
             echo "          ￥<input type='number' readonly='readonly' class='order tanka' value=".bcadd($row["tanka"] , bcmul($row["tanka"], bcdiv($row["zeiritu"],100,2),0),0).">\n";
@@ -279,7 +335,10 @@ if(isset($emsg)){//
             echo "          ￥<input type='number' readonly='readonly' class='order tanka' value=".$row["tanka"].">\n";
             echo "            <input type='hidden' name ='ORDERS[".$i."][ZEI]' value = '".(string)(bcsub($row["tanka"],bcdiv($row["tanka"], bcdiv(bcadd(100,$row["zeiritu"]),100,2),0),0))."'>\n";  //税込価格-(税込価格÷1.1or1.08)
         }
-
+        */
+        echo "          ￥<input type='number' readonly='readonly' class='order tanka' value=".($row["tanka"] + $row["tanka_zei"]).">\n";
+        echo "            <input type='hidden' name ='ORDERS[".$i."][ZEI]' value = '".$row["tanka_zei"]."'>\n";  //税込価格-(税込価格÷1.1or1.08)
+        
         echo "× <input type='number' readonly='readonly' name ='ORDERS[".$i."][SU]' id='suryou_".$row["shouhinCD"]."' class='order su' value = 0 style='display: inline'>\n";
         echo "      </div>\n";
         echo "  </div>\n";
@@ -328,7 +387,9 @@ if(isset($emsg)){//
         </div>
     </div>
 </div>
+
 </form>
+
 </html>
 <?php
 $stmt = null;

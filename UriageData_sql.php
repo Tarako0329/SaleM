@@ -22,18 +22,18 @@ if($_POST["mode"] == "del"){
     $status = $stmt->execute();
     $count = $stmt->rowCount();
     if($status && $count<>0){
-        $_SESSION["MSG"] = "売上を削除しました。<br>";
+        $_SESSION["MSG"] = "売上を削除しました。";
     }else{
-        $_SESSION["MSG"] = "売上削除失敗。<br><br>";
+        $_SESSION["MSG"] = "売上削除失敗。";
     }
 }elseif(($_POST["mode"]=="UpdateTk" || $_POST["mode"]=="UpdateEv") && $_SESSION["wheresql"]<>""){
     //イベント名or顧客名の更新モード(実行)
     if($_POST["mode"]=="UpdateEv"){
         $sql="update UriageData set Event = :UpNM ".$_SESSION["wheresql"];
-        $_SESSION["MSG"] = "イベント名を更新しました。<br>";
+        $_SESSION["MSG"] = "イベント名を更新しました。";
     }elseif($_POST["mode"]=="UpdateTk"){
         $sql="update UriageData set TokuisakiNM = :UpNM ".$_SESSION["wheresql"];
-        $_SESSION["MSG"] = "顧客名を更新しました。<br>";
+        $_SESSION["MSG"] = "顧客名を更新しました。";
     }
     $stmt = $pdo_h->prepare( $sql );
     
@@ -44,7 +44,7 @@ if($_POST["mode"] == "del"){
     if($status && $count<>0){
         
     }else{
-        $_SESSION["MSG"] = "更新失敗。<br><br>";
+        $_SESSION["MSG"] = "更新失敗。";
     }
     
 }elseif($_POST["mode"]=="UpdateKin"){
@@ -60,9 +60,9 @@ if($_POST["mode"] == "del"){
     $status = $stmt->execute();
     $count = $stmt->rowCount();
     if($status && $count<>0){
-        $_SESSION["MSG"] = "金額を更新しました。<br>";
+        $_SESSION["MSG"] = "金額を更新しました。";
     }else{
-        $_SESSION["MSG"] = "更新失敗。<br><br>";
+        $_SESSION["MSG"] = "更新失敗。";
     }
     
 }

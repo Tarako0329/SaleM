@@ -131,7 +131,7 @@ if($mode==0 || $mode==1){
     <!--郵便場号から住所取得-->
     <script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
 </head>
-<header style="flex-wrap:wrap">
+<header class="header-color" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="<?php if($mode==1 || $mode==4){echo "menu.php";}else{echo "index.php";}?>"><?php echo secho($title);?></a></div>
     <p style="font-size:1rem;">  ユーザー登録</p>
 </header>
@@ -155,9 +155,9 @@ if($mode==0 || $mode==1){
     <div class="container" style="padding-top:15px;">
     <div class="col-12 col-md-8">
     <?php   if($mode==0 || $mode==1){ ?>
-        <form method="post" action="account_create.php" style="font-size:1.5rem">
+        <form method="post" id="form1" action="account_create.php" style="font-size:1.5rem">
     <?php   }else{ ?>
-        <form method="post" action="account_sql.php" style="font-size:1.5rem">
+        <form method="post" id="form1" action="account_sql.php" style="font-size:1.5rem">
     <?php   } ?>
         <input type="hidden" name="csrf_token" value="<?php echo $token; ?>">
         <input type="hidden" name="MODE" value=<?php echo $next_mode; ?>>
@@ -244,6 +244,18 @@ if($mode==0 || $mode==1){
       input.setCustomValidity(''); // エラーメッセージのクリア
     }
   }
+    
+    // Enterキーが押された時にSubmitされるのを抑制する
+    document.getElementById("form1").onkeypress = (e) => {
+        // form1に入力されたキーを取得
+        const key = e.keyCode || e.charCode || 0;
+        // 13はEnterキーのキーコード
+        if (key == 13) {
+            // アクションを行わない
+            alert('test');
+            e.preventDefault();
+        }
+    }    
 // -->
 </script>
 </html>

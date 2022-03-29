@@ -1,5 +1,19 @@
 <?php
 date_default_timezone_set('Asia/Tokyo');
+//ディレクトリ・テストモード本番モードのURL切り分け用
+$s_name=$_SERVER['SCRIPT_NAME'];
+$dir_a=explode("/",$s_name,-1);
+define("MODE_DIR",$dir_a[2]);
+
+//CSSスーパーリロード頻度
+if(MODE_DIR=="TEST"){
+    $time=date('Ymd-Hi');
+    error_reporting( E_ALL );
+}else{
+    $time=date('Ymd');
+    error_reporting( E_ALL & ~E_NOTICE );
+}
+
 
 session_start();
 //session_regenerate_id(true);
@@ -34,10 +48,6 @@ define("PLAN_Y", $_ENV["PLAN_Y"]);
 //サイトタイトルの取得
 $title = $_ENV["TITLE"];
 
-//ディレクトリ・テストモード本番モードのURL切り分け用
-$s_name=$_SERVER['SCRIPT_NAME'];
-$dir_a=explode("/",$s_name,-1);
-define("MODE_DIR",$dir_a[2]);
 
 //暗号化キー
 $key = $_ENV["KEY"];
@@ -45,12 +55,6 @@ $key = $_ENV["KEY"];
 // DBとの接続
 $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
-//CSSスーパーリロード頻度
-if(MODE_DIR=="TEST"){
-    $time=date('Ymd-Hi');
-}else{
-    $time=date('Ymd');
-}
 
 //端末IDを発行し、１ヶ月の有効期限でCookieにセット
 if(!isset($_COOKIE['machin_id'])){

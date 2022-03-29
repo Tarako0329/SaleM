@@ -56,9 +56,7 @@ if($row[0]["yuukoukigen"]<>""){
   
 </script>
 
-<form method = "post" action="menu2.php">
-    
-<header>
+<header class="header-color">
     
     <?php
     if($logoff==false){
@@ -89,9 +87,10 @@ if($row[0]["yuukoukigen"]<>""){
     $array = [
         'レジ'=>['EVregi.php?csrf_token='.$token]
         ,'個別売上'=>['EVregi.php?mode=kobetu&csrf_token='.$token]
-        ,'売上実績'=>['UriageData.php?mode=select&csrf_token='.$token]
         ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token]
         ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token]
+        ,'売上実績'=>['UriageData.php?mode=select&csrf_token='.$token]
+        ,'売上解析'=>['xxxx.php?mode=select&csrf_token='.$token]
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]
         //,'契約・解除'=>['../../PAY/index.php?system='.$title.'&mode='.MODE_DIR]
         //,'お知らせ'=>['system_update_log.php']
@@ -107,7 +106,7 @@ if($row[0]["yuukoukigen"]<>""){
     echo "<div class='row'>";
 	foreach(array_merge($array,$array2) as $key=>$vals){
         echo "  <div class ='col-md-3 col-sm-6 col-6' style='padding:5px;' >\n";
-        echo "      <a href='".$vals[0]."' class='btn btn--orange'>".$key."\n";
+        echo "      <a href='".$vals[0]."' class='btn--topmenu btn-view'>".$key."\n";
         echo "      </a>\n";
         echo "  </div>\n";
         $i++;
@@ -119,11 +118,6 @@ if($row[0]["yuukoukigen"]<>""){
     </div>
 </body>
 
-<!--
-<footer>
-</footer>
--->
-</form>
 </html>
 <?php
     $pdo_h=null;
