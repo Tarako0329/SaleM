@@ -11,35 +11,7 @@ if($_GET["action"]=="logout"){
     session_start();
     $logoff=true;
 }
-$_SESSION["PK"]=PKEY;
-$_SESSION["SK"]=SKEY;
-$_SESSION["URL"]="../SaleM/".MODE_DIR."/subscription.php";
-$_SESSION["PLAN_M"]=PLAN_M;
-$_SESSION["PLAN_Y"]=PLAN_Y;
 
-//有効期限の取得
-$sql="select * from Users where uid=?";
-$stmt = $pdo_h->prepare($sql);
-$stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
-$stmt->execute();
-$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-if($row[0]["yuukoukigen"]<>""){
-    if(strtotime($row[0]["yuukoukigen"]) < strtotime(date("Y-m-d"))){
-        //有効期限切れ。申込日から即課金
-        $_SESSION["KIGEN"] = strtotime("+3 day");
-        echo "有効期限切れ";
-    }else{
-        //試用期間、もしくは支払済み期間の翌日から課金
-        $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
-        echo "有効期限付き(".$row[0]["yuukoukigen"]." まで)";
-        //echo "有効期限付き(".date("Y-m-d",$_SESSION["KIGEN"])." まで)";
-    }
-    $plan=0;
-}else{
-    //契約済
-    $plan=1;
-    //echo "本契約済み";
-}
 
 ?>
 <head>
@@ -85,26 +57,20 @@ if($row[0]["yuukoukigen"]<>""){
 
 <?php
     $array = [
-        'レジ'=>['EVregi.php?csrf_token='.$token]
-        ,'個別売上'=>['EVregi.php?mode=kobetu&csrf_token='.$token]
-        ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token]
-        ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token]
-        ,'売上実績'=>['UriageData.php?mode=select&csrf_token='.$token]
-        ,'売上解析'=>['analysis_menu.php?csrf_token='.$token]
-        ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]
+        '売上実績集計'=>['analysis_uriagejisseki.php?csrf_token='.$token]
+        ,'ABC分析'=>['xxxx.php?mode=kobetu&csrf_token='.$token]
+        ,'予備5'=>['xxxx.php?csrf_token='.$token]
+        ,'予備4'=>['xxxx.php?csrf_token='.$token]
+        ,'予備3'=>['xxxx.php?mode=select&csrf_token='.$token]
+        ,'予備2'=>['xxxx.php?mode=select&csrf_token='.$token]
+        ,'予備1'=>['xxxx.php?mode=1&csrf_token='.$token]
         //,'契約・解除'=>['../../PAY/index.php?system='.$title.'&mode='.MODE_DIR]
         //,'お知らせ'=>['system_update_log.php']
     ];
-    
-    if($plan==0){
-        $array2 = ['本契約'=>['../../PAY/index.php?system='.$title.'&mode='.MODE_DIR]];
-    }else{
-        $array2 = ['契約解除'=>['../../PAY/cancel.php?system='.$title.'&mode='.MODE_DIR]];
-    }
-    
+
     $i=0;
     echo "<div class='row'>";
-	foreach(array_merge($array,$array2) as $key=>$vals){
+	foreach(array_merge($array) as $key=>$vals){
         echo "  <div class ='col-md-3 col-sm-6 col-6' style='padding:5px;' >\n";
         echo "      <a href='".$vals[0]."' class='btn--topmenu btn-view'>".$key."\n";
         echo "      </a>\n";

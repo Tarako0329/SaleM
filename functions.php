@@ -283,48 +283,6 @@ function send_mail($to,$subject,$body){
 
 
 // =========================================================
-// バージョン差分修正SQL実行 廃止
-// =========================================================
-/*
-function updatedb($SV, $USER, $PASS, $DBNAME,$version,$comment){
-    //引数；サーバ、ID、パス、DB名、PGバージョン
-    //版管理ルール
-    //1.000
-    //1：大規模改善
-    //0.01～0.99：小規模改善
-    //0.001～0.009：バグ改修
-    $mysqli_fc = new mysqli($SV, $USER, $PASS, $DBNAME);
-    $mysqli_fc->set_charset('utf8');
-    
-    $sqlstr="select max(version) as version from version;";
-    $result = $mysqli_fc->query( $sqlstr );
-    $row_cnt = $result->num_rows;
-    $row = $result->fetch_assoc(); 
-
-
-    if((double)$row["version"]<1.00 && (double)$row["version"]<(double)$version){//DBのバージョン＜PGのバージョン
-        //差分SQL実行
-
-        echo $row["version"]." now version no<br>";
-        echo (string)$version." version up complete!! <br>";
-        $sqlstr = "insert into version values(1.00,'".$comment."');";
-	    $stmt = $mysqli_fc->query("LOCK TABLES version WRITE");
-	    $stmt = $mysqli_fc->prepare($sqlstr);
-	    $stmt->execute();
-	    $stmt = $mysqli_fc->query("UNLOCK TABLES");
-    }
-    if((double)$row["version"]<1.05 && (double)$row["version"]<(double)$version){//DBのバージョン＜PGのバージョン
-        //差分SQL実行
-        //ユーザテーブルの作成
-        //各種テーブルにユーザIDの項目を追加
-    }
-    $ver="version ".(string)$row["version"];
-    //echo $ver."<br>";
-    
-    $mysqli_fc->close();
-}
-*/
-// =========================================================
 // GUID取得
 // =========================================================
 function getGUID(){
@@ -346,6 +304,44 @@ function getGUID(){
     }
 }
 
+// =========================================================
+// 表(table)の出力
+// =========================================================
+function drow_table($aryColumn,$result){
+        echo "<table class='table-striped table-bordered' style='margin: auto;'>\n";
+        echo "<thead><tr>\n";
+        foreach($aryColumn as $value){
+            echo "<th>".$value."</th>";
+        }
+        
+        echo "\n</thead></tr>\n";
+        
+
+        foreach($result as $row){
+            
+            echo "<tr>";
+            for($i=0;isset($row[$i])==true;$i++){
+                if(preg_match('/[^0-9|^%,%]/',$row[$i])==0){//0～9とカンマ以外が存在して無い場合、数値として右寄せ
+                    $right = " class='text-right' ";
+                }elseif(preg_match('/[^0-9]/',$row[$i])==0){//0～9以外が存在して無い場合、数値として右寄せ
+                    $right = " class='text-right' ";
+                }else{
+                    $right = "";
+                }
+                
+                if($row["ShouhinNM"]===$row[$i]){
+                    $val = rot13decrypt($row["ShouhinNM"]);
+                }else{
+                    $val = $row[$i];
+                }
+                echo "<td".$right.">".$val."</td>";    
+            }
+            echo "</tr>\n";
+            
+            echo "</td></tr>\n";
+        }
+
+        echo "</table>\n";    
+}
+
 ?>
-
-
