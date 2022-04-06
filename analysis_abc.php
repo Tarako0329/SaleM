@@ -16,7 +16,7 @@ csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェ�
 */
 
 require "php_header.php";
-
+/*
 if(isset($_GET["csrf_token"]) || empty($_POST)){
     if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。①";
@@ -25,7 +25,7 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
         exit();
     }
 }
-
+*/
 $rtn=check_session_userid($pdo_h);
 $csrf_create = csrf_create();
 
@@ -40,23 +40,23 @@ if(!empty($_POST)){
     $ymto = (string)date('Y')."12";
     $list = "%";
 }
-deb_echo($list);
-if($_POST["sum_tani"]==1){//日ごと
-    $sqlstr = "select UriDate as 計上年月 ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
-    $gp_sqlstr = "group by UriDate order by UriDate";
-    $aryColumn = ["計上日","税抜売上","消費税","税込売上"];
+//deb_echo($list);
+$cols=0;
+if($_POST["sum_tani"]==1 || empty($_POST)){//全商品（金額）
+    $sqlstr = "select tmp.* ,sum(税抜売上) over() as 総売上 from (select ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ";
+    $gp_sqlstr = "group by ShouhinNM) tmp order by 税抜売上 desc";
+    $aryColumn = ["商品名","税抜売上"];
+    $cols=2;
 }elseif($_POST["sum_tani"]==2 || empty($_POST)){//月毎
-    $sqlstr = "select DATE_FORMAT(UriDate, '%Y/%m') as 計上年月 ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
-    $gp_sqlstr = "group by DATE_FORMAT(UriDate, '%Y%m') order by DATE_FORMAT(UriDate, '%Y%m')";
-    $aryColumn = ["計上年月","税抜売上","消費税","税込売上"];
-}elseif($_POST["sum_tani"]==3){//年ごと
+    $sqlstr = "select tmp.* ,sum(税抜売上) over(PARTITION BY Event) as 総売上 from (select Event,ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ";
+    $gp_sqlstr = "group by Event,ShouhinNM) tmp order by Event,税抜売上 desc";
+    $aryColumn = ["商品名","税抜売上"];
+    $cols=3;
+}/*elseif($_POST["sum_tani"]==3){//年ごと
     $sqlstr = "select DATE_FORMAT(UriDate, '%Y') as 計上年月 ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
     $gp_sqlstr = "group by DATE_FORMAT(UriDate, '%Y') order by DATE_FORMAT(UriDate, '%Y')";
     $aryColumn = ["計上年度","税抜売上","消費税","税込売上"];
 }elseif($_POST["sum_tani"]==4){//製品名ごと売上金額ランキング
-    $sqlstr = "select ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
-    $gp_sqlstr = "group by ShouhinNM order by sum(UriageKin) desc";
-    $aryColumn = ["商品名","税抜売上","消費税","税込売上"];
 }elseif($_POST["sum_tani"]==5){//製品名ごと売上数量ランキング
     $sqlstr = "select ShouhinNM as ShouhinNM ,sum(Su) as 売上数 from UriageData ";
     $gp_sqlstr = "group by ShouhinNM order by sum(Su) desc";
@@ -73,7 +73,7 @@ if($_POST["sum_tani"]==1){//日ごと
     $gp_sqlstr = "group by UriDate,UriageNO ) as UriSum group by 計上日 order by 計上日";
     $aryColumn = ["計上日","客単価","Event/店舗"];
 }   
-
+*/
 $sqlstr = $sqlstr." where DATE_FORMAT(UriDate, '%Y%m') between :ymfrom and :ymto AND uid = :user_id ";
 $sqlstr = $sqlstr." AND (Event like :event OR TokuisakiNM like :tokui )";
 $sqlstr = $sqlstr." ".$gp_sqlstr;
@@ -143,8 +143,8 @@ $EVresult = $stmt->fetchAll();
           }, 3000);
           */
         })(jQuery);
-        
-       const ctx = document.getElementById('myChart').getContext('2d');
+        /*
+        const ctx = document.getElementById('myChart').getContext('2d');
         const myChart = new Chart(ctx, {
             type: 'bar',
             data: {
@@ -216,6 +216,7 @@ $EVresult = $stmt->fetchAll();
             }
         });
     };
+    */
     </script>
 
     
@@ -231,7 +232,7 @@ $EVresult = $stmt->fetchAll();
     <div class="container-fluid">
     <div class="row">
     <div class="col-md-3" style='padding:5px;background:white'>
-        <form class="form" method="post" action="analysis_uriagejisseki.php" style='font-size:1.3rem'>
+        <form class="form" method="post" action="analysis_abc.php" style='font-size:1.3rem'>
             集計期間:
             <select name='ymfrom' class="form-control" style="padding:0;width:10rem;display:inline-block;margin:5px">
             <?php
@@ -255,13 +256,15 @@ $EVresult = $stmt->fetchAll();
             ?>
             </select>
             <select name='sum_tani' class="form-control" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px"><!--集計単位-->
-                <option value='1' <?php if($_POST["sum_tani"]==1){echo "selected";} ?> >売上実績(日計)</option>
-                <option value='2' <?php if($_POST["sum_tani"]==2 || empty($_POST["sum_tani"])){echo "selected";} ?>>売上実績(月計)</option>
+                <option value='1' <?php if($_POST["sum_tani"]==1 || empty($_POST["sum_tani"])){echo "selected";} ?> >商品別ABC分析</option>
+                <option value='2' <?php if($_POST["sum_tani"]==2){echo "selected";} ?>>イベント・店舗/商品別ABC分析</option>
+                <!--
                 <option value='3' <?php if($_POST["sum_tani"]==3){echo "selected";} ?> >売上実績(年計)</option>
                 <option value='4' <?php if($_POST["sum_tani"]==4){echo "selected";} ?> >売上ランキング(金額)</option>
                 <option value='5' <?php if($_POST["sum_tani"]==5){echo "selected";} ?> >売上ランキング(個数)</option>
                 <option value='6' <?php if($_POST["sum_tani"]==6){echo "selected";} ?> >客単価推移</option>
                 <option value='6' <?php if($_POST["sum_tani"]==7){echo "selected";} ?> >客単価ランキング</option>
+                -->
             </select>
             <select name='list' class="form-control" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px">
             <option value='%'>場所・顧客</option>
@@ -278,19 +281,14 @@ $EVresult = $stmt->fetchAll();
             <input type='submit' class='btn-view' style='padding:0;hight:55px;width:100px;margin:2px;' value='検 索'>
         </form>
     </div>
+    <!--
     <div class="col-md-6">
         <canvas id="myChart" width="95%" height="100%-55px" ></canvas>
     </div>
-    <div class="col-md-3" style='padding:5px'>
+    -->
+    <div class="col-md-9" style='padding:5px'>
     <?php
-        if($_SESSION["MSG"]!=""){
-            echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-1' class='lead'></div></div></div></div>";
-        }
-        $_SESSION["MSG"]="";
-        //var_dump($result);
-        drow_table($aryColumn,$result);
-        
-
+        drow_table_abc($aryColumn,$result,$cols);
     ?>
     </div>
     </div><!--row-->

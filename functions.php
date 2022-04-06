@@ -210,32 +210,6 @@ function get_pdo_options() {
                PDO::ATTR_EMULATE_PREPARES => false);        //同上
 }
 
-// =========================================================
-//登録メール
-// =========================================================
-function touroku_mail($to,$subject,$body){
-    $mail2=rot13encrypt($to);
-    $s_name=$_SERVER['SCRIPT_NAME'];
-    $dir_a=explode("/",$s_name,-1);
-    
-    // 送信元
-    $from = "From: テスト送信者<information@WEBREZ.jp>";
-    
-    // メールタイトル
-    $subject = "WEBREZ＋ 登録案内";
-     
-    // メール本文
-    $body = <<< "EOM"
-    WEBREZ+（ウェブレジプラス）にご興味をもっていただきありがとうございます。
-    こちらのURLから登録をお願いいたします。
-    
-    https://green-island.mixh.jp/SaleM/$dir_a[2]/account_create.php?mode=0&acc=$mail2
-    EOM;
-     
-    // メール送信
-    mail($to, $subject, $body, $from);
-    return 1;
-}
 
 // =========================================================
 // メール送信
@@ -337,11 +311,179 @@ function drow_table($aryColumn,$result){
                 echo "<td".$right.">".$val."</td>";    
             }
             echo "</tr>\n";
-            
-            echo "</td></tr>\n";
         }
 
         echo "</table>\n";    
 }
 
+// =========================================================
+// 表(table)の出力
+// =========================================================
+function drow_table_abc($aryColumn,$result,$cols){
+    //２カラムの場合は１表、３カラムの場合は３カラム目が大分類として分類ごとに表を作成
+
+    if($cols==2){
+        echo "<table class='table-striped table-bordered' style='margin: auto;'>\n";
+        echo "<thead><tr>\n";
+        foreach($aryColumn as $value){
+            echo "<th>".$value."</th>";
+        }
+        echo "<th>RANK</th>";
+        echo "\n</thead></tr>\n";
+
+        $wariai=0;
+        foreach($result as $row){
+            echo "<tr>";
+            for($i=0;isset($row[$i])==true;$i++){
+                if($i==2){
+                    continue;//３カラム目はスキップ
+                }
+                if(preg_match('/[^0-9|^%,%]/',$row[$i])==0){//0～9とカンマ以外が存在して無い場合、数値として右寄せ
+                    $right = " class='text-right' ";
+                }elseif(preg_match('/[^0-9]/',$row[$i])==0){//0～9以外が存在して無い場合、数値として右寄せ
+                    $right = " class='text-right' ";
+                }else{
+                    $right = "";
+                }
+                
+                if($row["ShouhinNM"]===$row[$i]){
+                    $val = rot13decrypt($row["ShouhinNM"]);
+                }else{
+                    $val = $row[$i];
+                }
+                
+                if($row["税抜売上"]===$row[$i]){
+                    $wariai=bcadd($wariai,bcdiv($row[$i],$row["総売上"],5),5);
+                    if($wariai<0.70000){
+                        $rank="A";
+                    }elseif($wariai<0.90000){
+                        $rank="B";
+                    }else{
+                        $rank="C";
+                    }
+                }
+                echo "<td".$right.">".$val."</td>";    
+            }
+            echo "<td class='text-center'>".$rank."</td>";
+            echo "</tr>\n";
+        }
+        echo "<tr><td>合計</td><td class='text-right'>".$row["総売上"]."</td></tr>";
+        echo "</table>\n";
+    }elseif($cols==3){
+        
+        $wariai=0;
+        $Event_old="x";
+        echo "<div class='container-fluid'>\n";
+        echo "<div class='row'\n>";
+
+        foreach($result as $row){
+            if($row["Event"]==""){$row["Event"]="-";}
+            
+            if($Event_old!=$row["Event"]){
+                if($Event_old!="x"){
+                    echo "<tr><td>合計</td><td class='text-right'>".$row["総売上"]."</td></tr>";
+                    echo "</table>\n";
+                    echo "</div>";
+                }
+                echo "<div class='col-md-3' style='padding:5px;background:white'>";
+                echo "<label for='".$row["Event"]."' style='text-align:center;font-weight:700;display:block;'>『".$row["Event"]."』のABC分析</label>\n";
+                echo "<table class='table-striped table-bordered' style='margin:auto;' id='".$row["Event"]."'>\n";
+                echo "<thead><tr>\n";
+                foreach($aryColumn as $value){
+                    echo "<th>".$value."</th>";
+                }
+                echo "<th>RANK</th>";
+                echo "\n</thead></tr>\n";
+                
+                $Event_old=$row["Event"];
+                $wariai=0;
+            }
+            echo "<tr>";
+            for($i=0;isset($row[$i])==true;$i++){
+                if($i==0 || $i==3){
+                    continue;//0カラム目はイベント名なのでスキップ
+                }
+                if(preg_match('/[^0-9|^%,%]/',$row[$i])==0){//0～9とカンマ以外が存在して無い場合、数値として右寄せ
+                    $right = " class='text-right' ";
+                }elseif(preg_match('/[^0-9]/',$row[$i])==0){//0～9以外が存在して無い場合、数値として右寄せ
+                    $right = " class='text-right' ";
+                }else{
+                    $right = "";
+                }
+                
+                if($row["ShouhinNM"]===$row[$i]){
+                    $val = rot13decrypt($row["ShouhinNM"]);
+                }else{
+                    $val = $row[$i];
+                }
+                
+                if($row["税抜売上"]===$row[$i]){
+                    $wariai=bcadd($wariai,bcdiv($row[$i],$row["総売上"],5),5);
+                    if($wariai<0.70000){
+                        $rank="A";
+                    }elseif($wariai<0.90000){
+                        $rank="B";
+                    }else{
+                        $rank="C";
+                    }
+                }
+                echo "<td".$right.">".$val."</td>";    
+            }
+            echo "<td class='text-center'>".$rank."</td>";
+            echo "</tr>\n";
+        }
+        echo "<tr><td>合計</td><td class='text-right'>".$row["総売上"]."</td></tr>";
+        echo "</table>\n";
+        echo "</div></div>";
+        
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// =========================================================
+//登録メール(メールサーバーを使わない場合PHPから送信)
+// =========================================================
+function touroku_mail($to,$subject,$body){
+    $mail2=rot13encrypt($to);
+    $s_name=$_SERVER['SCRIPT_NAME'];
+    $dir_a=explode("/",$s_name,-1);
+    
+    // 送信元
+    $from = "From: テスト送信者<information@WEBREZ.jp>";
+    
+    // メールタイトル
+    $subject = "WEBREZ＋ 登録案内";
+    
+    $url="https://green-island.mixh.jp/SaleM/$dir_a[2]/account_create.php?mode=0&acc=$mail2";
+     
+    // メール本文
+    $body = <<< EOM
+    WEBREZ+（ウェブレジプラス）にご興味をもっていただきありがとうございます。
+    こちらのURLから登録をお願いいたします。
+    
+    $url
+    EOM;
+     
+    // メール送信
+    mail($to, $subject, $body, $from);
+    return 1;
+}
 ?>

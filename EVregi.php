@@ -271,7 +271,7 @@ window.onload = function() {
     <?php
     }else{
     ?>
-        <div class="event" style="font-family:inherit;"><input type="text" class="ev" name="EV" value="<?php echo $event ?>" placeholder="イベント名等"></div>
+        <div class="event" style="font-family:inherit;"><input type="text" class="ev" name="EV" value="<?php echo $event ?>" placeholder="EVENT名/店舗名等"></div>
         <input type="hidden" name="KOKYAKU" value="">
     <?php
     }

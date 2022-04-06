@@ -58,7 +58,7 @@ if($_GET["action"]=="logout"){
 <?php
     $array = [
         '売上実績集計'=>['analysis_uriagejisseki.php?csrf_token='.$token]
-        ,'ABC分析'=>['xxxx.php?mode=kobetu&csrf_token='.$token]
+        ,'ABC分析'=>['analysis_abc.php?csrf_token='.$token]
         ,'予備5'=>['xxxx.php?csrf_token='.$token]
         ,'予備4'=>['xxxx.php?csrf_token='.$token]
         ,'予備3'=>['xxxx.php?mode=select&csrf_token='.$token]
