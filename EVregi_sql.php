@@ -56,18 +56,19 @@ if($_POST["commit_btn"] <> ""){
     
             $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
             $stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
-            $stmt->bindValue(3,  date("Y/m/d"), PDO::PARAM_STR);
+            //$stmt->bindValue(3,  date("Y/m/d"), PDO::PARAM_STR);
+            $stmt->bindValue(3,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
             $stmt->bindValue(4,  date("Y/m/d H:i:s"), PDO::PARAM_STR);
             $stmt->bindValue(5,  $_POST["EV"], PDO::PARAM_INT);
             $stmt->bindValue(6,  $_POST["KOKYAKU"], PDO::PARAM_STR);
-            $stmt->bindValue(7,  $row["CD"], PDO::PARAM_INT);
-            $stmt->bindValue(8,  $row["NM"], PDO::PARAM_STR);
-            $stmt->bindValue(9,  $row["SU"], PDO::PARAM_INT);
-            $stmt->bindValue(10, $row["UTISU"], PDO::PARAM_INT);
-            $stmt->bindValue(11, $row["TANKA"], PDO::PARAM_INT);
-            $stmt->bindValue(12, ($row["SU"] * $row["TANKA"]), PDO::PARAM_INT);
-            $stmt->bindValue(13, ($row["SU"] * $row["ZEI"]), PDO::PARAM_INT);
-            $stmt->bindValue(14, $row["ZEIKBN"], PDO::PARAM_INT);
+            $stmt->bindValue(7,  $row["CD"], PDO::PARAM_INT);                       //商品CD
+            $stmt->bindValue(8,  $row["NM"], PDO::PARAM_STR);                       //商品名
+            $stmt->bindValue(9,  $row["SU"], PDO::PARAM_INT);                       //数量
+            $stmt->bindValue(10, $row["UTISU"], PDO::PARAM_INT);                    //内数
+            $stmt->bindValue(11, $row["TANKA"], PDO::PARAM_INT);                    //単価
+            $stmt->bindValue(12, ($row["SU"] * $row["TANKA"]), PDO::PARAM_INT);     //数量×単価
+            $stmt->bindValue(13, ($row["SU"] * $row["ZEI"]), PDO::PARAM_INT);       //数量×単価税
+            $stmt->bindValue(14, $row["ZEIKBN"], PDO::PARAM_INT);                   //税区分
             
             $flg=$stmt->execute();
             
@@ -114,18 +115,19 @@ if($_POST["commit_btn"] <> ""){
         
                 $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
                 $stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
-                $stmt->bindValue(3,  date("Y/m/d"), PDO::PARAM_STR);
+                //$stmt->bindValue(3,  date("Y/m/d"), PDO::PARAM_STR);
+                $stmt->bindValue(3,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
                 $stmt->bindValue(4,  date("Y/m/d H:i:s"), PDO::PARAM_STR);
                 $stmt->bindValue(5,  $_POST["EV"], PDO::PARAM_INT);
                 $stmt->bindValue(6,  $_POST["KOKYAKU"], PDO::PARAM_STR);
-                $stmt->bindValue(7,  $row["ZEIKBN"], PDO::PARAM_INT);
-                $stmt->bindValue(8,  rot13encrypt("割引・割増:税率".(($row["zei_per"]-1)*100)."%分"), PDO::PARAM_STR);
-                $stmt->bindValue(9,  0, PDO::PARAM_INT);
-                $stmt->bindValue(10, 0, PDO::PARAM_INT);
-                $stmt->bindValue(11, 0, PDO::PARAM_INT);
-                $stmt->bindValue(12, $chousei_hon, PDO::PARAM_INT);
-                $stmt->bindValue(13, $chousei_zei, PDO::PARAM_INT);
-                $stmt->bindValue(14, $row["ZEIKBN"], PDO::PARAM_INT);
+                $stmt->bindValue(7,  9999, PDO::PARAM_INT);                                                             //商品CD
+                $stmt->bindValue(8,  rot13encrypt("割引・割増:税率".(($row["zei_per"]-1)*100)."%分"), PDO::PARAM_STR);  //商品名
+                $stmt->bindValue(9,  0, PDO::PARAM_INT);                                                                //数量
+                $stmt->bindValue(10, 0, PDO::PARAM_INT);                                                                //内数
+                $stmt->bindValue(11, 0, PDO::PARAM_INT);                                                                //単価
+                $stmt->bindValue(12, $chousei_hon, PDO::PARAM_INT);                                                     //数量×単価
+                $stmt->bindValue(13, $chousei_zei, PDO::PARAM_INT);                                                     //数量×単価税
+                $stmt->bindValue(14, $row["ZEIKBN"], PDO::PARAM_INT);                                                   //税区分
                 $flg=$stmt->execute();
                 
                 if($flg){
@@ -142,18 +144,19 @@ if($_POST["commit_btn"] <> ""){
         
                 $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
                 $stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
-                $stmt->bindValue(3,  date("Y/m/d"), PDO::PARAM_STR);
+                //$stmt->bindValue(3,  date("Y/m/d"), PDO::PARAM_STR);
+                $stmt->bindValue(3,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
                 $stmt->bindValue(4,  date("Y/m/d H:i:s"), PDO::PARAM_STR);
                 $stmt->bindValue(5,  $_POST["EV"], PDO::PARAM_INT);
                 $stmt->bindValue(6,  $_POST["KOKYAKU"], PDO::PARAM_STR);
-                $stmt->bindValue(7,  9999, PDO::PARAM_INT);
-                $stmt->bindValue(8,  rot13encrypt("割引・割増:端数"), PDO::PARAM_STR);
-                $stmt->bindValue(9,  0, PDO::PARAM_INT);
-                $stmt->bindValue(10, 0, PDO::PARAM_INT);
-                $stmt->bindValue(11, 0, PDO::PARAM_INT);
-                $stmt->bindValue(12, $chouseigaku-$goukei, PDO::PARAM_INT);
-                $stmt->bindValue(13, 0, PDO::PARAM_INT);
-                $stmt->bindValue(14, 0, PDO::PARAM_INT);//非課税
+                $stmt->bindValue(7,  9999, PDO::PARAM_INT);                             //商品CD
+                $stmt->bindValue(8,  rot13encrypt("割引・割増:端数"), PDO::PARAM_STR);  //商品名
+                $stmt->bindValue(9,  0, PDO::PARAM_INT);                                //数量
+                $stmt->bindValue(10, 0, PDO::PARAM_INT);                                //内数
+                $stmt->bindValue(11, 0, PDO::PARAM_INT);                                //単価
+                $stmt->bindValue(12, $chouseigaku-$goukei, PDO::PARAM_INT);             //数量×単価
+                $stmt->bindValue(13, 0, PDO::PARAM_INT);                                //数量×単価税
+                $stmt->bindValue(14, 0, PDO::PARAM_INT);                                //非課税//税区分
                 $flg=$stmt->execute();
                  if($flg){
                 }else{

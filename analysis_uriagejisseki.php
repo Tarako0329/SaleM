@@ -261,7 +261,7 @@ $EVresult = $stmt->fetchAll();
                 <option value='4' <?php if($_POST["sum_tani"]==4){echo "selected";} ?> >売上ランキング(金額)</option>
                 <option value='5' <?php if($_POST["sum_tani"]==5){echo "selected";} ?> >売上ランキング(個数)</option>
                 <option value='6' <?php if($_POST["sum_tani"]==6){echo "selected";} ?> >客単価推移</option>
-                <option value='6' <?php if($_POST["sum_tani"]==7){echo "selected";} ?> >客単価ランキング</option>
+                <option value='7' <?php if($_POST["sum_tani"]==7){echo "selected";} ?> >客単価ランキング</option>
             </select>
             <select name='list' class="form-control" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px">
             <option value='%'>場所・顧客</option>

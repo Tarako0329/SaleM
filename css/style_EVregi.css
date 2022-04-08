@@ -4,14 +4,14 @@ body {
 
 .yagou{
     width: 60%;
-    height: 100%;
+    height: 70%;
 }
 .event{
     width: 40%;
     height: 100%;
 }
 INPUT.ev{
-    /*INPUT 数量部*/
+    /*INPUT イベント名・店舗名部*/
     border-right:none;
     border-left:none;
     border-top:none;
@@ -20,10 +20,33 @@ INPUT.ev{
     font-size: 1.7rem;
     font-weight: 600;
     color: #fff;
-    height:80%;     
-    width:100%;
-    background: #ff838b;
+    position: fixed; /* ウィンドウを基準に画面に固定 */
+    top: 0; /* 上下の固定位置を上から0pxにする */
+    right: 0; /* 左右の固定位置を左から0pxにする */
+    height:50px;     
+    width:20rem;
+    /*background: #ff838b;*/
+    background:transparent;
     padding:0;
+    -webkit-border-radius : 0;
+}
+
+INPUT.date{
+    /*INPUT イベント名・店舗名部*/
+    border-right:none;
+    border-left:none;
+    border-top:none;
+    border-color:#fff;
+    
+    font-size: 1.3rem;
+    /*font-weight: 600;*/
+    color: #fff;
+
+    height:30%;
+    width:12rem;
+    background:transparent;
+    padding:0;
+    -webkit-border-radius : 0;
 }
 
 
@@ -60,7 +83,7 @@ INPUT.order{
     background:#fff;
 }
 INPUT.tanka{
-    /*INPUT 数量部*/
+    /*INPUT 単価部*/
     width:40%;
     /*text-align:center;*/
 }

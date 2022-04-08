@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="ja">
 <?php
+/*関数メモ
+check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
+
+【想定して無いページからの遷移チェック】
+csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容を返す。(POSTorGETで遷移先に渡す)
+　　　　　　　 headerでリダイレクトされた場合、COOKIEにセットされないので注意。
+
+遷移先のチェック
+csrf_chk()                              ：COOKIE・SESSION・POSTのトークンチェック。
+csrf_chk_nonsession()                   ：COOKIE・POSTのトークンチェック。
+csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェック。
+csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
+*/
 require "php_header.php";
 /*
 if(isset($_GET["csrf_token"]) || empty($_POST)){
@@ -261,8 +274,9 @@ window.onload = function() {
     <input type="hidden" name="csrf_token" value='<?php echo $token;?>'>
     <input type="hidden" name="mode" value='<?php echo $_GET["mode"];?>'>
     
-<header class="header-color">
+<header class="header-color" style='display:block'>
     <div class="title yagou"><a href="menu.php"><?php echo $title;?></a></div>
+    売上日：<input type='date' class='date' style='height:20%' name='KEIJOUBI' value='<?php echo (string)date("Y-m-d") ?>'>
     <?php
     if($_GET["mode"]=="kobetu"){
     ?>

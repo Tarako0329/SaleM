@@ -7,7 +7,7 @@ define("MODE_DIR",$dir_a[2]);
 
 //CSSスーパーリロード頻度
 if(MODE_DIR=="TEST"){
-    $time=date('Ymd-Hi');
+    $time=date('Ymd-His');
     error_reporting( E_ALL );
 }else{
     $time=date('Ymd');

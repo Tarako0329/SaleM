@@ -54,14 +54,14 @@ if(isset($_SESSION["EMSG"])){
                 <input type="password" id="inputPassword" class="form-control" name="LOGIN_PASS" placeholder="Password" required>
                 <div id="remember" class="checkbox">
                     <label>
-                        <input type="checkbox" name="AUTOLOGIN"> Remember 
+                        <input type="checkbox" name="AUTOLOGIN" checked> Remember 
                     </label>
                 </div>
 
                 <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit"  >ロ グ イ ン</button>
                 <input type="hidden" name="csrf_token" value="<?php echo secho($_SESSION['csrf_token']) ?>">
             </form><!-- /form -->
-            <a href="#" class="forgot-password">
+            <a href="forget_pass_sendurl.php" class="forgot-password">
                 Forgot the password?
             </a>
             <hr>

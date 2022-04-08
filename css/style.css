@@ -1,4 +1,21 @@
 /*共通のCSS*/
+/*使えるフォント
+font-family: 'Allerta Stencil', sans-serif;
+font-family: 'Cabin Sketch', cursive;
+font-family: 'Chewy', cursive;
+font-family: 'Fredericka the Great', cursive;
+font-family: 'Kranky', cursive;
+font-family: 'Londrina Outline', cursive;
+font-family: 'Rye', cursive;
+*/
+:root {
+    /*パネルボタンのカラー*/
+    --panel-font-color: #212529;    /*文字色*/
+    --panel-bk-color: #e29676;      /*背景色*/
+    --panel-bd-color: #47266e;      /*枠線*/
+    /*割引割増ボタンの色など*/
+    
+}
 html {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
@@ -35,15 +52,6 @@ header{
     color:inherit;
 }
 
-/*使えるフォント
-font-family: 'Allerta Stencil', sans-serif;
-font-family: 'Cabin Sketch', cursive;
-font-family: 'Chewy', cursive;
-font-family: 'Fredericka the Great', cursive;
-font-family: 'Kranky', cursive;
-font-family: 'Londrina Outline', cursive;
-font-family: 'Rye', cursive;
-*/
 
 /*トップメニューボタン*/
 .btn--topmenu{
@@ -60,9 +68,9 @@ font-family: 'Rye', cursive;
 
 /*ボタンの見た目*/
 .btn-view{
-    color: #212529;                 /*文字色*/
-    background-color: #e29676;      /*背景色*/
-    border:solid #47266e 0.5px;     /*枠線*/
+    color: var(--panel-font-color);               /*文字色*/
+    background-color: var(--panel-bk-color);      /*背景色*/
+    border:solid var(--panel-bd-color) 0.5px;     /*枠線*/
 
     font-weight: 700;
     line-height: 1.5;
@@ -95,6 +103,10 @@ font-family: 'Rye', cursive;
     background: #ed6d35;
     background-image:linear-gradient(to left top, #e4007f, #ed6d35);
     
+}
+.logoff-color:before
+{
+	color: #47266e ;
 }
 footer{
     background: #ffce5b;

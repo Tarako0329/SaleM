@@ -62,7 +62,7 @@ if($row[0]["yuukoukigen"]<>""){
     if($logoff==false){
     ?>
         <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div></a></div>
-        <span style="font-size:1.5rem;"><a href="menu.php?action=logout"><i class="fa-solid fa-right-from-bracket"></i></a></span>
+        <span style="font-size:1.5rem;"><a href="menu.php?action=logout"><i class="fa-solid fa-right-from-bracket fa-lg logoff-color"></i></a></span>
     <?php
     }else{
     ?>
@@ -90,7 +90,7 @@ if($row[0]["yuukoukigen"]<>""){
         ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token]
         ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token]
         ,'売上実績'=>['UriageData.php?mode=select&csrf_token='.$token]
-        ,'売上解析'=>['analysis_menu.php?csrf_token='.$token]
+        ,'売上分析'=>['analysis_menu.php?csrf_token='.$token]
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]
         //,'契約・解除'=>['../../PAY/index.php?system='.$title.'&mode='.MODE_DIR]
         //,'お知らせ'=>['system_update_log.php']
