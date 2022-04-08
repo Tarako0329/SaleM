@@ -48,11 +48,11 @@ if($_POST["answer"]<>""){
     $cnt=$stmt->rowCount();
     $result2=$stmt->fetchAll();
     if($cnt==1){
-        $_SESSION["uid"]=$result2[0]["uid"];
+        $_SESSION["user_id"]=$result2[0]["uid"];
+        echo $_SESSION["uid"]."<br>";
         header("HTTP/1.1 301 Moved Permanently");
         header("Location: account_create.php?mode=1&csrf_token=".$token);
         exit();
-         
     }else{
         $msg="秘密の答えが間違ってます。<br>";
     }
