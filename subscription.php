@@ -10,11 +10,25 @@ if($_GET["sid"]<>""){
     exit();
 }
 
+
+$sql="select DATE_ADD(yuukoukigen, INTERVAL 1 DAY) as keiyakudate from Users where uid=?";
+$stmt = $pdo_h->prepare($sql);
+$stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
+$stmt->execute();
+$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+if(date("Y-m-d")<$row[0]["keiyakudate"]){
+    $keiyakudate=$row[0]["keiyakudate"];
+}else{
+    $keiyakudate=date("Y-m-d");
+}
+
+
 $sqlstr="update Users set yuukoukigen=?,stripe_id=?,keiyakudate=?,plan=? where uid=?";
 $stmt = $pdo_h->prepare($sqlstr);
 $stmt->bindValue(1, NULL, PDO::PARAM_STR);
 $stmt->bindValue(2, $_GET["sid"], PDO::PARAM_STR);
-$stmt->bindValue(3, date("Y-m-d"), PDO::PARAM_STR);
+$stmt->bindValue(3, $keiyakudate, PDO::PARAM_STR);//課金契約の始まる日。トライアル期間中に申し込んだ場合は未来日付が入る。
 $stmt->bindValue(4, $_GET["M"], PDO::PARAM_INT);
 $stmt->bindValue(5, $_SESSION["user_id"], PDO::PARAM_INT);
 $flg=$stmt->execute();

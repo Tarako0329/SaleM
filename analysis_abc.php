@@ -234,7 +234,7 @@ $EVresult = $stmt->fetchAll();
     <div class="col-md-3" style='padding:5px;background:white'>
         <form class="form" method="post" action="analysis_abc.php" style='font-size:1.3rem'>
             集計期間:
-            <select name='ymfrom' class="form-control" style="padding:0;width:10rem;display:inline-block;margin:5px">
+            <select name='ymfrom' class="form-control" style="padding:0;width:11rem;display:inline-block;margin:5px">
             <?php
             foreach($SLVresult as $row){
                 if($ymfrom==$row["Value"]){
@@ -245,7 +245,7 @@ $EVresult = $stmt->fetchAll();
             ?>
             </select>
             から
-            <select name='ymto' class="form-control" style="padding:0;width:10rem;display:inline-block;margin:5px">
+            <select name='ymto' class="form-control" style="padding:0;width:11rem;display:inline-block;margin:5px">
             <?php
             foreach($SLVresult as $row){
                 if($ymto==$row["Value"]){

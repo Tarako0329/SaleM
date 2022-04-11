@@ -439,7 +439,26 @@ function drow_table_abc($aryColumn,$result,$cols){
     }
 }
 
+// =========================================================
+// CSV出力
+// =========================================================
+function output_csv($data,$kikan){
+    $date = date("Ymd");
+    header("Content-Type: application/octet-stream");
+    header("Content-Disposition: attachment; filename=売上実績_{$date}_{$kikan}.csv");
+    
+    // データ行の文字コード変換・加工
+    foreach ($data as $data_key => $line) {
+        foreach ($line as $line_key => $value) {
+            $data[$data_key][$line_key] = mb_convert_encoding($value, "SJIS", "UTF-8");
+        }
+    }
 
+    foreach ($data as $key => $line) {
+        echo implode($line, ",") . "\r\n";
+    }
+    exit;
+}
 
 
 

@@ -16,7 +16,7 @@ $_SESSION["SK"]=SKEY;
 $_SESSION["URL"]="../SaleM/".MODE_DIR."/subscription.php";
 $_SESSION["PLAN_M"]=PLAN_M;
 $_SESSION["PLAN_Y"]=PLAN_Y;
-
+$_SESSION["SUBID"]="";
 //有効期限の取得
 $sql="select * from Users where uid=?";
 $stmt = $pdo_h->prepare($sql);
@@ -39,6 +39,7 @@ if($row[0]["yuukoukigen"]<>""){
     //契約済
     $plan=1;
     //echo "本契約済み";
+    $_SESSION["SUBID"]=$row[0]["stripe_id"];
 }
 
 ?>
@@ -92,6 +93,7 @@ if($row[0]["yuukoukigen"]<>""){
         ,'売上実績'=>['UriageData.php?mode=select&csrf_token='.$token]
         ,'売上分析'=>['analysis_menu.php?csrf_token='.$token]
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]
+        ,'連携データ出力'=>['output_menu.php?csrf_token='.$token]
         //,'契約・解除'=>['../../PAY/index.php?system='.$title.'&mode='.MODE_DIR]
         //,'お知らせ'=>['system_update_log.php']
     ];
@@ -99,7 +101,8 @@ if($row[0]["yuukoukigen"]<>""){
     if($plan==0){
         $array2 = ['本契約'=>['../../PAY/index.php?system='.$title.'&mode='.MODE_DIR]];
     }else{
-        $array2 = ['契約解除'=>['../../PAY/cancel.php?system='.$title.'&mode='.MODE_DIR]];
+        //$array2 = ['契約解除について'=>['../../PAY/cancel.php?system='.$title.'&mode='.MODE_DIR]];
+        $array2 = ['契約解除へ'=>['sub_cancel.php?system='.$title.'&mode='.MODE_DIR]];
     }
     
     $i=0;

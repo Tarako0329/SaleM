@@ -74,7 +74,7 @@ if($_POST["sum_tani"]==1){//日ごと
     $aryColumn = ["計上日","客単価","Event/店舗"];
 }   
 
-$sqlstr = $sqlstr." where DATE_FORMAT(UriDate, '%Y%m') between :ymfrom and :ymto AND uid = :user_id ";
+$sqlstr = $sqlstr." where ShouhinCD<>9999 and DATE_FORMAT(UriDate, '%Y%m') between :ymfrom and :ymto AND uid = :user_id ";
 $sqlstr = $sqlstr." AND (Event like :event OR TokuisakiNM like :tokui )";
 $sqlstr = $sqlstr." ".$gp_sqlstr;
 
@@ -233,7 +233,7 @@ $EVresult = $stmt->fetchAll();
     <div class="col-md-3" style='padding:5px;background:white'>
         <form class="form" method="post" action="analysis_uriagejisseki.php" style='font-size:1.3rem'>
             集計期間:
-            <select name='ymfrom' class="form-control" style="padding:0;width:10rem;display:inline-block;margin:5px">
+            <select name='ymfrom' class="form-control" style="padding:0;width:11rem;display:inline-block;margin:5px">
             <?php
             foreach($SLVresult as $row){
                 if($ymfrom==$row["Value"]){
@@ -244,7 +244,7 @@ $EVresult = $stmt->fetchAll();
             ?>
             </select>
             から
-            <select name='ymto' class="form-control" style="padding:0;width:10rem;display:inline-block;margin:5px">
+            <select name='ymto' class="form-control" style="padding:0;width:11rem;display:inline-block;margin:5px">
             <?php
             foreach($SLVresult as $row){
                 if($ymto==$row["Value"]){
