@@ -15,16 +15,16 @@ csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェッ�
 csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
 */
 require "php_header.php";
-/*
+
 if(isset($_GET["csrf_token"]) || empty($_POST)){
-    if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
+    if(csrf_chk_redirect($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。".$_GET["csrf_token"];
         header("HTTP/1.1 301 Moved Permanently");
         header("Location: index.php");
         exit();
     }
 }
-*/
+
 //セッションのIDがクリアされた場合の再取得処理。
 $rtn=check_session_userid($pdo_h);
 
@@ -42,14 +42,13 @@ if($row[0]["yuukoukigen"]==""){
     $emsg="お試し期間、もしくは解約後有効期間が終了しました。<br>継続してご利用頂ける場合は<a href='../../PAY/index.php?system=".$title."&mode=".MODE_DIR."'>こちらから本契約をお願い致します </a>";
 }
 
-//商品M取得
-$sql = "select * from ShouhinMS where hyoujiKBN1='on' and uid = ? order by hyoujiNO,bunrui1,bunrui2,bunrui3,shouhinNM";
-$stmt = $pdo_h->prepare($sql);
-$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-$stmt->execute();
-$shouhiMS = $stmt->fetchAll();
 
 $token = csrf_create();
+$alert_msg="";
+if(!empty($_SESSION["msg"])){
+    $alert_msg=$_SESSION["msg"];
+}
+
 
 //イベント名の取得
 //セッション->クッキー->DB
@@ -72,10 +71,68 @@ if($_SESSION["EV"] != "" ){
         $buf = $stmt->fetch();
         $_SESSION["EV"] = $buf["value"];
         $event = $buf["value"];
+        //deb_echo("DB".$event);
+    } 
+}
+//メニューカテゴリー粒度(0:なし>1:大>2:中>3:小)
+//セッション->クッキー->DB
+if($_SESSION["CTGL"] != "" ){
+    $categoly = $_SESSION["CTGL"];
+    //deb_echo("session");
+}else{
+    $sql = "select value from PageDefVal where uid=? and machin=? and page=? and item=?";
+    $stmt = $pdo_h->prepare($sql);
+    $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+    $stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
+    $stmt->bindValue(3, "EVregi.php", PDO::PARAM_STR);
+    $stmt->bindValue(4, "CTGL", PDO::PARAM_STR);//name属性を指定
+    $stmt->execute();
+
+    if($stmt->rowCount()==0){
+        $categoly = 0;
+        deb_echo("NULL");
+    }else{
+        $buf = $stmt->fetch();
+        $_SESSION["CTGL"] = $buf["value"];
+        $categoly = $buf["value"];
         deb_echo("DB".$event);
     } 
 }
+$next_categoly=$categoly+1;
 
+if($categoly==0){
+    $sql_order="order by hyoujiNO,shouhinNM";
+    $sql_group="group by categoly";
+    $sql_select="'' as categoly";
+}else if($categoly==1){
+    $sqlorder="order by bunrui1,hyoujiNO,shouhinNM";
+    $sql_group="group by bunrui1";
+    $sql_select="if(bunrui1<>'',bunrui1,'未分類') as categoly";
+}else if($categoly==2){
+    $sqlorder="order by bunrui1,bunrui2,hyoujiNO,shouhinNM";
+    $sql_group="group by bunrui1,bunrui2";
+    $sql_select="concat(if(bunrui1<>'',bunrui1,'未分類'),'>',if(bunrui2<>'',bunrui2,'未分類')) as categoly";
+}else if($categoly==3){
+    $sqlorder="order by bunrui1,bunrui2,bunrui3,hyoujiNO,shouhinNM";
+    $sql_group="group by bunrui1,bunrui2,bunrui3";
+    $sql_select="concat(if(bunrui1<>'',bunrui1,'未分類'),'>',if(bunrui2<>'',bunrui2,'未分類'),'>',if(bunrui3<>'',bunrui3,'未分類')) as categoly";
+    $next_categoly=0;
+}
+    
+//商品M取得
+$sql = "select *,".$sql_select." from ShouhinMS where hyoujiKBN1='on' and uid = ? ".$sqlorder;
+$stmt = $pdo_h->prepare($sql);
+$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+$stmt->execute();
+$shouhiMS = $stmt->fetchAll();
+
+//商品M分類取得
+$sql = "select ".$sql_select." from ShouhinMS where hyoujiKBN1='on' and uid = ? ".$sql_group." ".$sqlorder;
+$stmt = $pdo_h->prepare($sql);
+$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+$stmt->execute();
+$shouhiMS_bunrui = $stmt->fetchAll();
+//deb_echo($next_categoly);
 
 ?>
 <head>
@@ -113,19 +170,6 @@ window.onload = function() {
         echo "    //".rot13decrypt($row["shouhinNM"])."ボタンクリック時\n";
         echo "    btn_menu_".$row["shouhinCD"].".onclick = function (){\n";
         echo "        cnt_suryou_".$row["shouhinCD"]." += 1;\n";
-        /*
-        //小数の計算はBC関数を使用
-        //税区分末尾１：外税　２：内税
-        if(substr(strval($row["zeiKBN"]),3,1) =="1" || $row["zeiKBN"]==0){
-            //外税もしくは非課税の場合
-            echo "        total_pay += ".bcadd($row["tanka"] , bcmul($row["tanka"], bcdiv($row["zeiritu"],100,2),0),0).";\n";
-            echo "        total_zei += ".bcmul($row["tanka"], bcdiv($row["zeiritu"],100,2),0).";\n";
-        }else{
-            //内税の場合
-            echo "        total_pay += ".$row["tanka"].";\n";
-            echo "        total_zei += ".bcsub($row["tanka"],bcdiv($row["tanka"], bcdiv(bcadd(100,$row["zeiritu"]),100,2),0),0).";\n";
-        }
-        */
         echo "        total_pay += ".($row["tanka"] + $row["tanka_zei"]).";\n";
         echo "        total_zei += ".$row["tanka_zei"].";\n";
         echo "        suryou_".$row["shouhinCD"].".value = cnt_suryou_".$row["shouhinCD"].";\n";
@@ -174,15 +218,6 @@ window.onload = function() {
         var oturikin = azukarikin - total_pay;
         oturi.innerHTML = oturikin;
     };
-/*
-    // メニューボタンクリック処理
-    btn_menu_002.onclick = function (){
-        cnt_suryou_2 += 1;
-        total_pay += 230;
-        suryou_2.value = cnt_suryou_2;
-        kaikei_disp.innerHTML = total_pay;
-    };
-*/
 
      var su = document.getElementsByClassName("su");
      var items = document.getElementsByClassName("items");
@@ -238,8 +273,8 @@ window.onload = function() {
         .text(msg);
     }
     (function($){
-      const s = alert('<?php echo $_SESSION["msg"]; ?> ').addClass('alert-success');
-      const e = alert('<?php echo $_SESSION["msg"]; ?> ').addClass('alert-danger');
+      const s = alert('<?php echo $alert_msg; ?> ').addClass('alert-success');
+      const e = alert('<?php echo $alert_msg; ?> ').addClass('alert-danger');
       // アラートを表示する
       $('#alert-s').append(s);
       // 5秒後にアラートを消す
@@ -264,7 +299,7 @@ window.onload = function() {
             alert('test');
             e.preventDefault();
         }
-    }    
+    }
     
 };    
 
@@ -272,7 +307,7 @@ window.onload = function() {
 
 <form method = "post" id="form1" action="EVregi_sql.php">
     <input type="hidden" name="csrf_token" value='<?php echo $token;?>'>
-    <input type="hidden" name="mode" value='<?php echo $_GET["mode"];?>'>
+    <input type="hidden" name="mode" value='<?php echo $_GET["mode"];?>'> <!--レジor個別売上-->
     
 <header class="header-color" style='display:block'>
     <div class="title yagou"><a href="menu.php"><?php echo $title;?></a></div>
@@ -285,14 +320,27 @@ window.onload = function() {
     <?php
     }else{
     ?>
-        <div class="event" style="font-family:inherit;"><input type="text" class="ev" name="EV" value="<?php echo $event ?>" placeholder="EVENT名/店舗名等"></div>
+        <div class="event" style="font-family:inherit;"><input type="text" class="ev" name="EV" value="<?php echo $event ?>" required="required" placeholder="(必須)EVENT名/店舗名等"></div>
         <input type="hidden" name="KOKYAKU" value="">
     <?php
     }
     ?>
 </header>
-
+<div class='header-select header-color' >
+    <select class='form-control' style='font-size:1.2rem;padding:0;'> <!--width:80%;-->
+        <option>カテゴリートップへ移動できます</option>
+    <?php
+        $i=1;
+        foreach($shouhiMS_bunrui as $row){
+            echo "<option value='#jump_".$i."'>".$row["categoly"]."</option>";
+            $i++;
+        }
+    ?>
+    </select>
+    <a  title="商品の並びを「カテゴリー（大⇒中⇒小⇒なし）」とローテーションで変更します。" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-regular fa-circle-question fa-lg"></i></a><a href='EVregi_sql.php?CTGL=<?php echo $next_categoly; ?>&mode=<?php echo $_GET["mode"]; ?>' style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-solid fa-arrow-rotate-right fa-lg"></i></a>
+</div>
 <body>
+
 <?php
     if(isset($emsg)){//
         echo $emsg;
@@ -305,9 +353,9 @@ window.onload = function() {
     }
 ?>
     <div class="container-fluid">
-        <div class="row" >
+        <div class="row" style='padding-top:5px;'>
             <div class="col-1 col-lg-0" ></div>
-            <div class="col-10 col-lg-3" style="font-size: 2.2rem;">
+            <div class="col-10 col-lg-3" style="font-size:2.2rem;padding-top:10px;">
                 <button type='button' class='btn-view btn-changeVal' style="display:none;padding:0.1rem;" id="CHOUSEI_AREA" >割引・割増</button>
             </div>
             <div class="col-1" ></div>
@@ -323,44 +371,70 @@ window.onload = function() {
             <div class="col-1" ></div>
         </div>
         <hr>
-        <div class="row">
-            
+
+        <div class='row' id='jump_0'>
+
 <?php
     $i=0;
-
+    $now=1;
+    $bunrui="";
+    
 	foreach($shouhiMS as $row){
+	    if($bunrui<>$row["categoly"]){
+	        //ジャンルを区切るバーの表示
+	        $next=$now+1;
+	        $befor=$now-1;
+	        echo "</div>";
+	        echo "<div class='row' style='background:var(--jumpbar-color);margin-top:5px;' >\n"; //height:30px;
+	        echo "<div class='col-12' id='jump_".$now."'><a href='#jump_".$befor."' class='btn-updown'><i class='fa-solid fa-angles-up'></i></a>\n";
+	        echo $row["categoly"];
+	        echo "<a href='#jump_".$next."'  class='btn-updown'><i class='fa-solid fa-angles-down'></i></a>\n";
+	        echo "</div></div>\n";
+	        echo "<div class='row'>";
+	        $bunrui=$row["categoly"];
+	        $now=$now+1;
+	    }
         echo "  <div class ='col-md-3 col-sm-6 col-6 items' id='items_".$row["shouhinCD"]."'>\n";
         echo "      <button type='button' class='btn-view btn--rezi' id='btn_menu_".$row["shouhinCD"]."'>".rot13decrypt($row["shouhinNM"])."\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][CD]' value = '".$row["shouhinCD"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][NM]' value = '".$row["shouhinNM"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][UTISU]' value = '".$row["utisu"]."'>\n";
-        //echo "      <input type='hidden' name ='ORDERS[".$i."][ZEI]' value = '".(string)(($row["zeiritu"]/100)*$row["tanka"])."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][ZEIKBN]' value = '".$row["zeiKBN"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][TANKA]' value = '".$row["tanka"]."'>\n";
         echo "      </button>\n";
         echo "      <div class ='ordered'>\n";
-        /*
-        if(substr(strval($row["zeiKBN"]),3,1) =="1" || $row["zeiKBN"]==0){
-            //外税（マスタは税抜単価）
-            echo "          ￥<input type='number' readonly='readonly' class='order tanka' value=".bcadd($row["tanka"] , bcmul($row["tanka"], bcdiv($row["zeiritu"],100,2),0),0).">\n";
-            echo "            <input type='hidden' name ='ORDERS[".$i."][ZEI]' value = '".(string)(bcmul($row["tanka"], bcdiv($row["zeiritu"],100,2),0))."'>\n";    //消費税：本体×税率
-        }else{
-            //内税（マスタは税込単価）
-            echo "          ￥<input type='number' readonly='readonly' class='order tanka' value=".$row["tanka"].">\n";
-            echo "            <input type='hidden' name ='ORDERS[".$i."][ZEI]' value = '".(string)(bcsub($row["tanka"],bcdiv($row["tanka"], bcdiv(bcadd(100,$row["zeiritu"]),100,2),0),0))."'>\n";  //税込価格-(税込価格÷1.1or1.08)
-        }
-        */
         echo "          ￥<input type='number' readonly='readonly' class='order tanka' value=".($row["tanka"] + $row["tanka_zei"]).">\n";
         echo "            <input type='hidden' name ='ORDERS[".$i."][ZEI]' value = '".$row["tanka_zei"]."'>\n";  //税込価格-(税込価格÷1.1or1.08)
-        
         echo "× <input type='number' readonly='readonly' name ='ORDERS[".$i."][SU]' id='suryou_".$row["shouhinCD"]."' class='order su' value = 0 style='display: inline'>\n";
         echo "      </div>\n";
         echo "  </div>\n";
+        
         $i = $i+1;
 	}
 ?> 
         </div>
+
     </div>
+    <script>
+        $('a[href*="#"]').click(function () {//全てのページ内リンクに適用させたい場合はa[href*="#"]のみでもOK
+        	var elmHash = $(this).attr('href'); //ページ内リンクのHTMLタグhrefから、リンクされているエリアidの値を取得
+        	var pos = $(elmHash).offset().top-100;	//idの上部の距離を取得
+        	$('body,html').animate({scrollTop: pos}, 500); //取得した位置にスクロール。500の数値が大きくなるほどゆっくりスクロール
+        	return false;
+        });
+        
+        $(function () {
+          $('select').change(function () {
+            var speed = 400;
+            var href = $(this).val();
+            var target = $(href == "#" || href == "" ? 'html' : href);
+            var position = target.offset().top-100;
+            $('body,html').animate({scrollTop:position}, speed, 'swing');
+            return false;
+          });
+        });        
+        
+    </script>
 </body>
 
 <footer>

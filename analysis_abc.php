@@ -16,7 +16,7 @@ csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェ�
 */
 
 require "php_header.php";
-/*
+
 if(isset($_GET["csrf_token"]) || empty($_POST)){
     if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。①";
@@ -25,7 +25,7 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
         exit();
     }
 }
-*/
+
 $rtn=check_session_userid($pdo_h);
 $csrf_create = csrf_create();
 
@@ -224,7 +224,7 @@ $EVresult = $stmt->fetchAll();
 </head>
  
 <header class="header-color" style="flex-wrap:wrap;height:50px">
-    <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></div>
+    <div class="title" style="width: 100%;"><a href="analysis_menu.php?csrf_token=<?php echo $csrf_create; ?>"><?php echo $title;?></a></div>
 
 </header>
 

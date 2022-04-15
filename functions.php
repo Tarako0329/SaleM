@@ -329,7 +329,7 @@ function drow_table_abc($aryColumn,$result,$cols){
             echo "<th>".$value."</th>";
         }
         echo "<th>RANK</th>";
-        echo "\n</thead></tr>\n";
+        echo "\n</tr></thead>\n";
 
         $wariai=0;
         foreach($result as $row){
@@ -367,7 +367,7 @@ function drow_table_abc($aryColumn,$result,$cols){
             echo "<td class='text-center'>".$rank."</td>";
             echo "</tr>\n";
         }
-        echo "<tr><td>合計</td><td class='text-right'>".$row["総売上"]."</td></tr>";
+        echo "<thead><tr><th>合計</th><th class='text-right'>".$row["総売上"]."</th></tr></thead>";
         echo "</table>\n";
     }elseif($cols==3){
         
@@ -381,12 +381,12 @@ function drow_table_abc($aryColumn,$result,$cols){
             
             if($Event_old!=$row["Event"]){
                 if($Event_old!="x"){
-                    echo "<tr><td>合計</td><td class='text-right'>".$row["総売上"]."</td></tr>";
+                    echo "<thead><tr><th>合計</th><th class='text-right'>".$row["総売上"]."</th></tr></thead>";
                     echo "</table>\n";
                     echo "</div>";
                 }
                 echo "<div class='col-md-3' style='padding:5px;background:white'>";
-                echo "<label for='".$row["Event"]."' style='text-align:center;font-weight:700;display:block;'>『".$row["Event"]."』のABC分析</label>\n";
+                echo "<label for='".$row["Event"]."' style='text-align:center;font-weight:700;display:block;'>『".$row["Event"]."』<br>のABC分析</label>\n";
                 echo "<table class='table-striped table-bordered' style='margin:auto;' id='".$row["Event"]."'>\n";
                 echo "<thead><tr>\n";
                 foreach($aryColumn as $value){

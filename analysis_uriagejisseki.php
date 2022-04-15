@@ -61,24 +61,36 @@ if($_POST["sum_tani"]==1){//日ごと
     $sqlstr = "select ShouhinNM as ShouhinNM ,sum(Su) as 売上数 from UriageData ";
     $gp_sqlstr = "group by ShouhinNM order by sum(Su) desc";
     $aryColumn = ["商品名","売上数"];
-}elseif($_POST["sum_tani"]==7){//イベント・店舗別客単価ランキング
-    $sqlstr = "select A,ROUND(avg(客単価)) as 平均客単価 from ";
-    $sqlstr = $sqlstr." (select UriDate as 計上日 ,concat(Event,TokuisakiNM) as A ,UriageNO ,sum(UriageKin) as 客単価 from UriageData ";
-    $gp_sqlstr = "group by UriDate,concat(Event,TokuisakiNM),UriageNO ) as UriSum group by A order by avg(客単価) desc";
-    $aryColumn = ["Event/店舗","客単価"];
 }elseif($_POST["sum_tani"]==6){//客単価推移
     //客単価一覧
     $sqlstr = "select 計上日,ROUND(avg(税抜売上)) as 客単価,Event from ";
     $sqlstr = $sqlstr." (select UriDate as 計上日 ,Event ,UriageNO ,sum(UriageKin) as 税抜売上 from UriageData ";
     $gp_sqlstr = "group by UriDate,UriageNO ) as UriSum group by 計上日 order by 計上日";
     $aryColumn = ["計上日","客単価","Event/店舗"];
-}   
+}elseif($_POST["sum_tani"]==7){//イベント・店舗別客単価ランキング
+    $sqlstr = "select KYAKU,ROUND(avg(客単価)) as 平均客単価 from ";
+    $sqlstr = $sqlstr." (select UriDate as 計上日 ,concat(Event,TokuisakiNM) as KYAKU ,UriageNO ,sum(UriageKin) as 客単価 from UriageData ";
+    $gp_sqlstr = "group by UriDate,concat(Event,TokuisakiNM),UriageNO ) as UriSum group by KYAKU order by avg(客単価) desc";
+    $aryColumn = ["Event/店舗","客単価"];
+}elseif($_POST["sum_tani"]==8){//イベント・店舗別来客数推移
+    $sqlstr = "select UriDate,sum(来客カウント) as 来客数,Event from ";
+    $sqlstr = $sqlstr." (select uid, UriDate, Event, TokuisakiNM, UriageNO,0 as ShouhinCD, 1 as 来客カウント from UriageData where Event <>'' ";
+    $sqlstr = $sqlstr." group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriSum ";
+    $gp_sqlstr = "group by UriDate,Event order by UriDate";
+    $aryColumn = ["計上日","来客数","Event/店舗"];
+}elseif($_POST["sum_tani"]==9){//イベント・店舗別来客数ランキング
+    $sqlstr = "select Event,ROUND(avg(来客数)) as 平均来客数 from (select UriDate,sum(来客カウント) as 来客数,Event from ";
+    $sqlstr = $sqlstr." (select uid, UriDate, Event, TokuisakiNM, UriageNO,0 as ShouhinCD, 1 as 来客カウント from UriageData where Event <>'' ";
+    $sqlstr = $sqlstr." group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriSum ";
+    $gp_sqlstr = "group by UriDate,Event) as Urisum2 group by Event order by ROUND(avg(来客数)) desc";
+    $aryColumn = ["Event/店舗","平均来客数"];
+}
 
 $sqlstr = $sqlstr." where ShouhinCD<>9999 and DATE_FORMAT(UriDate, '%Y%m') between :ymfrom and :ymto AND uid = :user_id ";
 $sqlstr = $sqlstr." AND (Event like :event OR TokuisakiNM like :tokui )";
 $sqlstr = $sqlstr." ".$gp_sqlstr;
 
-//deb_echo($sqlstr);
+deb_echo($sqlstr);
 
 $stmt = $pdo_h->prepare( $sqlstr );
 $stmt->bindValue("ymfrom", $ymfrom, PDO::PARAM_INT);
@@ -168,7 +180,7 @@ $EVresult = $stmt->fetchAll();
                     ?>
                     ],
                 datasets: [{
-                    label: '売上金額(税抜)<?php if($row[0]===$row["ShouhinNM"]){
+                    label: '<?php echo $aryColumn[1];if($row[0]===$row["ShouhinNM"]){
                             echo "TOP15";
                         }?>',
                     data: [
@@ -223,8 +235,7 @@ $EVresult = $stmt->fetchAll();
 </head>
  
 <header class="header-color" style="flex-wrap:wrap;height:50px">
-    <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></div>
-
+    <div class="title" style="width: 100%;"><a href="analysis_menu.php?csrf_token=<?php echo $csrf_create; ?>"><?php echo $title;?></a></div>
 </header>
 
 <body style='padding-top:55px'>
@@ -262,6 +273,8 @@ $EVresult = $stmt->fetchAll();
                 <option value='5' <?php if($_POST["sum_tani"]==5){echo "selected";} ?> >売上ランキング(個数)</option>
                 <option value='6' <?php if($_POST["sum_tani"]==6){echo "selected";} ?> >客単価推移</option>
                 <option value='7' <?php if($_POST["sum_tani"]==7){echo "selected";} ?> >客単価ランキング</option>
+                <option value='8' <?php if($_POST["sum_tani"]==8){echo "selected";} ?> >来客数推移</option>
+                <option value='9' <?php if($_POST["sum_tani"]==9){echo "selected";} ?> >平均来客数ランキング</option>
             </select>
             <select name='list' class="form-control" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px">
             <option value='%'>場所・顧客</option>
@@ -283,14 +296,8 @@ $EVresult = $stmt->fetchAll();
     </div>
     <div class="col-md-3" style='padding:5px'>
     <?php
-        if($_SESSION["MSG"]!=""){
-            echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-1' class='lead'></div></div></div></div>";
-        }
-        $_SESSION["MSG"]="";
         //var_dump($result);
         drow_table($aryColumn,$result);
-        
-
     ?>
     </div>
     </div><!--row-->

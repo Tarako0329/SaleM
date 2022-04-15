@@ -364,6 +364,7 @@ $ZEIresult = $pdo_h->query($ZEIsql);
         }
         $_SESSION["MSG"]="";
         echo $msg;
+        
     ?>
     <table class="table-striped table-bordered">
         <thead><tr><th>売上日</th><th>Event名</th><th>顧客名</th><th>売上№</th><th>商品</th><th style="width:3rem;">個数</th><th style="width:3rem;">単価</th><th style="width:5rem;">売上</th><th style="width:4rem;">消費税</th></tr></thead>

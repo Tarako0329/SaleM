@@ -1,7 +1,29 @@
 <!DOCTYPE html>
 <html lang="ja">
 <?php
+/*関数メモ
+check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
+
+【想定して無いページからの遷移チェック】
+csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容を返す。(POSTorGETで遷移先に渡す)
+　　　　　　　 headerでリダイレクトされた場合、COOKIEにセットされないので注意。
+
+遷移先のチェック
+csrf_chk()                              ：COOKIE・SESSION・POSTのトークンチェック。
+csrf_chk_nonsession()                   ：COOKIE・POSTのトークンチェック。
+csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェック。
+csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
+*/
 require "php_header.php";
+if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
+    $_SESSION["EMSG"]="セッションが正しくありませんでした。①";
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: index.php");
+    exit();
+}
+
+
+
 $rtn=check_session_userid($pdo_h);
 $token = csrf_create();
 $logoff=false;
@@ -57,7 +79,7 @@ if($_GET["action"]=="logout"){
 
 <?php
     $array = [
-        '売上実績集計'=>['analysis_uriagejisseki.php?csrf_token='.$token]
+         '実績集計'=>['analysis_uriagejisseki.php?csrf_token='.$token]
         ,'ABC分析'=>['analysis_abc.php?csrf_token='.$token]
         ,'予備5'=>['xxxx.php?csrf_token='.$token]
         ,'予備4'=>['xxxx.php?csrf_token='.$token]

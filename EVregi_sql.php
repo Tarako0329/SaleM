@@ -5,14 +5,32 @@ $token = csrf_create();
 $rtn=check_session_userid($pdo_h);
 
 //入力画面の前回値を記録
-$_SESSION["EV"] = $_POST["EV"];
-$stmt = $pdo_h->prepare ( 'call PageDefVal_update(?,?,?,?,?)' );
-$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-$stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
-$stmt->bindValue(3, "EVregi.php", PDO::PARAM_STR);
-$stmt->bindValue(4, "EV", PDO::PARAM_STR);
-$stmt->bindValue(5, $_POST["EV"], PDO::PARAM_STR);
-$stmt->execute();
+if($_POST["EV"]<>""){
+    //イベント名
+    $_SESSION["EV"] = $_POST["EV"];
+    $stmt = $pdo_h->prepare ( 'call PageDefVal_update(?,?,?,?,?)' );
+    $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+    $stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
+    $stmt->bindValue(3, "EVregi.php", PDO::PARAM_STR);
+    $stmt->bindValue(4, "EV", PDO::PARAM_STR);
+    $stmt->bindValue(5, $_POST["EV"], PDO::PARAM_STR);
+    $stmt->execute();
+}
+if($_GET["CTGL"]<>""){
+    //メニューのカテゴリー区切り
+    $_SESSION["CTGL"] = $_GET["CTGL"];
+    $stmt = $pdo_h->prepare ( 'call PageDefVal_update(?,?,?,?,?)' );
+    $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+    $stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
+    $stmt->bindValue(3, "EVregi.php", PDO::PARAM_STR);
+    $stmt->bindValue(4, "CTGL", PDO::PARAM_STR);
+    $stmt->bindValue(5, $_GET["CTGL"], PDO::PARAM_STR);
+    $stmt->execute();
+    $_SESSION["msg"]="カテゴリーを変更しました。";
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: EVregi.php?status=success&mode=".$_GET["mode"]."&csrf_token=".$token);
+    exit();
+}
 
 $E_Flg=0;
 $_SESSION["msg"]="登録処理が実行されませんでした。";
@@ -20,7 +38,6 @@ $emsg="";
 
 //売上登録
 if($_POST["commit_btn"] <> ""){
-//if(0){
     if(csrf_chk_nonsession()==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。";
         header("HTTP/1.1 301 Moved Permanently");

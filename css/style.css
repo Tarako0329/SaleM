@@ -8,14 +8,40 @@ font-family: 'Kranky', cursive;
 font-family: 'Londrina Outline', cursive;
 font-family: 'Rye', cursive;
 */
+
+/*色関連*/
 :root {
     /*パネルボタンのカラー*/
-    --panel-font-color: #212529;    /*文字色*/
-    --panel-bk-color: #e29676;      /*背景色*/
-    --panel-bd-color: #47266e;      /*枠線*/
-    /*割引割増ボタンの色など*/
+    --panel-font-color: #212529;        /*文字色*/
+    --panel-bk-color: #e29676;          /*背景色*/
+    --panel-bd-color: #47266e;          /*枠線*/
+    /*レジ画面・割引割増ボタンの色など*/
+    --wari-font-color:#212529;          /*文字色*/
+    --wari-bk-color:#ffce5b;            /*背景色*/
+    /*レジ画面・ジャンルバーのボタン・背景色など*/
+    --btn-updown-color:#d9e367;         /*上下ボタンの色*/
+    --btn-updown-font-color:#fff;    /*上下ボタンの文字色*/
+    --jumpbar-color:#d9e367;            /*バーの背景色*/
+    /*レジ画面・登録ボタン*/
+    --order-color:#eb6100;
+    --order-font-color:#fff;
+    /*レジ画面・フッター*/
+    --footer-color:#ffce5b;
+    /*レジ画面の釣銭・クリア・確認ボタン*/
+    --chk-color:#9acd32;
+    --chk-font-color:#fff
+}
+.header-color{
+    /*background: #ff838b; ピンク*/
+    background: #ed6d35;
+    background-image:linear-gradient(to left top, #e4007f, #ed6d35);
     
 }
+.logoff-color:before
+{
+	color: #47266e ;
+}
+
 html {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
@@ -59,12 +85,7 @@ header{
     width:100%; 
     font-size: 2.2rem;
 }
-/*レジボタン*/
-.btn--rezi{
-    height:70%;     
-    width:100%; 
-    font-size: 2.0rem;
-}
+
 
 /*ボタンの見た目*/
 .btn-view{
@@ -91,34 +112,6 @@ header{
     border-radius: 0.5rem;
     white-space: normal;  
 }
-/*割引割増ボタンの色など*/
-.btn-changeVal{
-    color: #212529;                 /*文字色*/
-    background-color: #ffce5b;      /*背景色*/
-    width:100%; 
-    font-weight: 600;
-}
-.header-color{
-    /*background: #ff838b; ピンク*/
-    background: #ed6d35;
-    background-image:linear-gradient(to left top, #e4007f, #ed6d35);
-    
-}
-.logoff-color:before
-{
-	color: #47266e ;
-}
-footer{
-    background: #ffce5b;
-}
-.btn--commit{
-    /*レジ画面の登録ボタン*/
-    color: #fff;
-    background-color: #eb6100;
-}
-.btn--chk{
-    /*レジ画面の釣銭・クリア・確認ボタン*/
-    color: #fff;
-    background-color: #9acd32;
-}
+
+
 

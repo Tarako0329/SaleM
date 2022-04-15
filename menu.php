@@ -1,11 +1,29 @@
 <!DOCTYPE html>
 <html lang="ja">
 <?php
+/*関数メモ
+check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
+
+【想定して無いページからの遷移チェック】
+csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容を返す。(POSTorGETで遷移先に渡す)
+　　　　　　　 headerでリダイレクトされた場合、COOKIEにセットされないので注意。
+
+遷移先のチェック
+csrf_chk()                              ：COOKIE・SESSION・POSTのトークンチェック。
+csrf_chk_nonsession()                   ：COOKIE・POSTのトークンチェック。
+csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェック。
+csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
+*/
+
 require "php_header.php";
 $rtn=check_session_userid($pdo_h);
 $token = csrf_create();
 $logoff=false;
-if($_GET["action"]=="logout"){
+$action="";
+if(!empty($_GET["action"])){
+    $action = $_GET["action"];
+}
+if($action=="logout"){
     setCookie("webrez_token", 'a', -1, "/", null, TRUE, TRUE); 
     session_destroy();
     session_start();
@@ -17,6 +35,7 @@ $_SESSION["URL"]="../SaleM/".MODE_DIR."/subscription.php";
 $_SESSION["PLAN_M"]=PLAN_M;
 $_SESSION["PLAN_Y"]=PLAN_Y;
 $_SESSION["SUBID"]="";
+
 //有効期限の取得
 $sql="select * from Users where uid=?";
 $stmt = $pdo_h->prepare($sql);
@@ -93,7 +112,7 @@ if($row[0]["yuukoukigen"]<>""){
         ,'売上実績'=>['UriageData.php?mode=select&csrf_token='.$token]
         ,'売上分析'=>['analysis_menu.php?csrf_token='.$token]
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]
-        ,'連携データ出力'=>['output_menu.php?csrf_token='.$token]
+        ,'会計連携'=>['output_menu.php?csrf_token='.$token]
         //,'契約・解除'=>['../../PAY/index.php?system='.$title.'&mode='.MODE_DIR]
         //,'お知らせ'=>['system_update_log.php']
     ];
