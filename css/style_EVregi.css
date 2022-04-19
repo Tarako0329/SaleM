@@ -85,11 +85,15 @@ INPUT.tanka{
     width:40%;
     padding:0;
     /*text-align:center;*/
+    -webkit-appearance: none;
+    -moz-appearance:textfield;
 }
 INPUT.su{
     /*INPUT 数量部*/
     width:20%;
     padding:0;
+    -webkit-appearance: none;
+    -moz-appearance:textfield;
 }
 
 .kaikei{
@@ -195,7 +199,6 @@ footer{
     flex-wrap:wrap;
     z-index: 99;
 }
-
 *,
 *:before,
 *:after {

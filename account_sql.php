@@ -21,7 +21,7 @@ if($_POST["BTN"] == "登　録"){
     $kigen=date('Y-m-d', strtotime('last day of next month' . date("Y-m-d")));
     
     //$sqlstr="insert into Users values(0,?,?,?,?,?,?,?,?,?,?,?,null,null,null,null,null,null,null,null,null,null,?,?,null)";
-    $sqlstr="insert into Users(uid,mail,password,question,answer,loginrez,insdate,yuukoukigen) values(0,?,?,?,?,?,?,?)";
+    $sqlstr="insert into Users(uid,mail,password,question,answer,loginrez,insdate,yuukoukigen,introducer_id) values(0,?,?,?,?,?,?,?,?)";
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $_SESSION["MAIL"], PDO::PARAM_STR);
     $stmt->bindValue(2, $_SESSION["PASS"], PDO::PARAM_STR);
@@ -30,6 +30,7 @@ if($_POST["BTN"] == "登　録"){
     $stmt->bindValue(5, $_SESSION["LOGINREZ"], PDO::PARAM_STR);
     $stmt->bindValue(6, date("Y-m-d"), PDO::PARAM_STR);
     $stmt->bindValue(7, $kigen, PDO::PARAM_STR);
+    $stmt->bindValue(8, $_SESSION["SHOUKAI"], PDO::PARAM_STR);
     /*
     $stmt->bindValue(6, $_SESSION["NAME"], PDO::PARAM_STR);
     $stmt->bindValue(7, $_SESSION["YAGOU"], PDO::PARAM_STR);

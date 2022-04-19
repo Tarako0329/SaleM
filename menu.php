@@ -113,6 +113,7 @@ if($row[0]["yuukoukigen"]<>""){
         ,'売上分析'=>['analysis_menu.php?csrf_token='.$token]
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]
         ,'会計連携'=>['output_menu.php?csrf_token='.$token]
+        ,'紹介者ID'=>['shoukai.php?csrf_token='.$token]
         //,'契約・解除'=>['../../PAY/index.php?system='.$title.'&mode='.MODE_DIR]
         //,'お知らせ'=>['system_update_log.php']
     ];

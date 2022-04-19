@@ -15,6 +15,12 @@ if($_GET["mode"]<>""){
     echo "不正アクセス";
     exit();
 }
+$shoukai="";
+if(!empty($_GET["shoukai"])){
+    $shoukai=$_GET["shoukai"];
+}elseif(!empty($_POST["shoukai"])){
+    $shoukai=$_POST["shoukai"];
+}
 
 //GETのセッションチェック
 if($mode==5 || $mode==6){
@@ -40,7 +46,15 @@ if($mode==1 || $mode==4){
 
 
 if($mode==0){
-    //新規の場合メールアドレスの重複チェック不要
+    //同一端末の前回ログイン情報をクリアする
+    //Cookie のトークンを削除
+    setCookie("webrez_token", '', -1, "/", null, TRUE, TRUE); // secure, httponly
+    //古くなったトークンを削除
+    delete_old_token($cookie_token, $pdo_h);
+    //セッション変数のクリア
+    $_SESSION = array();
+
+    //GETからメールアドレスを復元
     $_SESSION["MAIL"]=rot13decrypt($_GET["acc"]);
     $next_mode=3;
 }
@@ -99,6 +113,8 @@ if($mode==3 || $mode==4){
     $_SESSION["addr11"] = $_POST["addr11"];
     $_SESSION["ADD2"] = $_POST["ADD2"];
     $_SESSION["ADD3"] = $_POST["ADD3"];
+    $_SESSION["SHOUKAI"] = rot13decrypt(secho($shoukai))-10000;;
+    $_SESSION["MOTO_PASS"] = $_POST["PASS"];
 }
 
 $token=csrf_create();
@@ -139,10 +155,11 @@ if($mode==0 || $mode==1){
     <?php
     if($choufuku_flg==1){
         //メールアドレスの検索結果が１件以上の場合
-        echo "このメールアドレスは登録済みです。<a href='index.php'>TOP画面</a>に戻ってログインして下さい。<br>パスワードを忘れた場合は再発行してログインして下さい。<br>";
+        echo "このメールアドレスは登録済みです。<a href='index.php'>TOP画面</a>に戻ってログインして下さい。<br>パスワードを忘れた場合は<a href='forget_pass_sendurl.php'>コチラ</a>からパスワードの再設定をお願いします。<br>";
     }
     if($mode==5){
-        echo "<meta http-equiv='refresh' content=' 5; url=./menu.php'>";
+        //echo "<meta http-equiv='refresh' content=' 5; url=./menu.php'>";
+        echo "<meta http-equiv='refresh' content=' 5; url=./logincheck.php?csrf_token=".$token."'>";
         echo "情報が登録されました。<br>5秒後、メニュー画面に遷移します。";
         exit();
     }elseif($mode==6){
@@ -160,6 +177,7 @@ if($mode==0 || $mode==1){
     <?php   } ?>
         <input type="hidden" name="csrf_token" value="<?php echo $token; ?>">
         <input type="hidden" name="MODE" value=<?php echo $next_mode; ?>>
+        <input type="hidden" name="shoukai" value=<?php echo $shoukai; ?>>
         <div class="form-group">
             <label for="mail" >メールアドレス</label>
             <input type="email" maxlength="40" class="form-control" id="mail" name="MAIL" required="required" placeholder="必須" <?php if($mode>=3){echo "readonly='readonly' ";} echo "value='".secho($_SESSION["MAIL"])."'"; ?>>

@@ -2,6 +2,7 @@
 <html lang="ja">
 <?php
 require "php_header.php";
+/*
 if(isset($_GET["csrf_token"]) || empty($_POST)){
     if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。";
@@ -10,7 +11,7 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
         exit();
     }
 }
-
+*/
 if($_POST["commit_btn"] <> ""){
     if(csrf_chk()==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした";
@@ -125,18 +126,8 @@ $ZKMS = $stmt2->fetchAll();
     <p style="font-size:1rem;">  取扱商品 確認・編集 画面</p>
 </header>
 
-<body>    
-    <?php
-        //echo $_SESSION["MSG"]."<br>";
-        if($_SESSION["MSG"]!=""){
-            echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-1' class='lead'></div></div></div></div>";
-        }
-        $_SESSION["MSG"]="";
-    ?>
-    <div class="container-fluid">
+<div class='header2'>
     画面を横にすると他の項目も表示されます。<br>
-    <form method="post" id="form1" action="shouhinMSList.php">
-    <input type="hidden" name="csrf_token" value="<?php echo $csrf_create; ?>">
 
     <div class="btn-group btn-group-toggle" style="font-size:1rem;padding:0" data-toggle="buttons">
         <label class="btn btn-primary active">
@@ -147,6 +138,19 @@ $ZKMS = $stmt2->fetchAll();
         </label>
         <span style="font-size:1.5rem;">※単価変更欄に入力する金額</span>
     </div>
+</div>
+
+<body>    
+    <?php
+        //echo $_SESSION["MSG"]."<br>";
+        if($_SESSION["MSG"]!=""){
+            echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-1' class='lead'></div></div></div></div>";
+        }
+        $_SESSION["MSG"]="";
+    ?>
+    <div class="container-fluid">
+    <form method="post" id="form1" action="shouhinMSList.php">
+    <input type="hidden" name="csrf_token" value="<?php echo $csrf_create; ?>">
 
     
     <table class="table-striped">
@@ -254,9 +258,8 @@ foreach($stmt as $row){
 </body>
 
 <footer>
-    <dev class="col-1"></dev>
-    <dev class="col-2" style="padding:0;">
-        <input type="submit" value="登録" class="btn btn--chk" name="commit_btn">
+    <dev class="left1">
+        <input type="submit" value="登　録" class="btn btn--chk" style="border-radius:0;" name="commit_btn">
     </dev>
     </form>
 </footer>

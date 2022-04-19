@@ -296,7 +296,7 @@ window.onload = function() {
         // 13はEnterキーのキーコード
         if (key == 13) {
             // アクションを行わない
-            alert('test');
+            //alert('test');
             e.preventDefault();
         }
     }
@@ -337,7 +337,7 @@ window.onload = function() {
         }
     ?>
     </select>
-    <a  title="商品の並びを「カテゴリー（大⇒中⇒小⇒なし）」とローテーションで変更します。" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-regular fa-circle-question fa-lg"></i></a><a href='EVregi_sql.php?CTGL=<?php echo $next_categoly; ?>&mode=<?php echo $_GET["mode"]; ?>' style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-solid fa-arrow-rotate-right fa-lg"></i></a>
+    <a href="#" title="商品の並びを「カテゴリー（大⇒中⇒小⇒なし）」とローテーションで変更します。" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-regular fa-circle-question fa-lg"></i></a><a href='EVregi_sql.php?CTGL=<?php echo $next_categoly; ?>&mode=<?php echo $_GET["mode"]; ?>' style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-solid fa-arrow-rotate-right fa-lg"></i></a>
 </div>
 <body>
 

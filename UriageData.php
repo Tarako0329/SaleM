@@ -27,7 +27,7 @@ if($_GET["mode"]=="redirect"){
 $rtn=check_session_userid($pdo_h);
 $csrf_create = csrf_create();
 
-deb_echo("UID：".$_SESSION["user_id"]);
+//deb_echo("UID：".$_SESSION["user_id"]);
 
 $msg = "";
 
@@ -366,8 +366,8 @@ $ZEIresult = $pdo_h->query($ZEIsql);
         echo $msg;
         
     ?>
-    <table class="table-striped table-bordered">
-        <thead><tr><th>売上日</th><th>Event名</th><th>顧客名</th><th>売上№</th><th>商品</th><th style="width:3rem;">個数</th><th style="width:3rem;">単価</th><th style="width:5rem;">売上</th><th style="width:4rem;">消費税</th></tr></thead>
+    <table class="table-striped table-bordered" style='margin-top:10px'>
+        <thead><tr><th>売上日</th><th>Event名</th><th>顧客名</th><th>売上№</th><th>商品</th><th style="width:3rem;">個数</th><th style="width:3rem;">単価</th><th style="width:5rem;">売上</th><th style="width:4rem;">消費税</th><th style="width:auto;">削除</th></tr></thead>
 <?php    
 $Goukei=0;
 $GoukeiZei=0;
@@ -410,11 +410,6 @@ if($mode<>"select" && $mode<>"redirect"){
     <div class="right1">
         <button type='button' class='btn btn--chk' style="border-radius:0;" data-toggle="modal" data-target="#UriModal">検　索</button>
     </div>
-    <!--
-    <div class="right1">
-        <button type='button' class='btn btn--chk' style="border-radius:0;" data-toggle="modal" data-target="#**">出店料</button>
-    </div>
-    -->
 
 </footer>
 

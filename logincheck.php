@@ -20,13 +20,27 @@ define("PASSWORD", $_ENV["PASS"]);
 $key = $_ENV["KEY"];
 
 //パラメーター取得
-$mail_id = $_POST['LOGIN_EMAIL'];
-$password = $_POST['LOGIN_PASS'];
-$auto = $_POST['AUTOLOGIN'];
+$mail_id = "";
+$password = "";
+$auto = "";
 
-$csrf_token = $_POST['csrf_token'];
+$csrf_token = "";
 $cookie_token = $_COOKIE['webrez_token'];
 
+if(!empty($_POST)){
+    $mail_id = $_POST['LOGIN_EMAIL'];
+    $password = $_POST['LOGIN_PASS'];
+    $auto = $_POST['AUTOLOGIN'];
+    
+    $csrf_token = $_POST['csrf_token'];
+}
+if(!empty($_GET)){
+    $mail_id = $_SESSION["MAIL"];
+    $password = $_SESSION["MOTO_PASS"];
+    //$auto = $_GET['AUTOLOGIN'];
+    
+    $csrf_token = $_GET['csrf_token'];
+}
 
 //CSRF チェック
 if (empty($cookie_token) && $csrf_token != $_SESSION['csrf_token']) {
@@ -163,16 +177,6 @@ function register_token($id, $token, $pdo) {
     $stmt->execute();
 }
 
-/*
-* トークンの削除
-*/
-function delete_old_token($token, $pdo) {
-    //プレースホルダで SQL 作成
-    $sql = "DELETE FROM AUTO_LOGIN WHERE token = ?";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(1, $token, PDO::PARAM_STR);
-    $stmt->execute();
-}
 
 /*
 * ログイン画面へのリダイレクト

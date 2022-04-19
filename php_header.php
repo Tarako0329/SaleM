@@ -65,6 +65,6 @@ if(!isset($_COOKIE['machin_id'])){
 }
 define("MACHIN_ID", $machin_id);
 
-deb_echo("端末ID：".MACHIN_ID);
+//deb_echo("端末ID：".MACHIN_ID);
 
 ?>

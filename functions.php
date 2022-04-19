@@ -8,6 +8,17 @@ function get_token() {
     return bin2hex($bytes);
 }
 // =========================================================
+// トークンの削除
+// =========================================================
+function delete_old_token($token, $pdo) {
+    //プレースホルダで SQL 作成
+    $sql = "DELETE FROM AUTO_LOGIN WHERE token = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(1, $token, PDO::PARAM_STR);
+    $stmt->execute();
+}
+
+// =========================================================
 // 自動ログイン処理
 // =========================================================
 function check_auto_login($cookie_token, $pdo) {
