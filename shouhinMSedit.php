@@ -93,11 +93,11 @@ $csrf_token=csrf_create();
             <tr><td>商品名</td><td><input type="text" class="form-control" style="width:95%" id="shouhinNM" name="shouhinNM" required="required" placeholder="必須"></td></tr>
             <tr><td>単価</td><td><input type="number" onchange="zei_math()" class="form-control" style="width:95%" id="new_tanka" required="required" placeholder="必須"></td>
                 <td>
-                    <div class="btn-group btn-group-toggle" style="font-size:1rem;padding:0" data-toggle="buttons">
-                        <label class="btn btn-primary active">
+                    <div class="btn-group btn-group-toggle" style="padding:0" data-toggle="buttons">
+                        <label class="btn btn-outline-primary active" style="font-size:1.2rem">
                             <input type="radio" onchange="zei_math()" name="options" id="option1" value="zeikomi" autocomplete="off" checked> 税込み
                         </label>
-                        <label class="btn btn-primary">
+                        <label class="btn btn-outline-primary" style="font-size:1.2rem">
                             <input type="radio" onchange="zei_math()" name="options" id="option2" value="zeinuki" autocomplete="off"> 税抜き
                         </label>
                     </div>                    

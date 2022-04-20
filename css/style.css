@@ -29,7 +29,8 @@ font-family: 'Rye', cursive;
     --footer-color:#ffce5b;
     /*レジ画面の釣銭・クリア・確認ボタン*/
     --chk-color:#9acd32;
-    --chk-font-color:#fff
+    --chk-font-color:#fff;
+    --user-disp-color:#fff;
 }
 .line-green{
     color:#1dcd00;
@@ -40,7 +41,10 @@ font-family: 'Rye', cursive;
 .twitter-blue{
     color:#55acee;
 }
-
+.user_disp{
+    color:var(--user-disp-color);
+    font-weight: 400;
+}
 .header-color{
     /*background: #ff838b; ピンク*/
     background: #ed6d35;

@@ -2,7 +2,7 @@
 <html lang="ja">
 <?php
 require "php_header.php";
-/*
+
 if(isset($_GET["csrf_token"]) || empty($_POST)){
     if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。";
@@ -11,7 +11,7 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
         exit();
     }
 }
-*/
+
 if($_POST["commit_btn"] <> ""){
     if(csrf_chk()==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした";
@@ -87,7 +87,7 @@ $ZKMS = $stmt2->fetchAll();
     //共通部分、bootstrap設定、フォントCND、ファビコン等
     include "head.html" 
     ?>
-    <!--ページ専用CSS--><link rel="stylesheet" href="css/style_ShouhinMSL.css?<?php echo $time; ?>" >
+    <!--ページ専用CSS--><link rel='stylesheet' href='css/style_ShouhinMSL.css?<?php echo $time; ?>' >
     <TITLE><?php echo $title." 取扱商品 確認・編集";?></TITLE>
 </head>
 <script>
@@ -121,23 +121,26 @@ $ZKMS = $stmt2->fetchAll();
     };    
 
 </script>
-<header class="header-color" style="flex-wrap:wrap">
-    <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></div>
-    <p style="font-size:1rem;">  取扱商品 確認・編集 画面</p>
+<header class='header-color' style='flex-wrap:wrap'>
+    <div class='title' style='width: 100%;'><a href='menu.php'><?php echo $title;?></a></div>
+    <p style='font-size:1rem;'>  取扱商品 確認・編集 画面</p>
 </header>
 
 <div class='header2'>
     画面を横にすると他の項目も表示されます。<br>
 
-    <div class="btn-group btn-group-toggle" style="font-size:1rem;padding:0" data-toggle="buttons">
-        <label class="btn btn-primary active">
-            <input type="radio" name="options" id="option1" value="zeikomi" autocomplete="off" checked> 税込み
+    
+    
+
+    <div class='btn-group btn-group-toggle' style='padding:0' data-toggle='buttons'>
+        <label class='btn btn-outline-primary active' style='font-size:1.2rem'>
+            <input type='radio' name='options' id='option1' value='zeikomi' onChange='zei_math_all()' autocomplete='off' checked> 税『込』で金額変更
         </label>
-        <label class="btn btn-primary">
-            <input type="radio" name="options" id="option2" value="zeinuki" autocomplete="off"> 税抜き
+        <label class='btn btn-outline-primary' style='font-size:1.2rem'>
+            <input type='radio' name='options' id='option2' value='zeinuki' onChange='zei_math_all()' autocomplete='off'> 税『抜』で金額変更
         </label>
-        <span style="font-size:1.5rem;">※単価変更欄に入力する金額</span>
     </div>
+    
 </div>
 
 <body>    
@@ -148,17 +151,17 @@ $ZKMS = $stmt2->fetchAll();
         }
         $_SESSION["MSG"]="";
     ?>
-    <div class="container-fluid">
-    <form method="post" id="form1" action="shouhinMSList.php">
-    <input type="hidden" name="csrf_token" value="<?php echo $csrf_create; ?>">
+    <div class='container-fluid'>
+    <form method='post' id='form1' action='shouhinMSList.php'>
+    <input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
 
     
-    <table class="table-striped">
+    <table class='table-striped'>
         <thead>
             <tr>
-            <th scope="col" style='width:2rem;padding:0;'>ID</th><th scope="col" style='width:auto;padding:0px 5px 0px 0px;'>商品名</th><th scope="col">単価<br>変更</th><th scope="col">単価<br>(税抜)</th><th scope="col" >税区分</th>
-            <th scope="col">消費税</th><th scope="col" class='d-none d-sm-table-cell'>内容量</th><th scope="col" class="d-none d-sm-table-cell">単位</th><th scope="col" class="d-none d-sm-table-cell">分類1</th>
-            <th scope="col" class="d-none d-sm-table-cell">分類2</th><th scope="col" class="d-none d-sm-table-cell">分類3</th><th scope="col">レジ</th><th scope="col" class='d-none d-sm-table-cell'>並順</th><th class='d-none d-sm-table-cell' style='width:4rem;'></th>
+            <th scope='col' style='width:2rem;padding:0;'>ID</th><th scope='col' style='width:auto;padding:0px 5px 0px 0px;'>商品名</th><th scope='col'>単価<br>変更</th><th scope='col' style='color:red;'>単価<br>(税抜)</th><th scope='col' >税区分</th>
+            <th scope='col' style='color:red;'>消費税</th><th scope='col' class='d-none d-sm-table-cell'>内容量</th><th scope='col' class='d-none d-sm-table-cell'>単位</th><th scope='col' class='d-none d-sm-table-cell'>分類1</th>
+            <th scope='col' class='d-none d-sm-table-cell'>分類2</th><th scope='col' class='d-none d-sm-table-cell'>分類3</th><th scope='col'>レジ</th><th scope='col' class='d-none d-sm-table-cell'>並順</th><th class='d-none d-sm-table-cell' style='width:4rem;'></th>
             </tr>
         </thead>
         <tbody>
@@ -248,18 +251,25 @@ foreach($stmt as $row){
 
     $i = $i+1;
 }
-
+$i--;
+//JAVA SCRIPT
+echo "<script type='text/javascript' language='javascript'>\n";
+echo "  var zei_math_all=function(){\n";
+while($i>=0){
+    echo "      zei_math".$i."(new_tanka".$i.".value);\n";
+    $i--;
+}
+echo "  }\n";
+echo "</script>";
 ?>
         </tbody>
     </table>
-    
-    
     </div>
 </body>
 
 <footer>
-    <dev class="left1">
-        <input type="submit" value="登　録" class="btn btn--chk" style="border-radius:0;" name="commit_btn">
+    <dev class='left1'>
+        <input type='submit' value='登　録' class='btn btn--chk' style='border-radius:0;' name='commit_btn'>
     </dev>
     </form>
 </footer>

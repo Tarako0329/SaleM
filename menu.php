@@ -60,7 +60,13 @@ if($row[0]["yuukoukigen"]<>""){
     //echo "本契約済み";
     $_SESSION["SUBID"]=$row[0]["stripe_id"];
 }
-
+if($row[0]["yagou"]<>""){
+    $user=$row[0]["yagou"];
+}elseif($row[0]["name"]<>""){
+    $user=$row[0]["name"];
+}else{
+    $user=$row[0]["mail"];
+}
 ?>
 <head>
     <?php 
@@ -76,17 +82,18 @@ if($row[0]["yuukoukigen"]<>""){
   
 </script>
 
-<header class="header-color">
+<header class="header-color" style='display:block'>
     
     <?php
     if($logoff==false){
     ?>
-        <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div></a></div>
-        <span style="font-size:1.5rem;"><a href="menu.php?action=logout"><i class="fa-solid fa-right-from-bracket fa-lg logoff-color"></i></a></span>
+        <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div>
+        <div class='user_disp'>LogIn：<?php echo $user; ?></div>
+        <div style="position:fixed;top:0;right:0;"><a href="menu.php?action=logout"><i class="fa-solid fa-right-from-bracket fa-lg logoff-color"></i></a></div>
     <?php
     }else{
     ?>
-        <div class="yagou title"><a href="index.php"><?php echo $title;?></a></div></a></div>
+        <div class="yagou title"><a href="index.php"><?php echo $title;?></a></div>
     <?php
     }
     ?>
