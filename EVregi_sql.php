@@ -176,7 +176,7 @@ if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
                 $stmt->bindValue(4,  date("Y/m/d H:i:s"), PDO::PARAM_STR);
                 $stmt->bindValue(5,  $_POST["EV"], PDO::PARAM_INT);
                 $stmt->bindValue(6,  $_POST["KOKYAKU"], PDO::PARAM_STR);
-                $stmt->bindValue(7,  9999, PDO::PARAM_INT);                             //商品CD
+                $stmt->bindValue(7,  9998, PDO::PARAM_INT);                             //商品CD
                 $stmt->bindValue(8,  rot13encrypt("割引・割増:端数"), PDO::PARAM_STR);  //商品名
                 $stmt->bindValue(9,  0, PDO::PARAM_INT);                                //数量
                 $stmt->bindValue(10, 0, PDO::PARAM_INT);                                //内数
