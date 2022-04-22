@@ -152,8 +152,8 @@ function get_top($id, $pdo){
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($row['loginrez'] == "on") {
-        return "EVregi.php?csrf_token=".csrf_create();
-        //return "EVregi.php";
+        return "EVregi.php?mode=evrez&csrf_token=".csrf_create();
+        //return "EVregi.php"; EVregi.php?mode=evrez&csrf_token='.$token
     }else{
         return "menu.php";
     }
