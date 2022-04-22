@@ -1,6 +1,5 @@
 <?php
 require "php_header.php";
-$token = csrf_create();
 
 $rtn=check_session_userid($pdo_h);
 
@@ -26,6 +25,9 @@ if($_GET["CTGL"]<>""){
     $stmt->bindValue(4, "CTGL", PDO::PARAM_STR);
     $stmt->bindValue(5, $_GET["CTGL"], PDO::PARAM_STR);
     $stmt->execute();
+    
+    $token = csrf_create();
+
     $_SESSION["msg"]="カテゴリーを変更しました。";
     header("HTTP/1.1 301 Moved Permanently");
     header("Location: EVregi.php?status=success&mode=".$_GET["mode"]."&csrf_token=".$token);
@@ -37,13 +39,15 @@ $_SESSION["msg"]="登録処理が実行されませんでした。";
 $emsg="";
 
 //売上登録
-if($_POST["commit_btn"] <> ""){
+if($_POST["commit_btn"] == "uriage_commit"){
     if(csrf_chk_nonsession()==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。";
         header("HTTP/1.1 301 Moved Permanently");
         header("Location: index.php");
         exit();
     }
+    $token = csrf_create();
+
     $array = $_POST["ORDERS"];
     $sqlstr = "";
 
@@ -68,7 +72,7 @@ if($_POST["commit_btn"] <> ""){
             if($row["SU"]==0){
                 continue;
             }
-            $sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)";
+            $sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime,genka_tanka) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)";
             $stmt = $pdo_h->prepare($sqlstr);
     
             $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
@@ -86,6 +90,7 @@ if($_POST["commit_btn"] <> ""){
             $stmt->bindValue(12, ($row["SU"] * $row["TANKA"]), PDO::PARAM_INT);     //数量×単価
             $stmt->bindValue(13, ($row["SU"] * $row["ZEI"]), PDO::PARAM_INT);       //数量×単価税
             $stmt->bindValue(14, $row["ZEIKBN"], PDO::PARAM_INT);                   //税区分
+            $stmt->bindValue(15, $row["GENKA_TANKA"], PDO::PARAM_INT);              //原価単価
             
             $flg=$stmt->execute();
             
@@ -217,8 +222,11 @@ if($_POST["commit_btn"] <> ""){
         $stmt = null;
         $pdo_h = null;        
     }
+}else if($_POST["commit_btn"] == "shuppin_zaiko_commit"){//在庫登録
+  //  
+}else if($_POST["commit_btn"] == "stock_zaiko_commit"){//在庫登録
+  //  
 }
-
 if($E_Flg==1){
     $_SESSION["msg"]= "登録が失敗しました。再度実行してもエラーとなる場合は、ご迷惑をおかけしますが復旧までお待ちください。エラーは管理者へ自動通知されました。";
     $emsg = $emsg."/UriNO::".$UriageNO."　uid::".$_SESSION['user_id'];

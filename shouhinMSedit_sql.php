@@ -46,7 +46,7 @@ if($_POST["btn"] == "登録"){
     $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $new_shouhinCD = $row[0]["MCD"]+1;
 
-    $sqlstr="insert into ShouhinMS values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    $sqlstr="insert into ShouhinMS values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
     $stmt->bindValue(2, $new_shouhinCD, PDO::PARAM_INT);
@@ -57,13 +57,14 @@ if($_POST["btn"] == "登録"){
     $stmt->bindValue(7, $zeikbn, PDO::PARAM_INT);
     $stmt->bindValue(8, $_POST["utisu"], PDO::PARAM_INT);
     $stmt->bindValue(9, $_POST["tani"], PDO::PARAM_STR);
-    $stmt->bindValue(10,$_POST["bunrui1"], PDO::PARAM_STR);
-    $stmt->bindValue(11, $_POST["bunrui2"], PDO::PARAM_STR);
-    $stmt->bindValue(12, $_POST["bunrui3"], PDO::PARAM_STR);
-    $stmt->bindValue(13, $_POST["hyoujiKBN1"], PDO::PARAM_STR);
-    $stmt->bindValue(14, $_POST["hyoujiKBN2"], PDO::PARAM_STR);
-    $stmt->bindValue(15, $_POST["hyoujiKBN3"], PDO::PARAM_STR);
-    $stmt->bindValue(16, $_POST["hyoujiNO"], PDO::PARAM_INT);
+    $stmt->bindValue(10, $_POST["genka"], PDO::PARAM_INT);
+    $stmt->bindValue(11,$_POST["bunrui1"], PDO::PARAM_STR);
+    $stmt->bindValue(12, $_POST["bunrui2"], PDO::PARAM_STR);
+    $stmt->bindValue(13, $_POST["bunrui3"], PDO::PARAM_STR);
+    $stmt->bindValue(14, $_POST["hyoujiKBN1"], PDO::PARAM_STR);
+    $stmt->bindValue(15, $_POST["hyoujiKBN2"], PDO::PARAM_STR);
+    $stmt->bindValue(16, $_POST["hyoujiKBN3"], PDO::PARAM_STR);
+    $stmt->bindValue(17, $_POST["hyoujiNO"], PDO::PARAM_INT);
     
     $status=$stmt->execute();
     if($status==true){

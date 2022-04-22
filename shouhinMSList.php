@@ -30,7 +30,7 @@ if($_POST["commit_btn"] <> ""){
         $stmt->execute();
         $row3 = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $sqlstr = "update ShouhinMS set tanka=?,tanka_zei=?,zeiritu=?,zeikbn=?,tani=?,bunrui1=?,bunrui2=?,bunrui3=?,hyoujiKBN1=?,hyoujiNO=? where shouhinCD=? and uid=?";
+        $sqlstr = "update ShouhinMS set tanka=?,tanka_zei=?,zeiritu=?,zeikbn=?,tani=?,bunrui1=?,bunrui2=?,bunrui3=?,hyoujiKBN1=?,hyoujiNO=?,genka_tanka=? where shouhinCD=? and uid=?";
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $row["tanka"], PDO::PARAM_INT);
         $stmt->bindValue(2, $row["shouhizei"], PDO::PARAM_INT);
@@ -42,8 +42,9 @@ if($_POST["commit_btn"] <> ""){
         $stmt->bindValue(8, $row["bunrui3"], PDO::PARAM_STR);
         $stmt->bindValue(9, $row["hyoujiKBN1"], PDO::PARAM_STR);
         $stmt->bindValue(10,$row["hyoujiNO"], PDO::PARAM_INT);
-        $stmt->bindValue(11,$row["shouhinCD"], PDO::PARAM_INT);
-        $stmt->bindValue(12,$_SESSION['user_id'], PDO::PARAM_INT);
+        $stmt->bindValue(11,$row["genka"], PDO::PARAM_INT);
+        $stmt->bindValue(12,$row["shouhinCD"], PDO::PARAM_INT);
+        $stmt->bindValue(13,$_SESSION['user_id'], PDO::PARAM_INT);
         
         $status=$stmt->execute();
         
@@ -160,7 +161,7 @@ $ZKMS = $stmt2->fetchAll();
         <thead>
             <tr>
             <th scope='col' style='width:2rem;padding:0;'>ID</th><th scope='col' style='width:auto;padding:0px 5px 0px 0px;'>商品名</th><th scope='col'>単価<br>変更</th><th scope='col' style='color:red;'>単価<br>(税抜)</th><th scope='col' >税区分</th>
-            <th scope='col' style='color:red;'>消費税</th><th scope='col' class='d-none d-sm-table-cell'>内容量</th><th scope='col' class='d-none d-sm-table-cell'>単位</th><th scope='col' class='d-none d-sm-table-cell'>分類1</th>
+            <th scope='col' style='color:red;'>消費税</th><th scope='col'>想定原価</th><th scope='col' class='d-none d-sm-table-cell'>内容量</th><th scope='col' class='d-none d-sm-table-cell'>単位</th><th scope='col' class='d-none d-sm-table-cell'>分類1</th>
             <th scope='col' class='d-none d-sm-table-cell'>分類2</th><th scope='col' class='d-none d-sm-table-cell'>分類3</th><th scope='col'>レジ</th><th scope='col' class='d-none d-sm-table-cell'>並順</th><th class='d-none d-sm-table-cell' style='width:4rem;'></th>
             </tr>
         </thead>
@@ -184,7 +185,8 @@ foreach($stmt as $row){
             }
         }
     echo "</select>";
-    echo "<td><input type='number' readonly='readonly'  id ='ORDERS[".$i."][shouhizei]' name ='ORDERS[".$i."][shouhizei]' style='width:6rem;background-color:#a3a3a3;' value='".$row["tanka_zei"]."'></td>";
+    echo "<td><input type='number' readonly='readonly' id ='ORDERS[".$i."][shouhizei]' name ='ORDERS[".$i."][shouhizei]' style='width:6rem;background-color:#a3a3a3;' value='".$row["tanka_zei"]."'></td>";
+    echo "<td><input type='number' name ='ORDERS[".$i."][genka]' style='width:6rem;' value='".$row["genka_tanka"]."'></td>";
     echo "<td class='d-none d-sm-table-cell'><input type='number' name ='ORDERS[".$i."][utisu]' style='width:6rem;' value='".$row["utisu"]."'></td>";
     echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][tani]' style='width:3rem;' value='".$row["tani"]."'></td>";
     echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][bunrui1]' style='width:6rem;' value='".$row["bunrui1"]."'></td>";

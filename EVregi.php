@@ -120,7 +120,12 @@ if($categoly==0){
 }
     
 //商品M取得
-$sql = "select *,".$sql_select." from ShouhinMS where hyoujiKBN1='on' and uid = ? ".$sqlorder;
+if(!empty($_GET["mode"])){
+    //イベントレジモード以外はすべて表示する
+    $sql = "select *,".$sql_select." from ShouhinMS where uid = ? ".$sqlorder;
+}else{
+    $sql = "select *,".$sql_select." from ShouhinMS where hyoujiKBN1='on' and uid = ? ".$sqlorder;
+}
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
@@ -307,7 +312,7 @@ window.onload = function() {
 
 <form method = "post" id="form1" action="EVregi_sql.php">
     <input type="hidden" name="csrf_token" value='<?php echo $token;?>'>
-    <input type="hidden" name="mode" value='<?php echo $_GET["mode"];?>'> <!--レジor個別売上-->
+    <input type="hidden" name="mode" value='<?php echo $_GET["mode"];?>'> <!--レジor個別売上or在庫登録-->
     
 <header class="header-color" style='display:block'>
     <div class="title yagou"><a href="menu.php"><?php echo $title;?></a></div>
@@ -401,6 +406,7 @@ window.onload = function() {
         echo "      <input type='hidden' name ='ORDERS[".$i."][UTISU]' value = '".$row["utisu"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][ZEIKBN]' value = '".$row["zeiKBN"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][TANKA]' value = '".$row["tanka"]."'>\n";
+        echo "      <input type='hidden' name ='ORDERS[".$i."][GENKA_TANKA]' value = '".$row["genka_tanka"]."'>\n";
         echo "      </button>\n";
         echo "      <div class ='ordered'>\n";
         echo "          ￥<input type='number' readonly='readonly' class='order tanka' value=".($row["tanka"] + $row["tanka_zei"]).">\n";
@@ -449,7 +455,7 @@ window.onload = function() {
         <button type='button' class='btn btn--chk' style="display:none;border:solid;border-top:none;border-bottom:none;border-color:#fff;border-radius: 0;" id='order_return'>戻　る</button>
     </div>
     <div class="right2">
-        <button type='submit' class='btn btn--commit' style='display:none;border-radius:0;' id='btn_commit' name='commit_btn' value="commit">登　録</button>
+        <button type='submit' class='btn btn--commit' style='display:none;border-radius:0;' id='btn_commit' name='commit_btn' value="uriage_commit">登　録</button>
         <button type='button' class='btn btn--chk' style="border-radius:0;" id='order_chk'>確　認</button>
     </div>
 </footer>

@@ -113,12 +113,19 @@ $csrf_token=csrf_create();
                     ?>
                     </select>
                 </td></tr>
-            <tr><td>税抜単価</td><td><input type="number" readonly='readonly' class="form-control" style="width:95%" id="tanka" name="tanka" ></td>
+            <tr><td>税抜単価</td><td><input type="number" readonly='readonly' class="form-control" style="width:95%" id="tanka" name="tanka" ></td></tr>
             <tr><td>消費税</td><td><input type="number" readonly='readonly' class="form-control" style="width:95%" id="shouhizei" name="shouhizei" ></td></tr>
             <tr><td>税込単価</td>
                 <td>
                     <input type="number" readonly='readonly' class="form-control" style="width:95%;border:none;" id="zkomitanka" aria-describedby="zkomitankaHelp">
                     <small id="zkomitankaHelp" class="form-text text-muted">レジ画面に表示される金額は税込価格です。</small>
+                </td>
+            </tr>
+            <tr>
+                <td>想定原価単価</td>
+                <td>
+                    <input type="number" class="form-control" style="width:95%" id="genka" name="genka" aria-describedby="genka">
+                    <small id="genka" class="form-text text-muted">おおよその原材料費</small>
                 </td>
             </tr>
             <tr><td>内容量</td><td><input type="number" class="form-control" style="width:95%" id="utisu" name="utisu" placeholder="1箱12個入りの場合「12」等"></td></tr>
