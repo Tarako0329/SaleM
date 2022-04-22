@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang='ja'>
 <?php
 /*関数メモ
 check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
@@ -54,7 +54,7 @@ if(!empty($_SESSION["msg"])){
 //セッション->クッキー->DB
 if($_SESSION["EV"] != "" ){
     $event = $_SESSION["EV"];
-    deb_echo("session");
+    //deb_echo("session");
 }else{
     $sql = "select value from PageDefVal where uid=? and machin=? and page=? and item=?";
     $stmt = $pdo_h->prepare($sql);
@@ -66,7 +66,7 @@ if($_SESSION["EV"] != "" ){
 
     if($stmt->rowCount()==0){
         $event = "";
-        deb_echo("NULL");
+        //deb_echo("NULL");
     }else{
         $buf = $stmt->fetch();
         $_SESSION["EV"] = $buf["value"];
@@ -90,12 +90,12 @@ if($_SESSION["CTGL"] != "" ){
 
     if($stmt->rowCount()==0){
         $categoly = 0;
-        deb_echo("NULL");
+        //deb_echo("NULL");
     }else{
         $buf = $stmt->fetch();
         $_SESSION["CTGL"] = $buf["value"];
         $categoly = $buf["value"];
-        deb_echo("DB".$event);
+        //deb_echo("DB".$event);
     } 
 }
 $next_categoly=$categoly+1;
@@ -120,7 +120,7 @@ if($categoly==0){
 }
     
 //商品M取得
-if(!empty($_GET["mode"])){
+if($_GET["mode"]=="shuppin_zaiko"){
     //イベントレジモード以外はすべて表示する
     $sql = "select *,".$sql_select." from ShouhinMS where uid = ? ".$sqlorder;
 }else{
@@ -205,7 +205,9 @@ window.onload = function() {
         dentaku.style.display = 'block';
         order_return.style.display = 'block';
         order_clear.style.display = 'none';
-        CHOUSEI_AREA.style.display = 'block';
+        <?php
+            if($_GET["mode"]<>"shuppin_zaiko"){ echo "CHOUSEI_AREA.style.display = 'block';\n";} //在庫登録モードでは割引ボタンを表示しない
+        ?>
         total_pay_bk = total_pay; //調整前金額を保存
     };
     
@@ -316,7 +318,7 @@ window.onload = function() {
     
 <header class="header-color" style='display:block'>
     <div class="title yagou"><a href="menu.php"><?php echo $title;?></a></div>
-    売上日：<input type='date' class='date' style='height:20%' name='KEIJOUBI' value='<?php echo (string)date("Y-m-d") ?>'>
+    <?php if($_GET["mode"]=="shuppin_zaiko"){echo "出店日：";}else{echo "売上日：";}?><input type='date' class='date' style='height:20%' name='KEIJOUBI' required="required" value='<?php if($_GET["mode"]<>"shuppin_zaiko"){echo (string)date("Y-m-d");} ?>'>
     <?php
     if($_GET["mode"]=="kobetu"){
     ?>
@@ -444,39 +446,39 @@ window.onload = function() {
 </body>
 
 <footer>
-    <div class="kaikei">
-        <span style="font-size:1.6rem;">お会計</span> ￥<span id="kaikei">0</span>- <span style="font-size:1.6rem;">内税</span>(<span id="utizei">0</span>)
+    <div class='kaikei'>
+        <span style='font-size:1.6rem;'>お会計</span> ￥<span id='kaikei'>0</span>- <span style='font-size:1.6rem;'>内税</span>(<span id='utizei'>0</span>)
     </div>
-    <div class="right1">
-        <button type='button' class='btn btn--chk' style="border-radius:0;" id='dentaku' data-toggle="modal" data-target="#FcModal">釣　銭</button>
+    <div class='right1'>
+        <button type='button' class='btn btn--chk' style='border-radius:0;' id='dentaku' data-toggle='modal' data-target='#FcModal'><?php if($_GET["mode"]<>"shuppin_zaiko"){echo "釣　銭";} ?></button>
     </div>
-    <div class="right3">
-        <button type='button' class='btn btn--chk' style="border:solid;border-top:none;border-bottom:none;border-color:#fff;border-radius: 0;" id='order_clear'>クリア</button>
-        <button type='button' class='btn btn--chk' style="display:none;border:solid;border-top:none;border-bottom:none;border-color:#fff;border-radius: 0;" id='order_return'>戻　る</button>
+    <div class='right3'>
+        <button type='button' class='btn btn--chk' style='border:solid;border-top:none;border-bottom:none;border-color:#fff;border-radius: 0;' id='order_clear'>クリア</button>
+        <button type='button' class='btn btn--chk' style='display:none;border:solid;border-top:none;border-bottom:none;border-color:#fff;border-radius: 0;' id='order_return'>戻　る</button>
     </div>
-    <div class="right2">
-        <button type='submit' class='btn btn--commit' style='display:none;border-radius:0;' id='btn_commit' name='commit_btn' value="uriage_commit">登　録</button>
-        <button type='button' class='btn btn--chk' style="border-radius:0;" id='order_chk'>確　認</button>
+    <div class='right2'>
+        <button type='submit' class='btn btn--commit' style='display:none;border-radius:0;' id='btn_commit' name='commit_btn' value='uriage_commit'>登　録</button>
+        <button type='button' class='btn btn--chk' style='border-radius:0;' id='order_chk'>確　認</button>
     </div>
 </footer>
 
 <!--モーダル電卓-->
-<div class="modal fade" id="FcModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
-    <div class="modal-dialog  modal-dialog-centered">
-        <div class="modal-content" style="font-size: 3.0rem; font-weight: 800;">
-            <div class="modal-header">
-                <!--<div class="modal-title" id="myModalLabel">電　卓</div>-->
+<div class='modal fade' id='FcModal' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
+    <div class='modal-dialog  modal-dialog-centered'>
+        <div class='modal-content' style='font-size: 3.0rem; font-weight: 800;'>
+            <div class='modal-header'>
+                <!--<div class='modal-title' id='myModalLabel'>電　卓</div>-->
             </div>
-            <div class="modal-body">
+            <div class='modal-body'>
                 <label>お預り</label><br>
-                <input type="number" id="azukari"><br>
-                <p>お会計：￥<span id="seikyuu">0</span></p>
-                <button type="button" id="keisan">計　算</button>
-                <p>お釣り：￥<span id="oturi">0</span></p>    
+                <input type='number' id='azukari'><br>
+                <p>お会計：￥<span id='seikyuu'>0</span></p>
+                <button type='button' id='keisan'>計　算</button>
+                <p>お釣り：￥<span id='oturi'>0</span></p>    
             </div>
-            <div class="modal-footer">
-                <!--<button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>-->
-                <button type="button"  data-dismiss="modal">閉じる</button>
+            <div class='modal-footer'>
+                <!--<button type='button' class='btn btn-default' data-dismiss='modal'>閉じる</button>-->
+                <button type='button'  data-dismiss='modal'>閉じる</button>
             </div>
         </div>
     </div>
