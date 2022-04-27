@@ -25,7 +25,10 @@ $password = "";
 $auto = "";
 
 $csrf_token = "";
-$cookie_token = $_COOKIE['webrez_token'];
+$cookie_token="";
+if(!empty($_COOKIE['webrez_token'])){
+    $cookie_token = $_COOKIE['webrez_token'];
+}
 
 if(!empty($_POST)){
     $mail_id = $_POST['LOGIN_EMAIL'];

@@ -56,10 +56,10 @@ $key = $_ENV["KEY"];
 $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
 
-//端末IDを発行し、１ヶ月の有効期限でCookieにセット
+//端末IDを発行し、１年の有効期限でCookieにセット
 if(!isset($_COOKIE['machin_id'])){
     $machin_id = getGUID();
-    setCookie("machin_id", $machin_id, time()+60*60*24*30, "/", null, TRUE, TRUE); 
+    setCookie("machin_id", $machin_id, time()+60*60*24*365, "/", null, TRUE, TRUE); 
 }else{
     $machin_id = $_COOKIE['machin_id'];
 }
@@ -67,4 +67,27 @@ define("MACHIN_ID", $machin_id);
 
 //deb_echo("端末ID：".MACHIN_ID);
 
+$rtn=check_session_userid($pdo_h);
+
+$sql = "select value from PageDefVal where uid=? and machin=? and page=? and item=?";
+$stmt = $pdo_h->prepare($sql);
+$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+$stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
+$stmt->bindValue(3, "menu.php", PDO::PARAM_STR);
+$stmt->bindValue(4, "COLOR", PDO::PARAM_STR);//name属性を指定
+$stmt->execute();
+
+if($stmt->rowCount()==0){
+    $color_No = 0;
+    //deb_echo("NULL");
+}else{
+    $buf = $stmt->fetch();
+    $color_No = $buf["value"];
+    //deb_echo("COLOR".$color_No);
+} 
+
 ?>
+
+
+
+

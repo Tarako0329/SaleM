@@ -86,7 +86,7 @@ if($_POST["sum_tani"]==1){//日ごと
     $aryColumn = ["Event/店舗","平均来客数"];
 }
 
-$sqlstr = $sqlstr." where ShouhinCD<>9999 and DATE_FORMAT(UriDate, '%Y%m') between :ymfrom and :ymto AND uid = :user_id ";
+$sqlstr = $sqlstr." where ShouhinCD<9900 and DATE_FORMAT(UriDate, '%Y%m') between :ymfrom and :ymto AND uid = :user_id ";
 $sqlstr = $sqlstr." AND (Event like :event OR TokuisakiNM like :tokui )";
 $sqlstr = $sqlstr." ".$gp_sqlstr;
 

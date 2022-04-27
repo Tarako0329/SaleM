@@ -50,9 +50,15 @@ footer{
     width: 100%;
     z-index: 99;
     background:#fff;
+    display:flex;
+}
+.th1{
+    position: sticky;
+    top:120px;
+    background:#fff;
 }
 th{
     position: sticky;
-    top:120px;
+    top:145px;
     background:#fff;
 }

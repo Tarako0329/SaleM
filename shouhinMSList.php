@@ -2,7 +2,7 @@
 <html lang="ja">
 <?php
 require "php_header.php";
-
+/*
 if(isset($_GET["csrf_token"]) || empty($_POST)){
     if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。";
@@ -11,7 +11,7 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
         exit();
     }
 }
-
+*/
 if($_POST["commit_btn"] <> ""){
     if(csrf_chk()==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした";
@@ -128,11 +128,8 @@ $ZKMS = $stmt2->fetchAll();
 </header>
 
 <div class='header2'>
+    <div>
     画面を横にすると他の項目も表示されます。<br>
-
-    
-    
-
     <div class='btn-group btn-group-toggle' style='padding:0' data-toggle='buttons'>
         <label class='btn btn-outline-primary active' style='font-size:1.2rem'>
             <input type='radio' name='options' id='option1' value='zeikomi' onChange='zei_math_all()' autocomplete='off' checked> 税『込』で金額変更
@@ -141,7 +138,10 @@ $ZKMS = $stmt2->fetchAll();
             <input type='radio' name='options' id='option2' value='zeinuki' onChange='zei_math_all()' autocomplete='off'> 税『抜』で金額変更
         </label>
     </div>
-    
+    </div>
+    <div>
+        <button id='hyouji' style='position:fixed;top:75px;right:0' >all⇒checked</button>
+    </div>
 </div>
 
 <body>    
@@ -159,11 +159,16 @@ $ZKMS = $stmt2->fetchAll();
     
     <table class='table-striped'>
         <thead>
-            <tr>
-            <th scope='col' style='width:2rem;padding:0;'>ID</th><th scope='col' style='width:auto;padding:0px 5px 0px 0px;'>商品名</th><th scope='col'>単価<br>変更</th><th scope='col' style='color:red;'>単価<br>(税抜)</th><th scope='col' >税区分</th>
-            <th scope='col' style='color:red;'>消費税</th><th scope='col'>想定原価</th><th scope='col' class='d-none d-sm-table-cell'>内容量</th><th scope='col' class='d-none d-sm-table-cell'>単位</th><th scope='col' class='d-none d-sm-table-cell'>分類1</th>
+            <tr style='height:30px;'>
+                <th class='th1' scope='col' colspan='12' style='width:auto;padding:0px 5px 0px 0px;'>ID:商品名</th><th scope='col'>
+            </tr>
+            <tr style='height:30px;'>
+            <!--<th scope='col' style='width:2rem;padding:0;'>ID</th><th scope='col' style='width:auto;padding:0px 5px 0px 0px;'>商品名</th><th scope='col'>単価<br>変更</th><th scope='col' style='color:red;'>単価<br>(税抜)</th><th scope='col' >税区分</th>-->
+            <th scope='col'>単価変更</th><th scope='col' style='color:red;'>単価(税抜)</th><th scope='col' >税区分</th>
+            <th scope='col' style='color:red;'>消費税</th><th scope='col'>原価</th><th scope='col' class='d-none d-sm-table-cell'>内容量</th><th scope='col' class='d-none d-sm-table-cell'>単位</th><th scope='col' class='d-none d-sm-table-cell'>分類1</th>
             <th scope='col' class='d-none d-sm-table-cell'>分類2</th><th scope='col' class='d-none d-sm-table-cell'>分類3</th><th scope='col'>レジ</th><th scope='col' class='d-none d-sm-table-cell'>並順</th><th class='d-none d-sm-table-cell' style='width:4rem;'></th>
             </tr>
+            
         </thead>
         <tbody>
 <?php    
@@ -171,12 +176,13 @@ $i=0;
 foreach($stmt as $row){
     $chk="";
     if($row["hyoujiKBN1"]=="on"){$chk="checked";}
-    echo "<tr>\n";
-    echo "<td>".$row["shouhinCD"]."</td>";  //商品ＣＤ
-    echo "<td>".rot13decrypt($row["shouhinNM"])."</td>";    //商品名
-    echo "<td><input type='number' style='width:6rem;' id='new_tanka".$i."' onBlur='zei_math".$i."(this.value)' ></td>";   //単価修正欄
-    echo "<td><input type='number' readonly='readonly' id ='ORDERS[".$i."][tanka]' name ='ORDERS[".$i."][tanka]' style='width:6rem;background-color:#a3a3a3;' value='".$row["tanka"]."'></td>"; //登録単価
-    echo "<td><select id ='ORDERS[".$i."][zeikbn]' onchange='zei_math".$i."(new_tanka".$i.".value)' name ='ORDERS[".$i."][zeikbn]' style='width:7rem;height:30px;'>";     //税区分
+    echo "<tr id='tr1_".$i."'>\n";
+    echo "<td style='font-size:1.7rem;font-weight:700;' colspan='12'>".$row["shouhinCD"]."：".rot13decrypt($row["shouhinNM"])."</td>";    //商品名
+    echo "</tr>\n";
+    echo "<tr id='tr2_".$i."'>\n";
+    echo "<td><input type='number' style='width:8rem;' id='new_tanka".$i."' onBlur='zei_math".$i."(this.value)' placeholder='新価格のみ' ></td>";   //単価修正欄
+    echo "<td><input type='number' readonly='readonly' id ='ORDERS[".$i."][tanka]' name ='ORDERS[".$i."][tanka]' style='width:7rem;background-color:#a3a3a3;' value='".$row["tanka"]."'></td>"; //登録単価
+    echo "<td><select id ='ORDERS[".$i."][zeikbn]' onchange='zei_math".$i."(new_tanka".$i.".value)' name ='ORDERS[".$i."][zeikbn]' style='width:8rem;height:30px;'>";     //税区分
         foreach($ZKMS as $row2){
             if($row["zeiKBN"]==$row2["zeiKBN"]){
                 echo "<option value='".$row2["zeiKBN"]."' selected>".$row2["hyoujimei"]."</option>\n";
@@ -192,7 +198,7 @@ foreach($stmt as $row){
     echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][bunrui1]' style='width:6rem;' value='".$row["bunrui1"]."'></td>";
     echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][bunrui2]' style='width:6rem;' value='".$row["bunrui2"]."'></td>";
     echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][bunrui3]' style='width:6rem;' value='".$row["bunrui3"]."'></td>";
-    echo "<td><input type='checkbox' name ='ORDERS[".$i."][hyoujiKBN1]' style='width:4rem;' ".$chk."></td>";
+    echo "<td><input type='checkbox' id='chk_".$i."' name ='ORDERS[".$i."][hyoujiKBN1]' style='width:4rem;' ".$chk."></td>";
 //    echo "<td class='d-none d-sm-table-cell'><input type='number'   name ='ORDERS[".$i."][hyoujiKBN2]' style='width:4rem;' value='".$row["hyoujiKBN2"]."'></td>";
 //    echo "<td class='d-none d-sm-table-cell'><input type='number'   name ='ORDERS[".$i."][hyoujiKBN3]' style='width:4rem;' value='".$row["hyoujiKBN3"]."'></td>";
     echo "<td class='d-none d-sm-table-cell'><input type='number' name ='ORDERS[".$i."][hyoujiNO]' style='width:4rem;' value='".$row["hyoujiNO"]."'></td>"; //並び順
@@ -254,6 +260,8 @@ foreach($stmt as $row){
     $i = $i+1;
 }
 $i--;
+$kensu=$i;
+
 //JAVA SCRIPT
 echo "<script type='text/javascript' language='javascript'>\n";
 echo "  var zei_math_all=function(){\n";
@@ -262,6 +270,49 @@ while($i>=0){
     $i--;
 }
 echo "  }\n";
+
+$i=$kensu;
+echo "  var hyouji = document.getElementById('hyouji');\n";
+echo "  var disp;\n";
+echo "  var tr1;\n";
+echo "  var tr2;\n";
+echo "  hyouji.onclick=function(){\n";
+echo "      switch(hyouji.innerHTML){\n";
+echo "      case 'all⇒checked':\n"; //全件->チェックのみ
+echo "          check='table-row';\n";
+echo "          nocheck='none';\n";
+echo "          hyouji.innerHTML='checked⇒no-checked';\n";
+echo "          break;\n";
+echo "      case 'checked⇒no-checked':\n";//チェックのみ->未チェックのみ
+echo "          check='none';\n";
+echo "          nocheck='table-row';\n";
+echo "          hyouji.innerHTML='no-checked⇒all';\n";
+echo "          break;\n";
+echo "      case 'no-checked⇒all':\n";//未チェックのみ->全件
+echo "          check='table-row';\n";
+echo "          nocheck='table-row';\n";
+echo "          hyouji.innerHTML='all⇒checked';\n";
+echo "          break;\n";
+echo "      }\n";
+
+
+while($i>=0){
+    echo "      disp".$i." = document.getElementById('chk_".$i."');\n";
+    echo "          tr1".$i." = document.getElementById('tr1_".$i."');\n";
+    echo "          tr2".$i." = document.getElementById('tr2_".$i."');\n";
+    //echo "alert(disp".$i.".value + ':' + '".$i."');";
+    echo "      if(disp".$i.".checked === true){\n";
+    echo "          tr1".$i.".style.display=check;\n";
+    echo "          tr2".$i.".style.display=check;\n";
+    echo "      }else{\n";
+    echo "          tr1".$i.".style.display=nocheck;\n";
+    echo "          tr2".$i.".style.display=nocheck;\n";
+    echo "      }\n";
+    $i--;
+}
+
+echo "  };\n";
+
 echo "</script>";
 ?>
         </tbody>

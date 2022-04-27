@@ -367,13 +367,13 @@ $ZEIresult = $pdo_h->query($ZEIsql);
         
     ?>
     <table class="table-striped table-bordered" style='margin-top:10px'>
-        <thead><tr><th>売上日</th><th>Event名</th><th>顧客名</th><th>売上№</th><th>商品</th><th style="width:3rem;">個数</th><th style="width:3rem;">単価</th><th style="width:5rem;">売上</th><th style="width:4rem;">消費税</th><th style="width:auto;">削除</th></tr></thead>
+        <thead><tr><th scope='col'>売上日</th><th scope='col'>Event/顧客</th><th scope='col' class='d-none d-sm-table-cell'>売上№</th><th>商品</th><th scope='col' style="width:3rem;">個数</th><th scope='col' style="width:3rem;" class='d-none d-sm-table-cell'>単価</th><th scope='col' style="width:5rem;">売上</th><th scope='col' style="width:4rem;">消費税</th><th scope='col' style="width:auto;">削除</th></tr></thead>
 <?php    
 $Goukei=0;
 $GoukeiZei=0;
 $GoukeiZeikomi=0;
 foreach($result as $row){
-    echo "<tr><td>".$row["UriDate"]."</td><td>".$row["Event"]."</td><td>".$row["TokuisakiNM"]."</td><td class='text-center'>".$row["UriageNO"]."</td><td>".rot13decrypt($row["ShouhinNM"])."</td><td class='text-right'>".$row["su"]."</td><td class='text-right'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td><td class='text-right'>".$row["zei"]."</td><td style='width:4rem;text-align:center;'>";
+    echo "<tr><td>".$row["UriDate"]."</td><td>".$row["Event"].$row["TokuisakiNM"]."</td><td class='text-center d-none d-sm-table-cell'>".$row["UriageNO"]."</td><td>".rot13decrypt($row["ShouhinNM"])."</td><td class='text-right'>".$row["su"]."</td><td class='text-right d-none d-sm-table-cell'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td><td class='text-right'>".$row["zei"]."</td><td style='width:4rem;text-align:center;'>";
     if(($_POST["Type"]=="rireki" || $_POST["Type"]=="") && ($mode == "select" || $mode=="redirect")){
         //履歴表示の時だけ削除可能
         echo "<a href='UriageData.php?cd=".$row["ShouhinCD"]."&urino=".$row["UriageNO"]."&csrf_token=".$csrf_create."&mode=del'><i class='fa-regular fa-trash-can'></i></a>";

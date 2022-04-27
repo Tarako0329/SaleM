@@ -16,10 +16,12 @@ csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェ�
 */
 
 require "php_header.php";
-$rtn=check_session_userid($pdo_h);
+//$rtn=check_session_userid($pdo_h);
 $token = csrf_create();
 $logoff=false;
 $action="";
+//$color_No=0;
+$Max_color_No=1;
 if(!empty($_GET["action"])){
     $action = $_GET["action"];
 }
@@ -28,6 +30,20 @@ if($action=="logout"){
     session_destroy();
     session_start();
     $logoff=true;
+}
+if($action=="color_change"){
+    //配色の変更・保存
+    $color_No = $_GET["color"]+1;
+    if($color_No>$Max_color_No){
+        $color_No=0;
+    }
+    $stmt = $pdo_h->prepare ( 'call PageDefVal_update(?,?,?,?,?)' );
+    $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+    $stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
+    $stmt->bindValue(3, "menu.php", PDO::PARAM_STR);
+    $stmt->bindValue(4, "COLOR", PDO::PARAM_STR);
+    $stmt->bindValue(5, $color_No, PDO::PARAM_STR);
+    $stmt->execute();
 }
 $_SESSION["PK"]=PKEY;
 $_SESSION["SK"]=SKEY;
@@ -42,15 +58,16 @@ $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
 $stmt->execute();
 $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$msg="<br>";
 if($row[0]["yuukoukigen"]<>""){
     if(strtotime($row[0]["yuukoukigen"]) < strtotime(date("Y-m-d"))){
         //有効期限切れ。申込日から即課金
         $_SESSION["KIGEN"] = strtotime("+3 day");
-        echo "有効期限切れ";
+        $msg= "有効期限切れ";
     }else{
         //試用期間、もしくは支払済み期間の翌日から課金
         $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
-        echo "有効期限付き(".$row[0]["yuukoukigen"]." まで)";
+        $msg= "有効期限付き(".$row[0]["yuukoukigen"]." まで)";
         //echo "有効期限付き(".date("Y-m-d",$_SESSION["KIGEN"])." まで)";
     }
     $plan=0;
@@ -83,7 +100,6 @@ if($row[0]["yagou"]<>""){
 </script>
 
 <header class="header-color" style='display:block'>
-    
     <?php
     if($logoff==false){
     ?>
@@ -97,6 +113,7 @@ if($row[0]["yagou"]<>""){
     <?php
     }
     ?>
+    
 </header>
 
 <body>
@@ -107,7 +124,9 @@ if($row[0]["yagou"]<>""){
         //echo $_COOKIE["webrez_token"];
         exit;
     }
+    echo $msg;
 ?>
+    <div style="position:fixed;top:70px;right:0;font-weight:900;" class="rainbow-color"><a href="menu.php?action=color_change&color=<?php echo $color_No; ?>">COLOR<i class="fa-solid fa-rotate-right fa-lg rainbow-color"></i></a></div>
     <div class="container-fluid">
 
 <?php
@@ -116,7 +135,7 @@ if($row[0]["yagou"]<>""){
         ,'個別売上'=>['EVregi.php?mode=kobetu&csrf_token='.$token]
         ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token]
         ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token]
-        //,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko&csrf_token='.$token]
+        ,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko&csrf_token='.$token]
         ,'売上実績'=>['UriageData.php?mode=select&csrf_token='.$token]
         ,'売上分析'=>['analysis_menu.php?csrf_token='.$token]
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]

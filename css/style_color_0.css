@@ -1,0 +1,27 @@
+/*色関連*/
+:root {
+    /*パネルボタンのカラー*/
+    --panel-font-color: #212529;        /*文字色*/
+    --panel-bk-color: #e29676;          /*背景色*/
+    --panel-bd-color: #47266e;          /*枠線*/
+    /*レジ画面・割引割増ボタンの色など*/
+    --wari-font-color:#212529;          /*文字色*/
+    --wari-bk-color:#ffce5b;            /*背景色*/
+    /*レジ画面・ジャンルバーのボタン・背景色など*/
+    --btn-updown-color:#d9e367;         /*上下ボタンの色*/
+    --btn-updown-font-color:#fff;    /*上下ボタンの文字色*/
+    --jumpbar-color:#d9e367;            /*バーの背景色*/
+    /*レジ画面・登録ボタン*/
+    --order-color:#eb6100;
+    --order-font-color:#fff;
+    /*共通フッターカラー*/
+    --footer-color:#ffce5b;
+    /*レジ画面の釣銭・クリア・確認ボタン*/
+    --chk-color:#9acd32;
+    --chk-font-color:#fff;
+    --user-disp-color:#fff;
+    /*ヘッダーのタイトル文字色*/
+    --title-color:#47266e;
+    --title-from:#e4007f;
+    --title-to:#ed6d35;
+}
