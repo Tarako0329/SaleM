@@ -67,8 +67,7 @@ define("MACHIN_ID", $machin_id);
 
 //deb_echo("端末ID：".MACHIN_ID);
 
-$rtn=check_session_userid($pdo_h);
-
+//スキンの取得
 $sql = "select value from PageDefVal where uid=? and machin=? and page=? and item=?";
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);

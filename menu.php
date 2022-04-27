@@ -16,7 +16,7 @@ csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェ�
 */
 
 require "php_header.php";
-//$rtn=check_session_userid($pdo_h);
+$rtn=check_session_userid($pdo_h);
 $token = csrf_create();
 $logoff=false;
 $action="";
