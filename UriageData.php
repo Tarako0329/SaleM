@@ -46,7 +46,7 @@ if($_GET["mode"]<>""){
 if($mode=="del"){
     //削除モード(確認)
     $btnm = "削　除";
-    $msg ="この売上を削除しますか？<br><br>";
+    $msg ="この売上を削除しますか？<br>";
     $_SESSION["cd"]=$_GET["cd"];
     $_SESSION["urino"]=$_GET["urino"];
     $sql = "select * from UriageData where uid = :user_id and UriageNO = :UriNO and ShouhinCD = :ShouhinCD order by UriageNO";
@@ -58,9 +58,9 @@ if($mode=="del"){
 }elseif($mode=="UpdateEv" || $mode=="UpdateTk"){
     $btnm = "更　新";
     if($mode=="UpdateEv"){
-        $msg = "この売上のイベント名を『".$_POST["UpNM"]."』に変更しますか？<br><br>";
+        $msg = "この売上のイベント名を『".$_POST["UpNM"]."』に変更しますか？<br>";
     }else{
-        $msg = "この売上の顧客名を『".$_POST["UpNM"]."』に変更しますか？<br><br>";
+        $msg = "この売上の顧客名を『".$_POST["UpNM"]."』に変更しますか？<br>";
     }
     $_SESSION["UpNM"] = $_POST["UpNM"];
     if($_POST["UpUriDateFrom"]<>""){
@@ -117,7 +117,7 @@ if($mode=="del"){
 
 }elseif($mode=="UpdateKin"){
     $btnm = "更　新";
-    $msg = "この商品の売上単価を以下に変更しますか？<br>税抜単価：".$_POST["UpTanka"]." 消費税：".$_POST["UpZei"]." 税込単価：".$_POST["UpUriZei"]." <br><br>";
+    $msg = "この商品の売上単価を以下に変更しますか？<br>税抜単価：".$_POST["UpTanka"]." 消費税：".$_POST["UpZei"]." 税込単価：".$_POST["UpUriZei"]." <br>";
     //売上実績の取得
     
     $_SESSION["zeinukiTanka"] = $_POST["UpTanka"];
@@ -363,7 +363,7 @@ $ZEIresult = $pdo_h->query($ZEIsql);
             echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-1' class='lead'></div></div></div></div>";
         }
         $_SESSION["MSG"]="";
-        echo $msg;
+        echo "<p style='font-size:1.5rem'>".$msg."</p>\n";
         
     ?>
     <table class="table-striped table-bordered" style='margin-top:10px'>
@@ -392,7 +392,7 @@ if($mode<>"select" && $mode<>"redirect"){
     <form method="post" action="UriageData_sql.php">
         <input type="hidden" name="mode" value="<?php echo $mode;?>">
         <input type="hidden" name="csrf_token" value="<?php echo $csrf_create; ?>">
-        <input type="submit" class="btn btn-primary" style="width:20rem;padding:0;font-size:1.3rem;color:#fff" value="<?php echo $btnm;?>">
+        <button type="submit" class="btn btn-primary"><?php echo $btnm;?></button>
     </form>
     </div>
     
@@ -474,7 +474,7 @@ if($mode<>"select" && $mode<>"redirect"){
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" style="font-size:1.5rem;color:#fff" class="btn btn-primary" >決  定</button>
+                    <button type="submit" style="font-size:1.5rem;color:#fff" class="btn btn-primary" >決　定</button>
                 </div>
             </form>
         </div>
@@ -536,7 +536,7 @@ if($mode<>"select" && $mode<>"redirect"){
                 </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" style="font-size:1.5rem;color:#fff" class="btn btn-primary" >確  認</button>
+                    <button type="submit" style="font-size:1.5rem;color:#fff" class="btn btn-primary" >確　認</button>
                 </div>
             </form>
         </div>
@@ -644,7 +644,7 @@ if($mode<>"select" && $mode<>"redirect"){
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" style="font-size:1.5rem;color:#fff" class="btn btn-primary" >確  認</button>
+                    <button type="submit" style="font-size:1.5rem;color:#fff" class="btn btn-primary" >確　認</button>
                 </div>
             </form>
         </div>

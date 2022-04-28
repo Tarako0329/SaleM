@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang='ja'>
 <?php
 /*関数メモ
 check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
@@ -21,7 +21,7 @@ $token = csrf_create();
 $logoff=false;
 $action="";
 //$color_No=0;
-$Max_color_No=1;
+$Max_color_No=2;
 if(!empty($_GET["action"])){
     $action = $_GET["action"];
 }
@@ -91,7 +91,7 @@ if($row[0]["yagou"]<>""){
     include "head.html" 
     ?>
     <!--ページ専用CSS-->
-    <link rel="stylesheet" href="css/style_menu.css?<?php echo $time; ?>" >
+    <link rel='stylesheet' href='css/style_menu.css?<?php echo $time; ?>' >
     <TITLE><?php echo $title;?></TITLE>
 </head>
 
@@ -99,17 +99,17 @@ if($row[0]["yagou"]<>""){
   
 </script>
 
-<header class="header-color" style='display:block'>
+<header class='header-color' style='display:block'>
     <?php
     if($logoff==false){
     ?>
-        <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div>
+        <div class='yagou title'><a href='menu.php'><?php echo $title;?></a></div>
         <div class='user_disp'>LogIn：<?php echo $user; ?></div>
-        <div style="position:fixed;top:0;right:0;"><a href="menu.php?action=logout"><i class="fa-solid fa-right-from-bracket fa-lg logoff-color"></i></a></div>
+        <div style='position:fixed;top:0;right:0;'><a href='menu.php?action=logout'><i class='fa-solid fa-right-from-bracket fa-lg logoff-color'></i></a></div>
     <?php
     }else{
     ?>
-        <div class="yagou title"><a href="index.php"><?php echo $title;?></a></div>
+        <div class='yagou title'><a href='index.php'><?php echo $title;?></a></div>
     <?php
     }
     ?>
@@ -126,8 +126,8 @@ if($row[0]["yagou"]<>""){
     }
     echo $msg;
 ?>
-    <div style="position:fixed;top:70px;right:0;font-weight:900;" class="rainbow-color"><a href="menu.php?action=color_change&color=<?php echo $color_No; ?>">COLOR<i class="fa-solid fa-rotate-right fa-lg rainbow-color"></i></a></div>
-    <div class="container-fluid">
+    <div style='position:fixed;top:70px;right:0;' class='rainbow-color'><b><a href='menu.php?action=color_change&color=<?php echo $color_No; ?>'>COLOR<i class='fa-solid fa-rotate-right fa-lg rainbow-color'></i></a></b></div>
+    <div class='container-fluid'>
 
 <?php
     $array = [

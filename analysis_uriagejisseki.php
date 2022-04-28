@@ -29,7 +29,7 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
 $rtn=check_session_userid($pdo_h);
 $csrf_create = csrf_create();
 
-deb_echo("UID：".$_SESSION["user_id"]);
+//deb_echo("UID：".$_SESSION["user_id"]);
 
 if(!empty($_POST)){
     $ymfrom = $_POST["ymfrom"];
@@ -40,7 +40,7 @@ if(!empty($_POST)){
     $ymto = (string)date('Y')."12";
     $list = "%";
 }
-deb_echo($list);
+//deb_echo($list);
 if($_POST["sum_tani"]==1){//日ごと
     $sqlstr = "select UriDate as 計上年月 ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
     $gp_sqlstr = "group by UriDate order by UriDate";
@@ -90,7 +90,7 @@ $sqlstr = $sqlstr." where ShouhinCD<9900 and DATE_FORMAT(UriDate, '%Y%m') betwee
 $sqlstr = $sqlstr." AND (Event like :event OR TokuisakiNM like :tokui )";
 $sqlstr = $sqlstr." ".$gp_sqlstr;
 
-deb_echo($sqlstr);
+//deb_echo($sqlstr);
 
 $stmt = $pdo_h->prepare( $sqlstr );
 $stmt->bindValue("ymfrom", $ymfrom, PDO::PARAM_INT);
@@ -134,7 +134,7 @@ $EVresult = $stmt->fetchAll();
     include "head.html" 
     ?>
     <!--ページ専用CSS-->
-    <link rel="stylesheet" href="css/style_UriageData.css?<?php echo $time; ?>" >
+    <!--<link rel="stylesheet" href="css/style_UriageData.css?<?php echo $time; ?>" >-->
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    
     
@@ -242,7 +242,7 @@ $EVresult = $stmt->fetchAll();
     <div class="container-fluid">
     <div class="row">
     <div class="col-md-3" style='padding:5px;background:white'>
-        <form class="form" method="post" action="analysis_uriagejisseki.php" style='font-size:1.3rem'>
+        <form class="form" method="post" action="analysis_uriagejisseki.php" style='font-size:1.5rem'>
             集計期間:
             <select name='ymfrom' class="form-control" style="padding:0;width:11rem;display:inline-block;margin:5px">
             <?php
@@ -288,7 +288,7 @@ $EVresult = $stmt->fetchAll();
             }
             ?>
             </select>
-            <input type='submit' class='btn-view' style='padding:0;hight:55px;width:100px;margin:2px;' value='検 索'>
+            <button type='submit' class='btn btn-primary'>検　索</button>
         </form>
     </div>
     <div class="col-md-6">

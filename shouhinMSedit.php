@@ -91,8 +91,10 @@ $csrf_token=csrf_create();
         <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
         <table>
             <tr><td>商品名</td><td><input type="text" class="form-control" style="width:95%" id="shouhinNM" name="shouhinNM" required="required" placeholder="必須"></td></tr>
-            <tr><td>単価</td><td><input type="number" onchange="zei_math()" class="form-control" style="width:95%" id="new_tanka" required="required" placeholder="必須"></td>
-                <td>
+            <tr><td>売上単価</td><td><input type="number" onchange="zei_math()" class="form-control" style="width:95%" id="new_tanka" required="required" placeholder="必須"></td></tr>
+            <tr>
+                <td></td>
+                <td>└
                     <div class="btn-group btn-group-toggle" style="padding:0" data-toggle="buttons">
                         <label class="btn btn-outline-primary active" style="font-size:1.2rem">
                             <input type="radio" onchange="zei_math()" name="options" id="option1" value="zeikomi" autocomplete="off" checked> 税込み
@@ -100,8 +102,10 @@ $csrf_token=csrf_create();
                         <label class="btn btn-outline-primary" style="font-size:1.2rem">
                             <input type="radio" onchange="zei_math()" name="options" id="option2" value="zeinuki" autocomplete="off"> 税抜き
                         </label>
-                    </div>                    
-                </td></tr>
+                    </div>
+                    ┘
+                </td>
+            </tr>
             <tr><td>税区分</td>
                 <td>
                     <select class="form-control" onchange="zei_math()" style="width:80%;padding-top:0;" id="zeikbn" name="zeikbn" required="required" placeholder="必須" >
@@ -122,7 +126,7 @@ $csrf_token=csrf_create();
                 </td>
             </tr>
             <tr>
-                <td>想定原価単価</td>
+                <td>原価単価</td>
                 <td>
                     <input type="number" class="form-control" style="width:95%" id="genka" name="genka" aria-describedby="genka">
                     <small id="genka" class="form-text text-muted">おおよその原材料費</small>
@@ -158,9 +162,9 @@ $csrf_token=csrf_create();
         </div>
         -->
         <br>
-        <div class="col-2 col-md-1" style=" padding:0; margin-top:10px;">
-            <button type="submit" class="btn btn-primary" style="width:100%;" name="btn" value="登録">登  録</button>
-        </div>
+        <!--<div class="col-2 col-md-1" style=" padding:0; margin-top:10px;">-->
+            <button type="submit" class="btn btn-primary" name="btn" value="登録">登  録</button>
+        <!--</div>-->
     </form>
     </div>
 

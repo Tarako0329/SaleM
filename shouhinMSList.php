@@ -132,15 +132,23 @@ $ZKMS = $stmt2->fetchAll();
     画面を横にすると他の項目も表示されます。<br>
     <div class='btn-group btn-group-toggle' style='padding:0' data-toggle='buttons'>
         <label class='btn btn-outline-primary active' style='font-size:1.2rem'>
-            <input type='radio' name='options' id='option1' value='zeikomi' onChange='zei_math_all()' autocomplete='off' checked> 税『込』で金額変更
+            <input type='radio' name='options' id='option1' value='zeikomi' onChange='zei_math_all()' autocomplete='off' checked> 税 込 入 力
         </label>
         <label class='btn btn-outline-primary' style='font-size:1.2rem'>
-            <input type='radio' name='options' id='option2' value='zeinuki' onChange='zei_math_all()' autocomplete='off'> 税『抜』で金額変更
+            <input type='radio' name='options' id='option2' value='zeinuki' onChange='zei_math_all()' autocomplete='off'> 税 抜 入 力
         </label>
     </div>
     </div>
     <div>
+        <!--
         <button id='hyouji' style='position:fixed;top:75px;right:0' >all⇒checked</button>
+        -->
+        
+        <select id='hyouji' style='position:fixed;top:95px;right:0'>
+            <option value='0' selected>全て表示</option>
+            <option value='1'>チェック</option>
+            <option value='2'>未チェック</option>
+        </select>
     </div>
 </div>
 
@@ -180,7 +188,7 @@ foreach($stmt as $row){
     echo "<td style='font-size:1.7rem;font-weight:700;' colspan='12'>".$row["shouhinCD"]."：".rot13decrypt($row["shouhinNM"])."</td>";    //商品名
     echo "</tr>\n";
     echo "<tr id='tr2_".$i."'>\n";
-    echo "<td><input type='number' style='width:8rem;' id='new_tanka".$i."' onBlur='zei_math".$i."(this.value)' placeholder='新価格のみ' ></td>";   //単価修正欄
+    echo "<td><input type='number' style='width:8rem;' id='new_tanka".$i."' onBlur='zei_math".$i."(this.value)' placeholder='新価格' ></td>";   //単価修正欄
     echo "<td><input type='number' readonly='readonly' id ='ORDERS[".$i."][tanka]' name ='ORDERS[".$i."][tanka]' style='width:7rem;background-color:#a3a3a3;' value='".$row["tanka"]."'></td>"; //登録単価
     echo "<td><select id ='ORDERS[".$i."][zeikbn]' onchange='zei_math".$i."(new_tanka".$i.".value)' name ='ORDERS[".$i."][zeikbn]' style='width:8rem;height:30px;'>";     //税区分
         foreach($ZKMS as $row2){
@@ -276,22 +284,22 @@ echo "  var hyouji = document.getElementById('hyouji');\n";
 echo "  var disp;\n";
 echo "  var tr1;\n";
 echo "  var tr2;\n";
-echo "  hyouji.onclick=function(){\n";
-echo "      switch(hyouji.innerHTML){\n";
-echo "      case 'all⇒checked':\n"; //全件->チェックのみ
+echo "  hyouji.onchange=function(){\n";
+echo "      switch(hyouji.value){\n";
+echo "      case '1':\n"; //全件->チェックのみ
 echo "          check='table-row';\n";
 echo "          nocheck='none';\n";
-echo "          hyouji.innerHTML='checked⇒no-checked';\n";
+//echo "          hyouji.innerHTML='checked⇒no-checked';\n";
 echo "          break;\n";
-echo "      case 'checked⇒no-checked':\n";//チェックのみ->未チェックのみ
+echo "      case '2':\n";//チェックのみ->未チェックのみ
 echo "          check='none';\n";
 echo "          nocheck='table-row';\n";
-echo "          hyouji.innerHTML='no-checked⇒all';\n";
+//echo "          hyouji.innerHTML='no-checked⇒all';\n";
 echo "          break;\n";
-echo "      case 'no-checked⇒all':\n";//未チェックのみ->全件
+echo "      case '0':\n";//未チェックのみ->全件
 echo "          check='table-row';\n";
 echo "          nocheck='table-row';\n";
-echo "          hyouji.innerHTML='all⇒checked';\n";
+//echo "          hyouji.innerHTML='all⇒checked';\n";
 echo "          break;\n";
 echo "      }\n";
 

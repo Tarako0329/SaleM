@@ -318,7 +318,8 @@ window.onload = function() {
     
 <header class="header-color" style='display:block'>
     <div class="title yagou"><a href="menu.php"><?php echo $title;?></a></div>
-    <?php if($_GET["mode"]=="shuppin_zaiko"){echo "出店日：";}else{echo "売上日：";}?><input type='date' class='date' style='height:20%' name='KEIJOUBI' required="required" value='<?php if($_GET["mode"]<>"shuppin_zaiko"){echo (string)date("Y-m-d");} ?>'>
+    <span style='color:var(--user-disp-color);font-weight:400;'>
+    <?php if($_GET["mode"]=="shuppin_zaiko"){echo "出店日：";}else{echo "売上日：";}?></span><input type='date' class='date' style='height:20%' name='KEIJOUBI' required="required" value='<?php if($_GET["mode"]<>"shuppin_zaiko"){echo (string)date("Y-m-d");} ?>'>
     <?php
     if($_GET["mode"]=="kobetu"){
     ?>
@@ -393,7 +394,7 @@ window.onload = function() {
 	        $befor=$now-1;
 	        echo "</div>";
 	        echo "<div class='row' style='background:var(--jumpbar-color);margin-top:5px;' >\n"; //height:30px;
-	        echo "<div class='col-12' id='jump_".$now."'><a href='#jump_".$befor."' class='btn-updown'><i class='fa-solid fa-angles-up'></i></a>\n";
+	        echo "<div class='col-12' id='jump_".$now."' style='color:var(--categ-font-color);'><a href='#jump_".$befor."' class='btn-updown'><i class='fa-solid fa-angles-up'></i></a>\n";
 	        echo $row["categoly"];
 	        echo "<a href='#jump_".$next."'  class='btn-updown'><i class='fa-solid fa-angles-down'></i></a>\n";
 	        echo "</div></div>\n";
@@ -450,15 +451,15 @@ window.onload = function() {
         <span style='font-size:1.6rem;'>お会計</span> ￥<span id='kaikei'>0</span>- <span style='font-size:1.6rem;'>内税</span>(<span id='utizei'>0</span>)
     </div>
     <div class='right1'>
-        <button type='button' class='btn btn--chk' style='border-radius:0;' id='dentaku' data-toggle='modal' data-target='#FcModal'><?php if($_GET["mode"]<>"shuppin_zaiko"){echo "釣　銭";} ?></button>
+        <button type='button' class='btn--chk' style='border-left:none;border-right:none;' id='dentaku' data-toggle='modal' data-target='#FcModal'><?php if($_GET["mode"]<>"shuppin_zaiko"){echo "釣　銭";} ?></button>
     </div>
     <div class='right3'>
-        <button type='button' class='btn btn--chk' style='border:solid;border-top:none;border-bottom:none;border-color:#fff;border-radius: 0;' id='order_clear'>クリア</button>
-        <button type='button' class='btn btn--chk' style='display:none;border:solid;border-top:none;border-bottom:none;border-color:#fff;border-radius: 0;' id='order_return'>戻　る</button>
+        <button type='button' class='btn--chk' style=';' id='order_clear'>クリア</button>
+        <button type='button' class='btn--chk' style='display:none;' id='order_return'>戻　る</button>
     </div>
     <div class='right2'>
-        <button type='submit' class='btn btn--commit' style='display:none;border-radius:0;' id='btn_commit' name='commit_btn' value='uriage_commit'>登　録</button>
-        <button type='button' class='btn btn--chk' style='border-radius:0;' id='order_chk'>確　認</button>
+        <button type='submit' class='btn--commit' style='display:none;border-left:none;border-right:none;' id='btn_commit' name='commit_btn' value='uriage_commit'>登　録</button>
+        <button type='button' class='btn--chk' style='border-left:none;border-right:none;' id='order_chk'>確　認</button>
     </div>
 </footer>
 
