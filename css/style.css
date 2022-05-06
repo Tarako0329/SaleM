@@ -47,7 +47,7 @@ body {
 }
 .logoff-color:before
 {
-	color: #47266e ;
+	color: var(--user-disp-color);
 }
 .rainbow-color,
 .rainbow-color:before{
