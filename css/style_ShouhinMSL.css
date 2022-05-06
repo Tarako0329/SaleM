@@ -22,6 +22,12 @@ footer{
     display: flex;    
     font-size:3rem;
     z-index: 99;
+    border-top:var(--rez-border-top);
+    border-top-width:thin;
+    border-left:none;
+    border-right:none;
+    border-bottom:none;
+    border-color:var(--rez-border-color);
 }
 .left1{
     /*登録ボタンエリア*/
@@ -39,6 +45,13 @@ footer{
     height:100%; 
     width:100%;
     font-size: 2rem;
+    margin:0;
+    border-top:none;
+    border-right:var(--rez-border-top);
+    border-right-width:thin;
+    border-left:none;
+    border-bottom:none;
+    border-color:var(--rez-border-color);
 }
 .header2{
     height: 50px; /* 高さを指定 */

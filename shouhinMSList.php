@@ -330,7 +330,7 @@ echo "</script>";
 
 <footer>
     <dev class='left1'>
-        <input type='submit' value='登　録' class='btn btn--chk' style='border-radius:0;' name='commit_btn'>
+        <input type='submit' value='登　録' class='btn--chk' style='border-radius:0;' name='commit_btn'>
     </dev>
     </form>
 </footer>

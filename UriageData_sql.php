@@ -8,6 +8,7 @@ if(csrf_chk()==false){
 }
 
 $rtn=check_session_userid($pdo_h);
+$logfilename="sid_".$_SESSION['user_id'].".log";
 $csrf_create = csrf_create();
 
 $msg = "";
@@ -23,16 +24,18 @@ if($_POST["mode"] == "del"){
     $count = $stmt->rowCount();
     if($status && $count<>0){
         $_SESSION["MSG"] = "売上を削除しました。";
+        file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,DELETE,succsess,".$_SESSION['user_id']."/".$_SESSION["urino"]."/-/".$_SESSION["cd"]."/-/-/-/-\n",FILE_APPEND);
     }else{
         $_SESSION["MSG"] = "売上削除失敗。";
+        file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,DELETE,failed,".$_SESSION['user_id']."/".$_SESSION["urino"]."/-/".$_SESSION["cd"]."/-/-/-/-\n",FILE_APPEND);
     }
 }elseif(($_POST["mode"]=="UpdateTk" || $_POST["mode"]=="UpdateEv") && $_SESSION["wheresql"]<>""){
     //イベント名or顧客名の更新モード(実行)
     if($_POST["mode"]=="UpdateEv"){
-        $sql="update UriageData set Event = :UpNM ".$_SESSION["wheresql"];
+        $sql="update UriageData set Event = :UpNM ,updDatetime=now() ".$_SESSION["wheresql"];
         $_SESSION["MSG"] = "イベント名を更新しました。";
     }elseif($_POST["mode"]=="UpdateTk"){
-        $sql="update UriageData set TokuisakiNM = :UpNM ".$_SESSION["wheresql"];
+        $sql="update UriageData set TokuisakiNM = :UpNM ,updDatetime=now() ".$_SESSION["wheresql"];
         $_SESSION["MSG"] = "顧客名を更新しました。";
     }
     $stmt = $pdo_h->prepare( $sql );
@@ -42,13 +45,14 @@ if($_POST["mode"] == "del"){
     $status = $stmt->execute();
     $count = $stmt->rowCount();
     if($status && $count<>0){
-        
+        file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,succsess,".$_SESSION['user_id']."/".$_SESSION["UpNM"]."/".$_SESSION["wheresql"]."\n",FILE_APPEND);
     }else{
         $_SESSION["MSG"] = "更新失敗。";
+        file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,failed,".$_SESSION['user_id']."/".$_SESSION["UpNM"]."/".$_SESSION["wheresql"]."\n",FILE_APPEND);
     }
     
 }elseif($_POST["mode"]=="UpdateKin"){
-    $sql="update UriageData set tanka = :tanka,UriageKin = :tanka2 * su,zei=:zei * su, zeiKBN=:zeikbn,updDatetime=now() ".$_SESSION["wheresql"];
+    $sql="update UriageData set tanka = :tanka,UriageKin = :tanka2 * su,zei=:zei * su, zeiKBN=:zeikbn, updDatetime=now() ".$_SESSION["wheresql"];
     deb_echo($sql);
     $stmt = $pdo_h->prepare( $sql );
     
@@ -61,8 +65,10 @@ if($_POST["mode"] == "del"){
     $count = $stmt->rowCount();
     if($status && $count<>0){
         $_SESSION["MSG"] = "金額を更新しました。";
+        file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,succsess,".$_SESSION['user_id']."/金額修正:".$_SESSION["zeinukiTanka"]."/".$_SESSION["shouhizei"]."/".$_SESSION["zeikbn"]."\n",FILE_APPEND);
     }else{
         $_SESSION["MSG"] = "更新失敗。";
+        file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,failed,".$_SESSION['user_id']."/金額修正:".$_SESSION["zeinukiTanka"]."/".$_SESSION["shouhizei"]."/".$_SESSION["zeikbn"]."\n",FILE_APPEND);
     }
     
 }

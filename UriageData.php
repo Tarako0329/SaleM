@@ -42,6 +42,21 @@ if($_GET["mode"]<>""){
     exit();
 }
 
+if(!empty($_POST["Event"])){
+    $post_Event=$_POST["Event"];
+}else{
+    $post_Event="";
+}
+if(!empty($_POST["Type"])){
+    $post_Type=$_POST["Type"];
+}else{
+    $post_Type="";
+}
+if(!empty($_POST["Tokui"])){
+    $post_Tokui=$_POST["Tokui"];
+}else{
+    $post_Tokui="";
+}
 
 if($mode=="del"){
     //削除モード(確認)
@@ -187,27 +202,27 @@ if($mode=="del"){
     }
     $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND UriDate <= '".$UriTo."' ";
     
-    if($_POST["Event"]<>""){
+    if($post_Event<>""){
         $wheresql = $wheresql." AND Event=:Event ";
-        $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND Event='".$_POST["Event"]."' ";
+        $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND Event='".$post_Event."' ";
     }
-    if($_POST["Tokui"]<>""){
+    if($post_Tokui<>""){
         $wheresql= $wheresql." AND TokuisakiNM=:Tokui ";
-        $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND TokuisakiNM='".$_POST["Tokui"]."' ";
+        $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND TokuisakiNM='".$post_Tokui."' ";
     }
     $wheresql= $wheresql." AND uid = :user_id ";
     $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND uid = :user_id ";
     
-    if($_POST["Type"]=="rireki" || $_POST["Type"]==""){
+    if($post_Type=="rireki" || $post_Type==""){
         //履歴取得
         $sql = "select * from UriageData ".$wheresql." order by UriageNO";
-    }elseif($_POST["Type"]=="shubetu"){
+    }elseif($post_Type=="shubetu"){
         //商品別<!-- 何が売れてるか知りたい -->
         $sql = "select '-' as UriDate,'-' as Event,'-' as TokuisakiNM,'-' as UriageNO,'-' as Event,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ".$wheresql." group by ShouhinNM,tanka order by ShouhinNM";
-    }elseif($_POST["Type"]=="UriNO"){
+    }elseif($post_Type=="UriNO"){
         //Event会計別<!-- イベントでの客単価を知りたい -->
         $sql = "select '-' as UriDate,UriageNO,Event,'-' as TokuisakiNM,'-' as ShouhinNM,sum(su) as su,0 as tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ".$wheresql." group by Event,UriageNO order by Event,UriageNO";
-    }elseif($_POST["Type"]=="EVTKshubetu"){
+    }elseif($post_Type=="EVTKshubetu"){
         //顧客/Event別・種類別<!-- 顧客・イベントでの売れ筋を知りたい -->
         $sql = "select '-' as UriDate,'-' as UriageNO,Event,TokuisakiNM,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ".$wheresql." group by Event,TokuisakiNM,ShouhinNM,tanka order by Event,TokuisakiNM,ShouhinNM";
     }else{
@@ -223,11 +238,11 @@ if($mode=="del"){
     }else{
         $stmt->bindValue("UriDateTo", $UriFrom, PDO::PARAM_STR);
     }
-    if($_POST["Event"]<>""){
-        $stmt->bindValue("Event", $_POST["Event"], PDO::PARAM_STR);
+    if($post_Event<>""){
+        $stmt->bindValue("Event", $post_Event, PDO::PARAM_STR);
     }
-    if($_POST["Tokui"]<>""){
-        $stmt->bindValue("Tokui", $_POST["Tokui"], PDO::PARAM_STR);
+    if($post_Tokui<>""){
+        $stmt->bindValue("Tokui", $post_Tokui, PDO::PARAM_STR);
     }
 }elseif($mode=="redirect"){
     //更新結果の表示
@@ -248,7 +263,18 @@ if($rtn==false){
     deb_echo("失敗した場合は不正値が渡されたとみなし、wheresqlを破棄<br>");
     $_SESSION["wheresql"]="";
 }
-$result=$stmt->fetchAll();
+$result = $stmt->fetchAll();
+$rowcnt = $stmt->rowCount();
+if($rowcnt==0){
+    //今日の実績が無い場合
+    $msg="日付・イベント・顧客単位で集計した全実績。<br>(本日未売上時のみ表示)";
+    $sql = "select UriDate,'-' as UriageNO,Event,TokuisakiNM,'-' as ShouhinNM,0 as su,0 as tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ";
+    $sql = $sql."where uid=:user_id group by UriDate,Event,TokuisakiNM order by UriDate desc,Event,TokuisakiNM";
+    $stmt = $pdo_h->prepare( $sql );
+    $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
+    $rtn=$stmt->execute();
+    $result = $stmt->fetchAll();
+}
 
 //Eventリスト（検索モーダル用）
 $EVsql = "select Event from UriageData where uid =? group by Event order by Event";
@@ -337,7 +363,7 @@ $ZEIresult = $pdo_h->query($ZEIsql);
  
 <header class="header-color" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></div>
-    <div style="font-size:1rem;color:var(--user-disp-color);font-weight:400;"> 期間：<?php echo $UriFrom."～".$UriTo;?>　顧客：<?php echo $_POST["Tokui"];?>　EVENT：<?php echo $_POST["Event"];?></div>
+    <div style="font-size:1rem;color:var(--user-disp-color);font-weight:400;"> 期間：<?php echo $UriFrom."～".$UriTo;?>　顧客：<?php echo $post_Tokui;?>　EVENT：<?php echo $post_Event;?></div>
 
     <div class="hamburger">
         <span></span>
@@ -374,7 +400,7 @@ $GoukeiZei=0;
 $GoukeiZeikomi=0;
 foreach($result as $row){
     echo "<tr><td>".$row["UriDate"]."</td><td>".$row["Event"].$row["TokuisakiNM"]."</td><td class='text-center d-none d-sm-table-cell'>".$row["UriageNO"]."</td><td>".rot13decrypt($row["ShouhinNM"])."</td><td class='text-right'>".$row["su"]."</td><td class='text-right d-none d-sm-table-cell'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td><td class='text-right'>".$row["zei"]."</td><td style='width:4rem;text-align:center;'>";
-    if(($_POST["Type"]=="rireki" || $_POST["Type"]=="") && ($mode == "select" || $mode=="redirect")){
+    if(($post_Type=="rireki" || $post_Type=="") && ($mode == "select" || $mode=="redirect")){
         //履歴表示の時だけ削除可能
         echo "<a href='UriageData.php?cd=".$row["ShouhinCD"]."&urino=".$row["UriageNO"]."&csrf_token=".$csrf_create."&mode=del'><i class='fa-regular fa-trash-can'></i></a>";
     }
@@ -439,7 +465,7 @@ if($mode<>"select" && $mode<>"redirect"){
                             <option value=""></option>
                             <?php
                             foreach($EVresult as $row){
-                                if($_POST["Event"]==$row["Event"]){
+                                if($post_Event==$row["Event"]){
                                     echo "<option value='".$row["Event"]."' selected>".$row["Event"]."</option>\n";
                                 }else{
                                     echo "<option value='".$row["Event"]."'>".$row["Event"]."</option>\n";
@@ -454,7 +480,7 @@ if($mode<>"select" && $mode<>"redirect"){
                             <option value=""></option>
                             <?php
                             foreach($TKresult as $row){
-                                 if($_POST["Tokui"]==$row["TokuisakiNM"]){
+                                 if($post_Tokui==$row["TokuisakiNM"]){
                                     echo "<option value='".$row["TokuisakiNM"]."' selected>".$row["TokuisakiNM"]."</option>\n";
                                 }else{
                                     echo "<option value='".$row["TokuisakiNM"]."'>".$row["TokuisakiNM"]."</option>\n";
@@ -466,10 +492,10 @@ if($mode<>"select" && $mode<>"redirect"){
                     <div>
                         <label for="Type" class="control-label">表示：</label>
                         <select name="Type" style="font-size:1.5rem;padding-top:0;" id="Type" class="form-control">
-                            <option value="rireki" <?php if($_POST["Type"]=="rireki"){echo "selected";}  ?> >履歴</option>
-                            <option value="shubetu" <?php if($_POST["Type"]=="shubetu"){echo "selected";}  ?> >種類別</option>     <!-- 何が売れてるか知りたい -->
-                            <option value="UriNO" <?php if($_POST["Type"]=="UriNO"){echo "selected";}  ?> >Event会計別</option>  <!-- イベントでの客単価を知りたい -->
-                            <option value="EVTKshubetu" <?php if($_POST["Type"]=="EVTKshubetu"){echo "selected";}  ?> >顧客/Event別・種類別</option> <!-- 顧客・イベントでの売れ筋を知りたい -->
+                            <option value="rireki" <?php if($post_Type=="rireki"){echo "selected";}  ?> >履歴</option>
+                            <option value="shubetu" <?php if($post_Type=="shubetu"){echo "selected";}  ?> >種類別</option>     <!-- 何が売れてるか知りたい -->
+                            <option value="UriNO" <?php if($post_Type=="UriNO"){echo "selected";}  ?> >Event会計別</option>  <!-- イベントでの客単価を知りたい -->
+                            <option value="EVTKshubetu" <?php if($post_Type=="EVTKshubetu"){echo "selected";}  ?> >顧客/Event別・種類別</option> <!-- 顧客・イベントでの売れ筋を知りたい -->
                         </select>
                     </div>
                 </div>
@@ -583,7 +609,7 @@ if($mode<>"select" && $mode<>"redirect"){
                             <option value=""></option>
                             <?php
                             foreach($EVresult as $row){
-                                if($_POST["Event"]==$row["Event"]){
+                                if($post_Event==$row["Event"]){
                                     echo "<option value='".$row["Event"]."' selected>".$row["Event"]."</option>\n";
                                 }else{
                                     echo "<option value='".$row["Event"]."'>".$row["Event"]."</option>\n";
@@ -598,7 +624,7 @@ if($mode<>"select" && $mode<>"redirect"){
                             <option value=""></option>
                             <?php
                             foreach($TKresult as $row){
-                                 if($_POST["Tokui"]==$row["TokuisakiNM"]){
+                                 if($post_Tokui==$row["TokuisakiNM"]){
                                     echo "<option value='".$row["TokuisakiNM"]."' selected>".$row["TokuisakiNM"]."</option>\n";
                                 }else{
                                     echo "<option value='".$row["TokuisakiNM"]."'>".$row["TokuisakiNM"]."</option>\n";
@@ -613,10 +639,10 @@ if($mode<>"select" && $mode<>"redirect"){
                         <tr><td>修正後金額</td>
                         <td colspan="4">
                                 <div class="btn-group btn-group-toggle" style="font-size:1rem;" data-toggle="buttons">
-                                    <label class="btn btn-primary active" style="padding:1px;" onchange="zei_math()" >
+                                    <label class="btn btn-outline-primary active" style="padding:1px;" onchange="zei_math()" >
                                         <input type="radio" name="options" id="option1" value="zeikomi" autocomplete="off" checked> 税込み
                                     </label>
-                                    <label class="btn btn-primary" style="padding:1px;" onchange="zei_math()" >
+                                    <label class="btn btn-outline-primary" style="padding:1px;" onchange="zei_math()" >
                                         <input type="radio" name="options" id="option2" value="zeinuki" autocomplete="off"> 税抜き
                                     </label>
                                     

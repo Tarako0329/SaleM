@@ -49,7 +49,7 @@ $emsg="";
 
 //売上登録
 if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
-
+    $logfilename="sid_".$_SESSION['user_id'].".log";
 
     $array = $_POST["ORDERS"];
     $sqlstr = "";
@@ -78,11 +78,13 @@ if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
             }
             //$sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime,genka_tanka) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)";
             $stmt = $pdo_h->prepare($sqlstr);
-    
+            
+            $time = date("Y/m/d H:i:s");
+            
             $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
             $stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
             $stmt->bindValue(3,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
-            $stmt->bindValue(4,  date("Y/m/d H:i:s"), PDO::PARAM_STR);
+            $stmt->bindValue(4,  $time, PDO::PARAM_STR);
             $stmt->bindValue(5,  $_POST["EV"], PDO::PARAM_INT);
             $stmt->bindValue(6,  $_POST["KOKYAKU"], PDO::PARAM_STR);
             $stmt->bindValue(7,  $row["CD"], PDO::PARAM_INT);                       //商品CD
@@ -99,8 +101,10 @@ if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
             
             if($flg){
                 $emsg="売上のINSERTは正常終了\n";
+                file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,success,".$_SESSION['user_id']."/".$UriageNO."/".$_POST["EV"].$_POST["KOKYAKU"]."/".$row["CD"]."/".$row["SU"]."/".$row["TANKA"]."/".$row["ZEI"]."/".$row["GENKA_TANKA"]."\n",FILE_APPEND);
             }else{
                 $emsg="売上のINSERTでエラー";
+                file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,failed,".$_SESSION['user_id']."/".$UriageNO."/".$_POST["EV"].$_POST["KOKYAKU"]."/".$row["CD"]."/".$row["SU"]."/".$row["TANKA"]."/".$row["ZEI"]."/".$row["GENKA_TANKA"]."\n",FILE_APPEND);
                 $E_Flg=1;
                 break;
             }
@@ -139,11 +143,13 @@ if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
                 
                 $sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)";
                 $stmt = $pdo_h->prepare($sqlstr);
+                
+                $time = date("Y/m/d H:i:s");
         
                 $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
                 $stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
                 //$stmt->bindValue(3,  date("Y/m/d"), PDO::PARAM_STR);
-                $stmt->bindValue(3,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
+                $stmt->bindValue(3,  $time, PDO::PARAM_STR);
                 $stmt->bindValue(4,  date("Y/m/d H:i:s"), PDO::PARAM_STR);
                 $stmt->bindValue(5,  $_POST["EV"], PDO::PARAM_INT);
                 $stmt->bindValue(6,  $_POST["KOKYAKU"], PDO::PARAM_STR);
@@ -159,9 +165,11 @@ if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
                 
                 if($flg){
                     $emsg=$emsg."/割引割増のINSERTは正常終了\n";
+                    file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,success,".$_SESSION['user_id']."/".$UriageNO."/".$_POST["EV"].$_POST["KOKYAKU"]."/割引割増/0/".$chousei_hon."/".$chousei_zei."/0\n",FILE_APPEND);
                 }else{
                     $E_Flg=1;
                     $emsg=$emsg."/割引割増のINSERTでエラー";
+                    file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,failed,".$_SESSION['user_id']."/".$UriageNO."/".$_POST["EV"].$_POST["KOKYAKU"]."/割引割増/0/".$chousei_hon."/".$chousei_zei."/0\n",FILE_APPEND);
                     break;
                 }
                 $i++;
@@ -171,12 +179,14 @@ if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
                 $emsg=$emsg."/割引割増の端数処理開始\n";
                 $sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)";
                 $stmt = $pdo_h->prepare($sqlstr);
+                
+                $time = date("Y/m/d H:i:s");
         
                 $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
                 $stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
                 //$stmt->bindValue(3,  date("Y/m/d"), PDO::PARAM_STR);
                 $stmt->bindValue(3,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
-                $stmt->bindValue(4,  date("Y/m/d H:i:s"), PDO::PARAM_STR);
+                $stmt->bindValue(4,  $time, PDO::PARAM_STR);
                 $stmt->bindValue(5,  $_POST["EV"], PDO::PARAM_INT);
                 $stmt->bindValue(6,  $_POST["KOKYAKU"], PDO::PARAM_STR);
                 $stmt->bindValue(7,  9999-$i, PDO::PARAM_INT);                             //商品CD
@@ -190,9 +200,11 @@ if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
                 $flg=$stmt->execute();
                  if($flg){
                      $emsg=$emsg."/割引割増の端数調整のINSERTは正常終了\n";
+                     file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,success,".$_SESSION['user_id']."/".$UriageNO."/".$_POST["EV"].$_POST["KOKYAKU"]."/割引割増:端数/0/".$chouseigaku-$goukei."/0/0\n",FILE_APPEND);
                 }else{
                     $E_Flg=1;
                     $emsg=$emsg."/割引割増の端数調整のINSERTでエラー";
+                    file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,failed,".$_SESSION['user_id']."/".$UriageNO."/".$_POST["EV"].$_POST["KOKYAKU"]."/割引割増:端数/0/".$chouseigaku-$goukei."/0/0\n",FILE_APPEND);
                 }
                
             }
@@ -201,6 +213,8 @@ if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
         
         if($E_Flg==0){
             $pdo_h->commit();
+            file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,COMMIT,success,売上No".$UriageNO."\n",FILE_APPEND);
+            
             $_SESSION["msg"]="売上が登録されました。（売上№：".$UriageNO."）";
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: EVregi.php?status=success&mode=".$_POST["mode"]."&csrf_token=".$token);
@@ -210,6 +224,7 @@ if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
         }else{
             //1件でも失敗したらロールバック
             $pdo_h->rollBack();
+            file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,ROLLBACK,success,売上No".$UriageNO."\n",FILE_APPEND);
             
             $emsg=$emsg."/insert処理が失敗し、rollBackが発生しました。";
             $stmt = null;
@@ -220,6 +235,7 @@ if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
     }catch (Exception $e) {
         $pdo_h->rollBack();
         $emsg = $emsg."/レジ登録でERRORをCATHCしました。：".$e->getMessage();
+        file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,ROLLBACK,success,売上No".$UriageNO."\n",FILE_APPEND);
         $E_Flg=1;
         $stmt = null;
         $pdo_h = null;
@@ -227,6 +243,7 @@ if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
     }catch(Throwable $t){
         $pdo_h->rollBack();
         $emsg = $emsg."/レジ登録でFATAL ERRORをCATHCしました。：".$t->getMessage();
+        file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,ROLLBACK,success,売上No".$UriageNO."\n",FILE_APPEND);
         $E_Flg=1;
         $stmt = null;
         $pdo_h = null;        
