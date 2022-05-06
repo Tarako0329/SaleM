@@ -124,7 +124,7 @@ $ZKMS = $stmt2->fetchAll();
 </script>
 <header class='header-color' style='flex-wrap:wrap'>
     <div class='title' style='width: 100%;'><a href='menu.php'><?php echo $title;?></a></div>
-    <p style='font-size:1rem;'>  取扱商品 確認・編集 画面</p>
+    <p style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>  取扱商品 確認・編集 画面</p>
 </header>
 
 <div class='header2'>

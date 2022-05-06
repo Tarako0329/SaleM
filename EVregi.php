@@ -54,9 +54,9 @@ if(!empty($_SESSION["msg"])){
 //セッション->クッキー->DB
 if($_SESSION["EV"] != "" ){
     $event = $_SESSION["EV"];
-    //deb_echo("session");
+    deb_echo("session");
 }else{
-    $sql = "select value from PageDefVal where uid=? and machin=? and page=? and item=?";
+    $sql = "select value,updatetime from PageDefVal where uid=? and machin=? and page=? and item=?";
     $stmt = $pdo_h->prepare($sql);
     $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
     $stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
@@ -64,14 +64,26 @@ if($_SESSION["EV"] != "" ){
     $stmt->bindValue(4, "EV", PDO::PARAM_STR);//name属性を指定
     $stmt->execute();
 
+    
     if($stmt->rowCount()==0){
         $event = "";
-        //deb_echo("NULL");
+        deb_echo("NULL");
     }else{
         $buf = $stmt->fetch();
-        $_SESSION["EV"] = $buf["value"];
-        $event = $buf["value"];
-        //deb_echo("DB".$event);
+        $date = new DateTime($buf["updatetime"]);
+    
+        //指定した書式で日時を取得する
+        //echo $date->format('Y-m-d');
+        if($date->format('Y-m-d')!=date("Y-m-d")){
+            //イベントの日付が前日以前の場合はクリア
+            $event = "";
+            deb_echo($buf["updatetime"]."<br>");
+        }else{
+            //$buf = $stmt->fetch();
+            $_SESSION["EV"] = $buf["value"];
+            $event = $buf["value"];
+            deb_echo("DB".$event);
+        }
     } 
 }
 //メニューカテゴリー粒度(0:なし>1:大>2:中>3:小)
@@ -193,6 +205,11 @@ window.onload = function() {
     //電卓表示ボタン
     var dentaku = document.getElementById('dentaku');
     
+    function double(btn){
+        //登録ボタンの２重クリック防止
+        btn.innerHTML="登録中";
+        btn.disabled = true;
+    }
     order_chk.onclick = function(){
         //注文確認ボタン。選択されてないメニューを消し、ボタンの表示を変更する。
         <?php
@@ -289,7 +306,7 @@ window.onload = function() {
         s.alert('close');
       }, 5000);
       $('#alert-e').append(e);
-      /* アラートを消さない
+      /* エラーの場合はアラートを消さない
       setTimeout(() => {
         e.alert('close');
       }, 5000);
@@ -458,7 +475,7 @@ window.onload = function() {
         <button type='button' class='btn--chk' style='display:none;' id='order_return'>戻　る</button>
     </div>
     <div class='right2'>
-        <button type='submit' class='btn--commit' style='display:none;border-left:none;border-right:none;' id='btn_commit' name='commit_btn' value='uriage_commit'>登　録</button>
+        <button type='submit' class='btn--commit' style='display:none;border-left:none;border-right:none;' id='btn_commit' name='commit_btn' value='uriage_commit' onClick='double(this)'>登　録</button>
         <button type='button' class='btn--chk' style='border-left:none;border-right:none;' id='order_chk'>確　認</button>
     </div>
 </footer>

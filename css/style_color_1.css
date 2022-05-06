@@ -30,4 +30,6 @@
     --title-from:#ff838b; /*右下*/
     --title-to:#ff00ff; /*左上*/
     --user-disp-color:#fff; /*Loginfont*/
+    /*ハンバーガーメニュー*/
+    --hamburger-3line-color:#555;/*ボタン色・灰色*/
 }

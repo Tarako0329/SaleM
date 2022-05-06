@@ -75,7 +75,7 @@ $csrf_token=csrf_create();
 
 <header class="header-color" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="menu.php"><?php echo secho($title);?></a></div>
-    <p style="font-size:1rem;">  取扱商品登録画面</p>
+    <p style="font-size:1rem;color:var(--user-disp-color);font-weight:400;">  取扱商品登録画面</p>
 </header>
 
 <body>

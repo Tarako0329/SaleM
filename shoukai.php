@@ -124,7 +124,7 @@ window.onload = function() {
         <form method='post' action='shoukai.php'>
             あなたにWEBREZ+を紹介して下さった方の紹介者CDを登録して下さい。
             <input type='text' class='form-control' required="required" style='width:13rem;font-size:1.8rem;margin-top:5px;margin-bottom:5px;padding:0;' name='SHOUKAI' <?php if($ShoukaishaCD<>""){echo "value=".$ShoukaishaCD." readonly='readonly'";} ?>>
-            <input type='submit' class='btn btn-primary' style='width:80px;font-size:1.8rem' value='登　録'>
+            <input type='submit' class='btn-primary' style='width:100px;font-size:1.8rem' value='登　録' <?php if($ShoukaishaCD<>""){echo "disabled";}?>>
         </form>
         
     </div>

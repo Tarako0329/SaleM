@@ -15,7 +15,7 @@
     
     /*共通フッターカラー*/
     --footer-color:#7fffff;
-    /*レジフッター枠線*/
+    /*フッター枠線*/
     --rez-border-color:#0000ff;
     --rez-border-top:solid;
     /*レジ画面・登録ボタン*/
@@ -29,4 +29,7 @@
     --title-from:#000000; /*右下*/
     --title-to:#0000ff; /*左上*/
     --user-disp-color:#fff; /*Loginfont*/
+    /*ハンバーガーメニュー*/
+    --hamburger-3line-color:#fff;/*ボタン色・白*/
+    
 }

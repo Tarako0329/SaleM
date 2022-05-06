@@ -113,7 +113,11 @@ if($mode==3 || $mode==4){
     $_SESSION["addr11"] = $_POST["addr11"];
     $_SESSION["ADD2"] = $_POST["ADD2"];
     $_SESSION["ADD3"] = $_POST["ADD3"];
-    $_SESSION["SHOUKAI"] = rot13decrypt(secho($shoukai))-10000;;
+    if(rot13decrypt(secho($shoukai))!=""){
+        $_SESSION["SHOUKAI"] = rot13decrypt(secho($shoukai))-10000;
+    }else{
+        $_SESSION["SHOUKAI"] = NULL;
+    }
     $_SESSION["MOTO_PASS"] = $_POST["PASS"];
 }
 
@@ -148,7 +152,7 @@ if($mode==0 || $mode==1){
 </head>
 <header class="header-color" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="<?php if($mode==1 || $mode==4){echo "menu.php";}else{echo "index.php";}?>"><?php echo secho($title);?></a></div>
-    <p style="font-size:1rem;">  ユーザー登録</p>
+    <p style="font-size:1rem;color:var(--user-disp-color);font-weight:400;">  ユーザー登録</p>
 </header>
 
 <body>

@@ -17,6 +17,12 @@ footer{
     display: flex;    
     font-size:1.8rem;
     z-index: 99;
+    border-top:var(--rez-border-top);
+    border-top-width:thin;
+    border-left:none;
+    border-right:none;
+    border-bottom:none;
+    border-color:var(--rez-border-color);
 }
 td,th{
     padding-right:5px;
@@ -47,6 +53,12 @@ th{
     width:100%;
     height:100%; 
     font-size: 2rem;
+    border-top:none;
+    border-left:var(--rez-border-top);
+    border-left-width:thin;
+    border-right:none;
+    border-bottom:none;
+    border-color:var(--rez-border-color);
 }
 
 /*　↓ハンバーガーボタン↓　*/
@@ -67,7 +79,7 @@ th{
   width   : 30px;
   height  : 2px ;
   left    : 6px;
-  background : #555;
+  background : var(--hamburger-3line-color);
   -webkit-transition: 0.3s ease-in-out;
   -moz-transition   : 0.3s ease-in-out;
   transition        : 0.3s ease-in-out;

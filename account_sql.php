@@ -17,8 +17,9 @@ if(csrf_chk()==false && $mode>=3){
 }
 
 if($_POST["BTN"] == "登　録"){
-    //試用期間は登録日の翌月末
-    $kigen=date('Y-m-d', strtotime('last day of next month' . date("Y-m-d")));
+    //試用期間は登録日の翌月末->２ヶ月後に変更。（いつ登録すればお得・・・でタイミングを逃さないため）
+    //$kigen=date('Y-m-d', strtotime('last day of next month' . date("Y-m-d")));
+    $kigen=date('Y-m-d', strtotime(date("Y-m-d") . "+2 month"));
     
     //$sqlstr="insert into Users values(0,?,?,?,?,?,?,?,?,?,?,?,null,null,null,null,null,null,null,null,null,null,?,?,null)";
     $sqlstr="insert into Users(uid,mail,password,question,answer,loginrez,insdate,yuukoukigen,introducer_id) values(0,?,?,?,?,?,?,?,?)";

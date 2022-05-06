@@ -337,7 +337,7 @@ $ZEIresult = $pdo_h->query($ZEIsql);
  
 <header class="header-color" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></div>
-    <div style="font-size:1rem;"> 期間：<?php echo $UriFrom."～".$UriTo;?>　顧客：<?php echo $_POST["Tokui"];?>　EVENT：<?php echo $_POST["Event"];?></div>
+    <div style="font-size:1rem;color:var(--user-disp-color);font-weight:400;"> 期間：<?php echo $UriFrom."～".$UriTo;?>　顧客：<?php echo $_POST["Tokui"];?>　EVENT：<?php echo $_POST["Event"];?></div>
 
     <div class="hamburger">
         <span></span>
@@ -408,7 +408,7 @@ if($mode<>"select" && $mode<>"redirect"){
         <span style="font-size:1.3rem;">内訳(本体+税)：￥<?php echo $Goukei." + ".$GoukeiZei ?></span>
     </div>
     <div class="right1">
-        <button type='button' class='btn btn--chk' style="border-radius:0;" data-toggle="modal" data-target="#UriModal">検　索</button>
+        <button type='button' class='btn--chk' style="border-radius:0;" data-toggle="modal" data-target="#UriModal">検　索</button>
     </div>
 
 </footer>
