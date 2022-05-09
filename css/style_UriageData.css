@@ -32,6 +32,11 @@ th{
     top:69px;
     background:#fff;
 }
+.tr_stiky{
+    position: sticky;
+    top:87px;
+    background:#C3E5FF;
+}
 .kaikei{
     width:70%;
     height:100%;
@@ -116,7 +121,7 @@ nav.globalMenuSp {
   z-index : 2;
   top  : 0;
   right : 0;
-  color: #000;
+  color: var(--hamburger-fontcolor);    /*メニュー文字色*/
   background: #fff;
   text-align: left;
   transform: translateY(-100%);
@@ -126,7 +131,7 @@ nav.globalMenuSp {
 
 nav.globalMenuSp ul {
   /*background: #ccc;*/
-  background: #ff838b;
+  background: var(--hamburger-backcolor);
   margin: 0 auto;
   padding: 0;
   width: 100%;
@@ -137,7 +142,7 @@ nav.globalMenuSp ul li {
   padding: 0;
   width: 100%;
   /*border-bottom: 1px solid #fff;*/
-  border: 1px solid #fff;
+  border: 1px solid var(--hamburger-bordercolor);
 }
 nav.globalMenuSp ul li:last-child {
   padding-bottom: 0;
@@ -150,8 +155,8 @@ nav.globalMenuSp ul li:hover{
 
 nav.globalMenuSp ul li a {
   display: block;
-  color: #000;
-  padding: 0.5em 0;
+  color: var(--hamburger-fontcolor);
+  padding: 0.5em 5px; /*上下左右*/
   text-decoration :none;
 }
 

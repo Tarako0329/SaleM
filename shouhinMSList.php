@@ -219,7 +219,7 @@ foreach($stmt as $row){
     echo "        var select".$i." = document.getElementById('ORDERS[".$i."][zeikbn]');\n";
     echo "        var tanka".$i." = document.getElementById('ORDERS[".$i."][tanka]');\n";
     echo "        var shouhizei".$i." = document.getElementById('ORDERS[".$i."][shouhizei]');\n";
-    echo "        var kominuki".$i." = document.getElementsByName('options')\n";
+    echo "        var kominuki".$i." = document.getElementsByName('options');\n";
     
     echo "        var zei_math".$i." = function(new_tanka){\n"; //税計算関数
     echo "            if(new_tanka==''){\n";

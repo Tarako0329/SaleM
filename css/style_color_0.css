@@ -31,4 +31,8 @@
     --user-disp-color:#fff; /*Loginfont*/
     /*ハンバーガーメニュー*/
     --hamburger-3line-color:#555;/*ボタン色・灰色*/
+    --hamburger-fontcolor:#000;     /*文字色*/
+    --hamburger-bordercolor:#fff;   /*枠線*/
+    --hamburger-backcolor:#ff838b;  /*背景色*/
+
 }

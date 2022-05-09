@@ -209,8 +209,19 @@ INPUT.su{
     z-index: 99;
     display: flex;
 }
+.header-plus-minus{
+    height: 40px; /* 高さを70pxに指定 */
+    padding-top: 5px; /* ヘッダーに余白を指定 */
+    box-sizing: border-box; /* padding分を含んで幅を100%にするため */
+    position: fixed; /* ウィンドウを基準に画面に固定 */
+    top: 100px; /* 上下の固定位置を上から0pxにする */
+    left: 0; /* 左右の固定位置を左から0pxにする */
+    width: 100%;
+    z-index: 99;
+    display: flex;
+}
 body {
-    padding-top: 100px; /* ヘッダーの後ろに要素が隠れないようにするため */
+    padding-top: 140px; /* ヘッダーの後ろに要素が隠れないようにするため */
     padding-bottom:145px;  /*フッターーの後ろに要素が隠れないようにするため */
 }
 

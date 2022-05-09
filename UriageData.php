@@ -215,16 +215,17 @@ if($mode=="del"){
     
     if($post_Type=="rireki" || $post_Type==""){
         //履歴取得
-        $sql = "select * from UriageData ".$wheresql." order by UriageNO";
+        $sql = "select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData ".$wheresql." order by UriDate,Event,UriageNO";
     }elseif($post_Type=="shubetu"){
         //商品別<!-- 何が売れてるか知りたい -->
-        $sql = "select '-' as UriDate,'-' as Event,'-' as TokuisakiNM,'-' as UriageNO,'-' as Event,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ".$wheresql." group by ShouhinNM,tanka order by ShouhinNM";
+        $sql = "select '-' as UriDate,'-' as Event,'-' as TokuisakiNM,'-' as UriageNO,'-' as Event,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin,sum(zei) as zei,sum(su*genka_tanka) as genka,sum(UriageKin-(su*genka_tanka)) as arari ";
+        $sql = $sql."from UriageData ".$wheresql." group by ShouhinNM,tanka order by ShouhinNM";
     }elseif($post_Type=="UriNO"){
         //Event会計別<!-- イベントでの客単価を知りたい -->
-        $sql = "select '-' as UriDate,UriageNO,Event,'-' as TokuisakiNM,'-' as ShouhinNM,sum(su) as su,0 as tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ".$wheresql." group by Event,UriageNO order by Event,UriageNO";
+        $sql = "select '-' as UriDate,UriageNO,Event,'-' as TokuisakiNM,'-' as ShouhinNM,sum(su) as su,0 as tanka,sum(UriageKin) as UriageKin,sum(zei) as zei,sum(su*genka_tanka) as genka,sum(UriageKin-(su*genka_tanka)) as arari from UriageData ".$wheresql." group by Event,UriageNO order by Event,UriageNO";
     }elseif($post_Type=="EVTKshubetu"){
         //顧客/Event別・種類別<!-- 顧客・イベントでの売れ筋を知りたい -->
-        $sql = "select '-' as UriDate,'-' as UriageNO,Event,TokuisakiNM,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ".$wheresql." group by Event,TokuisakiNM,ShouhinNM,tanka order by Event,TokuisakiNM,ShouhinNM";
+        $sql = "select '-' as UriDate,'-' as UriageNO,Event,TokuisakiNM,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin,sum(zei) as zei,sum(su*genka_tanka) as genka,sum(UriageKin-(su*genka_tanka)) as arari from UriageData ".$wheresql." group by Event,TokuisakiNM,ShouhinNM,tanka order by Event,TokuisakiNM,ShouhinNM";
     }else{
         echo "そんな！";
     }
@@ -268,12 +269,13 @@ $rowcnt = $stmt->rowCount();
 if($rowcnt==0){
     //今日の実績が無い場合
     $msg="日付・イベント・顧客単位で集計した全実績。<br>(本日未売上時のみ表示)";
-    $sql = "select UriDate,'-' as UriageNO,Event,TokuisakiNM,'-' as ShouhinNM,0 as su,0 as tanka,sum(UriageKin) as UriageKin,sum(zei) as zei from UriageData ";
+    $sql = "select UriDate,'-' as UriageNO,Event,TokuisakiNM,'-' as ShouhinNM,0 as su,0 as tanka,sum(UriageKin) as UriageKin,sum(zei) as zei,sum(su*genka_tanka) as genka,sum(UriageKin-(su*genka_tanka)) as arari from UriageData ";
     $sql = $sql."where uid=:user_id group by UriDate,Event,TokuisakiNM order by UriDate desc,Event,TokuisakiNM";
     $stmt = $pdo_h->prepare( $sql );
     $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
     $rtn=$stmt->execute();
     $result = $stmt->fetchAll();
+    $post_Type="rireki2";
 }
 
 //Eventリスト（検索モーダル用）
@@ -376,7 +378,7 @@ $ZEIresult = $pdo_h->query($ZEIsql);
             <li><a style="font-weight:900">≪一括修正ﾒﾆｭｰ≫</a></li>
             <li><a data-toggle="modal" data-target="#UriUpEvModal" onclick="modechange_EV()">イベント名</a></li>
             <li><a data-toggle="modal" data-target="#UriUpEvModal" onclick="modechange_TK()">顧客名</a></li>
-            <li><a data-toggle="modal" data-target="#UriUpKinModal">金額</a></li>
+            <li><a data-toggle="modal" data-target="#UriUpKinModal" style='border-bottom:solid 1px var(--hamburger-bordercolor);'>金額</a></li>
         </ul>
     </nav>
 
@@ -393,13 +395,17 @@ $ZEIresult = $pdo_h->query($ZEIsql);
         
     ?>
     <table class="table-striped table-bordered" style='margin-top:10px'>
-        <thead><tr><th scope='col'>売上日</th><th scope='col'>Event/顧客</th><th scope='col' class='d-none d-sm-table-cell'>売上№</th><th>商品</th><th scope='col' style="width:3rem;">個数</th><th scope='col' style="width:3rem;" class='d-none d-sm-table-cell'>単価</th><th scope='col' style="width:5rem;">売上</th><th scope='col' style="width:4rem;">消費税</th><th scope='col' style="width:auto;">削除</th></tr></thead>
+        <thead><tr><th scope='col' class='d-none d-sm-table-cell'>売上日</th><th scope='col' class='d-none d-sm-table-cell'>Event/顧客</th><th scope='col'>売上№</th><th>商品</th><th scope='col' style="width:3rem;">数</th><th scope='col' style="width:3rem;" class='d-none d-sm-table-cell'>単価</th><th scope='col' style="width:5rem;">売上</th><th scope='col' style="width:4rem;">税</th><th scope='col' style="width:5rem;">原価</th><th scope='col' style="width:5rem;">粗利</th><th scope='col' style="width:auto;">削除</th></tr></thead>
 <?php    
 $Goukei=0;
 $GoukeiZei=0;
 $GoukeiZeikomi=0;
+$uridate="";
 foreach($result as $row){
-    echo "<tr><td>".$row["UriDate"]."</td><td>".$row["Event"].$row["TokuisakiNM"]."</td><td class='text-center d-none d-sm-table-cell'>".$row["UriageNO"]."</td><td>".rot13decrypt($row["ShouhinNM"])."</td><td class='text-right'>".$row["su"]."</td><td class='text-right d-none d-sm-table-cell'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td><td class='text-right'>".$row["zei"]."</td><td style='width:4rem;text-align:center;'>";
+    if($uridate!=$row["UriDate"].$row["Event"]){
+        echo "<tr class='tr_stiky'><td colspan='8' class='d-sm-none tr_stiky'>売上日：".$row["UriDate"]." 『".$row["Event"]."』</td></tr>\n";
+    }
+    echo "<tr><td class='d-none d-sm-table-cell'>".$row["UriDate"]."</td><td class='d-none d-sm-table-cell'>".$row["Event"].$row["TokuisakiNM"]."</td><td class='text-center'>".$row["UriageNO"]."</td><td>".rot13decrypt($row["ShouhinNM"])."</td><td class='text-right'>".$row["su"]."</td><td class='text-right d-none d-sm-table-cell'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td><td class='text-right'>".$row["zei"]."</td><td class='text-right'>".$row["genka"]."</td><td class='text-right'>".$row["arari"]."</td><td style='width:4rem;text-align:center;'>";
     if(($post_Type=="rireki" || $post_Type=="") && ($mode == "select" || $mode=="redirect")){
         //履歴表示の時だけ削除可能
         echo "<a href='UriageData.php?cd=".$row["ShouhinCD"]."&urino=".$row["UriageNO"]."&csrf_token=".$csrf_create."&mode=del'><i class='fa-regular fa-trash-can'></i></a>";
@@ -408,6 +414,7 @@ foreach($result as $row){
     $Goukei = $Goukei + $row["UriageKin"];
     $GoukeiZei = $GoukeiZei + $row["zei"];
     $GoukeiZeikomi = $GoukeiZeikomi + $row["UriageKin"] + $row["zei"];
+    $uridate=$row["UriDate"].$row["Event"];
 }
 ?>
     </table>

@@ -54,7 +54,7 @@ if(!empty($_SESSION["msg"])){
 //セッション->クッキー->DB
 if($_SESSION["EV"] != "" ){
     $event = $_SESSION["EV"];
-    deb_echo("session");
+    //deb_echo("session");
 }else{
     $sql = "select value,updatetime from PageDefVal where uid=? and machin=? and page=? and item=?";
     $stmt = $pdo_h->prepare($sql);
@@ -67,7 +67,7 @@ if($_SESSION["EV"] != "" ){
     
     if($stmt->rowCount()==0){
         $event = "";
-        deb_echo("NULL");
+        //deb_echo("NULL");
     }else{
         $buf = $stmt->fetch();
         $date = new DateTime($buf["updatetime"]);
@@ -77,12 +77,12 @@ if($_SESSION["EV"] != "" ){
         if($date->format('Y-m-d')!=date("Y-m-d")){
             //イベントの日付が前日以前の場合はクリア
             $event = "";
-            deb_echo($buf["updatetime"]."<br>");
+            //deb_echo($buf["updatetime"]."<br>");
         }else{
             //$buf = $stmt->fetch();
             $_SESSION["EV"] = $buf["value"];
             $event = $buf["value"];
-            deb_echo("DB".$event);
+            //deb_echo("DB".$event);
         }
     } 
 }
@@ -170,6 +170,7 @@ window.onload = function() {
      //合計金額を保持
      var kaikei_disp = document.getElementById("kaikei");
      var zei_disp = document.getElementById("utizei");
+     var plus_minus = document.getElementsByName('options');
      var total_pay = 0;
      var total_zei = 0;
      var total_pay_bk = 0;
@@ -186,12 +187,31 @@ window.onload = function() {
         //ボタンクリック時の動作関数
         echo "    //".rot13decrypt($row["shouhinNM"])."ボタンクリック時\n";
         echo "    btn_menu_".$row["shouhinCD"].".onclick = function (){\n";
-        echo "        cnt_suryou_".$row["shouhinCD"]." += 1;\n";
-        echo "        total_pay += ".($row["tanka"] + $row["tanka_zei"]).";\n";
-        echo "        total_zei += ".$row["tanka_zei"].";\n";
-        echo "        suryou_".$row["shouhinCD"].".value = cnt_suryou_".$row["shouhinCD"].";\n";
-        echo "        kaikei_disp.innerHTML = total_pay;\n";
-        echo "        zei_disp.innerHTML = total_zei;\n";
+        echo "        if(plus_minus[0].checked){\n";//通常モード（プラス）
+        echo "              cnt_suryou_".$row["shouhinCD"]." += 1;\n";
+        echo "              total_pay += ".($row["tanka"] + $row["tanka_zei"]).";\n";
+
+        echo "              total_pay_bk += ".($row["tanka"] + $row["tanka_zei"]).";\n";
+
+        echo "              total_zei += ".$row["tanka_zei"].";\n";
+        echo "              suryou_".$row["shouhinCD"].".value = cnt_suryou_".$row["shouhinCD"].";\n";
+        echo "              kaikei_disp.innerHTML = total_pay;\n";
+        echo "              zei_disp.innerHTML = total_zei;\n";
+        echo "        }else if(plus_minus[1].checked){\n";//減らすモード（マイナス）
+        echo "              if(cnt_suryou_".$row["shouhinCD"]."==0){\n";
+        echo "                  window.alert('数量０以下には出来ません');\n";
+        echo "                  exit;\n";
+        echo "              }\n";
+        echo "              cnt_suryou_".$row["shouhinCD"]." -= 1;\n";
+        echo "              total_pay -= ".($row["tanka"] + $row["tanka_zei"]).";\n";
+
+        echo "              total_pay_bk -= ".($row["tanka"] + $row["tanka_zei"]).";\n";
+
+        echo "              total_zei -= ".$row["tanka_zei"].";\n";
+        echo "              suryou_".$row["shouhinCD"].".value = cnt_suryou_".$row["shouhinCD"].";\n";
+        echo "              kaikei_disp.innerHTML = total_pay;\n";
+        echo "              zei_disp.innerHTML = total_zei;\n";
+        echo "        }\n";
         echo "    };\n";
         echo "\n";
     }
@@ -225,7 +245,7 @@ window.onload = function() {
         <?php
             if($_GET["mode"]<>"shuppin_zaiko"){ echo "CHOUSEI_AREA.style.display = 'block';\n";} //在庫登録モードでは割引ボタンを表示しない
         ?>
-        total_pay_bk = total_pay; //調整前金額を保存
+        //total_pay_bk = total_pay; //調整前金額を保存
     };
     
     dentaku.onclick = function(){
@@ -255,6 +275,7 @@ window.onload = function() {
         }
         kaikei_disp.innerHTML = 0;
         total_pay = 0;
+        total_pay_bk = 0;
         zei_disp.innerHTML = 0;
         total_zei = 0;
         <?php
@@ -275,14 +296,16 @@ window.onload = function() {
         btn_commit.style.display = 'none';
         order_chk.style.display = 'block';
         CHOUSEI_AREA.style.display = 'none';
+        CHOUSEI_BTN.style.display = 'block';
         CHOUSEI.style.display = 'none';
         CHOUSEI_GAKU.value='';
         kaikei_disp.innerHTML = total_pay_bk;
         total_pay=total_pay_bk;
      };
-    CHOUSEI_AREA.onclick = function(){
-        CHOUSEI_AREA.style.display = 'none';
+    CHOUSEI_BTN.onclick = function(){
+        CHOUSEI_BTN.style.display = 'none';
         CHOUSEI.style.display = 'block';
+        //total_pay_bk = total_pay
         return_btn = document.getElementById("maekin");
         maekin.innerHTML = total_pay_bk;
     }
@@ -345,7 +368,7 @@ window.onload = function() {
     <?php
     }else{
     ?>
-        <div class="event" style="font-family:inherit;"><input type="text" class="ev" name="EV" value="<?php echo $event ?>" required="required" placeholder="(必須)EVENT名/店舗名等"></div>
+        <div class="event" style="font-family:inherit;"><input type="text" class="ev" name="EV" value="<?php echo $event ?>" required="required" placeholder="(必須)イベント名等"></div>
         <input type="hidden" name="KOKYAKU" value="">
     <?php
     }
@@ -362,7 +385,18 @@ window.onload = function() {
         }
     ?>
     </select>
-    <a href="#" title="商品の並びを「カテゴリー（大⇒中⇒小⇒なし）」とローテーションで変更します。" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-regular fa-circle-question fa-lg"></i></a><a href='EVregi_sql.php?CTGL=<?php echo $next_categoly; ?>&mode=<?php echo $_GET["mode"]; ?>' style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-solid fa-arrow-rotate-right fa-lg"></i></a>
+    <a href="#" title="商品の並びを「カテゴリー（大->中->小->なし）」とローテーションで変更します。" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-regular fa-circle-question fa-lg logoff-color"></i></a><a href='EVregi_sql.php?CTGL=<?php echo $next_categoly; ?>&mode=<?php echo $_GET["mode"]; ?>' style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-solid fa-arrow-rotate-right fa-lg logoff-color"></i></a>
+</div>
+<div class='header-plus-minus' style='font-size:1.4rem;font-weight;700'>
+    <div class='btn-group btn-group-toggle mx-auto' style='padding:0;' data-toggle='buttons'>
+        <label class='btn btn-outline-primary active'>
+            <input type='radio' name='options' id='option1' value='plus' autocomplete='off' checked><i class="fa-solid fa-circle-plus"></i>　モード
+        </label>
+        <label class='btn btn-outline-warning'>
+            <input type='radio' name='options' id='option2' value='minus' autocomplete='off'><i class="fa-solid fa-circle-minus"></i>　モード
+        </label>
+    </div>
+    
 </div>
 <body>
 
@@ -378,10 +412,10 @@ window.onload = function() {
     }
 ?>
     <div class="container-fluid">
-        <div class="row" style='padding-top:5px;'>
+        <div class="row" style='padding-top:5px;display:none;' id='CHOUSEI_AREA'>
             <div class="col-1 col-lg-0" ></div>
             <div class="col-10 col-lg-3" style="font-size:2.2rem;padding-top:10px;">
-                <button type='button' class='btn-view btn-changeVal' style="display:none;padding:0.1rem;" id="CHOUSEI_AREA" >割引・割増</button>
+                <button type='button' class='btn-view btn-changeVal' style="padding:0.1rem;" id="CHOUSEI_BTN" >割引・割増</button>
             </div>
             <div class="col-1" ></div>
         </div>
