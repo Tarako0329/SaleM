@@ -268,6 +268,9 @@ $EVresult = $stmt->fetchAll();
                     echo "      borderColor: 'rgba('+(~~(256 * Math.random()))+','+(~~(256 * Math.random()))+','+ (~~(256 * Math.random()))+', 0.8)',\n";
                     echo "      label: '".rot13decrypt($row["ShouhinNM"])."',\n";
                     echo "      tension: 0.2,\n";
+                    echo "      pointRadius:5,\n";
+                    echo "      hitRadius:15,\n";
+                    echo "      pointHoverRadius:8,\n";
                     echo "      data: [";
                     $label=$row["ShouhinNM"];
                 }

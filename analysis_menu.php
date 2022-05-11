@@ -26,14 +26,6 @@ if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
 
 $rtn=check_session_userid($pdo_h);
 $token = csrf_create();
-$logoff=false;
-if($_GET["action"]=="logout"){
-    setCookie("webrez_token", 'a', -1, "/", null, TRUE, TRUE); 
-    session_destroy();
-    session_start();
-    $logoff=true;
-}
-
 
 ?>
 <head>
@@ -51,30 +43,10 @@ if($_GET["action"]=="logout"){
 </script>
 
 <header class="header-color">
-    
-    <?php
-    if($logoff==false){
-    ?>
-        <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div></a></div>
-        <span style="font-size:1.5rem;"><a href="menu.php?action=logout"><i class="fa-solid fa-right-from-bracket"></i></a></span>
-    <?php
-    }else{
-    ?>
-        <div class="yagou title"><a href="index.php"><?php echo $title;?></a></div></a></div>
-    <?php
-    }
-    ?>
+    <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div></a></div>
 </header>
 
 <body>
-<?php
-    if($logoff){
-        echo "ログオフしました。<br>";
-        echo "<a href='index.php'>再ログインする</a>";
-        //echo $_COOKIE["webrez_token"];
-        exit;
-    }
-?>
     <div class="container-fluid">
 
 <?php

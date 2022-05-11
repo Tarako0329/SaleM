@@ -187,16 +187,29 @@ function passEx($str,$uid,$key){
 }
 // =========================================================
 // 可逆暗号(日本語文字化け対策)
+// 22.05.11 商品名の暗号化運用を止めるため、既存関数を無効化。以降、暗号化したい場合はver2を使用する
 // =========================================================
 function rot13encrypt ($str) {
 	//暗号化
-    return str_rot13(base64_encode($str));
+    //return str_rot13(base64_encode($str));
+    return $str;
 }
 
 function rot13decrypt ($str) {
 	//暗号化解除
+    //return base64_decode(str_rot13($str));
+    return $str;
+}
+
+function rot13encrypt2 ($str) {
+	//暗号化
+    return str_rot13(base64_encode($str));
+}
+function rot13decrypt2 ($str) {
+	//暗号化解除
     return base64_decode(str_rot13($str));
 }
+
 // =========================================================
 // XSS対策 post get を echo するときに使用
 // =========================================================
