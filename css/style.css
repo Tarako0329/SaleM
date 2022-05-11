@@ -116,7 +116,7 @@ header{
     text-align: center;
     vertical-align: middle;
     text-decoration: none;
-    letter-spacing: 0.1em;
+    /*letter-spacing: 0.1em; 文字と文字の間隔*/
     border-radius: 0.5rem;
     white-space: normal;  
 }

@@ -1,38 +1,32 @@
 /*色関連*/
 :root {
-    /*パネルボタンのカラー*/
-    --panel-font-color: #6600ff;        /*文字色*/
-    --panel-bk-color: #fff;          /*背景色*/
-    --panel-bd-color: #0000ff;          /*枠線*/
-    /*レジ画面・割引割増ボタンの色など*/
-    --wari-font-color:#212529;          /*文字色*/
-    --wari-bk-color:#fff;            /*背景色*/
-    /*レジ画面・ジャンルバーのボタン・背景色など*/
-    --btn-updown-color:#0000ff;         /*上下ボタンの色*/
-    --btn-updown-font-color:#fff;    /*上下ボタンの文字色*/
-    --jumpbar-color:#0000ff;            /*バーの背景色*/
-    --categ-font-color:#fff;        /*カテゴリー名の文字色*/
-    
-    /*共通フッターカラー*/
-    --footer-color:#7fffff;
-    /*フッター枠線*/
-    --rez-border-color:#0000ff;
-    --rez-border-top:solid;
-    /*レジ画面・登録ボタン*/
-    --order-color:#2828ff;
-    --order-font-color:#fff;
-    /*レジ画面の釣銭・クリア・確認ボタン*/
-    --chk-color:#fff;
-    --chk-font-color:#0000ff;
-    /*ヘッダーのタイトル文字色*/
-    --title-color:#fff;
-    --title-from:#000000; /*右下*/
-    --title-to:#0000ff; /*左上*/
-    --user-disp-color:#fff; /*Loginfont*/
-    /*ハンバーガーメニュー*/
-    --hamburger-3line-color:#fff;   /*ボタン色・白*/
-    --hamburger-fontcolor:#6600ff;     /*文字色*/
-    --hamburger-bordercolor:#6600ff;   /*枠線*/
-    --hamburger-backcolor:#fff;  /*背景色*/
-    
+	--title-from:#000000;	/*ヘッダーグラデーションの右下*/
+	--title-to:#0000ff;	/*ヘッダーグラデーションの左上*/
+	--title-color:#fff;	/*ヘッダーのタイトル(webrez+)文字色*/
+	--user-disp-color:#fff;	/*ヘッダーの細かい情報文字色*/
+		
+	--rez-border-color:#0000ff;	/*レジフッター枠線の色*/
+	--rez-border-top:solid;	/*レジフッター枠線の有無*/
+		
+	--categ-font-color:#fff;	/*レジ画面・ジャンルバーのカテゴリー名の文字色*/
+	--jumpbar-color:#0000ff;	/*レジ画面・ジャンルバーのバーの背景色*/
+	--btn-updown-color:#0000ff;	/*レジ画面・ジャンルバーの上下ボタンの色*/
+	--btn-updown-font-color:#fff;	/*レジ画面・ジャンルバーの上下ボタンの文字色*/
+	--wari-bk-color:#fff;	/*レジ画面・割引割増ボタンの背景色*/
+	--wari-font-color:#212529;	/*レジ画面・割引割増ボタンの文字色*/
+	--order-color:#2828ff;	/*レジ画面・登録ボタンの背景色*/
+	--order-font-color:#fff;	/*レジ画面・登録ボタンの文字色*/
+	--minus-area-color:none;	/*レジ画面のマイナス部分背景色*/
+	--chk-color:#fff;	/*レジ画面の釣銭・クリア・確認ボタンの背景色*/
+	--chk-font-color:#0000ff;	/*レジ画面の釣銭・クリア・確認ボタンの文字色*/
+		
+	--panel-bk-color: #fff;	/*共通パネルボタンの背景色*/
+	--panel-font-color: #6600ff;	/*共通パネルボタンの文字色*/
+	--panel-bd-color: #0000ff;	/*共通パネルボタンの枠線*/
+	--footer-color:#7fffff;	/*共通フッターカラー*/
+		
+	--hamburger-3line-color:#fff;	/*売上実績画面ハンバーガーメニューの３本線のボタン色・灰色*/
+	--hamburger-backcolor:#fff;	/*売上実績画面ハンバーガーメニューの背景色*/
+	--hamburger-fontcolor:#6600ff;	/*売上実績画面ハンバーガーメニューの文字色*/
+	--hamburger-bordercolor:#6600ff;	/*売上実績画面ハンバーガーメニューの枠線*/
 }

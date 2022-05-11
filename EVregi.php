@@ -171,6 +171,7 @@ window.onload = function() {
      var kaikei_disp = document.getElementById("kaikei");
      var zei_disp = document.getElementById("utizei");
      var plus_minus = document.getElementsByName('options');
+     var minus_disp = document.getElementsByClassName('btn--rezi-minus');
      var total_pay = 0;
      var total_zei = 0;
      var total_pay_bk = 0;
@@ -390,13 +391,13 @@ window.onload = function() {
 <div class='header-plus-minus' style='font-size:1.4rem;font-weight;700'>
     <div class='btn-group btn-group-toggle mx-auto' style='padding:0;' data-toggle='buttons'>
         <label class='btn btn-outline-primary active'>
-            <input type='radio' name='options' id='option1' value='plus' autocomplete='off' checked><i class="fa-solid fa-circle-plus"></i>　モード
+            <input type='radio' name='options' id='option1' value='plus' autocomplete='off' checked>　▲　
         </label>
         <label class='btn btn-outline-warning'>
-            <input type='radio' name='options' id='option2' value='minus' autocomplete='off'><i class="fa-solid fa-circle-minus"></i>　モード
+            <input type='radio' name='options' id='option2' value='minus' autocomplete='off'>　▼　
         </label>
     </div>
-    
+        
 </div>
 <body>
 
@@ -455,17 +456,18 @@ window.onload = function() {
 	    }
         echo "  <div class ='col-md-3 col-sm-6 col-6 items' id='items_".$row["shouhinCD"]."'>\n";
         echo "      <button type='button' class='btn-view btn--rezi' id='btn_menu_".$row["shouhinCD"]."'>".rot13decrypt($row["shouhinNM"])."\n";
+        echo "      </button>\n";
+        //echo "      <div class='btn-view btn--rezi-minus' >▼\</div>n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][CD]' value = '".$row["shouhinCD"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][NM]' value = '".$row["shouhinNM"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][UTISU]' value = '".$row["utisu"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][ZEIKBN]' value = '".$row["zeiKBN"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][TANKA]' value = '".$row["tanka"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][GENKA_TANKA]' value = '".$row["genka_tanka"]."'>\n";
-        echo "      </button>\n";
         echo "      <div class ='ordered'>\n";
         echo "          ￥<input type='number' readonly='readonly' class='order tanka' value=".($row["tanka"] + $row["tanka_zei"]).">\n";
         echo "            <input type='hidden' name ='ORDERS[".$i."][ZEI]' value = '".$row["tanka_zei"]."'>\n";  //税込価格-(税込価格÷1.1or1.08)
-        echo "× <input type='number' readonly='readonly' name ='ORDERS[".$i."][SU]' id='suryou_".$row["shouhinCD"]."' class='order su' value = 0 style='display: inline'>\n";
+        echo "          × <input type='number' readonly='readonly' name ='ORDERS[".$i."][SU]' id='suryou_".$row["shouhinCD"]."' class='order su' value = 0 style='display: inline'>\n";
         echo "      </div>\n";
         echo "  </div>\n";
         

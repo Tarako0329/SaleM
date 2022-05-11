@@ -84,6 +84,10 @@ if($_POST["sum_tani"]==1){//日ごと
     $sqlstr = $sqlstr." group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriSum ";
     $gp_sqlstr = "group by UriDate,Event) as Urisum2 group by Event order by ROUND(avg(来客数)) desc";
     $aryColumn = ["Event/店舗","平均来客数"];
+}elseif($_POST["sum_tani"]==10){//商品の売れる勢い
+    $sqlstr = "select ShouhinNM,concat(time_format(insDatetime,'%H'), '時') as Hour,sum(su) as 個数 from UriageData ";
+    $gp_sqlstr = "group by ShouhinNM,time_format(insDatetime,'%H') order by ShouhinNM,time_format(insDatetime,'%H')";
+    $aryColumn = ["商品名","時","個数"];
 }
 
 $sqlstr = $sqlstr." where ShouhinCD<9900 and DATE_FORMAT(UriDate, '%Y%m') between :ymfrom and :ymto AND uid = :user_id ";
@@ -140,23 +144,11 @@ $EVresult = $stmt->fetchAll();
     
     <script>
     window.onload = function() {
-        //アラート用
-        function alert(msg) {
-          return $('<div class="alert" role="alert"></div>')
-            .text(msg);
-        }
-        (function($){
-          const e = alert('<?php echo $_SESSION["MSG"]; ?>').addClass('alert-success');
-          // アラートを表示する
-          $('#alert-1').append(e);
-          /* 2秒後にアラートを消す
-          setTimeout(() => {
-            e.alert('close');
-          }, 3000);
-          */
-        })(jQuery);
-        
-       const ctx = document.getElementById('myChart').getContext('2d');
+
+    <?php
+    if($_POST["sum_tani"]!=10){
+    ?>
+        const ctx = document.getElementById('myChart').getContext('2d');
         const myChart = new Chart(ctx, {
             type: 'bar',
             data: {
@@ -227,6 +219,112 @@ $EVresult = $stmt->fetchAll();
                 indexAxis: 'y'
             }
         });
+    <?php
+    }else if($_POST["sum_tani"]==10){
+        $label="";  //商品名を格納
+        $j=0;       //0～23までのカウンタ
+        $urisu=0;   //売上総数の保持
+        $min_hour=24;   //時間軸の最小値
+        $max_hour=0;    //時間軸の最大値
+        foreach($result as $row){
+            //取得したデータの中で最小時間をセット
+            if($min_hour>$row["Hour"]){
+                $min_hour=$row["Hour"];
+            }
+            //取得したデータの中で最大時間をセット
+            if($max_hour<$row["Hour"]){
+                $max_hour=$row["Hour"];
+            }
+        }
+        //最初に売れた時間帯の2時間前から最後に売れた1時間後までを時間軸に使用
+        $min_hour=$min_hour-2;
+        $max_hour=$max_hour+1;
+    ?>
+        var ctx = document.getElementById('myChart');
+        var data = {
+            <?php
+            echo "      labels: [";
+            $j=$min_hour;
+            while($j<=$max_hour){
+                echo "'".$j."時',";
+                $j++;
+            }
+            echo "],\n";
+            echo "      datasets: [\n";
+            $j=$min_hour;
+            foreach($result as $row){
+                if($label!=$row["ShouhinNM"]){
+                    if($j!=$min_hour){
+                        //echo $urisu;
+                        while($j<=$max_hour){
+                            echo $urisu.",";
+                            $j++;
+                        }
+                        echo "]},\n";
+                    }
+                    $urisu=0;
+                    $j=$min_hour;
+                    echo "      {\n";
+                    echo "      borderColor: 'rgba('+(~~(256 * Math.random()))+','+(~~(256 * Math.random()))+','+ (~~(256 * Math.random()))+', 0.8)',\n";
+                    echo "      label: '".rot13decrypt($row["ShouhinNM"])."',\n";
+                    echo "      tension: 0.2,\n";
+                    echo "      data: [";
+                    $label=$row["ShouhinNM"];
+                }
+                while($j<=$max_hour){
+                    //echo $j."時:".$row["Hour"]."\n";
+                    if($j."時"==$row["Hour"]){
+                        $urisu = $urisu + $row["個数"];
+                        echo $urisu.",";
+                        $j++;
+                        break;
+                    }else{
+                        echo $urisu.",";
+                    }
+                    
+                    $j++;
+                }
+            }
+            while($j<=$max_hour){
+                echo $urisu.",";
+                $j++;
+            }
+            echo "]}\n";
+            echo "      ]};\n";
+            /*
+            var data = {
+                labels: ["1月", "2月", "3月", "4月", "5月"],
+                datasets: [{
+                    label: 'プリンター',
+                    data: [880, 740, 900, 520, 930],
+                    borderColor: 'rgba(255, 100, 100, 1)',
+                    lineTension: 0,
+                    fill: false,
+                    borderWidth: 3
+                },
+                {
+                    label: 'パソコン',
+                    data: [1200, 1350, 1220, 1220, 1420],
+                    borderColor: 'rgba(100, 100, 255, 1)',
+                    lineTension: 0,
+                    fill: false,
+                    borderWidth: 3
+                }]
+            };
+            */
+            ?>
+        
+        var options = {};
+        
+        var ex_chart = new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: options
+        });
+    <?php
+    }
+    ?>
+        
     };
     </script>
 
@@ -275,16 +373,18 @@ $EVresult = $stmt->fetchAll();
                 <option value='7' <?php if($_POST["sum_tani"]==7){echo "selected";} ?> >客単価ランキング</option>
                 <option value='8' <?php if($_POST["sum_tani"]==8){echo "selected";} ?> >来客数推移</option>
                 <option value='9' <?php if($_POST["sum_tani"]==9){echo "selected";} ?> >平均来客数ランキング</option>
+                <option value='10' <?php if($_POST["sum_tani"]==10){echo "selected";} ?> >売れる勢い</option>
             </select>
             <select name='list' class="form-control" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px">
-            <option value='%'>場所・顧客</option>
+            <option value='%'>イベント・顧客の選択</option>
             <option value='%'>全て</option>
             <?php
             foreach($EVresult as $row){
                 if($list==$row["LIST"]){
                     echo "<option value='".$row["LIST"]."' selected>".$row["LIST"]."</option>\n";
+                }else{
+                    echo "<option value='".$row["LIST"]."'>".$row["LIST"]."</option>\n";
                 }
-                echo "<option value='".$row["LIST"]."'>".$row["LIST"]."</option>\n";
             }
             ?>
             </select>

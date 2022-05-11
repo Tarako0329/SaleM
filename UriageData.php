@@ -220,13 +220,16 @@ if($mode=="del"){
         //商品別<!-- 何が売れてるか知りたい -->
         $sql = "select '-' as UriDate,'-' as Event,'-' as TokuisakiNM,'-' as UriageNO,'-' as Event,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin,sum(zei) as zei,sum(su*genka_tanka) as genka,sum(UriageKin-(su*genka_tanka)) as arari ";
         $sql = $sql."from UriageData ".$wheresql." group by ShouhinNM,tanka order by ShouhinNM";
-    }elseif($post_Type=="UriNO"){
+    }
+    /*売上分析と機能が重複してるので削除
+    elseif($post_Type=="UriNO"){
         //Event会計別<!-- イベントでの客単価を知りたい -->
         $sql = "select '-' as UriDate,UriageNO,Event,'-' as TokuisakiNM,'-' as ShouhinNM,sum(su) as su,0 as tanka,sum(UriageKin) as UriageKin,sum(zei) as zei,sum(su*genka_tanka) as genka,sum(UriageKin-(su*genka_tanka)) as arari from UriageData ".$wheresql." group by Event,UriageNO order by Event,UriageNO";
     }elseif($post_Type=="EVTKshubetu"){
         //顧客/Event別・種類別<!-- 顧客・イベントでの売れ筋を知りたい -->
         $sql = "select '-' as UriDate,'-' as UriageNO,Event,TokuisakiNM,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin,sum(zei) as zei,sum(su*genka_tanka) as genka,sum(UriageKin-(su*genka_tanka)) as arari from UriageData ".$wheresql." group by Event,TokuisakiNM,ShouhinNM,tanka order by Event,TokuisakiNM,ShouhinNM";
-    }else{
+    }*/
+    else{
         echo "そんな！";
     }
     //echo $sql;
@@ -497,12 +500,14 @@ if($mode<>"select" && $mode<>"redirect"){
                         </select>
                     </div>
                     <div>
-                        <label for="Type" class="control-label">表示：</label>
+                        <label for="Type" class="control-label">表示：上で指定した期間中の</label>
                         <select name="Type" style="font-size:1.5rem;padding-top:0;" id="Type" class="form-control">
-                            <option value="rireki" <?php if($post_Type=="rireki"){echo "selected";}  ?> >履歴</option>
-                            <option value="shubetu" <?php if($post_Type=="shubetu"){echo "selected";}  ?> >種類別</option>     <!-- 何が売れてるか知りたい -->
-                            <option value="UriNO" <?php if($post_Type=="UriNO"){echo "selected";}  ?> >Event会計別</option>  <!-- イベントでの客単価を知りたい -->
-                            <option value="EVTKshubetu" <?php if($post_Type=="EVTKshubetu"){echo "selected";}  ?> >顧客/Event別・種類別</option> <!-- 顧客・イベントでの売れ筋を知りたい -->
+                            <option value="rireki" <?php if($post_Type=="rireki"){echo "selected";}  ?> >売上履歴</option>
+                            <option value="shubetu" <?php if($post_Type=="shubetu"){echo "selected";}  ?> >商品ごとの売上実績</option>     <!-- 何が売れてるか知りたい -->
+                            <!--売上分析と機能が重複してるので削除
+                            <option value="UriNO" <?php if($post_Type=="UriNO"){echo "selected";}  ?> >Event会計別</option>   イベントでの客単価を知りたい 
+                            <option value="EVTKshubetu" <?php if($post_Type=="EVTKshubetu"){echo "selected";}  ?> >顧客/Event別・種類別</option>  顧客・イベントでの売れ筋を知りたい 
+                            -->
                         </select>
                     </div>
                 </div>

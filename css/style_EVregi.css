@@ -31,7 +31,23 @@ INPUT.ev{
     width:100%; 
     font-size: 2.0rem;
 }
-
+/*レジボタン マイナス*/
+.btn--rezi-minus{
+    height:64.5%;
+    width:25%; 
+    font-size: 2.0rem;
+    position:absolute;
+    top:5px;
+    right:5px;
+    bottom:5px;
+    background:var(--minus-area-color);
+    opacity:0.5;
+    border-radius:0;
+    border-top:none;
+    border-right:none;
+    border-bottom:none;
+    padding-bottom:5px;
+}
 INPUT.date{
     /*INPUT イベント名・店舗名部*/
     border-right:none;
@@ -219,6 +235,7 @@ INPUT.su{
     width: 100%;
     z-index: 99;
     display: flex;
+    background:#fff;
 }
 body {
     padding-top: 140px; /* ヘッダーの後ろに要素が隠れないようにするため */

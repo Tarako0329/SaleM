@@ -301,17 +301,20 @@ function drow_table($aryColumn,$result){
         
         echo "\n</thead></tr>\n";
         
-
+        $row_sum[]=0;
         foreach($result as $row){
             
             echo "<tr>";
             for($i=0;isset($row[$i])==true;$i++){
                 if(preg_match('/[^0-9|^%,%]/',$row[$i])==0){//0～9とカンマ以外が存在して無い場合、数値として右寄せ
                     $right = " class='text-right' ";
+                    $row_sum[$i]=$row_sum[$i]+$row[$i];
                 }elseif(preg_match('/[^0-9]/',$row[$i])==0){//0～9以外が存在して無い場合、数値として右寄せ
                     $right = " class='text-right' ";
+                    $row_sum[$i]=$row_sum[$i]+$row[$i];
                 }else{
                     $right = "";
+                    $row_sum[$i]="";
                 }
                 
                 if($row["ShouhinNM"]===$row[$i]){
@@ -323,7 +326,12 @@ function drow_table($aryColumn,$result){
             }
             echo "</tr>\n";
         }
-
+        
+        echo "<thead><tr><th>合計</th>";
+        for($i=1;isset($row_sum[$i])==true;$i++){
+            echo "<th class='text-right'>".$row_sum[$i]."</th>";
+        }
+        echo "</tr></thead>\n";
         echo "</table>\n";    
 }
 
@@ -443,7 +451,7 @@ function drow_table_abc($aryColumn,$result,$cols){
             echo "<td class='text-center'>".$rank."</td>";
             echo "</tr>\n";
         }
-        echo "<tr><td>合計</td><td class='text-right'>".$row["総売上"]."</td></tr>";
+        echo "<thead><tr><th>合計</th><th class='text-right'>".$row["総売上"]."</th></tr></thead>";
         echo "</table>\n";
         echo "</div></div>";
         
