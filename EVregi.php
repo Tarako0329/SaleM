@@ -417,7 +417,7 @@ window.onload = function() {
             <input type='radio' name='options' value='minus' autocomplete='off'>　▼　
         </label>
     </div>
-    <a href="#" style='color:inherit;margin-left:5px;' data-toggle='modal' data-target='#modal_help2'><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>
+    <a href="#" style='color:inherit;margin-left:5px;margin-top:10px;' data-toggle='modal' data-target='#modal_help2'><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>
     <!--
     <div id='plus_disp'>【商品オーダーをタップして下さい。】</div>
     <div class='minus_disp' style='display:none;'>【商品タップでオーダー数を減らせます。】</div>
