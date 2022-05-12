@@ -398,7 +398,7 @@ $ZEIresult = $pdo_h->query($ZEIsql);
         
     ?>
     <table class="table-striped table-bordered" style='margin-top:10px'>
-        <thead><tr><th scope='col' class='d-none d-sm-table-cell'>売上日</th><th scope='col' class='d-none d-sm-table-cell'>Event/顧客</th><th scope='col'>売上№</th><th>商品</th><th scope='col' style="width:3rem;">数</th><th scope='col' style="width:3rem;" class='d-none d-sm-table-cell'>単価</th><th scope='col' style="width:5rem;">売上</th><th scope='col' style="width:4rem;">税</th><th scope='col' style="width:5rem;">原価</th><th scope='col' style="width:5rem;">粗利</th><th scope='col' style="width:auto;">削除</th></tr></thead>
+        <thead><tr><th scope='col' class='d-none d-sm-table-cell'>売上日</th><th scope='col' class='d-none d-sm-table-cell'>Event/顧客</th><th scope='col' style="width:2rem;">No</th><th>商品</th><th scope='col' style="width:3rem;">数</th><th scope='col' style="width:3rem;" class='d-none d-sm-table-cell'>単価</th><th scope='col' style="width:5rem;">売上</th><th scope='col' style="width:4rem;">税</th><th scope='col' style="width:5rem;">原価</th><th scope='col' style="width:5rem;">粗利</th><th scope='col' style="width:4rem;">削除</th></tr></thead>
 <?php    
 $Goukei=0;
 $GoukeiZei=0;

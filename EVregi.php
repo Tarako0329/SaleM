@@ -15,7 +15,7 @@ csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェッ�
 csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
 */
 require "php_header.php";
-
+/*
 if(isset($_GET["csrf_token"]) || empty($_POST)){
     if(csrf_chk_redirect($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。".$_GET["csrf_token"];
@@ -24,7 +24,7 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
         exit();
     }
 }
-
+*/
 //セッションのIDがクリアされた場合の再取得処理。
 $rtn=check_session_userid($pdo_h);
 
@@ -167,14 +167,13 @@ window.onload = function() {
 
      // オブジェクトと変数の準備
      
-     //合計金額を保持
      var kaikei_disp = document.getElementById("kaikei");
      var zei_disp = document.getElementById("utizei");
      var plus_minus = document.getElementsByName('options');
-     var minus_disp = document.getElementsByClassName('btn--rezi-minus');
-     var total_pay = 0;
-     var total_zei = 0;
-     var total_pay_bk = 0;
+     //フッター合計支払金額を保持
+     var total_pay = 0;     //税込総支払額
+     var total_zei = 0;     //総支払額の内税
+     var total_pay_bk = 0;  //値引値増前の金額を保持し、会計確定せずに戻る際にtotal_payに返す
      
      //PHPで繰り返し表示。メニューボタン数に応じて準備する
 <?php     
@@ -314,6 +313,25 @@ window.onload = function() {
         total_pay = CHOUSEI_GAKU.value;
         kaikei_disp.innerHTML = total_pay;
     }
+
+     var plus_mode = document.getElementById("plus_mode");
+     var minus_mode = document.getElementById("minus_mode");
+     //var plus_disp = document.getElementById("plus_disp");
+     var minus_disp = document.getElementsByClassName('minus_disp');
+     minus_mode.onclick = function(){
+        for (let i = 0; i < minus_disp.length; i++) {
+            minus_disp.item(i).style.display = 'block';
+        }
+        //plus_disp.style.display = 'none';
+     }
+     plus_mode.onclick = function(){
+        for (let i = 0; i < minus_disp.length; i++) {
+            minus_disp.item(i).style.display = 'none';
+        }
+        //plus_disp.style.display = 'block';
+     }
+
+
     
     //アラート用
     function alert(msg) {
@@ -386,18 +404,24 @@ window.onload = function() {
         }
     ?>
     </select>
-    <a href="#" title="商品の並びを「カテゴリー（大->中->小->なし）」とローテーションで変更します。" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-regular fa-circle-question fa-lg logoff-color"></i></a><a href='EVregi_sql.php?CTGL=<?php echo $next_categoly; ?>&mode=<?php echo $_GET["mode"]; ?>' style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-solid fa-arrow-rotate-right fa-lg logoff-color"></i></a>
+    <a href="#" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;' data-toggle='modal' data-target='#modal_help1'><i class="fa-regular fa-circle-question fa-lg logoff-color"></i></a>
+    <a href='EVregi_sql.php?CTGL=<?php echo $next_categoly; ?>&mode=<?php echo $_GET["mode"]; ?>' style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-solid fa-arrow-rotate-right fa-lg logoff-color"></i></a>
 </div>
-<div class='header-plus-minus' style='font-size:1.4rem;font-weight;700'>
-    <div class='btn-group btn-group-toggle mx-auto' style='padding:0;' data-toggle='buttons'>
-        <label class='btn btn-outline-primary active'>
-            <input type='radio' name='options' id='option1' value='plus' autocomplete='off' checked>　▲　
+<div class='header-plus-minus text-center' style='font-size:1.4rem;font-weight;700'>
+    <i class="fa-regular fa-circle-question fa-lg logoff-color"></i><!--スペーシングのため白アイコンを表示-->
+    <div class='btn-group btn-group-toggle' style='padding:0;' data-toggle='buttons'>
+        <label class='btn btn-outline-primary active' id='plus_mode'>
+            <input type='radio' name='options' value='plus' autocomplete='off' checked>　▲　
         </label>
-        <label class='btn btn-outline-warning'>
-            <input type='radio' name='options' id='option2' value='minus' autocomplete='off'>　▼　
+        <label class='btn btn-outline-warning' id='minus_mode'>
+            <input type='radio' name='options' value='minus' autocomplete='off'>　▼　
         </label>
     </div>
-        
+    <a href="#" style='color:inherit;margin-left:5px;' data-toggle='modal' data-target='#modal_help2'><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>
+    <!--
+    <div id='plus_disp'>【商品オーダーをタップして下さい。】</div>
+    <div class='minus_disp' style='display:none;'>【商品タップでオーダー数を減らせます。】</div>
+    -->
 </div>
 <body>
 
@@ -413,12 +437,15 @@ window.onload = function() {
     }
 ?>
     <div class="container-fluid">
-        <div class="row" style='padding-top:5px;display:none;' id='CHOUSEI_AREA'>
+        <div class="row text-center" style='padding-top:5px;display:none;' id='CHOUSEI_AREA'>
+            <!--
             <div class="col-1 col-lg-0" ></div>
             <div class="col-10 col-lg-3" style="font-size:2.2rem;padding-top:10px;">
                 <button type='button' class='btn-view btn-changeVal' style="padding:0.1rem;" id="CHOUSEI_BTN" >割引・割増</button>
             </div>
             <div class="col-1" ></div>
+            -->
+            <button type='button' class='btn-view btn-changeVal' style="padding:0.1rem;width:300px;font-size:2.2rem;" id="CHOUSEI_BTN" >割引・割増</button>
         </div>
 
         <div class="row" style="display:none" id="CHOUSEI">
@@ -457,7 +484,7 @@ window.onload = function() {
         echo "  <div class ='col-md-3 col-sm-6 col-6 items' id='items_".$row["shouhinCD"]."'>\n";
         echo "      <button type='button' class='btn-view btn--rezi' id='btn_menu_".$row["shouhinCD"]."'>".rot13decrypt($row["shouhinNM"])."\n";
         echo "      </button>\n";
-        //echo "      <div class='btn-view btn--rezi-minus' >▼\</div>n";
+        echo "      <div class='btn-view btn--rezi-minus bg-warning minus_disp' style='display:none;'></div>n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][CD]' value = '".$row["shouhinCD"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][NM]' value = '".$row["shouhinNM"]."'>\n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][UTISU]' value = '".$row["utisu"]."'>\n";
@@ -516,7 +543,7 @@ window.onload = function() {
     </div>
 </footer>
 
-<!--モーダル電卓-->
+<!--モーダル電卓(FcModal)-->
 <div class='modal fade' id='FcModal' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
     <div class='modal-dialog  modal-dialog-centered'>
         <div class='modal-content' style='font-size: 3.0rem; font-weight: 800;'>
@@ -529,6 +556,54 @@ window.onload = function() {
                 <p>お会計：￥<span id='seikyuu'>0</span></p>
                 <button type='button' id='keisan'>計　算</button>
                 <p>お釣り：￥<span id='oturi'>0</span></p>    
+            </div>
+            <div class='modal-footer'>
+                <!--<button type='button' class='btn btn-default' data-dismiss='modal'>閉じる</button>-->
+                <button type='button'  data-dismiss='modal'>閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--分類表示切替のヘルプ(modal_help1)-->
+<div class='modal fade' id='modal_help1' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
+    <div class='modal-dialog  modal-dialog-centered'>
+        <div class='modal-content' style='font-size: 1.5rem; font-weight: 600;'>
+            <div class='modal-header'>
+                <!--<div class='modal-title' id='myModalLabel'>電　卓</div>-->
+            </div>
+            <div class='modal-body text-center'>
+                <i class="fa-solid fa-arrow-rotate-right fa-lg"></i> をタップすると、商品登録時に設定した分類ごとにパネルが表示されます。<br>
+                タップするごとに（大分類⇒中分類⇒小分類⇒50音順）の順番でループします。<br>
+            </div>
+            <div class='modal-footer'>
+                <!--<button type='button' class='btn btn-default' data-dismiss='modal'>閉じる</button>-->
+                <button type='button'  data-dismiss='modal'>閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--加算減算モードのヘルプ(modal_help2)-->
+<div class='modal fade' id='modal_help2' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
+    <div class='modal-dialog  modal-dialog-centered'>
+        <div class='modal-content' style='font-size: 1.5rem; font-weight: 600;'>
+            <div class='modal-header'>
+                <!--<div class='modal-title' id='myModalLabel'>電　卓</div>-->
+            </div>
+            <div class='modal-body'>
+                <div class='btn-group btn-group-toggle' style='padding:0;' data-toggle='buttons'>
+                <label class='btn btn-outline-warning'>
+                    <input type='radio' autocomplete='off'>　▼　
+                </label>
+                </div>
+                をタップすると、注文数を減らせるようになります。<br>
+                <div class='btn-group btn-group-toggle' style='padding:0;' data-toggle='buttons'>
+                <label class='btn btn-outline-primary'>
+                <input type='radio' autocomplete='off'>　▲　
+                </label>
+                </div>
+                をタップすると元に戻ります。<br>
             </div>
             <div class='modal-footer'>
                 <!--<button type='button' class='btn btn-default' data-dismiss='modal'>閉じる</button>-->

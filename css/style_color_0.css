@@ -8,7 +8,7 @@
 	--rez-border-color:#fff;	/*レジフッター枠線の色*/
 	--rez-border-top:none;	/*レジフッター枠線の有無*/
 		
-	--categ-font-color:#fff;	/*レジ画面・ジャンルバーのカテゴリー名の文字色*/
+	--categ-font-color:black;	/*レジ画面・ジャンルバーのカテゴリー名の文字色*/
 	--jumpbar-color:#d9e367;	/*レジ画面・ジャンルバーのバーの背景色*/
 	--btn-updown-color:#d9e367;	/*レジ画面・ジャンルバーの上下ボタンの色*/
 	--btn-updown-font-color:#fff;	/*レジ画面・ジャンルバーの上下ボタンの文字色*/
@@ -16,7 +16,7 @@
 	--wari-font-color:#212529;	/*レジ画面・割引割増ボタンの文字色*/
 	--order-color:#eb6100;	/*レジ画面・登録ボタンの背景色*/
 	--order-font-color:#fff;	/*レジ画面・登録ボタンの文字色*/
-	--minus-area-color:none;	/*レジ画面のマイナス部分背景色*/
+	--minus-area-color:yellow;	/*レジ画面のマイナス部分背景色*/
 	--chk-color:#9acd32;	/*レジ画面の釣銭・クリア・確認ボタンの背景色*/
 	--chk-font-color:#fff;	/*レジ画面の釣銭・クリア・確認ボタンの文字色*/
 		

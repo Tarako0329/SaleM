@@ -45,9 +45,11 @@ body {
 .header-color{
     background-image:linear-gradient(to left top, var(--title-from), var(--title-to));
 }
-.logoff-color:before
-{
+.logoff-color:before{
 	color: var(--user-disp-color);
+}
+.awesome-color-panel-border-same:before{
+	color: var(--panel-bd-color);
 }
 .rainbow-color,
 .rainbow-color:before{
