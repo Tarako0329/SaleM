@@ -6,7 +6,7 @@ $token = csrf_create();
 $sqlstr="select * from Users where uid=?";
 $flg="";
 if(!empty($_POST)){
-    $ShoukaishaCD=rot13decrypt(secho($_POST["SHOUKAI"]))-10000;
+    $ShoukaishaCD=rot13decrypt2(secho($_POST["SHOUKAI"]))-10000;
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $ShoukaishaCD, PDO::PARAM_INT);
     $stmt->execute();
@@ -38,10 +38,10 @@ $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
 $stmt->execute();
 $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$ShoukaiCD=rot13encrypt($row[0]["uid"]+10000);
+$ShoukaiCD=rot13encrypt2($row[0]["uid"]+10000);
 $ShoukaishaCD="";
 if($row[0]["introducer_id"]<>""){
-    $ShoukaishaCD=rot13encrypt($row[0]["introducer_id"]+10000);
+    $ShoukaishaCD=rot13encrypt2($row[0]["introducer_id"]+10000);
 }
 
 
