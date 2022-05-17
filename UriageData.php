@@ -2,6 +2,7 @@
 <html lang="ja">
 <?php
 require "php_header.php";
+/*
 if($_GET["mode"]=="redirect"){
     if(csrf_chk_redirect($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。③";
@@ -23,7 +24,7 @@ if($_GET["mode"]=="redirect"){
     header("Location: index.php");
     exit();
 }
-
+*/
 $rtn=check_session_userid($pdo_h);
 $csrf_create = csrf_create();
 
@@ -206,10 +207,12 @@ if($mode=="del"){
         $wheresql = $wheresql." AND Event=:Event ";
         $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND Event='".$post_Event."' ";
     }
+    /*
     if($post_Tokui<>""){
         $wheresql= $wheresql." AND TokuisakiNM=:Tokui ";
         $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND TokuisakiNM='".$post_Tokui."' ";
     }
+    */
     $wheresql= $wheresql." AND uid = :user_id ";
     $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND uid = :user_id ";
     
@@ -220,6 +223,8 @@ if($mode=="del"){
         //商品別<!-- 何が売れてるか知りたい -->
         $sql = "select '-' as UriDate,'-' as Event,'-' as TokuisakiNM,'-' as UriageNO,'-' as Event,ShouhinNM,sum(su) as su,tanka,sum(UriageKin) as UriageKin,sum(zei) as zei,sum(su*genka_tanka) as genka,sum(UriageKin-(su*genka_tanka)) as arari ";
         $sql = $sql."from UriageData ".$wheresql." group by ShouhinNM,tanka order by ShouhinNM";
+    }elseif($post_Type=="sumary"){
+        //skip
     }
     /*売上分析と機能が重複してるので削除
     elseif($post_Type=="UriNO"){
@@ -232,21 +237,26 @@ if($mode=="del"){
     else{
         echo "そんな！";
     }
-    //echo $sql;
-    $stmt = $pdo_h->prepare( $sql );
-    if($_POST["UriDate"]<>""){
-        $stmt->bindValue("UriDate", $_POST["UriDate"], PDO::PARAM_STR);
-    }
-    if($_POST["UriDateTo"]<>""){
-        $stmt->bindValue("UriDateTo", $_POST["UriDateTo"], PDO::PARAM_STR);
-    }else{
-        $stmt->bindValue("UriDateTo", $UriFrom, PDO::PARAM_STR);
-    }
-    if($post_Event<>""){
-        $stmt->bindValue("Event", $post_Event, PDO::PARAM_STR);
-    }
-    if($post_Tokui<>""){
-        $stmt->bindValue("Tokui", $post_Tokui, PDO::PARAM_STR);
+    //deb_echo($sql);
+    
+    if($post_Type!="sumary"){
+        $stmt = $pdo_h->prepare( $sql );
+        if($_POST["UriDate"]<>""){
+            $stmt->bindValue("UriDate", $_POST["UriDate"], PDO::PARAM_STR);
+        }
+        if($_POST["UriDateTo"]<>""){
+            $stmt->bindValue("UriDateTo", $_POST["UriDateTo"], PDO::PARAM_STR);
+        }else{
+            $stmt->bindValue("UriDateTo", $UriFrom, PDO::PARAM_STR);
+        }
+        if($post_Event<>""){
+            $stmt->bindValue("Event", $post_Event, PDO::PARAM_STR);
+        }
+        /*
+        if($post_Tokui<>""){
+            $stmt->bindValue("Tokui", $post_Tokui, PDO::PARAM_STR);
+        }
+        */
     }
 }elseif($mode=="redirect"){
     //更新結果の表示
@@ -269,18 +279,21 @@ if($rtn==false){
 }
 $result = $stmt->fetchAll();
 $rowcnt = $stmt->rowCount();
-if($rowcnt==0){
-    //今日の実績が無い場合
-    $msg="日付・イベント・顧客単位で集計した全実績。<br>(本日未売上時のみ表示)";
+if($rowcnt==0 || $post_Type=="sumary"){
+    //今日の実績が無い場合,もしくはサマリー選択時
+    //$msg="日付・イベント・顧客単位で集計した全実績。";
+    if($rowcnt==0){
+        $msg="(本日未売上時はこの画面が初期表示)";
+    }
     $sql = "select UriDate,'-' as UriageNO,Event,TokuisakiNM,'-' as ShouhinNM,0 as su,0 as tanka,sum(UriageKin) as UriageKin,sum(zei) as zei,sum(su*genka_tanka) as genka,sum(UriageKin-(su*genka_tanka)) as arari from UriageData ";
-    $sql = $sql."where uid=:user_id group by UriDate,Event,TokuisakiNM order by UriDate desc,Event,TokuisakiNM";
+    $sql = $sql."where uid=:user_id group by UriDate,Event,TokuisakiNM order by UriDate,Event,TokuisakiNM";
     $stmt = $pdo_h->prepare( $sql );
     $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
     $rtn=$stmt->execute();
     $result = $stmt->fetchAll();
-    $post_Type="rireki2";
+    //$post_Type="rireki2";
 }
-
+/*AJaxでリアルタイム取得に変更
 //Eventリスト（検索モーダル用）
 $EVsql = "select Event from UriageData where uid =? group by Event order by Event";
 $stmt = $pdo_h->prepare($EVsql);
@@ -294,6 +307,7 @@ $stmt = $pdo_h->prepare($TKsql);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
 $TKresult = $stmt->fetchAll();
+*/
 
 //売上実績商品リスト（修正モーダル用）
 $SHsql = "select ShouhinCD,ShouhinNM from UriageData where uid =? group by ShouhinCD,ShouhinNM order by ShouhinCD,ShouhinNM";
@@ -346,7 +360,62 @@ $ZEIresult = $pdo_h->query($ZEIsql);
           }, 3000);
           */
         })(jQuery);
-    };
+
+        function getAllData(EvList){
+            //検索用のイベント・顧客・商品リストを取得
+            $.ajax({
+                // 通信先ファイル名
+                type        : 'POST',
+                url         : 'get_event_list.php',
+                //dataType    : 'application/json',
+                data        :{
+                                user_id:'<?php echo $_SESSION["user_id"];?>',
+                                date_from:$('#uridate')[0].value,
+                                date_to:$('#uridateto')[0].value
+                    }
+                },
+            ).done(
+                // 通信が成功した時
+                function(data) {
+                    //selectの子要素をすべて削除
+                    $(EvList).children().remove();
+                    $(EvList).append("<option value=''></option>\n");
+                    // 取得したレコードをeachで順次取り出す
+                    $.each(data, function(key, value){
+                        // appendで追記していく
+                        if(value.Event == '<?php echo $post_Event; ?>'){
+                            $(EvList).append("<option value='" + value.Event + "' selected>" + value.Event + "</option>\n");
+                        }else{
+                            $(EvList).append("<option value='" + value.Event + "'>" + value.Event + "</option>\n");
+                        }
+                    });
+                    /*
+                    console.log("通信成功");
+                    console.log(data);
+                    */
+                }
+            ).fail(
+                // 通信が失敗した時
+                function(XMLHttpRequest, textStatus, errorThrown){
+                    console.log("通信失敗2");
+                    console.log("XMLHttpRequest : " + XMLHttpRequest.status);
+                    console.log("textStatus     : " + textStatus);
+                    console.log("errorThrown    : " + errorThrown.message);
+                }
+            )};
+        getAllData('#Event');
+        
+        //検索モーダルの売上日を変更すると、イベントリストを更新
+        $('#uridate').change(function(){
+            getAllData('#Event');
+        });
+        $('#uridateto').change(function(){
+            getAllData('#Event');
+        });
+
+    };//window.onload
+
+    
     $(function() {
         $('.hamburger').click(function() {
             $(this).toggleClass('active');
@@ -363,12 +432,13 @@ $ZEIresult = $pdo_h->query($ZEIsql);
         });
     });
     </script>    
+    
     <TITLE><?php echo $title." 売上実績";?></TITLE>
 </head>
  
 <header class="header-color" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></div>
-    <div style="font-size:1rem;color:var(--user-disp-color);font-weight:400;"> 期間：<?php echo $UriFrom."～".$UriTo;?>　顧客：<?php echo $post_Tokui;?>　EVENT：<?php echo $post_Event;?></div>
+    <div style="font-size:1rem;color:var(--user-disp-color);font-weight:400;"> 期間：<?php echo $UriFrom."～".$UriTo;?>　EVENT/顧客：<?php echo $post_Event;?></div>
 
     <div class="hamburger">
         <span></span>
@@ -398,7 +468,7 @@ $ZEIresult = $pdo_h->query($ZEIsql);
         
     ?>
     <table class="table-striped table-bordered" style='margin-top:10px'>
-        <thead><tr><th scope='col' class='d-none d-sm-table-cell'>売上日</th><th scope='col' class='d-none d-sm-table-cell'>Event/顧客</th><th scope='col' style="width:2rem;">No</th><th>商品</th><th scope='col' style="width:3rem;">数</th><th scope='col' style="width:3rem;" class='d-none d-sm-table-cell'>単価</th><th scope='col' style="width:5rem;">売上</th><th scope='col' style="width:4rem;">税</th><th scope='col' style="width:5rem;">原価</th><th scope='col' style="width:5rem;">粗利</th><th scope='col' style="width:4rem;">削除</th></tr></thead>
+        <thead style='height:35px;'><tr><th scope='col' class='d-none d-sm-table-cell'>売上日</th><th scope='col' class='d-none d-sm-table-cell'>Event/顧客</th><th scope='col' style='width:2rem;'>No</th><th>商品</th><th scope='col' style="width:3rem;">数</th><th scope='col' style="width:3rem;" class='d-none d-sm-table-cell'>単価</th><th scope='col' style="width:5rem;">売上</th><th scope='col' style="width:4rem;">税</th><th scope='col' style="width:5rem;">原価</th><th scope='col' style="width:5rem;">粗利</th><th scope='col' style="width:4rem;">削除</th></tr></thead>
 <?php    
 $Goukei=0;
 $GoukeiZei=0;
@@ -452,7 +522,7 @@ if($mode<>"select" && $mode<>"redirect"){
 <!--売上実績検索条件-->
 <div class="modal fade" id="UriModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
     <div class="modal-dialog  modal-dialog-centered">
-        <div class="modal-content" style="font-size:1.5rem; font-weight: 600;background-color:rgba(255,255,255,0.55);">
+        <div class="modal-content" style="font-size:1.5rem; font-weight: 600;background-color:rgba(255,255,255,0.8);">
             
             <form class="form-horizontal" method="post" action="UriageData.php">
                 <input type="hidden" name="csrf_token" value="<?php echo $csrf_create; ?>">
@@ -470,10 +540,11 @@ if($mode<>"select" && $mode<>"redirect"){
                         <input type="date" style="font-size:1.5rem;" name="UriDateTo" maxlength="10" id="uridateto" class="form-control" value="<?php echo $UriTo; ?>">
                     </div>
                     <div>
-                        <label for="Event" class="control-label">イベント名：</label>
-                        <select name="Event" style="font-size:1.5rem;padding-top:0;" id="Event" class="form-control">
+                        <label for="Event" class="control-label">イベント名/顧客名：</label>
+                        <select name="Event" style="font-size:1.5rem;padding-top:0;" id="Event" class="form-control" aria-describedby="EvHelp">
                             <option value=""></option>
                             <?php
+                            /*Ajaxで取得に変更
                             foreach($EVresult as $row){
                                 if($post_Event==$row["Event"]){
                                     echo "<option value='".$row["Event"]."' selected>".$row["Event"]."</option>\n";
@@ -481,14 +552,18 @@ if($mode<>"select" && $mode<>"redirect"){
                                     echo "<option value='".$row["Event"]."'>".$row["Event"]."</option>\n";
                                 }
                             }
+                            */
                             ?>
                         </select>
+                        <small id="EvHelp" class="form-text text-muted">売上日の期間を変更すると選択肢が更新されます。</small>
                     </div>
+                    <!--イベント検索と統合
                     <div>
                         <label for="Tokui" class="control-label">得意先：</label>
                         <select name="Tokui" style="font-size:1.5rem;padding-top:0;" id="Tokui" class="form-control">
                             <option value=""></option>
                             <?php
+                            /*イベント検索と統合
                             foreach($TKresult as $row){
                                  if($post_Tokui==$row["TokuisakiNM"]){
                                     echo "<option value='".$row["TokuisakiNM"]."' selected>".$row["TokuisakiNM"]."</option>\n";
@@ -496,14 +571,17 @@ if($mode<>"select" && $mode<>"redirect"){
                                     echo "<option value='".$row["TokuisakiNM"]."'>".$row["TokuisakiNM"]."</option>\n";
                                 }
                             }
+                            */
                             ?>
                         </select>
                     </div>
+                    -->
                     <div>
                         <label for="Type" class="control-label">表示：上で指定した期間中の</label>
                         <select name="Type" style="font-size:1.5rem;padding-top:0;" id="Type" class="form-control">
                             <option value="rireki" <?php if($post_Type=="rireki"){echo "selected";}  ?> >売上履歴</option>
                             <option value="shubetu" <?php if($post_Type=="shubetu"){echo "selected";}  ?> >商品ごとの売上実績</option>     <!-- 何が売れてるか知りたい -->
+                            <option value="sumary" <?php if($post_Type=="sumary"){echo "selected";}  ?> >売上日・イベント単位の合計売上実績</option>     <!-- 何日の○○イベントでいくら？-->
                             <!--売上分析と機能が重複してるので削除
                             <option value="UriNO" <?php if($post_Type=="UriNO"){echo "selected";}  ?> >Event会計別</option>   イベントでの客単価を知りたい 
                             <option value="EVTKshubetu" <?php if($post_Type=="EVTKshubetu"){echo "selected";}  ?> >顧客/Event別・種類別</option>  顧客・イベントでの売れ筋を知りたい 
@@ -523,7 +601,7 @@ if($mode<>"select" && $mode<>"redirect"){
 <!--<div class="modal fade" id="UriUpEvModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true"> modal-dialog-centered-->
 <div class="modal fade" id="UriUpEvModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
     <div class="modal-dialog  ">
-        <div class="modal-content" style="font-size:1.5rem; font-weight: 600;background-color:rgba(255,255,255,0.55);">
+        <div class="modal-content" style="font-size:1.5rem; font-weight: 600;background-color:rgba(255,255,255,0.8);">
             
             <form class="form-horizontal" method="post" action="UriageData.php">
                 <input type="hidden" name="csrf_token" value="<?php echo $csrf_create; ?>">
@@ -586,7 +664,7 @@ if($mode<>"select" && $mode<>"redirect"){
 <!--<div class="modal fade" id="UriUpEvModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true"> modal-dialog-centered-->
 <div class="modal fade" id="UriUpKinModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
     <div class="modal-dialog  ">
-        <div class="modal-content" style="font-size:1.5rem; font-weight: 600;background-color:rgba(255,255,255,0.55);">
+        <div class="modal-content" style="font-size:1.5rem; font-weight: 600;background-color:rgba(255,255,255,0.8);">
             
             <form class="form-horizontal" method="post" action="UriageData.php">
                 <input type="hidden" name="csrf_token" value="<?php echo $csrf_create; ?>">

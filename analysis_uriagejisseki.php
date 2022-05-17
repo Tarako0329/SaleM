@@ -35,56 +35,63 @@ if(!empty($_POST)){
     $ymfrom = $_POST["ymfrom"];
     $ymto = $_POST["ymto"];
     $list = $_POST["list"];
+    $analysis_type=$_POST["sum_tani"];
 }else{
     $ymfrom = (int)((string)date('Y')."01");
     $ymto = (string)date('Y')."12";
     $list = "%";
+    $analysis_type=$_GET["sum_tani"];
 }
+
+
+
+
+
 //deb_echo($list);
-if($_POST["sum_tani"]==1){//日ごと
+if($analysis_type==1){//日ごと
     $sqlstr = "select UriDate as 計上年月 ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
     $gp_sqlstr = "group by UriDate order by UriDate";
     $aryColumn = ["計上日","税抜売上","消費税","税込売上"];
-}elseif($_POST["sum_tani"]==2 || empty($_POST)){//月毎
+}elseif($analysis_type==2){//月毎
     $sqlstr = "select DATE_FORMAT(UriDate, '%Y/%m') as 計上年月 ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
     $gp_sqlstr = "group by DATE_FORMAT(UriDate, '%Y%m') order by DATE_FORMAT(UriDate, '%Y%m')";
     $aryColumn = ["計上年月","税抜売上","消費税","税込売上"];
-}elseif($_POST["sum_tani"]==3){//年ごと
+}elseif($analysis_type==3){//年ごと
     $sqlstr = "select DATE_FORMAT(UriDate, '%Y') as 計上年月 ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
     $gp_sqlstr = "group by DATE_FORMAT(UriDate, '%Y') order by DATE_FORMAT(UriDate, '%Y')";
     $aryColumn = ["計上年度","税抜売上","消費税","税込売上"];
-}elseif($_POST["sum_tani"]==4){//製品名ごと売上金額ランキング
+}elseif($analysis_type==4){//製品名ごと売上金額ランキング
     $sqlstr = "select ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
     $gp_sqlstr = "group by ShouhinNM order by sum(UriageKin) desc";
     $aryColumn = ["商品名","税抜売上","消費税","税込売上"];
-}elseif($_POST["sum_tani"]==5){//製品名ごと売上数量ランキング
+}elseif($analysis_type==5){//製品名ごと売上数量ランキング
     $sqlstr = "select ShouhinNM as ShouhinNM ,sum(Su) as 売上数 from UriageData ";
     $gp_sqlstr = "group by ShouhinNM order by sum(Su) desc";
     $aryColumn = ["商品名","売上数"];
-}elseif($_POST["sum_tani"]==6){//客単価推移
+}elseif($analysis_type==6){//客単価推移
     //客単価一覧
     $sqlstr = "select 計上日,ROUND(avg(税抜売上)) as 客単価,Event from ";
     $sqlstr = $sqlstr." (select UriDate as 計上日 ,Event ,UriageNO ,sum(UriageKin) as 税抜売上 from UriageData ";
     $gp_sqlstr = "group by UriDate,UriageNO ) as UriSum group by 計上日 order by 計上日";
     $aryColumn = ["計上日","客単価","Event/店舗"];
-}elseif($_POST["sum_tani"]==7){//イベント・店舗別客単価ランキング
+}elseif($analysis_type==7){//イベント・店舗別客単価ランキング
     $sqlstr = "select KYAKU,ROUND(avg(客単価)) as 平均客単価 from ";
     $sqlstr = $sqlstr." (select UriDate as 計上日 ,concat(Event,TokuisakiNM) as KYAKU ,UriageNO ,sum(UriageKin) as 客単価 from UriageData ";
     $gp_sqlstr = "group by UriDate,concat(Event,TokuisakiNM),UriageNO ) as UriSum group by KYAKU order by avg(客単価) desc";
     $aryColumn = ["Event/店舗","客単価"];
-}elseif($_POST["sum_tani"]==8){//イベント・店舗別来客数推移
+}elseif($analysis_type==8){//イベント・店舗別来客数推移
     $sqlstr = "select UriDate,sum(来客カウント) as 来客数,Event from ";
     $sqlstr = $sqlstr." (select uid, UriDate, Event, TokuisakiNM, UriageNO,0 as ShouhinCD, 1 as 来客カウント from UriageData where Event <>'' ";
     $sqlstr = $sqlstr." group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriSum ";
     $gp_sqlstr = "group by UriDate,Event order by UriDate";
     $aryColumn = ["計上日","来客数","Event/店舗"];
-}elseif($_POST["sum_tani"]==9){//イベント・店舗別来客数ランキング
+}elseif($analysis_type==9){//イベント・店舗別来客数ランキング
     $sqlstr = "select Event,ROUND(avg(来客数)) as 平均来客数 from (select UriDate,sum(来客カウント) as 来客数,Event from ";
     $sqlstr = $sqlstr." (select uid, UriDate, Event, TokuisakiNM, UriageNO,0 as ShouhinCD, 1 as 来客カウント from UriageData where Event <>'' ";
     $sqlstr = $sqlstr." group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriSum ";
     $gp_sqlstr = "group by UriDate,Event) as Urisum2 group by Event order by ROUND(avg(来客数)) desc";
     $aryColumn = ["Event/店舗","平均来客数"];
-}elseif($_POST["sum_tani"]==10){//商品の売れる勢い
+}elseif($analysis_type==10){//商品の売れる勢い
     $sqlstr = "select ShouhinNM,concat(time_format(insDatetime,'%H'), '時') as Hour,sum(su) as 個数 from UriageData ";
     $gp_sqlstr = "group by ShouhinNM,time_format(insDatetime,'%H') order by ShouhinNM,time_format(insDatetime,'%H')";
     $aryColumn = ["商品名","時","個数"];
@@ -146,7 +153,7 @@ $EVresult = $stmt->fetchAll();
     window.onload = function() {
 
     <?php
-    if($_POST["sum_tani"]!=10){
+    if($analysis_type!=10){
     ?>
         const ctx = document.getElementById('myChart').getContext('2d');
         const myChart = new Chart(ctx, {
@@ -220,7 +227,7 @@ $EVresult = $stmt->fetchAll();
             }
         });
     <?php
-    }else if($_POST["sum_tani"]==10){
+    }else if($analysis_type==10){
         $label="";  //商品名を格納
         $j=0;       //0～23までのカウンタ
         $urisu=0;   //売上総数の保持
@@ -367,16 +374,16 @@ $EVresult = $stmt->fetchAll();
             ?>
             </select>
             <select name='sum_tani' class="form-control" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px"><!--集計単位-->
-                <option value='1' <?php if($_POST["sum_tani"]==1){echo "selected";} ?> >売上実績(日計)</option>
-                <option value='2' <?php if($_POST["sum_tani"]==2 || empty($_POST["sum_tani"])){echo "selected";} ?>>売上実績(月計)</option>
-                <option value='3' <?php if($_POST["sum_tani"]==3){echo "selected";} ?> >売上実績(年計)</option>
-                <option value='4' <?php if($_POST["sum_tani"]==4){echo "selected";} ?> >売上ランキング(金額)</option>
-                <option value='5' <?php if($_POST["sum_tani"]==5){echo "selected";} ?> >売上ランキング(個数)</option>
-                <option value='6' <?php if($_POST["sum_tani"]==6){echo "selected";} ?> >客単価推移</option>
-                <option value='7' <?php if($_POST["sum_tani"]==7){echo "selected";} ?> >客単価ランキング</option>
-                <option value='8' <?php if($_POST["sum_tani"]==8){echo "selected";} ?> >来客数推移</option>
-                <option value='9' <?php if($_POST["sum_tani"]==9){echo "selected";} ?> >平均来客数ランキング</option>
-                <option value='10' <?php if($_POST["sum_tani"]==10){echo "selected";} ?> >売れる勢い</option>
+                <option value='1' <?php if($analysis_type==1){echo "selected";} ?> >売上実績(日計)</option>
+                <option value='2' <?php if($analysis_type==2){echo "selected";} ?>>売上実績(月計)</option>
+                <option value='3' <?php if($analysis_type==3){echo "selected";} ?> >売上実績(年計)</option>
+                <option value='4' <?php if($analysis_type==4){echo "selected";} ?> >売上ランキング(金額)</option>
+                <option value='5' <?php if($analysis_type==5){echo "selected";} ?> >売上ランキング(個数)</option>
+                <option value='6' <?php if($analysis_type==6){echo "selected";} ?> >客単価推移</option>
+                <option value='7' <?php if($analysis_type==7){echo "selected";} ?> >客単価ランキング</option>
+                <option value='8' <?php if($analysis_type==8){echo "selected";} ?> >来客数推移</option>
+                <option value='9' <?php if($analysis_type==9){echo "selected";} ?> >平均来客数ランキング</option>
+                <option value='10' <?php if($analysis_type==10){echo "selected";} ?> >売れる勢い</option>
             </select>
             <select name='list' class="form-control" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px">
             <option value='%'>イベント・顧客の選択</option>

@@ -35,19 +35,21 @@ if(!empty($_POST)){
     $ymfrom = $_POST["ymfrom"];
     $ymto = $_POST["ymto"];
     $list = $_POST["list"];
+    $analysis_type=$_POST["sum_tani"];
 }else{
     $ymfrom = (int)((string)date('Y')."01");
     $ymto = (string)date('Y')."12";
     $list = "%";
+    $analysis_type=$_GET["sum_tani"];
 }
 //deb_echo($list);
 $cols=0;
-if($_POST["sum_tani"]==1 || empty($_POST)){//全商品（金額）
+if($analysis_type==1 || empty($_POST)){//全商品（金額）
     $sqlstr = "select tmp.* ,sum(税抜売上) over() as 総売上 from (select ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ";
     $gp_sqlstr = "group by ShouhinNM) tmp order by 税抜売上 desc";
     $aryColumn = ["商品名","税抜売上"];
     $cols=2;
-}elseif($_POST["sum_tani"]==2 || empty($_POST)){//月毎
+}elseif($analysis_type==2 || empty($_POST)){//月毎
     $sqlstr = "select tmp.* ,sum(税抜売上) over(PARTITION BY Event) as 総売上 from (select Event,ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ";
     $gp_sqlstr = "group by Event,ShouhinNM) tmp order by Event,税抜売上 desc";
     $aryColumn = ["商品名","税抜売上"];
@@ -256,8 +258,8 @@ $EVresult = $stmt->fetchAll();
             ?>
             </select>
             <select name='sum_tani' class="form-control" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px"><!--集計単位-->
-                <option value='1' <?php if($_POST["sum_tani"]==1 || empty($_POST["sum_tani"])){echo "selected";} ?> >商品別ABC分析</option>
-                <option value='2' <?php if($_POST["sum_tani"]==2){echo "selected";} ?>>イベント・店舗/商品別ABC分析</option>
+                <option value='1' <?php if($analysis_type==1){echo "selected";} ?> >商品別ABC分析</option>
+                <option value='2' <?php if($analysis_type==2){echo "selected";} ?>>イベント・店舗/商品別ABC分析</option>
                 <!--
                 <option value='3' <?php if($_POST["sum_tani"]==3){echo "selected";} ?> >売上実績(年計)</option>
                 <option value='4' <?php if($_POST["sum_tani"]==4){echo "selected";} ?> >売上ランキング(金額)</option>

@@ -51,17 +51,21 @@ $token = csrf_create();
 
 <?php
     $array = [
-         '実績集計'=>['analysis_uriagejisseki.php?csrf_token='.$token]
-        ,'ABC分析'=>['analysis_abc.php?csrf_token='.$token]
-        ,'予備5'=>['xxxx.php?csrf_token='.$token]
-        ,'予備4'=>['xxxx.php?csrf_token='.$token]
-        ,'予備3'=>['xxxx.php?mode=select&csrf_token='.$token]
-        ,'予備2'=>['xxxx.php?mode=select&csrf_token='.$token]
-        ,'予備1'=>['xxxx.php?mode=1&csrf_token='.$token]
+         '売上金額ランキング'=>['analysis_uriagejisseki.php?sum_tani=4&csrf_token='.$token,'商品ごとの売上金額ランキングを表示。']
+        ,'売上個数ランキング'=>['analysis_uriagejisseki.php?sum_tani=5&csrf_token='.$token,'商品ごとの売上個数ランキングを表示。']
+        ,'客単価実績'=>['analysis_uriagejisseki.php?sum_tani=6&csrf_token='.$token,'日ごとの平均客単価を表示します。']
+        ,'客単価ランキング'=>['analysis_uriagejisseki.php?sum_tani=7&csrf_token='.$token,'イベントごとに客単価を算出し、ランキングを表示。']
+        ,'来客数実績'=>['analysis_uriagejisseki.php?sum_tani=8&csrf_token='.$token,'日ごとの来客数（会計数）を表示。']
+        ,'来客数ランキング'=>['analysis_uriagejisseki.php?sum_tani=9&csrf_token='.$token,'イベントごとの平均来客数を算出し、ランキングを表示']
+        ,'時間帯別売上実績'=>['analysis_uriagejisseki.php?sum_tani=10&csrf_token='.$token,'時間帯ごとに何がどれだけ売れているかを分析・グラフ化します。<br>グラフ化して見ることで商品の売れる勢いを確認出来ます。<br>例えば、開店と同時に売れる商品は人気商品なので多めに準備するといいでしょうし、地味に売れ続ける商品も根強い人気があると分析できます。']
+        ,'期間毎売上集計'=>['analysis_uriagejisseki.php?sum_tani=2&csrf_token='.$token,'日ごと、月毎、年間の売上金額を確認<br>イベント名を指定することで過去の売上傾向を確認出来ます。']
+        ,'ABC分析'=>['analysis_abc.php?sum_tani=2&csrf_token='.$token,'売上の8割は2割の製品で構成されている。という統計学的な話があります。<br>売上げの7割を支える商品群をAグループ、2割を支える商品群をBグループ、残り1割をCグループに分類してます。<br>Aグループは人気商品。Cグループはあまり売上げに貢献していない商品と位置づけられます。<br>取扱商品の検討材料等に利用できます。']
+        //,'バスケット分析'=>['xxxx.php?mode=1&csrf_token='.$token]
         //,'契約・解除'=>['../../PAY/index.php?system='.$title.'&mode='.MODE_DIR]
         //,'お知らせ'=>['system_update_log.php']
     ];
 
+    /*
     $i=0;
     echo "<div class='row'>";
 	foreach(array_merge($array) as $key=>$vals){
@@ -72,6 +76,22 @@ $token = csrf_create();
         $i++;
 	}
     echo "</div>";
+    */
+    
+	foreach(array_merge($array) as $key=>$vals){
+        echo "<div class='row' style='margin-top:20px;'>";
+        echo "  <div class ='col-md-3 col-sm-6 col-6' >\n";
+        echo "      <a href='".$vals[0]."' class='btn--topmenu btn-view' style='font-size:1.5rem;width:170px;'>".$key."\n";
+        echo "      </a>\n";
+        echo "  </div>\n";
+        echo "</div>";
+        echo "<div class='row'>";
+        echo "  <div class ='col-12'  style='paddin-left:10px' >\n";
+        echo "<div>".$vals[1]."</div>";
+        echo "  </div>\n";
+        echo "</div>";
+	}
+    
 	
 ?> 
               
