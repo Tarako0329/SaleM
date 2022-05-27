@@ -136,7 +136,8 @@ if($row[0]["yagou"]<>""){
         ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token]
         ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token]
         //,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko&csrf_token='.$token]
-        ,'売上実績'=>['UriageData.php?mode=select&csrf_token='.$token]
+        //,'売上実績'=>['UriageData.php?mode=select&csrf_token='.$token] UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where
+        ,'売上実績'=>['UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where&csrf_token='.$token]
         ,'売上分析'=>['analysis_menu.php?csrf_token='.$token]
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]
         ,'会計連携'=>['output_menu.php?csrf_token='.$token]

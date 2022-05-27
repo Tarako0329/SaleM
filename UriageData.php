@@ -3,14 +3,24 @@
 <?php
 require "php_header.php";
 
-if($_GET["mode"]=="redirect"){
+if(!empty($_GET["mode"]) && $_GET["mode"]<>""){
+    $mode=$_GET["mode"];
+}elseif($_POST["mode"] && $_POST["mode"]<>""){
+    $mode=$_POST["mode"];
+}else{
+    $_SESSION["EMSG"]="セッションが正しくありませんでした：モード指定なし";
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: index.php");
+    exit();
+}
+
+if($mode=="redirect"){
     if(csrf_chk_redirect($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。③";
         header("HTTP/1.1 301 Moved Permanently");
         header("Location: index.php");
         exit();
     }
-
 }elseif(isset($_GET["csrf_token"]) || empty($_POST)){
     if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。①";
@@ -32,43 +42,59 @@ $csrf_create = csrf_create();
 
 $msg = "";
 
-if($_GET["mode"]<>""){
-    $mode=$_GET["mode"];
-}elseif($_POST["mode"]<>""){
-    $mode=$_POST["mode"];
-}else{
-    $_SESSION["EMSG"]="セッションが正しくありませんでした：モード指定なし";
-    header("HTTP/1.1 301 Moved Permanently");
-    header("Location: index.php");
-    exit();
-}
-
-if(!empty($_POST["Event"])){
-    $post_Event=$_POST["Event"];
-}else{
-    $post_Event="";
-}
-if(!empty($_POST["Type"])){
-    $post_Type=$_POST["Type"];
-}else{
-    $post_Type="";
-}
-if(!empty($_POST["Tokui"])){
-    $post_Tokui=$_POST["Tokui"];
-}else{
-    $post_Tokui="";
+if(0==0){
+    if(!empty($_POST["Event"])){
+        $post_Event=$_POST["Event"];
+    }else{
+        $post_Event="";
+    }
+    if(!empty($_POST["Type"])){
+        $post_Type=$_POST["Type"];
+    }else{
+        $post_Type="";
+    }
+    if(!empty($_POST["Tokui"])){
+        $post_Tokui=$_POST["Tokui"];
+    }else{
+        $post_Tokui="";
+    }
+    if(!empty($_POST["UriDateFrom"])){
+        $post_UriDateFrom=$_POST["UriDateFrom"];
+    }else{
+        $post_UriDateFrom="";
+    }
+    if(!empty($_POST["UriDateTo"])){
+        $post_UriDateTo=$_POST["UriDateTo"];
+    }else{
+        $post_UriDateTo="";
+    }
+    if(!empty($_POST["UpShouhinCD"])){
+        $post_UpShouhinCD=$_POST["UpShouhinCD"];
+    }else{
+        $post_UpShouhinCD="";
+    }
+    if(!empty($_GET["urino"])){
+        $get_urino=$_GET["urino"];
+    }else{
+        $get_urino="";
+    }
+    if(!empty($_GET["cd"])){
+        $get_cd=$_GET["cd"];
+    }else{
+        $get_cd="";
+    }
 }
 
 if($mode=="del"){
     //削除モード(確認)
     $btnm = "削　除";
     $msg ="この売上を削除しますか？<br>";
-    $_SESSION["cd"]=$_GET["cd"];
-    $_SESSION["urino"]=$_GET["urino"];
-    $sql = "select * from UriageData where uid = :user_id and UriageNO = :UriNO and ShouhinCD = :ShouhinCD order by UriageNO";
+    $_SESSION["cd"]=$get_cd;
+    $_SESSION["urino"]=$get_urino;
+    $sql = "select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData where uid = :user_id and UriageNO = :UriNO and ShouhinCD = :ShouhinCD order by UriageNO";
     $stmt = $pdo_h->prepare( $sql );
-    $stmt->bindValue("UriNO", $_GET["urino"], PDO::PARAM_INT);
-    $stmt->bindValue("ShouhinCD", $_GET["cd"], PDO::PARAM_INT);
+    $stmt->bindValue("UriNO", $get_urino, PDO::PARAM_INT);
+    $stmt->bindValue("ShouhinCD", $get_cd, PDO::PARAM_INT);
     deb_echo($_SESSION["wheresql"]);
     
 }elseif($mode=="UpdateEv" || $mode=="UpdateTk"){
@@ -79,17 +105,23 @@ if($mode=="del"){
         $msg = "この売上の顧客名を『".$_POST["UpNM"]."』に変更しますか？<br>";
     }
     $_SESSION["UpNM"] = $_POST["UpNM"];
-    if($_POST["UpUriDateFrom"]<>""){
+    
+    //if($_POST["UpUriDateFrom"]<>""){
+    if($post_UriDateFrom<>""){
         if($_POST["UpUriDateTo"]<>""){
-            $UpUriDateTo=$_POST["UpUriDateTo"];
+            //$UpUriDateTo=$_POST["UpUriDateTo"];
+            $UpUriDateTo=$post_UriDateTo;
         }else{
-            $UpUriDateTo=$_POST["UpUriDateFrom"];
+            //$UpUriDateTo=$_POST["UpUriDateFrom"];
+            $UpUriDateTo=$post_UriDateFrom;
         }
         $sql = "select * from UriageData where uid = :user_id and UriDate between :From and :To order by UriageNO";
-        $_SESSION["wheresql"] = " where uid = :user_id and UriDate between '".$_POST["UpUriDateFrom"]."' and '".$UpUriDateTo."' ";
+        //$_SESSION["wheresql"] = " where uid = :user_id and UriDate between '".$_POST["UpUriDateFrom"]."' and '".$UpUriDateTo."' ";
+        $_SESSION["wheresql"] = " where uid = :user_id and UriDate between '".$post_UriDateFrom."' and '".$UpUriDateTo."' ";
         
         $stmt = $pdo_h->prepare( $sql );
-        $stmt->bindValue("From", $_POST["UpUriDateFrom"], PDO::PARAM_STR);
+        //$stmt->bindValue("From", $_POST["UpUriDateFrom"], PDO::PARAM_STR);
+        $stmt->bindValue("From", $post_UriDateFrom, PDO::PARAM_STR);
         $stmt->bindValue("To", $UpUriDateTo, PDO::PARAM_STR);
     }elseif($_POST["UpUriNoFrom"]<>""){
         $UpUriNoFrom=$_POST["UpUriNoFrom"];
@@ -132,29 +164,32 @@ if($mode=="del"){
     }
 
 }elseif($mode=="UpdateKin"){
+    //金額の更新
     $btnm = "更　新";
     $msg = "この商品の売上単価を以下に変更しますか？<br>税抜単価：".$_POST["UpTanka"]." 消費税：".$_POST["UpZei"]." 税込単価：".$_POST["UpUriZei"]." <br>";
-    //売上実績の取得
-    
+
     $_SESSION["zeinukiTanka"] = $_POST["UpTanka"];
     $_SESSION["shouhizei"] = $_POST["UpZei"];
     $_SESSION["zeikbn"] = $_POST["Upzeikbn"];
 
-    $wheresql="where ShouhinCD = :ShouhinCD ";
-    $_SESSION["wheresql"]="where ShouhinCD = ".$_POST["UpShouhinCD"];
+    $UriFrom = rtn_date($post_UriDateFrom,"today");
+    $UriTo = rtn_date($post_UriDateTo,"today");
+    $post_Event = rtn_wildcard($post_Event);
 
+    $wheresql="where ShouhinCD = :ShouhinCD AND UriDate >= :UriDate AND UriDate <= :UriDateTo AND concat(Event,TokuisakiNM) like :Event AND uid = :user_id  ";
+    $_SESSION["wheresql"]="where ShouhinCD = ".$post_UpShouhinCD." AND UriDate >= '".$UriFrom."' AND UriDate <= '".$UriTo."' AND concat(Event,TokuisakiNM) like '".$post_Event."' AND uid = :user_id ";
+
+    /*
     if($_POST["UpUriDateFrom"]<>""){
         $wheresql= $wheresql." AND UriDate >= :UriDate ";
         $UriFrom = (string)$_POST["UpUriDateFrom"];
         $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND UriDate >= '".$UriFrom."' ";
     }
-
     if($_POST["UpUriDateTo"]<>""){
         $UriTo = (string)$_POST["UpUriDateTo"];
         $wheresql=$wheresql." AND UriDate <= :UriDateTo ";
         $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND UriDate <= '".$UriTo."' ";
     }
-
     if($_POST["UpEvent"]<>""){
         $wheresql = $wheresql." AND Event=:Event ";
         $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND Event='".$_POST["UpEvent"]."' ";
@@ -163,14 +198,18 @@ if($mode=="del"){
         $wheresql= $wheresql." AND TokuisakiNM=:Tokui ";
         $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND TokuisakiNM='".$_POST["UpTokui"]."' ";
     }
+    
     $wheresql= $wheresql." AND uid = :user_id ";
     $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND uid = :user_id ";
-    
-    $sql = "select * from UriageData ".$wheresql." order by UriageNO";
+    */
+    $sql = "select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData ".$wheresql." order by UriageNO";
 
     $stmt = $pdo_h->prepare( $sql );
-    $stmt->bindValue("ShouhinCD", $_POST["UpShouhinCD"], PDO::PARAM_INT);
-    
+    $stmt->bindValue("ShouhinCD", $post_UpShouhinCD, PDO::PARAM_INT);
+    $stmt->bindValue("UriDate", $UriFrom, PDO::PARAM_STR);
+    $stmt->bindValue("UriDateTo", $UriTo, PDO::PARAM_STR);
+    $stmt->bindValue("Event", $post_Event, PDO::PARAM_STR);
+    /*
     if($_POST["UpUriDateFrom"]<>""){
         $stmt->bindValue("UriDate", $_POST["UpUriDateFrom"], PDO::PARAM_STR);
     }
@@ -183,8 +222,20 @@ if($mode=="del"){
     if($_POST["UpTokui"]<>""){
         $stmt->bindValue("Tokui", $_POST["UpTokui"], PDO::PARAM_STR);
     }
+    */
 }elseif($mode=="select"){
     //売上実績の取得
+    $UriFrom = rtn_date($post_UriDateFrom,"today");
+    $UriTo = rtn_date($post_UriDateTo,"today");
+    $post_Event = rtn_wildcard($post_Event);
+    
+    $wheresql="where UriDate >= :UriDate  AND UriDate <= :UriDateTo and concat(Event,TokuisakiNM) like :Event  AND uid = :user_id ";
+    
+    //削除した後に表示する履歴のwhere文をセッションに保存
+    $_SESSION["wheresql"]="where UriDate >= '".$UriFrom."' AND UriDate <= '".$UriTo."' and concat(Event,TokuisakiNM) like '".$post_Event."'  AND uid = :user_id ";
+
+
+    /*
     if($_POST["UriDate"]<>""){
         $wheresql="where UriDate >= :UriDate ";
         $UriFrom = (string)$_POST["UriDate"];
@@ -202,20 +253,17 @@ if($mode=="del"){
         $UriTo = $UriFrom;
     }
     $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND UriDate <= '".$UriTo."' ";
-    
     if($post_Event<>""){
         $wheresql = $wheresql." AND Event=:Event ";
         $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND Event='".$post_Event."' ";
     }
-    /*
     if($post_Tokui<>""){
         $wheresql= $wheresql." AND TokuisakiNM=:Tokui ";
         $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND TokuisakiNM='".$post_Tokui."' ";
     }
-    */
     $wheresql= $wheresql." AND uid = :user_id ";
     $_SESSION["wheresql"]=$_SESSION["wheresql"]." AND uid = :user_id ";
-    
+    */
     if($post_Type=="rireki" || $post_Type==""){
         //履歴取得
         $sql = "select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData ".$wheresql." order by UriDate,Event,UriageNO";
@@ -241,6 +289,10 @@ if($mode=="del"){
     
     if($post_Type!="sumary"){
         $stmt = $pdo_h->prepare( $sql );
+        $stmt->bindValue("UriDate", $UriFrom, PDO::PARAM_STR);
+        $stmt->bindValue("UriDateTo", $UriTo, PDO::PARAM_STR);
+        $stmt->bindValue("Event", $post_Event, PDO::PARAM_STR);
+        /*
         if($_POST["UriDate"]<>""){
             $stmt->bindValue("UriDate", $_POST["UriDate"], PDO::PARAM_STR);
         }
@@ -252,6 +304,7 @@ if($mode=="del"){
         if($post_Event<>""){
             $stmt->bindValue("Event", $post_Event, PDO::PARAM_STR);
         }
+        */
         /*
         if($post_Tokui<>""){
             $stmt->bindValue("Tokui", $post_Tokui, PDO::PARAM_STR);
@@ -260,19 +313,19 @@ if($mode=="del"){
     }
 }elseif($mode=="redirect"){
     //更新結果の表示
-    //$msg = $_SESSION["MSG"];
-    //$_SESSION["MSG"]="";
     deb_echo($_SESSION["wheresql"]);
     $sql = "select * from UriageData ".$_SESSION["wheresql"]." order by UriageNO";
     $stmt = $pdo_h->prepare( $sql );
-    //更新後は破棄
-    //$_SESSION["wheresql"]="";
 }else{
     echo "想定外エラー";
     exit();
 }
+
+
 $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
 $rtn=$stmt->execute();
+
+
 if($rtn==false){
     deb_echo("失敗した場合は不正値が渡されたとみなし、wheresqlを破棄<br>");
     $_SESSION["wheresql"]="";
@@ -310,12 +363,13 @@ $TKresult = $stmt->fetchAll();
 */
 
 //売上実績商品リスト（修正モーダル用）
+/*
 $SHsql = "select ShouhinCD,ShouhinNM from UriageData where uid =? group by ShouhinCD,ShouhinNM order by ShouhinCD,ShouhinNM";
 $stmt = $pdo_h->prepare($SHsql);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
 $SHresult = $stmt->fetchAll();
-
+*/
 //税区分M
 $ZEIsql="select * from ZeiMS order by zeiKBN;";
 $ZEIresult = $pdo_h->query($ZEIsql);
@@ -361,32 +415,38 @@ $ZEIresult = $pdo_h->query($ZEIsql);
           */
         })(jQuery);
 
-        function getAllData(EvList){
+        function getAllData(List,date_from,date_to,get_list_type){
             //検索用のイベント・顧客・商品リストを取得
+            //id名[List]のリストデータを[date_from]～[date_to]に発生した[get_list_type]に更新
             $.ajax({
                 // 通信先ファイル名
                 type        : 'POST',
-                url         : 'get_event_list.php',
+                url         : 'ajax_get_event_list.php',
                 //dataType    : 'application/json',
                 data        :{
-                                user_id:'<?php echo $_SESSION["user_id"];?>',
-                                date_from:$('#uridate')[0].value,
-                                date_to:$('#uridateto')[0].value
-                    }
+                                user_id     :'<?php echo $_SESSION["user_id"];?>',
+                                date_from   :$(date_from)[0].value,
+                                date_to     :$(date_to)[0].value,
+                                list_type   :get_list_type //イベントリスト or 商品リスト
+                            }
                 },
             ).done(
                 // 通信が成功した時
                 function(data) {
                     //selectの子要素をすべて削除
-                    $(EvList).children().remove();
-                    $(EvList).append("<option value=''></option>\n");
+                    $(List).children().remove();
+                    $(List).append("<option value=''></option>\n");
                     // 取得したレコードをeachで順次取り出す
                     $.each(data, function(key, value){
                         // appendで追記していく
-                        if(value.Event == '<?php echo $post_Event; ?>'){
-                            $(EvList).append("<option value='" + value.Event + "' selected>" + value.Event + "</option>\n");
-                        }else{
-                            $(EvList).append("<option value='" + value.Event + "'>" + value.Event + "</option>\n");
+                        if(get_list_type=='Event'){
+                            if(value.LIST == '<?php echo $post_Event; ?>'){
+                                $(List).append("<option value='" + value.LIST + "' selected>" + value.LIST + "</option>\n");
+                            }else{
+                                $(List).append("<option value='" + value.LIST + "'>" + value.LIST + "</option>\n");
+                            }
+                        }else if(get_list_type=='Shouhin'){
+                            $(List).append("<option value='" + value.CODE + "'>" + value.CODE+ ":" + value.LIST + "</option>\n");
                         }
                     });
                     /*
@@ -403,15 +463,31 @@ $ZEIresult = $pdo_h->query($ZEIsql);
                     console.log("errorThrown    : " + errorThrown.message);
                 }
             )};
-        getAllData('#Event');
+            
+        //起動時にリストを取得
+        getAllData('#Event','#uridate','#uridateto','Event');
+        getAllData('#ShouhinCD','#UpUriDateFrom','#UpUriDateTo','Shouhin');
+        getAllData('#Event_urikin_up','#UpUriDateFrom','#UpUriDateTo','Event');
         
         //検索モーダルの売上日を変更すると、イベントリストを更新
         $('#uridate').change(function(){
-            getAllData('#Event');
+            getAllData('#Event','#uridate','#uridateto','Event');
         });
         $('#uridateto').change(function(){
-            getAllData('#Event');
+            getAllData('#Event','#uridate','#uridateto','Event');
         });
+        
+        //金額修正モーダルの売上日を変更するとイベントリスト、商品リストを更新
+        $('#UpUriDateFrom').change(function(){
+            getAllData('#ShouhinCD','#UpUriDateFrom','#UpUriDateTo','Shouhin');
+            getAllData('#Event_urikin_up','#UpUriDateFrom','#UpUriDateTo','Event');
+        });
+        $('#UpUriDateTo').change(function(){
+            getAllData('#ShouhinCD','#UpUriDateFrom','#UpUriDateTo','Shouhin');
+            getAllData('#Event_urikin_up','#UpUriDateFrom','#UpUriDateTo','Event');
+        });
+        
+        
 
     };//window.onload
 
@@ -465,8 +541,8 @@ $ZEIresult = $pdo_h->query($ZEIsql);
         }
         $_SESSION["MSG"]="";
         echo "<p style='font-size:1.5rem'>".$msg."</p>\n";
-        
     ?>
+    <a href='UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where'>修正モード</a>
     <table class="table-striped table-bordered" style='margin-top:10px'>
         <thead ><tr><th scope='col' class='d-none d-sm-table-cell'>売上日</th><th scope='col' class='d-none d-sm-table-cell'>Event/顧客</th><th scope='col' style='width:2rem;'>No</th><th>商品</th><th scope='col' style="width:3rem;">数</th><th scope='col' style="width:3rem;" class='d-none d-sm-table-cell'>単価</th><th scope='col' style="width:5rem;">売上</th><th scope='col' style="width:4rem;">税</th><th scope='col' style="width:5rem;">原価</th><th scope='col' style="width:5rem;">粗利</th><th scope='col' style="width:4rem;">削除</th></tr></thead>
 <?php    
@@ -476,7 +552,7 @@ $GoukeiZeikomi=0;
 $uridate="";
 foreach($result as $row){
     if($uridate!=$row["UriDate"].$row["Event"]){
-        echo "<tr class='tr_stiky'><td colspan='8' class='d-sm-none tr_stiky'>売上日：".$row["UriDate"]." 『".$row["Event"]."』</td></tr>\n";
+        echo "<tr class='tr_stiky'><td colspan='8' class='d-sm-none tr_stiky'>売上日：".$row["UriDate"]." 『".$row["Event"].$row["TokuisakiNM"]."』</td></tr>\n";
     }
     echo "<tr><td class='d-none d-sm-table-cell'>".$row["UriDate"]."</td><td class='d-none d-sm-table-cell'>".$row["Event"].$row["TokuisakiNM"]."</td><td class='text-center'>".$row["UriageNO"]."</td><td>".rot13decrypt($row["ShouhinNM"])."</td><td class='text-right'>".$row["su"]."</td><td class='text-right d-none d-sm-table-cell'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td><td class='text-right'>".$row["zei"]."</td><td class='text-right'>".$row["genka"]."</td><td class='text-right'>".$row["arari"]."</td><td style='width:4rem;text-align:center;'>";
     if(($post_Type=="rireki" || $post_Type=="") && ($mode == "select" || $mode=="redirect")){
@@ -533,14 +609,14 @@ if($mode<>"select" && $mode<>"redirect"){
                 <div class="modal-body">
                     <div>
                         <label for="uridate" class="control-label">売上日～：</label>
-                        <input type="date" style="font-size:1.5rem;" name="UriDate" maxlength="10" id="uridate" class="form-control" value="<?php echo $UriFrom; ?>">
+                        <input type="date" style="font-size:1.5rem;" name="UriDateFrom" maxlength="10" id="uridate" class="form-control" value="<?php echo $UriFrom; ?>">
                     </div>
                     <div>
                         <label for="uridateto" class="control-label">～売上日：</label>
                         <input type="date" style="font-size:1.5rem;" name="UriDateTo" maxlength="10" id="uridateto" class="form-control" value="<?php echo $UriTo; ?>">
                     </div>
                     <div>
-                        <label for="Event" class="control-label">イベント名/顧客名：</label>
+                        <label for="Event" class="control-label">イベント/顧客名：</label>
                         <select name="Event" style="font-size:1.5rem;padding-top:0;" id="Event" class="form-control" aria-describedby="EvHelp">
                             <option value=""></option>
                             <?php
@@ -614,8 +690,8 @@ if($mode<>"select" && $mode<>"redirect"){
                         <table>
                         <tr><td>売上日範囲指定</td></tr>
                         <tr>
-                            <td><input type="date" style="font-size:1.5rem;width:90%;" name="UpUriDateFrom" maxlength="10" class="form-control" id="M_EV01" value="<?php echo $UriFrom; ?>" onchange="del1()"></td><td>～</td>
-                            <td><input type="date" style="font-size:1.5rem;width:90%;" name="UpUriDateTo" maxlength="10" class="form-control" id="M_EV02" value="<?php echo $UriTo; ?>" onchange="del1()"></td>
+                            <td><input type="date" style="font-size:1.5rem;width:90%;" name="UriDateFrom" maxlength="10" class="form-control" id="M_EV01" value="<?php echo $UriFrom; ?>" onchange="del1()"></td><td>～</td>
+                            <td><input type="date" style="font-size:1.5rem;width:90%;" name="UriDateTo" maxlength="10" class="form-control" id="M_EV02" value="<?php echo $UriTo; ?>" onchange="del1()"></td>
                         </tr>
                         </table>
                     <div>
@@ -674,30 +750,33 @@ if($mode<>"select" && $mode<>"redirect"){
                 </div>
                 <div class="modal-body">
                     <div>
-                        <label for="ShouhinCD" class="control-label">修正対象商品名：</label>
-                        <select name="UpShouhinCD" style="font-size:1.5rem;padding-top:0;" id="ShouhinCD" class="form-control" required="required" placeholder="必須">
-                            <option value=""></option>
-                            <?php
-                            foreach($SHresult as $row){
-                                echo "<option value='".$row["ShouhinCD"]."'>商品ID(".$row["ShouhinCD"].")：".rot13decrypt($row["ShouhinNM"])."</option>\n";
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div>
                         <table>
                         <tr><td>売上日範囲指定</td></tr>
                         <tr>
-                            <td><input type="date" style="font-size:1.5rem;width:90%;" name="UpUriDateFrom" maxlength="10" class="form-control" value="<?php echo $UriFrom; ?>"></td><td>～</td>
-                            <td><input type="date" style="font-size:1.5rem;width:90%;" name="UpUriDateTo" maxlength="10" class="form-control" value="<?php echo $UriTo; ?>"></td>
+                            <td><input type="date" style="font-size:1.5rem;width:90%;" id='UpUriDateFrom' name="UriDateFrom" maxlength="10" class="form-control" value="<?php echo $UriFrom; ?>"></td><td>～</td>
+                            <td><input type="date" style="font-size:1.5rem;width:90%;" id='UpUriDateTo' name="UriDateTo" maxlength="10" class="form-control" value="<?php echo $UriTo; ?>"></td>
                         </tr>
                         </table>
                     </div>
                     <div>
-                        <label for="Event" class="control-label">イベント名：</label>
-                        <select name="UpEvent" style="font-size:1.5rem;padding-top:0;" id="Event" class="form-control">
+                        <label for="ShouhinCD" class="control-label">修正対象商品名：</label>
+                        <select name="UpShouhinCD" style="font-size:1.5rem;padding-top:0;" id="ShouhinCD" class="form-control" required="required" placeholder="必須">
                             <option value=""></option>
                             <?php
+                            /*Ajaxで取得に変更
+                            foreach($SHresult as $row){
+                                echo "<option value='".$row["ShouhinCD"]."'>商品ID(".$row["ShouhinCD"].")：".rot13decrypt($row["ShouhinNM"])."</option>\n";
+                            }
+                            */
+                            ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="Event" class="control-label">イベント/顧客名：</label>
+                        <select name="Event" style="font-size:1.5rem;padding-top:0;" id="Event_urikin_up" class="form-control">
+                            <option value=""></option>
+                            <?php
+                            /*Ajaxで取得に変更
                             foreach($EVresult as $row){
                                 if($post_Event==$row["Event"]){
                                     echo "<option value='".$row["Event"]."' selected>".$row["Event"]."</option>\n";
@@ -705,14 +784,17 @@ if($mode<>"select" && $mode<>"redirect"){
                                     echo "<option value='".$row["Event"]."'>".$row["Event"]."</option>\n";
                                 }
                             }
+                            */
                             ?>
                         </select>
                     </div>
+                    <!--
                     <div>
                         <label for="Tokui" class="control-label">得意先：</label>
                         <select name="UpTokui" style="font-size:1.5rem;padding-top:0;" id="Tokui" class="form-control">
                             <option value=""></option>
                             <?php
+                            /*
                             foreach($TKresult as $row){
                                  if($post_Tokui==$row["TokuisakiNM"]){
                                     echo "<option value='".$row["TokuisakiNM"]."' selected>".$row["TokuisakiNM"]."</option>\n";
@@ -720,9 +802,11 @@ if($mode<>"select" && $mode<>"redirect"){
                                     echo "<option value='".$row["TokuisakiNM"]."'>".$row["TokuisakiNM"]."</option>\n";
                                 }
                             }
+                            */
                             ?>
                         </select>
                     </div>
+                    -->
                     <hr>
                     <div>
                         <table>

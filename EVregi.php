@@ -15,7 +15,7 @@ csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェッ�
 csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
 */
 require "php_header.php";
-/*
+
 if(isset($_GET["csrf_token"]) || empty($_POST)){
     if(csrf_chk_redirect($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。".$_GET["csrf_token"];
@@ -24,7 +24,7 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
         exit();
     }
 }
-*/
+
 //セッションのIDがクリアされた場合の再取得処理。
 $rtn=check_session_userid($pdo_h);
 
@@ -367,7 +367,7 @@ window.onload = function() {
         }
     }
     
-};    
+};//window.onload
 
 </script>
 

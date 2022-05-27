@@ -492,11 +492,41 @@ function output_csv($data,$kikan){
     exit;
 }
 
+// =========================================================
+// 日付未指定時にルールに沿ってYMDを返す
+// =========================================================
+function rtn_date($date,$mode){
+    //rtn_date(empty($date),$mode)
+    //$date:チェックする日付　$mode:日付が空白の場合　today=今日　min=0000-00-00 max=2999-12-31 を返す
+    
+    if($date==false){
+        //何かしら入ってる
+        $rtn_date = (string)$date;
+    }elseif($mode=="today"){
+        $rtn_date = (string)date("Y-m-d");
+    }elseif($mode=="min"){
+        $rtn_date = "0000-00-00";
+    }elseif($mode=="max"){
+        $rtn_date = "2999-12-31";
+    }else{
+        $rtn_date = "";
+    }
+    
+    return $rtn_date;
+}
 
-
-
-
-
+// =========================================================
+// 検索ワード未指定時にワイルドカード(%)を返す
+// =========================================================
+function rtn_wildcard($word){
+    //rtn_wildcard(empty($word))で使用する
+    if($word==true){
+        //空白の場合
+        return "%";
+    }else{
+        return $word;
+    }
+}
 
 
 
@@ -510,7 +540,7 @@ function output_csv($data,$kikan){
 
 
 // =========================================================
-//登録メール(メールサーバーを使わない場合PHPから送信)
+// 登録メール(メールサーバーを使わない場合PHPから送信)
 // =========================================================
 function touroku_mail($to,$subject,$body){
     $mail2=rot13encrypt($to);

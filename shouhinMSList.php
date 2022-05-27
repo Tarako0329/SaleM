@@ -4,14 +4,14 @@
 require "php_header.php";
 
 if(isset($_GET["csrf_token"]) || empty($_POST)){
-    if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
+    if(csrf_chk_redirect($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。";
         header("HTTP/1.1 301 Moved Permanently");
         header("Location: index.php");
         exit();
     }
 }
-
+/*
 if($_POST["commit_btn"] <> ""){
     if(csrf_chk()==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした";
@@ -67,6 +67,7 @@ if($_POST["commit_btn"] <> ""){
     }
     
 }
+*/
 $csrf_create = csrf_create();
 
 //商品マスタの取得
@@ -140,10 +141,6 @@ $ZKMS = $stmt2->fetchAll();
     </div>
     </div>
     <div>
-        <!--
-        <button id='hyouji' style='position:fixed;top:75px;right:0' >all⇒checked</button>
-        -->
-        
         <select id='hyouji' style='position:fixed;top:95px;right:0'>
             <option value='0' selected>全て表示</option>
             <option value='1'>チェック</option>
@@ -161,7 +158,7 @@ $ZKMS = $stmt2->fetchAll();
         $_SESSION["MSG"]="";
     ?>
     <div class='container-fluid'>
-    <form method='post' id='form1' action='shouhinMSList.php'>
+    <form method='post' id='form1' action='shouhinMSList_sql.php'>
     <input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
 
     
