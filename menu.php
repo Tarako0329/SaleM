@@ -156,7 +156,7 @@ if($row[0]["yagou"]<>""){
     $i=0;
     echo "<div class='row'>";
 	foreach(array_merge($array,$array2) as $key=>$vals){
-        echo "  <div class ='col-md-3 col-sm-6 col-6' style='padding:5px;' >\n";
+        echo "  <div class ='col-md-3 col-sm-6 col-6 menu_".$i."' style='padding:5px;' >\n";
         echo "      <a href='".$vals[0]."' class='btn--topmenu btn-view'>".$key."\n";
         echo "      </a>\n";
         echo "  </div>\n";
@@ -169,6 +169,53 @@ if($row[0]["yagou"]<>""){
     </div>
 </body>
 
+<!--シェパードナビ
+<script src="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/js/shepherd.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/css/shepherd.css"/>
+<script>
+//import Shepherd from 'shepherd.js';
+const tour = new Shepherd.Tour({
+  useModalOverlay: true,
+  defaultStepOptions: {
+    //classes: 'shepherd-theme-arrows bg-purple-dark',
+    scrollTo: true
+  }
+});
+tour.addStep({
+  //title:`ご登録ありがとうございます。`,
+  text: `<p style='font-size:2rem;line-height:2rem;'> ご登録ありがとうございます。<br>まずはレジに表示する商品を登録しましょう。</p>`,
+  /*
+  attachTo: {
+    element: '.test',
+    on: 'bottom'
+  },
+  */
+  buttons: [
+    {
+      text: 'Next',
+      action: tour.next
+    }
+  ]
+});
+
+tour.addStep({
+//  title:'はじめに',
+  text: '商品の登録はここから！',
+  attachTo: {
+    element: '.menu_2',
+    on: 'bottom'
+  },
+  buttons: [
+    {
+      text: 'Next',
+      action: tour.next
+    }
+  ]
+});
+
+tour.start();    
+</script>
+-->
 </html>
 <?php
     $pdo_h=null;
