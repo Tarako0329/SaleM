@@ -83,12 +83,12 @@ $csrf_token = csrf_create();
     <link rel="stylesheet" href="css/style_ShouhinMSedit.css?<?php echo $time; ?>" >
     <TITLE><?php echo secho($title)." 取扱商品削除画面";?></TITLE>
 </head>
-<header class="header-color" style="flex-wrap:wrap">
+<header class="header-color common_header" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="menu.php"><?php echo secho($title);?></a></div>
     <p style="font-size:1rem;color:var(--user-disp-color);font-weight:400;">  取扱商品削除画面</p>
 </header>
 
-<body>
+<body class='common_body'>
     <div class="container-fluid" style="padding-top:15px;">
     <?php 
     if($msg<>""){

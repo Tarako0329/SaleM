@@ -166,7 +166,6 @@ $shouhiMS_bunrui = $stmt->fetchAll();
 window.onload = function() {
 
      // オブジェクトと変数の準備
-     
      var kaikei_disp = document.getElementById("kaikei");
      var zei_disp = document.getElementById("utizei");
      var plus_minus = document.getElementsByName('options');
@@ -263,12 +262,12 @@ window.onload = function() {
         oturi.innerHTML = oturikin;
     };
 
-     var su = document.getElementsByClassName("su");
-     var items = document.getElementsByClassName("items");
-     var reset_btn = document.getElementById("order_clear");
-     var return_btn = document.getElementById("order_return");
-     // リセットボタンのクリック処理
-     reset_btn.onclick = function (){
+    var su = document.getElementsByClassName("su");
+    var items = document.getElementsByClassName("items");
+    var reset_btn = document.getElementById("order_clear");
+    var return_btn = document.getElementById("order_return");
+    // リセットボタンのクリック処理
+    reset_btn.onclick = function (){
         for (let i = 0; i < su.length; i++) {
             su.item(i).value = 0;
             items.item(i).style.display = 'block';
@@ -375,10 +374,13 @@ window.onload = function() {
     <input type="hidden" name="csrf_token" value='<?php echo $token;?>'>
     <input type="hidden" name="mode" value='<?php echo $_GET["mode"];?>'> <!--レジor個別売上or在庫登録-->
     
-<header class="header-color" style='display:block'>
+<header class="header-color common_header" style='display:block'>
     <div class="title yagou"><a href="menu.php"><?php echo $title;?></a></div>
+    <span class='item_1'>
     <span style='color:var(--user-disp-color);font-weight:400;'>
-    <?php if($_GET["mode"]=="shuppin_zaiko"){echo "出店日：";}else{echo "売上日：";}?></span><input type='date' class='date' style='height:20%' name='KEIJOUBI' required="required" value='<?php if($_GET["mode"]<>"shuppin_zaiko"){echo (string)date("Y-m-d");} ?>'>
+    <?php if($_GET["mode"]=="shuppin_zaiko"){echo "出店日：";}else{echo "売上日：";}?>
+    </span><input type='date' class='date' style='height:20%' name='KEIJOUBI' required="required" value='<?php if($_GET["mode"]<>"shuppin_zaiko"){echo (string)date("Y-m-d");} ?>'>
+    </span>
     <?php
     if($_GET["mode"]=="kobetu"){
     ?>
@@ -387,14 +389,14 @@ window.onload = function() {
     <?php
     }else{
     ?>
-        <div class="event" style="font-family:inherit;"><input type="text" class="ev" name="EV" value="<?php echo $event ?>" required="required" placeholder="(必須)イベント名等"></div>
+        <div class="event" style="font-family:inherit;"><input type="text" class="ev item_2" name="EV" value="<?php echo $event ?>" required="required" placeholder="(必須)イベント名等"></div>
         <input type="hidden" name="KOKYAKU" value="">
     <?php
     }
     ?>
 </header>
 <div class='header-select header-color' >
-    <select class='form-control' style='font-size:1.2rem;padding:0;'> <!--width:80%;-->
+    <select class='form-control item_16' style='font-size:1.2rem;padding:0;'> <!--width:80%;-->
         <option>カテゴリートップへ移動できます</option>
     <?php
         $i=1;
@@ -405,9 +407,9 @@ window.onload = function() {
     ?>
     </select>
     <a href="#" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;' data-toggle='modal' data-target='#modal_help1'><i class="fa-regular fa-circle-question fa-lg logoff-color"></i></a>
-    <a href='EVregi_sql.php?CTGL=<?php echo $next_categoly; ?>&mode=<?php echo $_GET["mode"]; ?>' style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-solid fa-arrow-rotate-right fa-lg logoff-color"></i></a>
+    <a class='item_15' href='EVregi_sql.php?CTGL=<?php echo $next_categoly; ?>&mode=<?php echo $_GET["mode"]; ?>' style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-solid fa-arrow-rotate-right fa-lg logoff-color"></i></a>
 </div>
-<div class='header-plus-minus text-center' style='font-size:1.4rem;font-weight;700'>
+<div class='header-plus-minus text-center item_4' style='font-size:1.4rem;font-weight;700'>
     <i class="fa-regular fa-circle-question fa-lg logoff-color"></i><!--スペーシングのため白アイコンを表示-->
     <div class='btn-group btn-group-toggle' style='padding:0;' data-toggle='buttons'>
         <label class='btn btn-outline-primary active' id='plus_mode'>
@@ -418,13 +420,9 @@ window.onload = function() {
         </label>
     </div>
     <a href="#" style='color:inherit;margin-left:5px;margin-top:10px;' data-toggle='modal' data-target='#modal_help2'><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>
-    <!--
-    <div id='plus_disp'>【商品オーダーをタップして下さい。】</div>
-    <div class='minus_disp' style='display:none;'>【商品タップでオーダー数を減らせます。】</div>
-    -->
 </div>
-<body>
-
+<body class='common_body'>
+    
 <?php
     if(isset($emsg)){//
         echo $emsg;
@@ -437,18 +435,13 @@ window.onload = function() {
     }
 ?>
     <div class="container-fluid">
+        <div class='item_11 item_12'>
         <div class="row text-center" style='padding-top:5px;display:none;' id='CHOUSEI_AREA'>
-            <!--
-            <div class="col-1 col-lg-0" ></div>
-            <div class="col-10 col-lg-3" style="font-size:2.2rem;padding-top:10px;">
-                <button type='button' class='btn-view btn-changeVal' style="padding:0.1rem;" id="CHOUSEI_BTN" >割引・割増</button>
-            </div>
-            <div class="col-1" ></div>
-            -->
-            <button type='button' class='btn-view btn-changeVal' style="padding:0.1rem;width:300px;font-size:2.2rem;" id="CHOUSEI_BTN" >割引・割増</button>
+            <button type='button' class='btn-view btn-changeVal ' style="padding:0.1rem;width:300px;font-size:2.2rem;" id="CHOUSEI_BTN" >割引・割増</button>
         </div>
+        
 
-        <div class="row" style="display:none" id="CHOUSEI">
+        <div class="row " style="display:none" id="CHOUSEI">
             <div class="col-1 col-md-0" ></div>
             <div class="col-10 col-md-7" style="font-size: 2.2rem;">
                 お会計額：￥<span id="maekin">0</span> ⇒
@@ -457,9 +450,10 @@ window.onload = function() {
             </div>
             <div class="col-1" ></div>
         </div>
+        </div>
         <hr>
 
-        <div class='row' id='jump_0'>
+        <div class='row item_3' id='jump_0'>
 
 <?php
     $i=0;
@@ -507,7 +501,7 @@ window.onload = function() {
     <script>
         $('a[href*="#"]').click(function () {//全てのページ内リンクに適用させたい場合はa[href*="#"]のみでもOK
         	var elmHash = $(this).attr('href'); //ページ内リンクのHTMLタグhrefから、リンクされているエリアidの値を取得
-        	var pos = $(elmHash).offset().top-100;	//idの上部の距離を取得
+        	var pos = $(elmHash).offset().top-145;	//idの上部の距離を取得
         	$('body,html').animate({scrollTop: pos}, 500); //取得した位置にスクロール。500の数値が大きくなるほどゆっくりスクロール
         	return false;
         });
@@ -517,7 +511,8 @@ window.onload = function() {
             var speed = 400;
             var href = $(this).val();
             var target = $(href == "#" || href == "" ? 'html' : href);
-            var position = target.offset().top-100;
+            //var position = target.offset().top-100;
+            var position = target.offset().top-145;
             $('body,html').animate({scrollTop:position}, speed, 'swing');
             return false;
           });
@@ -526,27 +521,27 @@ window.onload = function() {
     </script>
 </body>
 
-<footer>
+<footer class='rezfooter'>
     <div class='kaikei'>
         <span style='font-size:1.6rem;'>お会計</span> ￥<span id='kaikei'>0</span>- <span style='font-size:1.6rem;'>内税</span>(<span id='utizei'>0</span>)
     </div>
     <div class='right1'>
-        <button type='button' class='btn--chk' style='border-left:none;border-right:none;' id='dentaku' data-toggle='modal' data-target='#FcModal'><?php if($_GET["mode"]<>"shuppin_zaiko"){echo "釣　銭";} ?></button>
+        <button type='button' class='btn--chk item_5' style='border-left:none;border-right:none;' id='dentaku' data-toggle='modal' data-target='#FcModal'><?php if($_GET["mode"]<>"shuppin_zaiko"){echo "釣　銭";} ?></button>
     </div>
-    <div class='right3'>
-        <button type='button' class='btn--chk' style=';' id='order_clear'>クリア</button>
-        <button type='button' class='btn--chk' style='display:none;' id='order_return'>戻　る</button>
+    <div class='right3 item_10'>
+        <button type='button' class='btn--chk item_8' style=';' id='order_clear'>クリア</button>
+        <button type='button' class='btn--chk ' style='display:none;' id='order_return'>戻　る</button>
     </div>
-    <div class='right2'>
-        <button type='submit' class='btn--commit' style='display:none;border-left:none;border-right:none;' id='btn_commit' name='commit_btn' value='uriage_commit' onClick='double(this)'>登　録</button>
-        <button type='button' class='btn--chk' style='border-left:none;border-right:none;' id='order_chk'>確　認</button>
+    <div class='right2 item_9'>
+        <button type='submit' class='btn--commit item_13' style='display:none;border-left:none;border-right:none;' id='btn_commit' name='commit_btn' value='uriage_commit' onClick='double(this)'>登　録</button>
+        <button type='button' class='btn--chk ' style='border-left:none;border-right:none;' id='order_chk'>確　認</button>
     </div>
 </footer>
-
+</form>
 <!--モーダル電卓(FcModal)-->
 <div class='modal fade' id='FcModal' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
     <div class='modal-dialog  modal-dialog-centered'>
-        <div class='modal-content' style='font-size: 3.0rem; font-weight: 800;'>
+        <div class='modal-content item_6' style='font-size: 3.0rem; font-weight: 800;'>
             <div class='modal-header'>
                 <!--<div class='modal-title' id='myModalLabel'>電　卓</div>-->
             </div>
@@ -559,7 +554,7 @@ window.onload = function() {
             </div>
             <div class='modal-footer'>
                 <!--<button type='button' class='btn btn-default' data-dismiss='modal'>閉じる</button>-->
-                <button type='button'  data-dismiss='modal'>閉じる</button>
+                <button type='button'  class='item_7' data-dismiss='modal'>閉じる</button>
             </div>
         </div>
     </div>
@@ -592,14 +587,14 @@ window.onload = function() {
                 <!--<div class='modal-title' id='myModalLabel'>電　卓</div>-->
             </div>
             <div class='modal-body'>
-                <div class='btn-group btn-group-toggle' style='padding:0;' data-toggle='buttons'>
-                <label class='btn btn-outline-warning'>
+                <div class='btn-group btn-group-toggle' data-toggle='buttons'>
+                <label class='btn btn-outline-warning' style='padding:0;'>
                     <input type='radio' autocomplete='off'>　▼　
                 </label>
                 </div>
                 をタップすると、注文数を減らせるようになります。<br>
-                <div class='btn-group btn-group-toggle' style='padding:0;' data-toggle='buttons'>
-                <label class='btn btn-outline-primary'>
+                <div class='btn-group btn-group-toggle' data-toggle='buttons'>
+                <label class='btn btn-outline-primary' style='padding:0;' >
                 <input type='radio' autocomplete='off'>　▲　
                 </label>
                 </div>
@@ -613,8 +608,585 @@ window.onload = function() {
     </div>
 </div>
 
-</form>
 
+<!--シェパードナビ
+<script src="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/js/shepherd.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/css/shepherd.css"/>
+-->
+<script src="shepherd/shepherd.min.js?<?php echo $time; ?>"></script>
+<link rel="stylesheet" href="shepherd/shepherd.css?<?php echo $time; ?>"/>
+<?php require "ajax_func_tourFinish.php";?>
+<script>
+    const TourMilestone = '<?php echo $_SESSION["tour"];?>';
+
+    const tutorial_5 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: false,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'tutorial_5'
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>売上計上日はここで変更します。<br><br>過去の売上を入れ忘れた場合、ここの日付を変更して売上登録をして下さい。</p>`,
+        attachTo: {
+            element: '.item_1',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>出店しているイベント名を入力します。<br><br>今回は適当に入れてください。</p>`,
+        attachTo: {
+            element: '.item_2',
+            on: 'bottom'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>お会計はメニューをタップした数だけカウントされます。<br><br>試しに何回かタップしてみてください。</p>`,
+        attachTo: {
+            element: '.item_3',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `
+                <div class='btn-group btn-group-toggle' data-toggle='buttons'>
+                <label class='btn btn-outline-warning' style='padding:0;' >
+                    <input type='radio' autocomplete='off'>　▼　
+                </label>
+                </div>
+                <br><p class='tour_discription'>を選択すると、メニュータップ時にマイナスされるようになります。<br><br>オーダーを多く入れすぎたときに使ってください。</p>`,
+        attachTo: {
+            element: '.item_4',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `
+                <div class='btn-group btn-group-toggle' data-toggle='buttons'>
+                <label class='btn btn-outline-primary  style='padding:0;'>
+                    <input type='radio' name='options' value='plus' autocomplete='off' checked>　▲　
+                </label>
+                </div>
+                <br><p class='tour_discription'>を選択すると、元に戻ります。</p>`,
+        attachTo: {
+            element: '.item_4',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>お釣り計算機が表示されます。<!--<br><br>釣銭ボタンを押して表示してみてください。--></p>`,
+        attachTo: {
+            element: '.item_5',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>受取金額を入力して「計算」ボタンを押すとお釣りが表示されます。<br><br>ここでは計算するだけで、何も登録されません。</p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>再度「釣銭」ボタンを押すと計算機が非表示になります。<!--<br><br>釣銭ボタンを何度か押してしてみてください。--></p>`,
+        attachTo: {
+            element: '.item_5',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    /*
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>お釣り計算機です。<br><br>（表示されてない場合は[BACK]を押して釣銭ボタンを押してください。</p>`,
+        buttons: [
+            {
+                text: 'back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>受取金額を入力して「計算」ボタンを押すとお釣りが表示されます。<br><br>ここでは計算するだけで、何も登録されません。</p>`,
+        attachTo: {
+            element: '.item_6',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>「閉じる」ボタンを押すか、枠外をタップすると前の画面に戻ります。</p>`,
+        attachTo: {
+            element: '.item_7',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    */
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>「クリア」ボタンを押すと、全ての数量を０にクリアします。</p>`,
+        attachTo: {
+            element: '.item_8',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>「確認」ボタンを押すと、注文したメニューのみが表示されます。<br><br>この状態で注文結果の最終確認を行います。<br><br>ボタン名が「確認」から「登録」に変更されます。</p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>「確認」ボタンを押して下さい。</p>`,
+        attachTo: {
+            element: '.item_9',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>注文内容を修正したい場合は「戻る」ボタンを押すと、ひとつ前の状態に戻ります。
+                <br>表示が「クリア」のままの場合、「Back」をタップして「確認」を押してください。
+                <br><br><span style='color:red;'>今回は「戻る」は押さずに「NEXT」をタップしてください。</span></p>`,
+        attachTo: {
+            element: '.item_10',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>次に、「割引・割増」について説明します。</p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    /*
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>「割引・割増」ボタンが表示されてない場合、下の「確認」ボタンを押してください。</p>`,
+        attachTo: {
+            element: '.item_9',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    */
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>「割引・割増」ボタンをタップしてください。
+                <br>
+                <br>ボタンが表示されていない場合、「Back」ボタンで前に戻り、「確認」ボタンを押してください。</p>`,
+        attachTo: {
+            element: '.item_11',
+            on: 'bottom'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>まとめ買いに対する割引や、サービス時間超過に対する追加料金等で<span style='color:red;'>『支払総額』を変更したい場合</span>に使用します。</p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>割引割増を使用すると、売上げの実績は以下の表に登録されます。
+                <br>
+                <br>例：割引（3,300円を3,000円）<br>商品A：1,100円<br>商品B：1,100円<br>商品C：1,100円<br><span style='color:red;'>割引：-300円</span></p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>「変更後の金額を入力」をタップし、割引後・割増後の総額を入力すると、下のお会計額が変更されます。</p>`,
+        attachTo: {
+            element: '.item_12',
+            on: 'bottom'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.nextAndSave
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>最後に「登録」ボタンを押すと、売上げの登録が完了します。</p>`,
+        attachTo: {
+            element: '.item_9',
+            on: 'top'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>いろいろ操作してみて最後に「登録」をタップしてください。</p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+
+
+
+
+
+    const tutorial_6 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: false,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'tutorial_6'
+    });
+    tutorial_6.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>売上が登録されると画面上部に緑色のメッセージバーが表示されます。
+                <br>(しばらくすると自動で消えます。)</p>`,
+        buttons: [
+            {
+                text: 'Next',
+                action: tutorial_6.next
+            }
+        ]
+    });
+    tutorial_6.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>次に、レジ画面のカテゴリー別表示についてです。</p>`,
+        buttons: [
+            {
+                text: 'Next',
+                action: tutorial_6.next
+            }
+        ]
+    });
+    tutorial_6.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>商品登録時にカテゴリーを設定すると、設定したカテゴリーごとに商品を纏めて表示ます。</p>`,
+        buttons: [
+            {
+                text: 'Next',
+                action: tutorial_6.nextAndSave
+            }
+        ]
+    });
+    tutorial_6.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>ここをタップするとカテゴリー別表示に変更されます。<br>試しにタップしてください。</p>`,
+        attachTo: {
+            element: '.item_15',
+            on: 'bottom'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_6.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_6.next
+            }
+        ]
+    });
+
+    const tutorial_7 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: false,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'tutorial_7'
+    });
+    tutorial_7.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>カテゴリー別表示の場合、ここのリストにカテゴリーが表示されるようになります。<br>目的のカテゴリーを選択すると、その付近まで画面が自動でスライドするようになります</p>`,
+        attachTo: {
+            element: '.item_16',
+            on: 'bottom'
+        },
+        buttons: [
+            {
+                text: 'Next',
+                action: tutorial_7.next
+            }
+        ]
+    });
+    tutorial_7.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'><i class="fa-solid fa-arrow-rotate-right fa-lg  awesome-color-panel-border-same"></i>をタップするごとにカテゴリーの粒度が「大→中→小→分別なし」の順で切り替わるので、ご自由に設定して下さい。</p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_7.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_7.next
+            }
+        ]
+    });
+    tutorial_7.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>「商品登録～レジの使い方」までの説明は以上となります。</p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_7.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_7.next
+            }
+        ]
+    });
+    tutorial_7.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>次はレジで登録した売上げの確認に移ります。</p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_7.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_7.next
+            }
+        ]
+    });
+    tutorial_7.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>画面上部の「WebRez＋」をタップしてメニュー画面に戻ってください。
+                <br>
+                <br><span style='font-size:1rem;color:green;'>※進捗を保存しました。</span>
+                </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_7.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_7.complete
+            }
+        ]
+    });
+    
+    if(TourMilestone=="tutorial_4"){
+        tutorial_5.start(tourFinish,'tutorial','');  
+    }else if(TourMilestone=="tutorial_5"){
+        tutorial_6.start(tourFinish,'tutorial','');
+    }else if(TourMilestone=="tutorial_6"){
+        tutorial_7.start(tourFinish,'tutorial','save');
+    }
+    
+
+</script>
 </html>
 <?php
 $stmt = null;

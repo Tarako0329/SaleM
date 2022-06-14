@@ -350,13 +350,13 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
     <TITLE><?php echo $title." 売上実績";?></TITLE>
 </head>
  
-<header class='header-color' style='flex-wrap:wrap'>
+<header class='header-color common_header' style='flex-wrap:wrap'>
     <div class='title' style='width: 100%;'><a href='menu.php'><?php echo $title;?></a></div>
     <div style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'> <?php echo $joken;?></div>
     <!--<div style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'> 修正モード </div>-->
 </header>
 <div class='header_menu'>
-    <div style='position:fixed;right:5px;top:70px;'>
+    <div style='position:fixed;right:5px;top:70px;' class='item_2'>
         <p style='margin-bottom:0px'>修正モード</p>
         <div class="switchArea">
             <input type="checkbox" id="switch1" onClick='chang_mode()' <?php if($_SESSION["UriageData_Correct_mode"]==="true"){echo "checked";} if($mode=="Update"){echo " readOnly ='readOnly' disabled ";} ?>>
@@ -377,7 +377,7 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
     ?>
 </div>
 
-<body id='body'>
+<body class='common_body' id='body'>
     <div class='container-fluid'>
     
     <?php
@@ -389,7 +389,7 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
         
     ?>
 
-    <table class='table-striped table-bordered' style='margin-top:10px'>
+    <table class='table-striped table-bordered item_0' style='margin-top:10px'>
         <thead >
             <tr>
                 <th scope='col' class='d-none d-sm-table-cell'>売上日</th><th scope='col' class='d-none d-sm-table-cell'>Event/顧客</th><th scope='col' style='width:2rem;'>No</th>
@@ -415,7 +415,7 @@ foreach($result as $row){
     echo "<td><a href='UriageData_Correct.php?mode=select&ad4=".rot13encrypt2($row["ShouhinCD"])."&ad5=".rot13encrypt2($row["ShouhinNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".($row["ShouhinNM"])."</a></td>";
     echo "<td class='text-right'>".$row["su"]."</td><td class='text-right d-none d-sm-table-cell'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td>";
     echo "<td class='text-right'>".$row["zei"]."</td><td class='text-right'>".$row["genka"]."</td><td class='text-right'>".$row["arari"]."</td>\n<td>";
-    if(($Type=="rireki") && ($mode == "select")){
+    if(($Type=="rireki") && ($mode == "select") || ($mode == "Updated")){
         //履歴表示の時だけ削除可能
         echo "<a href='UriageData_Correct.php?cd=".$row["ShouhinCD"]."&urino=".$row["UriageNO"]."&csrf_token=".$csrf_create."&mode=del'><i class='fa-regular fa-trash-can'></i></a>";
     }
@@ -523,12 +523,12 @@ if($mode=="Update" || $mode=="del"){
     </div>
 </body>
 
-<footer>
+<footer class='common_footer'>
     <div class='kaikei'>
         合計(税込)：￥<?php echo $GoukeiZeikomi ?>-<br>
         <span style='font-size:1.3rem;'>内訳(本体+税)：￥<?php echo $Goukei." + ".$GoukeiZei ?></span>
     </div>
-    <div class='right1'>
+    <div class='right1 item_1'>
         <button type='button' class='btn--chk' style='border-radius:0;' data-toggle='modal' data-target='#UriModal'>検　索</button>
     </div>
 
@@ -739,72 +739,234 @@ if($mode=="Update" || $mode=="del"){
         alert("更新対象がありません。");
         return false;
     }
-
-/*
-
-    var M_EV29 = document.getElementById('M_EV29');
-    var M_EV28 = document.getElementById('M_EV28');
-    var M_EV27 = document.getElementById('M_EV27');
-    var M_EV26 = document.getElementById('M_EV26');
-    var M_EV25 = document.getElementById('M_EV25');
-    var M_EV24 = document.getElementById('M_EV24');
-    var M_EV23 = document.getElementById('M_EV23');
-    var M_EV22 = document.getElementById('M_EV22');
-    var M_EV21 = document.getElementById('M_EV21');
-    var M_EV20 = document.getElementById('M_EV20');
-
-    var M_EV11 = document.getElementById('M_EV11');
-    var M_EV12 = document.getElementById('M_EV12');
-
-    var M_EV01 = document.getElementById('M_EV01');
-    var M_EV02 = document.getElementById('M_EV02');
-    function del1(){//日付指定時
-        M_EV11.value='';
-        M_EV12.value='';
-        M_EV29.value='';
-        M_EV28.value='';
-        M_EV27.value='';
-        M_EV26.value='';
-        M_EV25.value='';
-        M_EV24.value='';
-        M_EV23.value='';
-        M_EV22.value='';
-        M_EV21.value='';
-        M_EV20.value='';
-    }
-    function del2(){//売上NO範囲指定
-        M_EV01.value='';
-        M_EV02.value='';
-        M_EV29.value='';
-        M_EV28.value='';
-        M_EV27.value='';
-        M_EV26.value='';
-        M_EV25.value='';
-        M_EV24.value='';
-        M_EV23.value='';
-        M_EV22.value='';
-        M_EV21.value='';
-        M_EV20.value='';
-    }
-    function del3(){//売上No複数指定
-        M_EV01.value='';
-        M_EV02.value='';
-        M_EV11.value='';
-        M_EV12.value='';
-    }
-    var mode=document.getElementById('mode');
-    var lbl=document.getElementById('lbl');
-    function modechange_TK(){
-        lbl.innerText='修正後顧客名'
-        mode.value='UpdateTk'
-    }
-    function modechange_EV(){
-        lbl.innerText='修正後イベント名';
-        mode.value='UpdateEv';
-    }
-*/    
 </script>
+<!--シェパードナビshepherd
+<script src="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/js/shepherd.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/css/shepherd.css"/>
+-->
+<script src="shepherd/shepherd.min.js?<?php echo $time; ?>"></script>
+<link rel="stylesheet" href="shepherd/shepherd.css?<?php echo $time; ?>"/>
+<?php require "ajax_func_tourFinish.php";?>
+<script>
+    const TourMilestone = '<?php echo $_SESSION["tour"];?>';
 
+    const tutorial_9 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'tutorial_9'
+    });
+    tutorial_9.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>レジで売上を入力した当日に「売上実績」を開くと当日の売上明細が表示されます。
+               </p>`,
+        attachTo: {
+            element: '.item_0',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_9.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_9.next
+            }
+        ]
+    });
+    tutorial_9.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>
+                <a href='#' class='btn-view' style='padding:4px;'>イベント集計</a>
+                <a href='#' class='btn-view' style='padding:4px;'>商品集計</a>
+                <a href='#' class='btn-view' style='padding:4px;'>会計明細</a>
+                <br>
+                <br>画面上部にあるこれらのボタンをタップすると、売上実績の表示方法を変更できます。
+                <br>
+                <br><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i> をタップするとボタンの説明と表の操作方法を確認出来ます。
+                </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_9.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_9.next
+            }
+        ]
+    });
+    tutorial_9.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>過去の売上を確認したい場合は「検索」からも行う事が出来ます。
+                <br>
+                <br>ボタンをタップすると、検索用の画面が表示され、再度タップすると表示が消えます。
+                <br>
+                <br>
+               </p>`,
+        attachTo: {
+            element: '.item_1',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_9.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_9.next
+            }
+        ]
+    });
+    tutorial_9.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>ためしにタップして画面を確認してみてください。
+                <br>
+                <br>(確認したら、検索画面を閉じた状態で「Next」をタップしてください。)
+               </p>`,
+        attachTo: {
+            element: '.item_1',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_9.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_9.next
+            }
+        ]
+    });
+    tutorial_9.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>レジで打ち間違えた場合、この画面から売上の修正を行う事が出来ます。
+               </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_9.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_9.next
+            }
+        ]
+    });
+    tutorial_9.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>この「修正モード」をタップしてONに変更すると、修正用の画面に切り替わります。
+                <br>
+                <br>今回は説明しませんが、修正が必要となったら修正モードに切り替えて<i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i> マークより使い方を確認して下さい。
+               </p>`,
+        attachTo: {
+            element: '.item_2',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_9.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_9.next
+            }
+        ]
+    });
+    tutorial_9.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>次に、レジで登録した売上を消す方法を説明します。
+               </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_9.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_9.nextAndSave
+            }
+        ]
+    });
+    tutorial_9.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'><a href='#'><i class='fa-regular fa-trash-can'></i></a> マークをタップすることで売上を消す事が出来ます。
+               </p>`,
+        attachTo: {
+            element: '.item_0',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_9.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_9.next
+            }
+        ]
+    });
+    tutorial_9.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>今回はチュートリアルの一環で売上を登録してますので、売上を全て削除して下さい。
+               </p>`,
+        attachTo: {
+            element: '.item_0',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_9.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_9.complete
+            }
+        ]
+    });
+
+    const tutorial_10 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'tutorial_10'
+    });
+    tutorial_10.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>全ての売上を削除したら「WebRez+」をタップしてトップメニューに移動して下さい。
+                <br>
+                <br><span style='font-size:1rem;color:green;'>※進捗を保存しました。</span></p>`,
+        buttons: [
+            {
+                text: 'Next',
+                action: tutorial_10.complete
+            }
+        ]
+    });
+
+
+    if(TourMilestone=="tutorial_8"){
+        tutorial_9.start(tourFinish,'tutorial','');
+    }else if(TourMilestone=="tutorial_9" && 'Updated'=='<?php echo $mode; ?>'){
+        tutorial_10.start(tourFinish,'tutorial','save');
+    }
+</script>    
 </html>
 <?php
 $EVresult  = null;

@@ -53,9 +53,9 @@ $token=csrf_create();
     <link rel="stylesheet" href="css/style_account_create.css?<?php echo $time; ?>" >
     <TITLE><?php echo secho($title)." 契約関連";?></TITLE>
 </head>
-<header class="header-color" style="flex-wrap:wrap">
+<header class="header-color common_header" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></a></div>
     <p style="font-size:1rem;color:var(--user-disp-color);font-weight:400;">  契約関連</p>
 </header>
 
-<body>
+<body class='common_body'>

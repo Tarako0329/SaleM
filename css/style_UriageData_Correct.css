@@ -1,4 +1,4 @@
-body {
+.common_body {
     padding-top:105px;
     padding-bottom:70px; /*フッターーの後ろに要素が隠れないようにするため */
     font-size:1.1rem;
@@ -8,7 +8,7 @@ INPUT{
     height:20px;
 }
 
-footer{
+.common_footer{
     background: var(--footer-color);
     height: 60px; /* 高さを70pxに指定 */
     position: fixed; /* ウィンドウを基準に画面に固定 */

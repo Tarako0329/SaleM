@@ -60,12 +60,12 @@ if($_POST["BTN"] == "send"){
     <link rel="stylesheet" href="css/style_account_create.css?<?php echo $time; ?>" >
     <TITLE><?php echo secho($title)." ユーザー登録";?></TITLE>
 </head>
-<header class="header-color" style="flex-wrap:wrap">
+<header class="header-color common_header" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="<?php echo "index.php";?>"><?php echo secho($title);?></a></div>
     <p style="font-size:1rem;">  ユーザー登録</p>
 </header>
 
-<body>
+<body class='common_body'>
     <div class="container" style="padding-top:15px;">
     <div class='col-12 col-md-8' style="font-size:1.5rem;font-weight:800;">
     <?php

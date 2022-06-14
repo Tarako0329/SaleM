@@ -84,11 +84,11 @@ window.onload = function() {
 }  
 </script>
 
-<header class="header-color">
+<header class="header-color common_header">
     <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div></a></div>
 </header>
 
-<body>
+<body class='common_body'>
     <?php
     if($flg=="success"){
         echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-s' class='lead'></div></div></div></div>";

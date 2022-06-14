@@ -11,63 +11,7 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
         exit();
     }
 }
-/*
-if($_POST["commit_btn"] <> ""){
-    if(csrf_chk()==false){
-        $_SESSION["EMSG"]="セッションが正しくありませんでした";
-        header("HTTP/1.1 301 Moved Permanently");
-        header("Location: index.php");
-    }
-    $array = $_POST["ORDERS"];
-    $sqlstr = "";
 
-    $pdo_h->beginTransaction();
-    $E_Flg=0;
-    foreach($array as $row){
-        $sqlstr="select * from ZeiMS where zeiKBN=?;";
-        $stmt = $pdo_h->prepare($sqlstr);
-        $stmt->bindValue(1, $row["zeikbn"], PDO::PARAM_INT);
-        $stmt->execute();
-        $row3 = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        $sqlstr = "update ShouhinMS set tanka=?,tanka_zei=?,zeiritu=?,zeikbn=?,tani=?,bunrui1=?,bunrui2=?,bunrui3=?,hyoujiKBN1=?,hyoujiNO=?,genka_tanka=? where shouhinCD=? and uid=?";
-        $stmt = $pdo_h->prepare($sqlstr);
-        $stmt->bindValue(1, $row["tanka"], PDO::PARAM_INT);
-        $stmt->bindValue(2, $row["shouhizei"], PDO::PARAM_INT);
-        $stmt->bindValue(3, $row3[0]["zeiritu"], PDO::PARAM_INT);
-        $stmt->bindValue(4, $row["zeikbn"], PDO::PARAM_STR);
-        $stmt->bindValue(5, $row["tani"], PDO::PARAM_STR);
-        $stmt->bindValue(6, $row["bunrui1"], PDO::PARAM_STR);
-        $stmt->bindValue(7, $row["bunrui2"], PDO::PARAM_STR);
-        $stmt->bindValue(8, $row["bunrui3"], PDO::PARAM_STR);
-        $stmt->bindValue(9, $row["hyoujiKBN1"], PDO::PARAM_STR);
-        $stmt->bindValue(10,$row["hyoujiNO"], PDO::PARAM_INT);
-        $stmt->bindValue(11,$row["genka"], PDO::PARAM_INT);
-        $stmt->bindValue(12,$row["shouhinCD"], PDO::PARAM_INT);
-        $stmt->bindValue(13,$_SESSION['user_id'], PDO::PARAM_INT);
-        
-        $status=$stmt->execute();
-        
-        if($status==true){
-            
-        }else{
-            $E_Flg=1;
-            break;
-            
-        }
-    }
-    
-    if($E_Flg==0){
-        $pdo_h->commit();
-        $_SESSION["MSG"]= "更新されました。";
-    }else{
-        //1件でも失敗したらロールバック
-        $pdo_h->rollBack();
-        $_SESSION["MSG"]= "更新が失敗しました。";
-    }
-    
-}
-*/
 $csrf_create = csrf_create();
 
 //商品マスタの取得
@@ -89,7 +33,8 @@ $ZKMS = $stmt2->fetchAll();
     //共通部分、bootstrap設定、フォントCND、ファビコン等
     include "head.html" 
     ?>
-    <!--ページ専用CSS--><link rel='stylesheet' href='css/style_ShouhinMSL.css?<?php echo $time; ?>' >
+    <!--ページ専用CSS-->
+    <link rel='stylesheet' href='css/style_ShouhinMSL.css?<?php echo $time; ?>' >
     <TITLE><?php echo $title." 取扱商品 確認・編集";?></TITLE>
 </head>
 <script>
@@ -123,7 +68,7 @@ $ZKMS = $stmt2->fetchAll();
     };    
 
 </script>
-<header class='header-color' style='flex-wrap:wrap'>
+<header class='header-color common_header' style='flex-wrap:wrap'>
     <div class='title' style='width: 100%;'><a href='menu.php'><?php echo $title;?></a></div>
     <p style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>  取扱商品 確認・編集 画面</p>
 </header>
@@ -131,7 +76,7 @@ $ZKMS = $stmt2->fetchAll();
 <div class='header2'>
     <div>
     画面を横にすると他の項目も表示されます。<br>
-    <div class='btn-group btn-group-toggle' style='padding:0' data-toggle='buttons'>
+    <div class='btn-group btn-group-toggle item_2' style='padding:0' data-toggle='buttons'>
         <label class='btn btn-outline-primary active' style='font-size:1.2rem'>
             <input type='radio' name='options' id='option1' value='zeikomi' onChange='zei_math_all()' autocomplete='off' checked> 税 込 入 力
         </label>
@@ -141,15 +86,18 @@ $ZKMS = $stmt2->fetchAll();
     </div>
     </div>
     <div>
-        <select id='hyouji' style='position:fixed;top:95px;right:0'>
+        <select id='hyouji' class='hyouji item_0'>
             <option value='0' selected>全て表示</option>
             <option value='1'>チェック</option>
             <option value='2'>未チェック</option>
         </select>
     </div>
+    <?php if(empty($_SESSION["tour"])){?>
+    <a href="#" style='color:inherit;position:fixed;top:72px;right:5px;' onclick='help()'><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>
+    <?php }?>
 </div>
 
-<body>    
+<body class='common_body media_body'>    
     <?php
         //echo $_SESSION["MSG"]."<br>";
         if($_SESSION["MSG"]!=""){
@@ -162,7 +110,7 @@ $ZKMS = $stmt2->fetchAll();
     <input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
 
     
-    <table class='table-striped'>
+    <table class='table-striped item_1'>
         <thead>
             <tr style='height:30px;'>
                 <th class='th1' scope='col' colspan='12' style='width:auto;padding:0px 5px 0px 0px;'>ID:商品名</th><th scope='col'>
@@ -325,13 +273,572 @@ echo "</script>";
     </div>
 </body>
 
-<footer>
-    <dev class='left1'>
+<footer class='common_footer'>
+    <dev class='left1 item_3'>
         <input type='submit' value='登　録' class='btn--chk' style='border-radius:0;' name='commit_btn'>
     </dev>
     </form>
 </footer>
+<!--シェパードナビshepherd
+<script src="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/js/shepherd.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/css/shepherd.css"/>
+-->
+<script src="shepherd/shepherd.min.js?<?php echo $time; ?>"></script>
+<link rel="stylesheet" href="shepherd/shepherd.css?<?php echo $time; ?>"/>
+<?php require "ajax_func_tourFinish.php";?>
+<script>
+    const TourMilestone = '<?php echo $_SESSION["tour"];?>';
+    
+    const tutorial_12 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: false,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'tutorial_12'
+    });
+    tutorial_12.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'> 商品一覧の修正画面になります。
+              </p>`,
+        buttons: [
+            {
+                text: 'Next',
+                action: tutorial_12.next
+            }
+        ]
+    });
+    tutorial_12.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'> 登録した商品の「価格変更」やレジへの「表示/非表示」の切替はこの状態(縦画面表示)で行えます。
+              </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_12.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_12.next
+            }
+        ]
+    });
+    tutorial_12.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'> その他の項目については画面を横にすると表示され、修正可能な状態となります。
+              </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_12.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_12.next
+            }
+        ]
+    });
+    tutorial_12.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'> 画面を横にしてみてください。
+                <br>PCの場合、ブラウザの幅を拡大縮小すると表示が切り替わります。
+                <br>タブレットの場合は最初から全て表示されているかと思います。
+              </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_12.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_12.next
+            }
+        ]
+    });
+    tutorial_12.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'> 右上のリストボックスをタップすると、レジ画面の表示対象チェックが入っているもの、いないもの、全件表示と切り替える事が可能です。
+              </p>`,
+        attachTo: {
+            element: '.item_0',
+            on: 'bottom'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_12.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_12.next
+            }
+        ]
+    });
+    tutorial_12.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>試しにタップして変更してみてください。
+              </p>`,
+        attachTo: {
+            element: '.item_0',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_12.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_12.next
+            }
+        ]
+    });
+    tutorial_12.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>商品の価格を変更する際は「新価格」欄をタップして変更後の価格を入力して下さい。
+              </p>`,
+        attachTo: {
+            element: '.item_1',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_12.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_12.next
+            }
+        ]
+    });
+    tutorial_12.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>入力した「新価格」が「税込か税抜」かは、こちらで選択して下さい。
+              </p>`,
+        attachTo: {
+            element: '.item_2',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_12.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_12.next
+            }
+        ]
+    });
+    tutorial_12.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>レジへの「表示/非表示」の切替は「レジ」行のチェック有無で切り替えます。
+              </p>`,
+        attachTo: {
+            element: '.item_1',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_12.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_12.next
+            }
+        ]
+    });
+    tutorial_12.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>その他の項目についても、コチラの画面で修正したい部分をタップして打ち変えることで修正が可能です。
+              </p>`,
+        attachTo: {
+            element: '.item_1',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_12.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_12.next
+            }
+        ]
+    });
+    tutorial_12.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>修正が完了したら「登録」ボタンをタップすると、変更内容が登録されます。
+              </p>`,
+        attachTo: {
+            element: '.item_3',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_12.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_12.nextAndSave
+            }
+        ]
+    });
+    tutorial_12.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>なお、こちらで商品の価格等を修正しても過去の売上が変更されることはありません。
+              </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_12.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_12.next
+            }
+        ]
+    });
+    tutorial_12.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>試しに項目を修正し、「登録」してみてください。
+              </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_12.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_12.complete
+            }
+        ]
+    });
 
+    const tutorial_13 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'tutorial_13'
+    });
+    tutorial_13.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>最後に、登録した商品情報の削除について説明します。
+              </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_13.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_13.next
+            }
+        ]
+    });
+    tutorial_13.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'><span style='color:red;'>ちなみに、削除しようとしている商品の「売上」が１件でも登録されていると削除する事は出来ません。</span>
+              </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_13.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_13.next
+            }
+        ]
+    });
+    tutorial_13.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>画面を横にして頂くと右端に<i class='fa-regular fa-trash-can'></i>　マークが表示されます。
+              </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_13.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_13.next
+            }
+        ]
+    });
+    tutorial_13.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'><i class='fa-regular fa-trash-can'></i>　マークをタップすると削除を確認する画面に移動します。
+              </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_13.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_13.next
+            }
+        ]
+    });
+    tutorial_13.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>今回登録した商品が不要な商品でしたら<i class='fa-regular fa-trash-can'></i>　マークをタップして削除して下さい。
+              </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_13.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_13.next
+            }
+        ]
+    });
+    tutorial_13.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>以上でチュートリアルは終了となります。
+                <br>お疲れ様でした。
+              </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_13.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_13.complete
+            }
+        ]
+    });
+
+    const helpTour = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: false,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'helpTour'
+    });
+    helpTour.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'> 登録した商品の「価格変更」やレジへの「表示/非表示」の切替はこの状態(縦画面表示)で行えます。
+              </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: helpTour.back
+            },
+            {
+                text: 'Next',
+                action: helpTour.next
+            }
+        ]
+    });
+    helpTour.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'> 画面を横にすると他の項目も表示され、修正可能な状態となります。
+              </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: helpTour.back
+            },
+            {
+                text: 'Next',
+                action: helpTour.next
+            }
+        ]
+    });
+    helpTour.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'> 画面を横にしてみてください。
+                <br>PCの場合、ブラウザの幅を拡大縮小すると表示が切り替わります。
+                <br>タブレットの場合は最初から全て表示されているかと思います。
+              </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: helpTour.back
+            },
+            {
+                text: 'Next',
+                action: helpTour.next
+            }
+        ]
+    });
+    helpTour.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'><i class='fa-regular fa-trash-can'></i>　マークをタップすると削除を確認する画面に移動します。
+              </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: helpTour.back
+            },
+            {
+                text: 'Next',
+                action: helpTour.next
+            }
+        ]
+    });
+    helpTour.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'> 右上のリストボックスをタップすると、レジ画面の表示対象チェックが入っているもの、いないもの、全件表示と切り替える事が可能です。
+              </p>`,
+        attachTo: {
+            element: '.item_0',
+            on: 'bottom'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: helpTour.back
+            },
+            {
+                text: 'Next',
+                action: helpTour.next
+            }
+        ]
+    });
+    helpTour.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>商品の価格を変更する際は「新価格」欄をタップして変更後の価格を入力して下さい。
+              </p>`,
+        attachTo: {
+            element: '.item_1',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: helpTour.back
+            },
+            {
+                text: 'Next',
+                action: helpTour.next
+            }
+        ]
+    });
+    helpTour.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>入力した「新価格」が「税込か税抜」かは、こちらで選択して下さい。
+              </p>`,
+        attachTo: {
+            element: '.item_2',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: helpTour.back
+            },
+            {
+                text: 'Next',
+                action: helpTour.next
+            }
+        ]
+    });
+    helpTour.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>レジへの「表示/非表示」の切替は「レジ」行のチェック有無で切り替えます。
+              </p>`,
+        attachTo: {
+            element: '.item_1',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: helpTour.back
+            },
+            {
+                text: 'Next',
+                action: helpTour.next
+            }
+        ]
+    });
+    helpTour.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>その他の項目についても、コチラの画面で修正したい部分をタップして打ち変えることで修正が可能です。
+              </p>`,
+        attachTo: {
+            element: '.item_1',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: helpTour.back
+            },
+            {
+                text: 'Next',
+                action: helpTour.next
+            }
+        ]
+    });
+    helpTour.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>修正が完了したら「登録」ボタンをタップすると、変更内容が登録されます。
+              </p>`,
+        attachTo: {
+            element: '.item_3',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: helpTour.back
+            },
+            {
+                text: 'Next',
+                action: helpTour.next
+            }
+        ]
+    });
+    helpTour.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>なお、こちらで商品の価格等を修正しても過去の売上が変更されることはありません。
+              </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: helpTour.back
+            },
+            {
+                text: 'finish',
+                action: helpTour.complete
+            }
+        ]
+    });
+    
+    if(TourMilestone=="tutorial_11"){
+        tutorial_12.start(tourFinish,'tutorial','');
+    }else if(TourMilestone=="tutorial_12"){
+        tutorial_13.start(tourFinish,'tutorial','finish');
+    }
+
+    function help(){
+        helpTour.start(tourFinish,'help','');
+    }
+
+</script>
 </html>
 <?php
 $stmt  = null;

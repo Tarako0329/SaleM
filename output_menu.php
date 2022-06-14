@@ -44,7 +44,7 @@ if(!empty($_POST)){
   
 </script>
 
-<header class="header-color">
+<header class="header-color common_header">
     
     <?php
     if($logoff==false){
@@ -60,7 +60,7 @@ if(!empty($_POST)){
     ?>
 </header>
 
-<body>
+<body class='common_body'>
     <div class="container" style="padding-top:15px;">
     <form method='post' action='#' style="font-size:1.5rem">
         

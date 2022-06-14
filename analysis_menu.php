@@ -42,11 +42,11 @@ $token = csrf_create();
   
 </script>
 
-<header class="header-color">
+<header class="header-color common_header">
     <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div></a></div>
 </header>
 
-<body>
+<body class='common_body'>
     <div class="container-fluid">
 
 <?php

@@ -242,12 +242,12 @@ INPUT.su{
     display: inline-block;
     background:#fff;
 }
-body {
+.common_body {
     padding-top: 140px; /* ヘッダーの後ろに要素が隠れないようにするため */
     padding-bottom:145px;  /*フッターーの後ろに要素が隠れないようにするため */
 }
 
-footer{
+.rezfooter{
     background: var(--footer-color);
     height: 110px; /* 高さを指定 */
     position: fixed; /* ウィンドウを基準に画面に固定 */

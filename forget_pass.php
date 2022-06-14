@@ -85,14 +85,14 @@ if($_POST["answer"]<>""){
     </script>
 
     
-    <TITLE><?php echo $title." 売上分析";?></TITLE>
+    <TITLE><?php echo $title." forget password";?></TITLE>
 </head>
  
-<header class="header-color" style="flex-wrap:wrap;height:50px">
+<header class="header-color common_header" style="flex-wrap:wrap;height:50px">
     <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></div>
 </header>
 
-<body style='padding-top:55px'>
+<body class='common_body' style='padding-top:55px'>
     <div class="container">
         <form method='post' action='forget_pass.php' style='font-size:1.6rem'>
         <p style='color:red'>

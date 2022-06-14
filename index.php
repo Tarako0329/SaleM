@@ -34,12 +34,12 @@ if(isset($_SESSION["EMSG"])){
     <TITLE><?php echo secho($title)." ようこそ";?></TITLE>
 </head>
  
-<header  class="header-color" style="flex-wrap:wrap">
+<header  class="header-color common_header" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="index.php" ><?php echo secho($title);?></a></div>
     <div style="font-size:1rem;"> ようこそWEBREZへ</div>
 </header>
 
-<body>
+<body class='common_body'>
     <div class="container">
         <div class="card card-container">
             <!-- 

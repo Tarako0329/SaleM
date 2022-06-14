@@ -42,9 +42,9 @@ $token=csrf_create();
     <link rel="stylesheet" href="css/style_account_create.css?<?php echo $time; ?>" >
     <TITLE><?php echo secho($title)." サブスクリプション解約";?></TITLE>
 </head>
-<header class="header-color" style="flex-wrap:wrap">
+<header class="header-color common_header" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></a></div>
     <p style="font-size:1rem;">サブスクリプション解約</p>
 </header>
 
-<body>
+<body class='common_body'>

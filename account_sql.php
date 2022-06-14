@@ -32,16 +32,7 @@ if($_POST["BTN"] == "登　録"){
     $stmt->bindValue(6, date("Y-m-d"), PDO::PARAM_STR);
     $stmt->bindValue(7, $kigen, PDO::PARAM_STR);
     $stmt->bindValue(8, $_SESSION["SHOUKAI"], PDO::PARAM_STR);
-    /*
-    $stmt->bindValue(6, $_SESSION["NAME"], PDO::PARAM_STR);
-    $stmt->bindValue(7, $_SESSION["YAGOU"], PDO::PARAM_STR);
-    $stmt->bindValue(8, $_SESSION["zip11"], PDO::PARAM_STR);
-    $stmt->bindValue(9, $_SESSION["addr11"], PDO::PARAM_STR);
-    $stmt->bindValue(10, $_SESSION["ADD2"], PDO::PARAM_STR);
-    $stmt->bindValue(11, $_SESSION["ADD3"], PDO::PARAM_STR);
-    $stmt->bindValue(12, date("Y-m-d"), PDO::PARAM_STR);
-    $stmt->bindValue(13, $kigen, PDO::PARAM_STR);
-    */
+
     $flg=$stmt->execute();
     
     if($flg){

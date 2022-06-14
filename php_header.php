@@ -7,29 +7,34 @@ define("MODE_DIR",$dir_a[2]);
 
 //CSSスーパーリロード頻度
 if(MODE_DIR=="TEST"){
+    //テスト環境はミリ秒単位
     $time=date('Ymd-His');
     error_reporting( E_ALL );
 }else{
+    //本番は1日単位
     $time=date('Ymd');
     error_reporting( E_ALL & ~E_NOTICE );
 }
 
 
 session_start();
-//session_regenerate_id(true);
+
 require "./vendor/autoload.php";
 
 $pass=dirname(__FILE__);
-//require "version.php";
+
 require "functions.php";
 
+//ツアーガイド実行中か否かを判断する
+$_SESSION["tour"]=(empty($_SESSION["tour"])?"":$_SESSION["tour"]);
+deb_echo($_SESSION["tour"]);
 
 //.envの取得
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 define("DNS","mysql:host=".$_ENV["SV"].";dbname=".$_ENV["DBNAME"].";charset=utf8");
-define("USER_NAME", $_ENV["USER"]);
+define("USER_NAME", $_ENV["DBUSER"]);
 define("PASSWORD", $_ENV["PASS"]);
 
 define("HOST", $_ENV["HOST"]);

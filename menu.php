@@ -99,7 +99,7 @@ if($row[0]["yagou"]<>""){
   
 </script>
 
-<header class='header-color' style='display:block'>
+<header class='common_header header-color' style='display:block'>
     <?php
     if($logoff==false){
     ?>
@@ -116,7 +116,7 @@ if($row[0]["yagou"]<>""){
     
 </header>
 
-<body>
+<body class='common_body' >
 <?php
     if($logoff){
         echo "ログオフしました。<br>";
@@ -136,14 +136,12 @@ if($row[0]["yagou"]<>""){
         ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token]
         ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token]
         //,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko&csrf_token='.$token]
-        //,'売上実績'=>['UriageData.php?mode=select&csrf_token='.$token] UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where
         ,'売上実績'=>['UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where&csrf_token='.$token]
         ,'売上分析'=>['analysis_menu.php?csrf_token='.$token]
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]
         ,'会計連携'=>['output_menu.php?csrf_token='.$token]
         ,'紹介者ID'=>['shoukai.php?csrf_token='.$token]
-        //,'契約・解除'=>['../../PAY/index.php?system='.$title.'&mode='.MODE_DIR]
-        //,'お知らせ'=>['system_update_log.php']
+        ,'ヘルプ'=>['help_menu.php']
     ];
     
     if($plan==0){
@@ -169,53 +167,280 @@ if($row[0]["yagou"]<>""){
     </div>
 </body>
 
-<!--シェパードナビ
-<script src="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/js/shepherd.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/css/shepherd.css"/>
-<script>
-//import Shepherd from 'shepherd.js';
-const tour = new Shepherd.Tour({
-  useModalOverlay: true,
-  defaultStepOptions: {
-    //classes: 'shepherd-theme-arrows bg-purple-dark',
-    scrollTo: true
-  }
-});
-tour.addStep({
-  //title:`ご登録ありがとうございます。`,
-  text: `<p style='font-size:2rem;line-height:2rem;'> ご登録ありがとうございます。<br>まずはレジに表示する商品を登録しましょう。</p>`,
-  /*
-  attachTo: {
-    element: '.test',
-    on: 'bottom'
-  },
-  */
-  buttons: [
-    {
-      text: 'Next',
-      action: tour.next
-    }
-  ]
-});
-
-tour.addStep({
-//  title:'はじめに',
-  text: '商品の登録はここから！',
-  attachTo: {
-    element: '.menu_2',
-    on: 'bottom'
-  },
-  buttons: [
-    {
-      text: 'Next',
-      action: tour.next
-    }
-  ]
-});
-
-tour.start();    
-</script>
+<!--シェパードナビshepherd
+<script src="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/js/shepherd.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/css/shepherd.css"/>
 -->
+<?php
+    if(empty($_SESSION["tour"])){
+        //ツアー中でない場合、チュートリアルが終わっているか確認する
+        //$sqlstr="SELECT * FROM Users WHERE JSON_CONTAINS(ToursLog, '\"finish\"', '$.tutorial') and uid=?";
+        $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.tutorial') as tutorial FROM Users WHERE uid=?";
+        $stmt = $pdo_h->prepare($sqlstr);
+        $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
+        $stmt->execute();
+        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if(empty($row[0]["tutorial"])){
+            //チュートリアル未実施
+            $_SESSION["tour"]="tutorial_1";
+        }elseif($row[0]["tutorial"]=="finish"){
+            //チュートリアル完了
+            
+        }else{
+            //チュートリアル実施中（再開）
+            $_SESSION["tour"]=$row[0]["tutorial"];
+        }
+    }
+?>
+<script src="shepherd/shepherd.min.js?<?php echo $time; ?>"></script>
+<link rel="stylesheet" href="shepherd/shepherd.css?<?php echo $time; ?>"/>
+<?php require "ajax_func_tourFinish.php";?>
+<script>
+    const TourMilestone = '<?php echo $_SESSION["tour"];?>';
+
+    const tutorial_1 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'tutorial_1'
+    });
+    tutorial_1.addStep({
+        title: `<p class='tour_header'>ご登録ありがとうございます。</p>`,
+        text: `<p class='tour_discription'> これから簡単にWEBREZの使い方(チュートリアル)を説明します。
+              <br>10～20分ほどの操作になります。
+              <br>
+              <br>時間的に後にしたい方は「後で見る」タップして下さい。
+              <br>見なくてもいい方は「不要」タップして下さい。</p>`,
+        buttons: [
+            {
+                text: '不要',
+                action: tutorial_1.skip
+            },
+            {
+                text: '後で見る',
+                action: tutorial_1.cancel
+            },
+            {
+                text: 'Next',
+                action: tutorial_1.next
+            }
+        ]
+    });
+    tutorial_1.addStep({
+        title: `<p class='tour_header'>ご登録ありがとうございます。</p>`,
+        text: `<p class='tour_discription'>なお、WebRez+の基本的な使い方ですが、
+                <br>「登録」ボタン「削除」ボタン以外は何をしてもシステムがおかしくなる事はありません。
+                <br><br>所々に<a href="#" ><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>マークが設置してあり、タップするとヘルプが表示されます。
+                <br><br>色々試しながら使い方を覚えたい方は「不要」をタップしてもいいかもしれません。</p>`,
+        buttons: [
+            {
+                text: '不要',
+                action: tutorial_1.skip
+            },
+            {
+                text: '後で見る',
+                action: tutorial_1.cancel
+            },
+            {
+                text: 'Next',
+                action: tutorial_1.next
+            }
+        ]
+    });
+    tutorial_1.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>途中で右上の「ｘ」をタップするとチュートリアルは強制終了します。
+               <br>その場合、再度この画面にアクセスした際に自動的に再開します。
+               </p>`,
+        buttons: [
+            {
+                text: 'Next',
+                action: tutorial_1.next
+            }
+        ]
+    });
+    tutorial_1.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>
+                チュートリアルを進めていくと途中で
+                <br><br><span style='color:green;'>※進捗を保存しました。</span>
+                <br>と表示されます。
+                <br>以降は「ｘ」で終了しても、次回ログイン時にチュートリアルの続きから開始されます。
+               </p>`,
+        buttons: [
+            {
+                text: 'Next',
+                action: tutorial_1.next
+            }
+        ]
+    });
+    tutorial_1.addStep({
+        title: `<p class='tour_header'>チュートリアル。</p>`,
+        text: `<p class='tour_discription'> チュートリアルの流れは以下の通りです。
+              <br>
+              <br>１．レジに表示する商品の登録
+              <br>２．レジの使い方
+              <br>３．売上実績の確認/修正/削除
+              <br>４．商品情報の修正/削除
+              <br></p>`,
+        buttons: [
+            {
+                text: '不要',
+                action: tutorial_1.skip
+            },
+            {
+                text: '後で見る',
+                action: tutorial_1.cancel
+            },
+            {
+                text: 'Next',
+                action: tutorial_1.next
+            }
+        ]
+    });
+    tutorial_1.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>まずはレジに表示する商品を登録しましょう。</p>`,
+        buttons: [
+            {
+                text: 'Next',
+                action: tutorial_1.next
+            }
+        ]
+    });
+    tutorial_1.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>「商品登録」ボタンをタップしてください。</p>`,
+        attachTo: {
+            element: '.menu_2',
+            on: 'bottom'
+        },
+        cancelIcon:{
+            enabled:false
+        }
+    });
+
+    const tutorial_4 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'tutorial_4'
+    });
+    tutorial_4.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>続いて「レジ」画面の説明に移ります。</p>`,
+        buttons: [
+            {
+                text: 'Next',
+                action: tutorial_4.nextAndSave
+            }
+        ]
+    });
+    tutorial_4.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>「レジ」ボタンをタップしてください。</p>`,
+        attachTo: {
+            element: '.menu_0',
+            on: 'bottom'
+        },
+        cancelIcon:{
+            enabled:false
+        }
+    });
+    
+    const tutorial_8 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'tutorial_8'
+    });
+    tutorial_8.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>続いて「売上実績」を確認します。</p>`,
+        cancelIcon:{
+            enabled:false
+        },
+        buttons: [
+            {
+                text: 'Next',
+                action: tutorial_8.nextAndSave
+            }
+        ]
+    });
+    tutorial_8.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>「売上実績」ボタンをタップしてください。</p>`,
+        attachTo: {
+            element: '.menu_4',
+            on: 'bottom'
+        },
+        cancelIcon:{
+            enabled:false
+        }
+    });
+
+    const tutorial_11 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'tutorial_11'
+    });
+    tutorial_11.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>最後に、レジ用に登録した商品情報の修正について説明します。</p>`,
+        cancelIcon:{
+            enabled:false
+        },
+        buttons: [
+            {
+                text: 'Next',
+                action: tutorial_11.nextAndSave
+            }
+        ]
+    });
+    tutorial_11.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>「商品一覧」ボタンをタップしてください。</p>`,
+        attachTo: {
+            element: '.menu_3',
+            on: 'bottom'
+        },
+        cancelIcon:{
+            enabled:false
+        }
+    });
+
+    if(TourMilestone=="tutorial_1"){
+        tutorial_1.start(tourFinish,'tutorial','');
+    }else　if(TourMilestone=="tutorial_3"){
+        tutorial_4.start(tourFinish,'tutorial','');    
+    }else　if(TourMilestone=="tutorial_7"){
+        tutorial_8.start(tourFinish,'tutorial','');    
+    }else　if(TourMilestone=="tutorial_10"){
+        tutorial_11.start(tourFinish,'tutorial','');    
+    }
+</script>
+
 </html>
 <?php
     $pdo_h=null;

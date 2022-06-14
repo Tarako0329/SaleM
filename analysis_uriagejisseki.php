@@ -369,11 +369,11 @@ $EVresult = $stmt->fetchAll();
     <TITLE><?php echo $title." 売上分析";?></TITLE>
 </head>
  
-<header class='header-color' style='flex-wrap:wrap;height:50px'>
+<header class='header-color common_header' style='flex-wrap:wrap;height:50px'>
     <div class='title' style='width: 100%;'><a href='analysis_menu.php?csrf_token=<?php echo $csrf_create; ?>'><?php echo $title;?></a></div>
 </header>
 
-<body style='padding-top:55px'>
+<body class='common_body' style='padding-top:55px'>
     <div class='container-fluid'>
     <div class='row'>
     <div class='col-md-3' style='padding:5px;background:white'>

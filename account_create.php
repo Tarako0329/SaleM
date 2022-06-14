@@ -150,7 +150,7 @@ if($mode==0 || $mode==1){
     <!--郵便場号から住所取得-->
     <script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
 </head>
-<header class="header-color" style="flex-wrap:wrap">
+<header class="header-color common_header" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="<?php if($mode==1 || $mode==4){echo "menu.php";}else{echo "index.php";}?>"><?php echo secho($title);?></a></div>
     <p style="font-size:1rem;color:var(--user-disp-color);font-weight:400;">  ユーザー登録</p>
 </header>
@@ -163,7 +163,8 @@ if($mode==0 || $mode==1){
     }
     if($mode==5){
         //echo "<meta http-equiv='refresh' content=' 5; url=./menu.php'>";
-        echo "<meta http-equiv='refresh' content=' 5; url=./logincheck.php?csrf_token=".$token."'>";
+        //echo "<meta http-equiv='refresh' content=' 5; url=./logincheck.php?csrf_token=".$token."'>";
+        echo "<meta http-equiv='refresh' content=' 5; url=./menu.php?csrf_token=".$token."'>";
         echo "情報が登録されました。<br>5秒後、メニュー画面に遷移します。";
         exit();
     }elseif($mode==6){
