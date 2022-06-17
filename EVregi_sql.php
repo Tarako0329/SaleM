@@ -334,7 +334,7 @@ if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
 if($E_Flg==1){
     $_SESSION["msg"]= "登録が失敗しました。再度実行してもエラーとなる場合は、ご迷惑をおかけしますが復旧までお待ちください。エラーは管理者へ自動通知されました。";
     $emsg = $emsg."/UriNO::".$UriageNO."　uid::".$_SESSION['user_id'];
-    send_mail("green.green.midori@gmail.com","【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
+    send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
 }
 
 $stmt = null;

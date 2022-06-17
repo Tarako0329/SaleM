@@ -47,10 +47,11 @@ if($action=="color_change"){
 }
 $_SESSION["PK"]=PKEY;
 $_SESSION["SK"]=SKEY;
-$_SESSION["URL"]="../SaleM/".MODE_DIR."/subscription.php";
+
+$_SESSION["URL"]=ROOT_URL."subscription.php";   //支払成功後にアクセスするURL
 $_SESSION["PLAN_M"]=PLAN_M;
 $_SESSION["PLAN_Y"]=PLAN_Y;
-$_SESSION["SUBID"]="";
+$_SESSION["SUBID"]="";      //strip subscription idをクリア
 
 //有効期限の取得
 $sql="select * from Users where uid=?";
@@ -68,14 +69,14 @@ if($row[0]["yuukoukigen"]<>""){
         //試用期間、もしくは支払済み期間の翌日から課金
         $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
         $msg= "有効期限付き(".$row[0]["yuukoukigen"]." まで)";
-        //echo "有効期限付き(".date("Y-m-d",$_SESSION["KIGEN"])." まで)";
     }
     $plan=0;
 }else{
     //契約済
     $plan=1;
     //echo "本契約済み";
-    $_SESSION["SUBID"]=$row[0]["stripe_id"];
+    //$_SESSION["SUBID"]=$row[0]["stripe_id"];
+    //echo $_SESSION["SUBID"];
 }
 if($row[0]["yagou"]<>""){
     $user=$row[0]["yagou"];
@@ -141,14 +142,18 @@ if($row[0]["yagou"]<>""){
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]
         ,'会計連携'=>['output_menu.php?csrf_token='.$token]
         ,'紹介者ID'=>['shoukai.php?csrf_token='.$token]
-        ,'ヘルプ'=>['help_menu.php']
+        //,'ヘルプ'=>['help_menu.php']
     ];
     
+    //契約・解約関連は各時で実装したファイルを指定する
+    $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', null));
+
+    $dir_path =  bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', null));
+ 
     if($plan==0){
-        $array2 = ['本契約'=>['../../PAY/index.php?system='.$title.'&mode='.MODE_DIR]];
+        $array2 = ["本契約"=>[PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path]];
     }else{
-        //$array2 = ['契約解除について'=>['../../PAY/cancel.php?system='.$title.'&mode='.MODE_DIR]];
-        $array2 = ['契約解除へ'=>['sub_cancel.php?system='.$title.'&mode='.MODE_DIR]];
+        $array2 = ['契約解除へ'=>['sub_cancel.php']];
     }
     
     $i=0;

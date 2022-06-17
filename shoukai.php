@@ -95,7 +95,8 @@ window.onload = function() {
     }elseif($flg=="failed"){
         echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-e' class='lead'></div></div></div></div>";
     }
-    $url="https://green-island.mixh.jp/SaleM/".MODE_DIR."/pre_account.php?shoukai=".$ShoukaiCD;
+    
+    $url=ROOT_URL."pre_account.php?shoukai=".$ShoukaiCD;
     ?>
     <div class="container" style="padding-top:15px;">
         WEBREZ+を紹介していただくと、紹介者・登録者の双方にAMAZONギフト券500円分をプレゼントします。<br>

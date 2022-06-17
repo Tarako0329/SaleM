@@ -12,20 +12,23 @@ $stmt->execute();
 $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $_SESSION["SUBID"]=$row[0]["stripe_id"];
+$flg="";
 
 if($row[0]["keiyakudate"]>date("Y-m-d")){
-    $msg="トライアル期間中の解約となりますので料金は発生致しません。";
+    $day=date("Y-m-d", strtotime($row[0]["keiyakudate"]." -1 day"));
+    $msg="トライアル期間中の解約となりますので<span style='color:red'>料金は発生致しません</span>。<br>引き続き、トライアル期間として「".$day."」までは利用できます。<br>";
+    $flg="trial";
 }else if($row[0]["plan"]==12){
-    $msg="次回契約更新日は『";
+    $msg="次回契約更新日は『<span style='color:red'>";
     if(date("Y").substr($row[0]["keiyakudate"],4)>date("Y-m-d")){
         $day=date("Y").substr($row[0]["keiyakudate"],4);
     }else{
         $day=date("Y", strtotime("1 year")).substr($row[0]["keiyakudate"],4);
     }
-    $msg=$msg.$day."』となってます。<br>";
+    $msg=$msg.$day."</span>』となってます。<br>";
     
 }else if($row[0]["plan"]==1){
-    $msg="次回契約更新日は『";
+    $msg="次回契約更新日は『<span style='color:red'>";
     if(date("Y-m").substr($row[0]["keiyakudate"],7)>date("Y-m-d")){
         $day=date("Y-m").substr($row[0]["keiyakudate"],7);
     }else{
@@ -37,16 +40,15 @@ if($row[0]["keiyakudate"]>date("Y-m-d")){
         //echo $date;
     } else {
         $day = (new DateTimeImmutable)->modify('last day of '.substr($day,0,7))->format('Y-m-d');
-        
     }
-    $msg=$msg.$day."』となってます。<br>";
+    $msg=$msg.$day."</span>』となってます。<br>";
 }else{
     echo "想定外エラー";
     exit();
 }
 
 $_SESSION["yuukoukigen"]=$day;
-$_SESSION["mode"]=MODE_DIR;
+$_SESSION["redirect_url"]=ROOT_URL."sub_cancel2.php"; //解約処理終了後に飛ぶURL
 $token=csrf_create();
 
 ?>
@@ -61,25 +63,31 @@ $token=csrf_create();
 </head>
 <header class="header-color common_header" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></a></div>
-    <p style="font-size:1rem;">サブスクリプションの解約</p>
+    <p class='user_disp'style="font-size:1rem;">サブスクリプションの解約</p>
 </header>
 
-<body class='common_body'>
-    <form methon="post" action='../../PAY/cancel.php' style='font-size:1.5rem'>
+<body class='common_body' style='font-size:1.5rem;padding-left:10px;'>
     <?php echo $msg; ?>
-    <br>
-    次回以降の契約更新を停止する場合は、「解約」ボタンを選択して下さい。
+    <?php
+    if($flg!="trial"){
+    ?>
+        <br>
+        次回以降の契約更新を停止する場合は、「解約」ボタンを選択して下さい。
+        <br><br>
+        解約後も契約更新日の前日までWEBREZ+はご利用いただけます。
+        <br><br>
+        それ以降、新規の売上登録は出来ませんが、今まで入力した売上の閲覧・更新は可能となってます。
+        <br><br>
+        なお、登録データは削除されませんので、解約後、再契約いただくことで引き続き使用する事も可能です。
+        <br><br>
+        以上の内容をご理解頂いたうえで、解約をお願い致します。
+    <?php
+    }
+    ?>
     <br><br>
-    解約後も契約更新日の前日までWEBREZ+はご利用いただけます。
-    <br><br>
-    それ以降、新規の売上登録は出来ませんが、今まで入力した売上の閲覧・更新は可能となってます。
-    <br><br>
-    なお、登録データは削除されませんので、解約後、再契約いただくことで引き続き使用する事も可能です。
-    <br><br>
-    以上の内容をご理解頂いたうえで、解約をお願い致します。
-    <br><br>
-    <input type='submit' value='解 約（確定）' class='btn btn-primary' style='font-size:1.5rem'>
-    </form>
+    <a href='<?php echo PAY_CANCEL_URL; ?>?token=<?php echo $token; ?>' class='btn btn-primary' style='color:#fff;' >解 約（確定）</a>
     
+
 </body>
     
+</html>

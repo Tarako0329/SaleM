@@ -4,7 +4,6 @@
 
 require "php_header.php";
 
-
 $_SESSION['csrf_token'] = get_token(); // CSRFのトークンを取得する
 //トークンがセットされていたらリダイレクト
 if (isset($_COOKIE['webrez_token'])) {

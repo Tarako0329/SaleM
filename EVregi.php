@@ -38,8 +38,11 @@ if($row[0]["yuukoukigen"]==""){
     //本契約済み
 }elseif($row[0]["yuukoukigen"] < date("Y-m-d")){
     //お試し期間終了
+    $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', null));
+    $dir_path =  bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', null));
+    
     echo row[0]["yuukoukigen"] ;    
-    $emsg="お試し期間、もしくは解約後有効期間が終了しました。<br>継続してご利用頂ける場合は<a href='../../PAY/index.php?system=".$title."&mode=".MODE_DIR."'>こちらから本契約をお願い致します </a>";
+    $emsg="お試し期間、もしくは解約後有効期間が終了しました。<br>継続してご利用頂ける場合は<a href='".PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path."'>こちらから本契約をお願い致します </a>";
 }
 
 

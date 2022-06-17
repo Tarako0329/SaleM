@@ -221,7 +221,7 @@ function secho($s) {
 // テスト環境のみ出力
 // =========================================================
 function deb_echo($s){
-    if(MODE_DIR=="TEST"){
+    if(EXEC_MODE=="Test"){
         echo $s."<br>";
     }
 }

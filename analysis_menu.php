@@ -62,23 +62,9 @@ $token = csrf_create();
         ,'期間毎売上集計'=>['analysis_uriagejisseki.php?sum_tani=2&csrf_token='.$token,'日ごと、月毎、年間の売上金額を確認<br>イベント名を指定することで過去の売上傾向を確認出来ます。']
         ,'ABC分析'=>['analysis_abc.php?sum_tani=2&csrf_token='.$token,'売上の8割は2割の製品で構成されている。という統計学的な話があります。<br>売上げの7割を支える商品群をAグループ、2割を支える商品群をBグループ、残り1割をCグループに分類してます。<br>Aグループは人気商品。Cグループはあまり売上げに貢献していない商品と位置づけられます。<br>取扱商品の検討材料等に利用できます。']
         //,'バスケット分析'=>['xxxx.php?mode=1&csrf_token='.$token]
-        //,'契約・解除'=>['../../PAY/index.php?system='.$title.'&mode='.MODE_DIR]
-        //,'お知らせ'=>['system_update_log.php']
     ];
 
-    /*
-    $i=0;
-    echo "<div class='row'>";
-	foreach(array_merge($array) as $key=>$vals){
-        echo "  <div class ='col-md-3 col-sm-6 col-6' style='padding:5px;' >\n";
-        echo "      <a href='".$vals[0]."' class='btn--topmenu btn-view'>".$key."\n";
-        echo "      </a>\n";
-        echo "  </div>\n";
-        $i++;
-	}
-    echo "</div>";
-    */
-    
+
 	foreach(array_merge($array) as $key=>$vals){
         echo "<div class='row' style='margin-top:20px;'>";
         echo "  <div class ='col-md-3 col-sm-6 col-6' >\n";

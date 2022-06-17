@@ -6,11 +6,12 @@
     <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
     <link href='https://fonts.googleapis.com/css2?family=Murecho:wght@200&family=Allerta+Stencil&family=Cabin+Sketch&family=Chewy&family=Fredericka+the+Great&family=Kranky&family=Londrina+Outline&family=Zen+Kurenaido&display=swap' rel='stylesheet'>
-    <!--ファビコン-->
+    <!--ファビコン
     <link rel='icon' sizes='16x16' href='/favicon.ico' />
     <link rel='icon' type='image/svg+xml' href='/favicon.svg'>
+    -->
     <link rel='apple-touch-icon' href='/apple-touch-icon.png'>
-    <link rel='manifest' href='/manifest.json' />
+    <!--<link rel='manifest' href='/manifest.json'>-->
 
     <!-- Bootstrap CSS -->
     <link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css' integrity='sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO' crossorigin='anonymous'>
@@ -25,3 +26,11 @@
     <!--サイト共通-->
     <link rel='stylesheet' href='css/style.css?<?php echo $time; ?>' >
     <link rel='stylesheet' href='css/style_color_<?php echo $color_No;?>.css?<?php echo $time; ?>' >
+    <link rel='manifest' href='/manifest.webmanifest'>
+    <script>
+        if('serviceWorker' in navigator){
+        	navigator.serviceWorker.register('/serviceworker.js').then(function(){
+        		console.log("Service Worker is registered!!");
+        	});
+        }        
+    </script>

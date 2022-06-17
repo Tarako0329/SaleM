@@ -1,6 +1,20 @@
 <?php
 date_default_timezone_set('Asia/Tokyo');
+require "./vendor/autoload.php";
+//.envの取得
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
+
+ini_set('session.cookie_domain', '.'.MAIN_DOMAIN); 
+session_start();
+
+require "functions.php";
+
+
 //ディレクトリ・テストモード本番モードのURL切り分け用
+/*
 $s_name=$_SERVER['SCRIPT_NAME'];
 $dir_a=explode("/",$s_name,-1);
 define("MODE_DIR",$dir_a[2]);
@@ -15,28 +29,37 @@ if(MODE_DIR=="TEST"){
     $time=date('Ymd');
     error_reporting( E_ALL & ~E_NOTICE );
 }
+*/
 
+define("ROOT_URL",substr($_SERVER['SCRIPT_URI'],0,mb_strrpos($_SERVER['SCRIPT_URI'],"/")+1));
+define("EXEC_MODE",$_ENV["EXEC_MODE"]);
 
-session_start();
+//deb_echo(ROOT_URL);
 
-require "./vendor/autoload.php";
+if(EXEC_MODE=="Test"){
+    //テスト環境はミリ秒単位
+    $time=date('Ymd-His');
+    error_reporting( E_ALL );
+}else{
+    //本番は1日単位
+    $time=date('Ymd');
+    error_reporting( E_ALL & ~E_NOTICE );
+}
+
 
 $pass=dirname(__FILE__);
 
-require "functions.php";
 
 //ツアーガイド実行中か否かを判断する
 $_SESSION["tour"]=(empty($_SESSION["tour"])?"":$_SESSION["tour"]);
-deb_echo($_SESSION["tour"]);
+//deb_echo($_SESSION["tour"]);
 
-//.envの取得
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-
+//DB接続関連
 define("DNS","mysql:host=".$_ENV["SV"].";dbname=".$_ENV["DBNAME"].";charset=utf8");
 define("USER_NAME", $_ENV["DBUSER"]);
 define("PASSWORD", $_ENV["PASS"]);
 
+//メール送信関連
 define("HOST", $_ENV["HOST"]);
 define("PORT", $_ENV["PORT"]);
 define("FROM", $_ENV["FROM"]);
@@ -45,10 +68,16 @@ define("POP_HOST", $_ENV["POP_HOST"]);
 define("POP_USER", $_ENV["POP_USER"]);
 define("POP_PASS", $_ENV["POP_PASS"]);
 
+//システム通知
+define("SYSTEM_NOTICE_MAIL",$_ENV["SYSTEM_NOTICE_MAIL"]);
+
+//契約・支払関連のキー情報
 define("SKEY", $_ENV["SKey"]);
 define("PKEY", $_ENV["PKey"]);
 define("PLAN_M", $_ENV["PLAN_M"]);
 define("PLAN_Y", $_ENV["PLAN_Y"]);
+define("PAY_CONTRACT_URL", $_ENV["PAY_contract_url"]);
+define("PAY_CANCEL_URL", $_ENV["PAY_cancel_url"]);
 
 //サイトタイトルの取得
 $title = $_ENV["TITLE"];
