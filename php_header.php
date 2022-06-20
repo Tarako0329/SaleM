@@ -7,34 +7,20 @@ $dotenv->load();
 
 define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
 
-ini_set('session.cookie_domain', '.'.MAIN_DOMAIN); 
+$rtn=session_set_cookie_params(24*60*60*24*3,'/','.'.MAIN_DOMAIN,true);
+if($rtn==false){
+    echo "ERROR:session_set_cookie_params";
+    exit();
+}
 session_start();
 
 require "functions.php";
 
 
-//ディレクトリ・テストモード本番モードのURL切り分け用
-/*
-$s_name=$_SERVER['SCRIPT_NAME'];
-$dir_a=explode("/",$s_name,-1);
-define("MODE_DIR",$dir_a[2]);
-
-//CSSスーパーリロード頻度
-if(MODE_DIR=="TEST"){
-    //テスト環境はミリ秒単位
-    $time=date('Ymd-His');
-    error_reporting( E_ALL );
-}else{
-    //本番は1日単位
-    $time=date('Ymd');
-    error_reporting( E_ALL & ~E_NOTICE );
-}
-*/
-
 define("ROOT_URL",substr($_SERVER['SCRIPT_URI'],0,mb_strrpos($_SERVER['SCRIPT_URI'],"/")+1));
 define("EXEC_MODE",$_ENV["EXEC_MODE"]);
 
-//deb_echo(ROOT_URL);
+deb_echo(ROOT_URL);
 
 if(EXEC_MODE=="Test"){
     //テスト環境はミリ秒単位

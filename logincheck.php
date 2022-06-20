@@ -1,8 +1,13 @@
 <?php
+date_default_timezone_set('Asia/Tokyo');
+$rtn=session_set_cookie_params(24*60*60*24*3,'/','.'.MAIN_DOMAIN,true);
+if($rtn==false){
+    echo "ERROR:session_set_cookie_params";
+    exit();
+}
 session_start();
 session_regenerate_id(true);
 require "./vendor/autoload.php";
-date_default_timezone_set('Asia/Tokyo');
 
 $pass=dirname(__FILE__);
 require "functions.php";

@@ -20,17 +20,8 @@ $rtn=check_session_userid($pdo_h);
 $token = csrf_create();
 $logoff=false;
 $action="";
-//$color_No=0;
+
 $Max_color_No=2;
-if(!empty($_GET["action"])){
-    $action = $_GET["action"];
-}
-if($action=="logout"){
-    setCookie("webrez_token", 'a', -1, "/", null, TRUE, TRUE); 
-    session_destroy();
-    session_start();
-    $logoff=true;
-}
 if($action=="color_change"){
     //配色の変更・保存
     $color_No = $_GET["color"]+1;
@@ -45,45 +36,76 @@ if($action=="color_change"){
     $stmt->bindValue(5, $color_No, PDO::PARAM_STR);
     $stmt->execute();
 }
-$_SESSION["PK"]=PKEY;
-$_SESSION["SK"]=SKEY;
 
-$_SESSION["URL"]=ROOT_URL."subscription.php";   //支払成功後にアクセスするURL
-$_SESSION["PLAN_M"]=PLAN_M;
-$_SESSION["PLAN_Y"]=PLAN_Y;
-$_SESSION["SUBID"]="";      //strip subscription idをクリア
 
-//有効期限の取得
-$sql="select * from Users where uid=?";
-$stmt = $pdo_h->prepare($sql);
-$stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
-$stmt->execute();
-$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$msg="<br>";
-if($row[0]["yuukoukigen"]<>""){
-    if(strtotime($row[0]["yuukoukigen"]) < strtotime(date("Y-m-d"))){
-        //有効期限切れ。申込日から即課金
-        $_SESSION["KIGEN"] = strtotime("+3 day");
-        $msg= "有効期限切れ";
-    }else{
-        //試用期間、もしくは支払済み期間の翌日から課金
-        $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
-        $msg= "有効期限付き(".$row[0]["yuukoukigen"]." まで)";
-    }
-    $plan=0;
-}else{
-    //契約済
-    $plan=1;
-    //echo "本契約済み";
-    //$_SESSION["SUBID"]=$row[0]["stripe_id"];
-    //echo $_SESSION["SUBID"];
+
+
+if(!empty($_GET["action"])){
+    $action = $_GET["action"];
 }
-if($row[0]["yagou"]<>""){
-    $user=$row[0]["yagou"];
-}elseif($row[0]["name"]<>""){
-    $user=$row[0]["name"];
+if($action=="logout"){
+    $_SESSION = array();// セッション変数を全て解除する
+    
+    // セッションを切断するにはセッションクッキーも削除する。
+    // Note: セッション情報だけでなくセッションを破壊する。
+    if (isset($_COOKIE[session_name()])) {
+        setCookie(session_name(), '', -1, "/", '.'.MAIN_DOMAIN, TRUE, TRUE); 
+    }
+    setCookie("webrez_token", '', -1, "/", null, TRUE, TRUE); 
+
+    session_destroy();// 最終的に、セッションを破壊する
+    $logoff=true;
 }else{
-    $user=$row[0]["mail"];
+    $_SESSION["PK"]=PKEY;
+    $_SESSION["SK"]=SKEY;
+    
+    $_SESSION["URL"]=ROOT_URL."subscription.php";   //支払成功後にアクセスするURL
+    $_SESSION["PLAN_M"]=PLAN_M;
+    $_SESSION["PLAN_Y"]=PLAN_Y;
+    $_SESSION["SUBID"]="";      //strip subscription idをクリア
+    
+    //ユーザ情報の取得
+    $sql="select * from Users where uid=?";
+    $stmt = $pdo_h->prepare($sql);
+    $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $msg="<br>";
+    //強制ログアウト処理
+    if($row[0]["ForcedLogout"]==true){
+        //system更新を有効にするためにログアウトが必要な場合の処理
+        $sql="update Users set ForcedLogout=false where uid=?";
+        $stmt = $pdo_h->prepare($sql);
+        $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
+        $stmt->execute();
+        header("HTTP/1.1 301 Moved Permanently");
+        header("Location: menu.php?action=logout&ForcedLogout=true");
+        exit();
+    }
+    //契約状況の確認
+    if($row[0]["yuukoukigen"]<>""){
+        if(strtotime($row[0]["yuukoukigen"]) < strtotime(date("Y-m-d"))){
+            //有効期限切れ。申込日から即課金
+            $_SESSION["KIGEN"] = strtotime("+3 day");
+            $msg= "有効期限切れ";
+        }else{
+            //試用期間、もしくは支払済み期間の翌日から課金
+            $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
+            $msg= "有効期限付き(".$row[0]["yuukoukigen"]." まで)";
+        }
+        $plan=0;
+    }else{
+        //契約済
+        $plan=1;
+    }
+    //ユーザ名・屋号の取得
+    if($row[0]["yagou"]<>""){
+        $user=$row[0]["yagou"];
+    }elseif($row[0]["name"]<>""){
+        $user=$row[0]["name"];
+    }else{
+        $user=$row[0]["mail"];
+    }
 }
 ?>
 <head>
@@ -120,9 +142,13 @@ if($row[0]["yagou"]<>""){
 <body class='common_body' >
 <?php
     if($logoff){
-        echo "ログオフしました。<br>";
+        if($_GET["ForcedLogout"]==true){
+            echo "システム更新時に追加した機能を有効にするため、強制ログアウトしました。<br>お手数ですが、再度ログインしてご利用ください。<br><br>";
+        }else{
+            echo "ログオフしました。<br>";
+        }
         echo "<a href='index.php'>再ログインする</a>";
-        //echo $_COOKIE["webrez_token"];
+        
         exit;
     }
     echo $msg;
