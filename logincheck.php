@@ -1,5 +1,12 @@
 <?php
 date_default_timezone_set('Asia/Tokyo');
+require "./vendor/autoload.php";
+
+//.envの取得
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
+
 $rtn=session_set_cookie_params(24*60*60*24*3,'/','.'.MAIN_DOMAIN,true);
 if($rtn==false){
     echo "ERROR:session_set_cookie_params";
@@ -7,15 +14,9 @@ if($rtn==false){
 }
 session_start();
 session_regenerate_id(true);
-require "./vendor/autoload.php";
 
 $pass=dirname(__FILE__);
 require "functions.php";
-
-
-//.envの取得
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
 
 define("DNS","mysql:host=".$_ENV["SV"].";dbname=".$_ENV["DBNAME"].";charset=utf8");
 define("USER_NAME", $_ENV["DBUSER"]);
