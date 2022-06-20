@@ -89,6 +89,14 @@ th{
     border-bottom:none;
     border-color:var(--rez-border-color);
 }
+@media (display-mode: standalone){
+    .common_footer{
+        height: 80px; /* 高さを70pxに指定 */
+    }
+    .common_body {
+        padding-bottom:90px; /*フッターーの後ろに要素が隠れないようにするため */
+    }
+}
 
 
  /* === ボタンを表示するエリア ============================== */

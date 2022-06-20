@@ -44,7 +44,7 @@ foreach($daybefor as $day){
     foreach($stmt as $row){
         echo "対象あり：".$row["mail"]."\n";
         $to = $row["mail"];
-        $subject = "WEBREZ+ 無料トライアル終了１０日前のお知らせ";
+        $subject = "WEBREZ+ 無料トライアル終了 ".$day." 日前のお知らせ";
     
         $body = <<< "EOM"
             （WEBREZ+より自動送信しております。）

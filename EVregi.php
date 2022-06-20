@@ -41,7 +41,7 @@ if($row[0]["yuukoukigen"]==""){
     $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', null));
     $dir_path =  bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', null));
     
-    echo row[0]["yuukoukigen"] ;    
+    //echo row[0]["yuukoukigen"] ;
     $emsg="お試し期間、もしくは解約後有効期間が終了しました。<br>継続してご利用頂ける場合は<a href='".PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path."'>こちらから本契約をお願い致します </a>";
 }
 
@@ -429,6 +429,7 @@ window.onload = function() {
 <?php
     if(isset($emsg)){//
         echo $emsg;
+        echo "</body></html>";
         exit();
     }
     if($_GET["status"]=="success"){

@@ -258,6 +258,26 @@ INPUT.su{
     flex-wrap:wrap;
     z-index: 99;
 }
+@media (display-mode: standalone){
+  /* ここにPWA環境下でのみ実行する設定を記述 */
+    .right3{
+        /*クリアボタンエリア*/
+        height:80px;
+    }
+    .right2{
+        /*確認・登録ボタンエリア*/
+        height:80px;
+    }
+    .right1{
+        /*電卓ボタンエリア*/
+        height:80px;
+    }
+    .rezfooter{
+        height: 130px; /* 高さを指定 */
+    }
+    
+}
+
 *,
 *:before,
 *:after {
