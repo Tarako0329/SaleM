@@ -27,5 +27,8 @@
         	navigator.serviceWorker.register('serviceworker.js').then(function(){
         		console.log("Service Worker is registered!!");
         	});
-        }        
+        }
+        if(window.matchMedia('(display-mode: standalone)').matches){
+            // ここにPWA環境下でのみ実行するコードを記述
+        }
     </script>

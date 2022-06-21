@@ -90,7 +90,7 @@ if($_POST["BTN"] == "send"){
             <input type="email" maxlength="40" class="form-control" id="mail" name="MAIL" required="required" placeholder="必須" <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["MAIL"])."'";}  ?>>
         </div>
         <div class="col-2 col-md-1" style=" padding:0; margin-top:10px;">
-            <button type="submit" class="btn btn-primary" style="width:150%;hight:150%;font-size:1.5rem" name="BTN" value="send">送 信</button>
+            <button type="submit" class="btn btn-primary" style="font-size:1.5rem" name="BTN" value="send">送 信</button>
         </div>
         <br>
     </form>

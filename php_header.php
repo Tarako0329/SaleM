@@ -21,6 +21,7 @@ define("ROOT_URL",substr($_SERVER['SCRIPT_URI'],0,mb_strrpos($_SERVER['SCRIPT_UR
 define("EXEC_MODE",$_ENV["EXEC_MODE"]);
 
 deb_echo(ROOT_URL);
+deb_echo(EXEC_MODE."：uid_".$_SESSION["user_id"]);
 
 if(EXEC_MODE=="Test"){
     //テスト環境はミリ秒単位

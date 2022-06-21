@@ -54,29 +54,48 @@ function check_auto_login($cookie_token, $pdo) {
 
 
 function check_session_userid($pdo_h){
-    if(empty($_SESSION["user_id"])){
-        //セッションのIDがクリアされた場合の再取得処理。
-        if(empty($_COOKIE['webrez_token'])){
-            //自動ログインが無効の場合、ログイン画面へ
-            $_SESSION["EMSG"]="セッションが切れてます。";
+    if(EXEC_MODE=="Trial"){
+        if(empty($_COOKIE["user_id"]) && empty($_SESSION["user_id"])){
             header("HTTP/1.1 301 Moved Permanently");
-            header("Location: index.php");
+            header("Location: TrialDataCreate.php");
             exit();
-        }elseif(check_auto_login($_COOKIE['webrez_token'],$pdo_h)==false){
-            $_SESSION["EMSG"]="自動ログインの有効期限が切れてます";
+        }
+        //トライアルモードの場合はクッキーにもuidを保存（24時間有効）
+        if(empty($_COOKIE["user_id"]) || (!empty($_SESSION["user_id"]) && $_COOKIE["user_id"] != $_SESSION["user_id"])){
+            //クッキーが空　もしくは　セッションありかつセッション＜＞クッキーの場合
+            setCookie("user_id", $_SESSION["user_id"], time()+60*60*24, "/", null, TRUE, TRUE);
+        }
+        if(empty($_SESSION["user_id"])){
+            $_SESSION["user_id"]=$_COOKIE["user_id"];
+        }
+    }else{
+
+        if(empty($_SESSION["user_id"])){
+            //セッションのIDがクリアされた場合の再取得処理。
+            if(empty($_COOKIE['webrez_token'])){
+                //自動ログインが無効の場合、ログイン画面へ
+                $_SESSION["EMSG"]="セッションが切れてます。";
+                header("HTTP/1.1 301 Moved Permanently");
+                header("Location: index.php");
+                exit();
+            }elseif(check_auto_login($_COOKIE['webrez_token'],$pdo_h)==false){
+                $_SESSION["EMSG"]="自動ログインの有効期限が切れてます";
+                header("HTTP/1.1 301 Moved Permanently");
+                header("Location: index.php");
+                exit();
+            }
+            
+        }
+        if(!($_SESSION["user_id"]<>"")){
+            //念のための最終チェック
+            $_SESSION["EMSG"]="ユーザーＩＤの再取得に失敗しました。";
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: index.php");
             exit();
         }
-        
+
     }
-    if(!($_SESSION["user_id"]<>"")){
-        //念のための最終チェック
-        $_SESSION["EMSG"]="ユーザーＩＤの再取得に失敗しました。";
-        header("HTTP/1.1 301 Moved Permanently");
-        header("Location: index.php");
-        exit();
-    }
+    
     return true;
 }
 
@@ -221,7 +240,7 @@ function secho($s) {
 // テスト環境のみ出力
 // =========================================================
 function deb_echo($s){
-    if(EXEC_MODE=="Test"){
+    if(EXEC_MODE!="Product"){
         echo $s."<br>";
     }
 }

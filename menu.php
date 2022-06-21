@@ -173,15 +173,17 @@ if($action=="logout"){
     
     //契約・解約関連は各時で実装したファイルを指定する
     $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', null));
-
     $dir_path =  bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', null));
- 
-    if($plan==0){
-        $array2 = ["本契約"=>[PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path]];
-    }else{
-        $array2 = ['契約解除へ'=>['sub_cancel.php']];
-    }
     
+    if(EXEC_MODE!="Trial"){
+        if($plan==0){
+            $array2 = ["本契約"=>[PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path]];
+        }else{
+            $array2 = ['契約解除へ'=>['sub_cancel.php']];
+        }
+    }else{
+        $array2=array();
+    }
     $i=0;
     echo "<div class='row'>";
 	foreach(array_merge($array,$array2) as $key=>$vals){

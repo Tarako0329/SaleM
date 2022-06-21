@@ -275,7 +275,7 @@ echo "</script>";
 
 <footer class='common_footer'>
     <dev class='left1 item_3'>
-        <input type='submit' value='登　録' class='btn--chk' style='border-radius:0;' name='commit_btn'>
+        <button type='submit' class='btn--chk' style='border-radius:0;' name='commit_btn' >登　録</button>
     </dev>
     </form>
 </footer>

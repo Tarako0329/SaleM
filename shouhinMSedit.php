@@ -167,7 +167,7 @@ $csrf_token=csrf_create();
         </div>
         -->
         <br>
-        <button type="submit" class="btn btn-primary item_13" name="btn" value="登録">登  録</button>
+        <button type="submit" class="btn btn-primary item_13" name="btn" value="登録" >登  録</button>
     </form>
     </div>
 

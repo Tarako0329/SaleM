@@ -3,6 +3,12 @@
 <?php
 
 require "php_header.php";
+if(EXEC_MODE=="Trial"){
+        header("HTTP/1.1 301 Moved Permanently");
+        header("Location: menu.php");
+        exit();
+}
+
 
 $_SESSION['csrf_token'] = get_token(); // CSRFのトークンを取得する
 //トークンがセットされていたらリダイレクト
