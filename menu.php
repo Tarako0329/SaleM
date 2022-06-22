@@ -19,9 +19,14 @@ require "php_header.php";
 $rtn=check_session_userid($pdo_h);
 $token = csrf_create();
 $logoff=false;
+$Max_color_No=2;
+
 $action="";
 
-$Max_color_No=2;
+if(!empty($_GET["action"])){
+    $action = $_GET["action"];
+}
+
 if($action=="color_change"){
     //配色の変更・保存
     $color_No = $_GET["color"]+1;
@@ -40,9 +45,6 @@ if($action=="color_change"){
 
 
 
-if(!empty($_GET["action"])){
-    $action = $_GET["action"];
-}
 if($action=="logout"){
     $_SESSION = array();// セッション変数を全て解除する
     
