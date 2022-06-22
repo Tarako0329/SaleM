@@ -277,8 +277,8 @@ echo "</script>";
     <dev class='left1 item_3'>
         <button type='submit' class='btn--chk' style='border-radius:0;' name='commit_btn' >登　録</button>
     </dev>
-    </form>
 </footer>
+</form>
 <!--シェパードナビshepherd
 <script src="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/js/shepherd.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/css/shepherd.css"/>

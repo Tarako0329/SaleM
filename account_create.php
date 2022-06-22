@@ -78,6 +78,7 @@ if($mode==1){
     $_SESSION["addr11"] = $row[0]["address1"];
     $_SESSION["ADD2"] = $row[0]["address2"];
     $_SESSION["ADD3"] = $row[0]["address3"];
+    $_SESSION["chk_pass"]="";
     $next_mode=4;
 }
 
@@ -103,6 +104,7 @@ if($mode==3 || $mode==4){
     }
     //POSTをSESSIONに格納
     $_SESSION["MAIL"] = $_POST["MAIL"];
+    $_SESSION["chk_pass"] = $_POST["chk_pass"];
     $_SESSION["PASS"] = passEX($_POST["PASS"],$_POST["MAIL"],$key);
     $_SESSION["QUESTION"] = $_POST["QUESTION"];
     $_SESSION["ANSWER"] = $_POST["ANSWER"];
@@ -145,25 +147,23 @@ if($mode==0 || $mode==1){
     include "head.html" 
     ?>
     <!--ページ専用CSS-->
-    <link rel="stylesheet" href="css/style_account_create.css?<?php echo $time; ?>" >
+    <link rel='stylesheet' href='css/style_account_create.css?<?php echo $time; ?>' >
     <TITLE><?php echo secho($title)." ユーザー登録";?></TITLE>
     <!--郵便場号から住所取得-->
-    <script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
+    <script src='https://ajaxzip3.github.io/ajaxzip3.js' charset='UTF-8'></script>
 </head>
-<header class="header-color common_header" style="flex-wrap:wrap">
-    <div class="title" style="width: 100%;"><a href="<?php if($mode==1 || $mode==4){echo "menu.php";}else{echo "index.php";}?>"><?php echo secho($title);?></a></div>
-    <p style="font-size:1rem;color:var(--user-disp-color);font-weight:400;">  ユーザー登録</p>
+<header class='header-color common_header' style='flex-wrap:wrap'>
+    <div class='title' style='width: 100%;'><a href='<?php if($mode==1 || $mode==4){echo "menu.php";}else{echo "index.php";}?>'><?php echo secho($title);?></a></div>
+    <p style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>  ユーザー登録</p>
 </header>
 
-<body>
+<body class='common_body'>
     <?php
     if($choufuku_flg==1){
         //メールアドレスの検索結果が１件以上の場合
         echo "このメールアドレスは登録済みです。<a href='index.php'>TOP画面</a>に戻ってログインして下さい。<br>パスワードを忘れた場合は<a href='forget_pass_sendurl.php'>コチラ</a>からパスワードの再設定をお願いします。<br>";
     }
     if($mode==5){
-        //echo "<meta http-equiv='refresh' content=' 5; url=./menu.php'>";
-        //echo "<meta http-equiv='refresh' content=' 5; url=./logincheck.php?csrf_token=".$token."'>";
         echo "<meta http-equiv='refresh' content=' 5; url=./menu.php?csrf_token=".$token."'>";
         echo "情報が登録されました。<br>5秒後、メニュー画面に遷移します。";
         exit();
@@ -173,42 +173,66 @@ if($mode==0 || $mode==1){
         exit();
     }
     ?>
-    <div class="container" style="padding-top:15px;">
-    <div class="col-12 col-md-8">
+    <div class='container' style='padding-top:15px;'>
+    <div class='col-12 col-md-8'>
     <?php   if($mode==0 || $mode==1){ ?>
-        <form method="post" id="form1" action="account_create.php" style="font-size:1.5rem">
+        <form method='post' id='form1' action='account_create.php' style='font-size:1.5rem'>
     <?php   }else{ ?>
-        <form method="post" id="form1" action="account_sql.php" style="font-size:1.5rem">
+        <form method='post' id='form1' action='account_sql.php' style='font-size:1.5rem'>
     <?php   } ?>
-        <input type="hidden" name="csrf_token" value="<?php echo $token; ?>">
-        <input type="hidden" name="MODE" value=<?php echo $next_mode; ?>>
-        <input type="hidden" name="shoukai" value=<?php echo $shoukai; ?>>
-        <div class="form-group">
-            <label for="mail" >メールアドレス</label>
-            <input type="email" maxlength="40" class="form-control" id="mail" name="MAIL" required="required" placeholder="必須" <?php if($mode>=3){echo "readonly='readonly' ";} echo "value='".secho($_SESSION["MAIL"])."'"; ?>>
+        <input type='hidden' name='csrf_token' value='<?php echo $token; ?>'>
+        <input type='hidden' name='MODE' value=<?php echo $next_mode; ?>>
+        <input type='hidden' name='shoukai' value=<?php echo $shoukai; ?>>
+        <div class='form-group'>
+            <label for='mail' >メールアドレス</label>
+            <input type='email' maxlength='40' class='form-control' id='mail' name='MAIL' required='required' placeholder='必須' <?php if($mode>=3){echo "readonly='readonly' ";} echo "value='".secho($_SESSION["MAIL"])."'"; ?>>
         </div>
-        <div class="form-group">
-            <label for="pass" >パスワード(6桁以上)</label>
-            <input type="password" minlength="6" class="form-control" id="pass" required="required" placeholder="必須" <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_POST["PASS"])."'";}  ?>>
+
+        <hr>
+    <?php
+        if($mode==1 || $mode==4){
+    ?>
+        <div class='form-group'>
+        <label for='chk_pass' >
+        	<input type='checkbox'  id='chk_pass' name='chk_pass' <?php if($mode>=1){if($_SESSION["chk_pass"]=="on"){echo "checked";};} ?>>パスワードを変更する
+        </label>
         </div>
-        <div class="form-group">
-            <label for="pass2">パスワード（確認）</label>
-            <input type="password" minlength="6" class="form-control" id="pass2" oninput="Checkpass(this)" name="PASS" required="required" placeholder="必須" <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_POST["PASS"])."'";}  ?>>
+    <?php
+        }
+    ?>
+        <div class='form-group'>
+            <label for='pass' >パスワード(6桁以上)</label>
+            <input type='password' minlength='6' class='form-control' id='pass' 
+            <?php if($mode==0){echo "required='required' placeholder='必須'";} if($mode>=1){echo "readonly='readonly' ";} if($mode>=2){echo "value='".secho($_POST["PASS"])."'";}  ?>>
         </div>
-        <div class="form-group">
-            <label for="question" >秘密の質問(パスワードを忘れたときに使用します)</label>
-            <input type="text" maxlength="20" class="form-control" id="question" name="QUESTION" required="required" placeholder="例：初恋の人の名前" <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["QUESTION"])."'";}  ?>>
+        <div class='form-group'>
+            <label for='pass2'>パスワード（確認）</label>
+            <input type='password' minlength='6' class='form-control' id='pass2' oninput='Checkpass(this)' name='PASS' 
+            <?php if($mode==0){echo "required='required' placeholder='必須'";} if($mode>=1){echo "readonly='readonly' ";} if($mode>=2){echo "value='".secho($_POST["PASS"])."'";}  ?>>
         </div>
-        <div class="form-group">
-            <label for="answer" >答え</label>
-            <input type="text" maxlength="20" class="form-control" id="answer" name="ANSWER" required="required" placeholder="例：ささき" <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["ANSWER"])."'";}  ?>>
-            <small id="answer" class="form-text text-muted">ひらがな・半角英数・スペース不使用を推奨</small>
+<hr>
+        <div class='form-group'>
+            <label for='question' >秘密の質問(パスワードを忘れたときに使用します)</label>
+            <input type='text' maxlength='20' class='form-control' id='question' name='QUESTION' required='required' placeholder='例：初恋の人の名前' <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["QUESTION"])."'";}  ?>>
+        </div>
+        <div class='form-group'>
+            <label for='answer' >答え</label>
+            <input type='text' maxlength='20' class='form-control' id='answer' name='ANSWER' required='required' placeholder='例：ささき' <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["ANSWER"])."'";}  ?>>
+            <small id='answer' class='form-text text-muted'>ひらがな・半角英数・スペース不使用を推奨</small>
         </div>
         <br>
+        <!--
         <div class="form-group form-check">
             <input type="checkbox" class="form-check-input" id="loginrez" name="LOGINREZ" <?php if($mode>=1){if($_SESSION["LOGINREZ"]=="on"){echo "checked";};} ?>>
             <label class="form-check-label" for="loginrez" style="padding-left:5px;padding-top:3px">ログイン後レジ画面表示</label>
         </div>
+        -->
+        <div class='form-group'>
+        <label for='loginrez' >
+        	<input type='checkbox'  id='loginrez' name='LOGINREZ' <?php if($mode>=1){if($_SESSION["LOGINREZ"]=="on"){echo "checked";};} ?>>ログイン後レジ画面表示
+        </label>
+        </div>
+
 <?php
     if($mode==1 || $mode==4){
 ?>
@@ -216,56 +240,56 @@ if($mode==0 || $mode==1){
         <hr>
         <div>ここから下は請求書・納品書・自動送信メール等に使用します。<br>使用しない方は入力不要です。</div>
         <hr>
-        <div class="form-group">
-            <label for="name" >姓名</label>
-            <input type="text" class="form-control" id="name" name="NAME" placeholder="納品書・請求書等に使用" <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["NAME"])."'";}  ?>>
+        <div class='form-group'>
+            <label for='name' >姓名</label>
+            <input type='text' class='form-control' id='name' name='NAME' placeholder='納品書・請求書等に使用' <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["NAME"])."'";}  ?>>
         </div>
-        <div class="form-group">
-            <label for="yagou" >屋号</label>
-            <input type="text" class="form-control" id="yagou" name="YAGOU" placeholder="納品書・請求書等に使用" <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["YAGOU"])."'";}  ?>>
+        <div class='form-group'>
+            <label for='yagou' >屋号</label>
+            <input type='text' class='form-control' id='yagou' name='YAGOU' placeholder='納品書・請求書等に使用' <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["YAGOU"])."'";}  ?>>
         </div>
-        <div class="form-group">
-            <label for="yubin" >郵便番号('-'抜き)</label>
-            <input type="text" class="form-control" id="yubin" name="zip11" onKeyUp="AjaxZip3.zip2addr(this,'','addr11','addr11');"　placeholder="納品書・請求書等に使用" <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["zip11"])."'";}  ?>>
+        <div class='form-group'>
+            <label for='yubin' >郵便番号('-'抜き)</label>
+            <input type='text' class='form-control' id='yubin' name='zip11' onKeyUp='AjaxZip3.zip2addr(this,'','addr11','addr11');'　placeholder='納品書・請求書等に使用' <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["zip11"])."'";}  ?>>
         </div>
-        <div class="form-group">
-            <label for="add1" >住所１</label>
-            <input type="text" maxlength="20" class="form-control" id="add1" name="addr11" placeholder="納品書・請求書等に使用。住所1行目" <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["addr11"])."'";}  ?>>
+        <div class='form-group'>
+            <label for='add1' >住所１</label>
+            <input type='text' maxlength='20' class='form-control' id='add1' name='addr11' placeholder='納品書・請求書等に使用。住所1行目' <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["addr11"])."'";}  ?>>
         </div>
-        <div class="form-group">
-            <label for="add2" >住所２</label>
-            <input type="text" maxlength="20" class="form-control" id="add2" name="ADD2" placeholder="納品書・請求書等に使用。住所2行目" <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["ADD2"])."'";}  ?>>
+        <div class='form-group'>
+            <label for='add2' >住所２</label>
+            <input type='text' maxlength='20' class='form-control' id='add2' name='ADD2' placeholder='納品書・請求書等に使用。住所2行目' <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["ADD2"])."'";}  ?>>
         </div>
-        <div class="form-group">
-            <label for="add3" >住所３</label>
-            <input type="text" maxlength="20" class="form-control" id="add3" name="ADD3" placeholder="納品書・請求書等に使用。住所3行目" <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["ADD3"])."'";}  ?>>
+        <div class='form-group'>
+            <label for='add3' >住所３</label>
+            <input type='text' maxlength='20' class='form-control' id='add3' name='ADD3' placeholder='納品書・請求書等に使用。住所3行目' <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["ADD3"])."'";}  ?>>
         </div>
 <?php
     }
 ?>
-        <div class="col-2 col-md-1" style=" padding:0; margin-top:10px;">
-            <button type="submit" class="btn btn-primary" style="width:180%;hight:150%;font-size:1.5rem" name="BTN" value="<?php echo $btnname; ?>"><?php echo secho($btnname); ?></button>
+        <div class='col-2 col-md-1' style=' padding:0; margin-top:10px;'>
+            <button type='submit' class='btn btn-primary' style='width:180%;hight:150%;font-size:1.5rem' name='BTN' value='<?php echo $btnname; ?>'><?php echo secho($btnname); ?></button>
         </div>
         <br>
     </form>
     </div>
     </div>
 </body>
-<script language="JavaScript" type="text/javascript">
+<script language='JavaScript' type='text/javascript'>
 <!--
-  function Checkpass(input){
-    //IE対応の為変更
-    
-    var pass = document.getElementById("pass").value; //メールフォームの値を取得
-    var passConfirm = input.value; //メール確認用フォームの値を取得(引数input)
-
-    // パスワードの一致確認
-    if(pass != passConfirm){
-      input.setCustomValidity('パスワードが一致しません'); // エラーメッセージのセット
-    }else{
-      input.setCustomValidity(''); // エラーメッセージのクリア
+    function Checkpass(input){
+        //IE対応の為変更
+        
+        var pass = document.getElementById("pass").value; //メールフォームの値を取得
+        var passConfirm = input.value; //メール確認用フォームの値を取得(引数input)
+        
+        // パスワードの一致確認
+        if(pass != passConfirm){
+            input.setCustomValidity('パスワードが一致しません'); // エラーメッセージのセット
+        }else{
+            input.setCustomValidity(''); // エラーメッセージのクリア
+        }
     }
-  }
     
     // Enterキーが押された時にSubmitされるのを抑制する
     document.getElementById("form1").onkeypress = (e) => {
@@ -274,10 +298,30 @@ if($mode==0 || $mode==1){
         // 13はEnterキーのキーコード
         if (key == 13) {
             // アクションを行わない
-            alert('test');
+            //alert('test');
             e.preventDefault();
         }
-    }    
+    }
+    document.getElementById('chk_pass').onclick = function(){
+        const a = document.getElementById('pass');
+        const b = document.getElementById('pass2');
+        if(a.required==true){
+            a.required=false;
+            b.required=false;
+            a.placeholder='';
+            b.placeholder='';
+            a.readOnly='readonly';
+            b.readOnly='readonly';
+        }else{
+            a.required=true;
+            b.required=true;
+            a.placeholder='必須';
+            b.placeholder='必須';
+            a.readOnly='';
+            b.readOnly='';
+        }
+    }
+    
 // -->
 </script>
 </html>
@@ -285,21 +329,6 @@ if($mode==0 || $mode==1){
 $stmt=null;
 $pdo_h=null;
 ?>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -47,6 +47,7 @@ if($_POST["BTN"] == "登　録"){
         $mode=6;
     }
 }elseif($_POST["BTN"] == "更　新"){
+    /*
     $sqlstr="update Users set mail=?,password=?,question=?,answer=?,loginrez=?,name=?,yagou=?,yubin=?,address1=?,address2=?,address3=? where uid=?";
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $_SESSION["MAIL"], PDO::PARAM_STR);
@@ -61,6 +62,27 @@ if($_POST["BTN"] == "登　録"){
     $stmt->bindValue(10, $_SESSION["ADD2"], PDO::PARAM_STR);
     $stmt->bindValue(11, $_SESSION["ADD3"], PDO::PARAM_STR);
     $stmt->bindValue(12, $_SESSION["user_id"], PDO::PARAM_INT);
+    */
+    if($_SESSION["chk_pass"]=="on"){
+        $sqlstr="update Users set mail=:mail,password=:password,question=:question,answer=:answer,loginrez=:loginrez,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3 where uid=:uid";
+        $stmt = $pdo_h->prepare($sqlstr);
+        $stmt->bindValue("password", $_SESSION["PASS"], PDO::PARAM_STR);
+    }else{
+        $sqlstr="update Users set mail=:mail,question=:question,answer=:answer,loginrez=:loginrez,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3 where uid=:uid";
+        $stmt = $pdo_h->prepare($sqlstr);
+        //$stmt->bindValue("password", $_SESSION["PASS"], PDO::PARAM_STR);
+    }
+    $stmt->bindValue("mail", $_SESSION["MAIL"], PDO::PARAM_STR);
+    $stmt->bindValue("question", $_SESSION["QUESTION"], PDO::PARAM_STR);
+    $stmt->bindValue("answer", $_SESSION["ANSWER"], PDO::PARAM_STR);
+    $stmt->bindValue("loginrez", $_SESSION["LOGINREZ"], PDO::PARAM_STR);
+    $stmt->bindValue("name", $_SESSION["NAME"], PDO::PARAM_STR);
+    $stmt->bindValue("yagou", $_SESSION["YAGOU"], PDO::PARAM_STR);
+    $stmt->bindValue("yubin", $_SESSION["zip11"], PDO::PARAM_STR);
+    $stmt->bindValue("address1", $_SESSION["addr11"], PDO::PARAM_STR);
+    $stmt->bindValue("address2", $_SESSION["ADD2"], PDO::PARAM_STR);
+    $stmt->bindValue("address3", $_SESSION["ADD3"], PDO::PARAM_STR);
+    $stmt->bindValue("uid", $_SESSION["user_id"], PDO::PARAM_INT);
     $flg=$stmt->execute();
     
     if($flg){

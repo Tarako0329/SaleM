@@ -72,7 +72,7 @@ if($action=="logout"){
     $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
     $stmt->execute();
     $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $msg="<br>";
+    $msg="";
     //強制ログアウト処理
     if($row[0]["ForcedLogout"]==true){
         //system更新を有効にするためにログアウトが必要な場合の処理
@@ -89,11 +89,11 @@ if($action=="logout"){
         if(strtotime($row[0]["yuukoukigen"]) < strtotime(date("Y-m-d"))){
             //有効期限切れ。申込日から即課金
             $_SESSION["KIGEN"] = strtotime("+3 day");
-            $msg= "有効期限切れ";
+            $msg= "有効期限切れ<br>";
         }else{
             //試用期間、もしくは支払済み期間の翌日から課金
             $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
-            $msg= "有効期限付き(".$row[0]["yuukoukigen"]." まで)";
+            $msg= "有効期限付き(".$row[0]["yuukoukigen"]." まで)<br>";
         }
         $plan=0;
     }else{
@@ -143,7 +143,7 @@ if($action=="logout"){
 
 <body class='common_body' >
     <div style='position:fixed;top:70px;right:0;' class='rainbow-color'><b><a href='menu.php?action=color_change&color=<?php echo $color_No; ?>'>COLOR<i class='fa-solid fa-rotate-right fa-lg rainbow-color'></i></a></b></div>
-    <div class='container-fluid'>
+    <div class='container-fluid' style='padding-top:15px;'>
 
 <?php
     if($logoff){
@@ -156,7 +156,7 @@ if($action=="logout"){
         
         exit;
     }
-    echo $msg."<br>";
+    echo $msg;
 
     if(EXEC_MODE=="Trial"){
         echo "有効期限を過ぎると初期状態に戻りますので、ご自由に操作して下さい。<br>";

@@ -79,9 +79,9 @@ if(0==0){
     }
     //GET
     if(!empty($_GET)){
-        //初回アクセスはGETで来るの日付に今日をセット
+        //初回アクセスはGETで来るので日付に今日をセット
         if(!empty($_GET["first"])){
-            $msg="本日の売上";
+            $_SESSION["MSG"]="本日の売上";
             $_SESSION["UriFrom"]=date("Y-m-d");
             $_SESSION["UriTo"]=date("Y-m-d");
             $_SESSION["UriageData_Correct_mode"]="false";
@@ -240,9 +240,11 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
           // アラートを表示する
           $('#alert-1').append(s);
           //5秒後にアラートを消す
+          /*
           setTimeout(() => {
             s.alert('close');
           }, 5000);
+          */
           
         })(jQuery);
 
