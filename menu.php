@@ -140,6 +140,9 @@ if($action=="logout"){
 </header>
 
 <body class='common_body' >
+    <div style='position:fixed;top:70px;right:0;' class='rainbow-color'><b><a href='menu.php?action=color_change&color=<?php echo $color_No; ?>'>COLOR<i class='fa-solid fa-rotate-right fa-lg rainbow-color'></i></a></b></div>
+    <div class='container-fluid'>
+
 <?php
     if($logoff){
         if($_GET["ForcedLogout"]==true){
@@ -151,12 +154,12 @@ if($action=="logout"){
         
         exit;
     }
-    echo $msg;
-?>
-    <div style='position:fixed;top:70px;right:0;' class='rainbow-color'><b><a href='menu.php?action=color_change&color=<?php echo $color_No; ?>'>COLOR<i class='fa-solid fa-rotate-right fa-lg rainbow-color'></i></a></b></div>
-    <div class='container-fluid'>
+    echo $msg."<br>";
 
-<?php
+    if(EXEC_MODE=="Trial"){
+        echo "体験用に事前に商品・売上が登録済みです。また、体験版で入力・削除等した内容は有効期限を過ぎると初期状態に戻りますので、ご自由に操作して下さい。<br>";
+    }
+
     $array = [
         'レジ'=>['EVregi.php?mode=evrez&csrf_token='.$token]
         ,'個別売上'=>['EVregi.php?mode=kobetu&csrf_token='.$token]
@@ -268,11 +271,13 @@ if($action=="logout"){
     });
     tutorial_1.addStep({
         title: `<p class='tour_header'>チュートリアル</p>`,
-        text: `<p class='tour_discription'>なお、WebRez+の基本的な使い方ですが、
-                <br>「登録」ボタン「削除」ボタン以外は何をしてもシステムがおかしくなる事はありません。
-                <br><br>所々に<a href="#" ><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>マークが設置してあり、タップするとヘルプが表示されます。
-                <br><br>色々試しながら使い方を覚えたい方は「不要」をタップしてもいいかもしれません。
-                <br>(不要をタップすると、以後チュートリアルは表示されません。)</p>`,
+        text: `<p class='tour_discription'>＜WebRez+の基本的な使い方＞
+                <br>所々に<a href="#" ><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>マークがあり、タップするとヘルプが表示されます。
+                <br>
+                <br>「登録/削除」ボタンをタップしない限り、売上等の登録済みのデータが変更される事ありません。
+                <br>
+                <br>色々試しながら使い方を覚えたい方は「不要」をタップすると、以降のチュートリアルは表示されません。
+                </p>`,
         buttons: [
             {
                 text: '不要',
