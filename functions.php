@@ -255,7 +255,7 @@ function secho($s) {
 // テスト環境のみ出力
 // =========================================================
 function deb_echo($s){
-    if(EXEC_MODE!="Product"){
+    if(EXEC_MODE=="Test"){
         echo $s."<br>";
     }
 }
