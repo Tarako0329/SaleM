@@ -227,7 +227,10 @@ if($action=="logout"){
 ?>
 <script src="shepherd/shepherd.min.js?<?php echo $time; ?>"></script>
 <link rel="stylesheet" href="shepherd/shepherd.css?<?php echo $time; ?>"/>
-<?php require "ajax_func_tourFinish.php";?>
+<?php 
+    require "ajax_func_tourFinish.php";
+    $hello=(EXEC_MODE=="Trial"?"WebRez+に興味を持って頂きありがとうございます。":"ご登録ありがとうございます。");
+?>
 <script>
     const TourMilestone = '<?php echo $_SESSION["tour"];?>';
 
@@ -243,17 +246,16 @@ if($action=="logout"){
         tourName:'tutorial_1'
     });
     tutorial_1.addStep({
-        title: `<p class='tour_header'>ご登録ありがとうございます。</p>`,
-        text: `<p class='tour_discription'> これから簡単にWEBREZの使い方(チュートリアル)を説明します。
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'> 
+              <?php echo $hello; ?>
+              <br>
+              <br>これから簡単にWEBREZの使い方(チュートリアル)を説明します。
               <br>10～20分ほどの操作になります。
               <br>
               <br>時間的に後にしたい方は「後で見る」タップして下さい。
-              <br>見なくてもいい方は「不要」タップして下さい。</p>`,
+              <br>「後で見る」をタップすると、次回トップ画面にアクセスした際に再度チュートリアルが開始されます。</p>`,
         buttons: [
-            {
-                text: '不要',
-                action: tutorial_1.skip
-            },
             {
                 text: '後で見る',
                 action: tutorial_1.cancel
@@ -265,11 +267,12 @@ if($action=="logout"){
         ]
     });
     tutorial_1.addStep({
-        title: `<p class='tour_header'>ご登録ありがとうございます。</p>`,
+        title: `<p class='tour_header'>チュートリアル</p>`,
         text: `<p class='tour_discription'>なお、WebRez+の基本的な使い方ですが、
                 <br>「登録」ボタン「削除」ボタン以外は何をしてもシステムがおかしくなる事はありません。
                 <br><br>所々に<a href="#" ><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>マークが設置してあり、タップするとヘルプが表示されます。
-                <br><br>色々試しながら使い方を覚えたい方は「不要」をタップしてもいいかもしれません。</p>`,
+                <br><br>色々試しながら使い方を覚えたい方は「不要」をタップしてもいいかもしれません。
+                <br>(不要をタップすると、以後チュートリアルは表示されません。)</p>`,
         buttons: [
             {
                 text: '不要',

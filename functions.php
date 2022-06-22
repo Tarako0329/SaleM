@@ -56,18 +56,33 @@ function check_auto_login($cookie_token, $pdo) {
 function check_session_userid($pdo_h){
     if(EXEC_MODE=="Trial"){
         if(empty($_COOKIE["user_id"]) && empty($_SESSION["user_id"])){
+            //セッション・クッキーのどちらにもIDが無い場合、ID発行を行う
+            header("HTTP/1.1 301 Moved Permanently");
+            header("Location: TrialDataCreate.php");
+            exit();
+        }else if((!empty($_SESSION["user_id"]) && empty($_COOKIE["user_id"])) || (!empty($_SESSION["user_id"]) && $_COOKIE["user_id"] != $_SESSION["user_id"])){
+            //クッキーが空　もしくは　セッションありかつセッション＜＞クッキーの場合
+            //クッキーにセッションの値をセットする
+            setCookie("user_id", $_SESSION["user_id"], time()+60*60*24, "/", null, TRUE, TRUE);
+        }else if(!empty($_COOKIE["user_id"]) && empty($_SESSION["user_id"])){
+            //セッションが空の場合、クッキーからIDを取得する
+            $_SESSION["user_id"]=$_COOKIE["user_id"];
+        }
+        
+        //取得できたIDがDBに存在するか確認
+        $sqlstr="select * from Users where uid=?";
+        $stmt = $pdo_h->prepare($sqlstr);
+        $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+        if (count($rows) == 0) {
+            //IDは取得できたがDB側にデータが無い場合もID再発行
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: TrialDataCreate.php");
             exit();
         }
-        //トライアルモードの場合はクッキーにもuidを保存（24時間有効）
-        if(empty($_COOKIE["user_id"]) || (!empty($_SESSION["user_id"]) && $_COOKIE["user_id"] != $_SESSION["user_id"])){
-            //クッキーが空　もしくは　セッションありかつセッション＜＞クッキーの場合
-            setCookie("user_id", $_SESSION["user_id"], time()+60*60*24, "/", null, TRUE, TRUE);
-        }
-        if(empty($_SESSION["user_id"])){
-            $_SESSION["user_id"]=$_COOKIE["user_id"];
-        }
+        
     }else{
 
         if(empty($_SESSION["user_id"])){
