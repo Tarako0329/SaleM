@@ -12,4 +12,31 @@
   box-sizing: inherit;
 }
 
+.common_footer{
+    background-image:linear-gradient(to left top, var(--title-from), var(--title-to));
+    color:var(--user-disp-color);
+    height: 50px; /* 高さを70pxに指定 */
+    position: fixed; /* ウィンドウを基準に画面に固定 */
+    bottom: 0;
+    Right: 0;
+    width: 100%;
+    display: flex;    
+    font-size:1.2rem;
+    z-index: 99;
+    border-top:var(--rez-border-top);
+    border-top-width:thin;
+    border-left:none;
+    border-right:none;
+    border-bottom:none;
+    border-color:var(--rez-border-color);
+}
 
+
+@media (display-mode: standalone){
+    .common_footer{
+        height: 70px; /* 高さを70pxに指定 */
+    }
+    .common_body {
+        padding-bottom:80px; /*フッターーの後ろに要素が隠れないようにするため */
+    }
+}

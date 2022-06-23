@@ -20,7 +20,7 @@ $token = csrf_create();
 $msg="";
 
 if($_GET["acc"]<>""){
-    $mail=rot13decrypt($_GET["acc"]);
+    $mail=rot13decrypt2($_GET["acc"]);
 }else if($_POST["mail"]<>""){
     $mail=$_POST["mail"];
 }else{

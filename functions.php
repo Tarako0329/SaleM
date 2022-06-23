@@ -577,7 +577,7 @@ function rtn_wildcard($word){
 // 登録メール(メールサーバーを使わない場合PHPから送信)
 // =========================================================
 function touroku_mail($to,$subject,$body){
-    $mail2=rot13encrypt($to);
+    $mail2=rot13encrypt2($to);
     $s_name=$_SERVER['SCRIPT_NAME'];
     $dir_a=explode("/",$s_name,-1);
     
@@ -587,18 +587,18 @@ function touroku_mail($to,$subject,$body){
     // メールタイトル
     $subject = "WEBREZ＋ 登録案内";
     
-    $url="https://green-island.mixh.jp/SaleM/$dir_a[2]/account_create.php?mode=0&acc=$mail2";
-     
-    // メール本文
-    $body = <<< EOM
-    WEBREZ+（ウェブレジプラス）にご興味をもっていただきありがとうございます。
-    こちらのURLから登録をお願いいたします。
-    
-    $url
-    EOM;
-     
     // メール送信
     mail($to, $subject, $body, $from);
     return 1;
 }
+
+
+
+
+
+
+
+
+
+
 ?>

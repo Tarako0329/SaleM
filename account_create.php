@@ -55,7 +55,7 @@ if($mode==0){
     $_SESSION = array();
 
     //GETからメールアドレスを復元
-    $_SESSION["MAIL"]=rot13decrypt($_GET["acc"]);
+    $_SESSION["MAIL"]=rot13decrypt2($_GET["acc"]);
     $next_mode=3;
 }
 

@@ -154,7 +154,7 @@ if($action=="logout"){
         }
         echo "<a href='index.php'>再ログインする</a>";
         
-        exit;
+        exit();
     }
     echo $msg;
 
@@ -204,7 +204,11 @@ if($action=="logout"){
               
     </div>
 </body>
-
+<footer class='common_footer' style='padding:5px;'>
+    <p style='padding:5px;'>お問い合わせはコチラ</p>
+    <a href='https://lin.ee/HLSLl23' style='padding:5px;'><i class="fa-brands fa-line fa-2x line-green"></i></a>
+    <a href='https://green-island.mixh.jp/wdps/%e3%81%8a%e5%95%8f%e3%81%84%e5%90%88%e3%82%8f%e3%81%9b/' style='padding:5px;' target='_blank' rel='noopener noreferrer'><i class="fa-solid fa-square-envelope fa-2x"></i></a>
+</footer>
 <!--シェパードナビshepherd
 <script src="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/js/shepherd.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/css/shepherd.css"/>

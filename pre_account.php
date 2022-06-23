@@ -28,16 +28,17 @@ if($_POST["BTN"] == "send"){
         //登録用メール送信
         $to = $_POST["MAIL"];
         $subject = "WEBREZ登録のご案内";
-        $mail2=rot13encrypt($to);
-        
+        $mail2=rot13encrypt2($to);
+        $url=ROOT_URL."account_create.php?mode=0&acc=".$mail2."&shoukai=".$shoukai;
+        /*
         $s_name=$_SERVER['SCRIPT_NAME'];
         $dir_a=explode("/",$s_name,-1);
-
+        */
         $body = <<< "EOM"
             WEBREZ+（ウェブレジプラス）にご興味をもっていただきありがとうございます。
             こちらのURLから登録をお願いいたします。
             
-            https://green-island.mixh.jp/SaleM/$dir_a[2]/account_create.php?mode=0&acc=$mail2&shoukai=$shoukai
+            $url
             EOM;
         if(FROM==""){
             //.env にメールアカウント情報が設定されてない場合、phpのsendmailで送付

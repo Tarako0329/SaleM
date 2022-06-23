@@ -67,7 +67,7 @@ if(isset($_SESSION["EMSG"])){
                 <input type="hidden" name="csrf_token" value="<?php echo secho($_SESSION['csrf_token']) ?>">
             </form><!-- /form -->
             <a href="forget_pass_sendurl.php" class="forgot-password">
-                Forgot the password?
+                ﾊﾟｽﾜｰﾄﾞを忘れたらｸﾘｯｸ
             </a>
             <hr>
             <!--<a href="account_create.php?mode=0" class="btn btn-lg btn-primary btn-block btn-signin" style="padding-top:8px" >新 規 登 録</a>-->

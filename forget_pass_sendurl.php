@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja">
 <?php
-//ユーザ登録、登録情報の修正画面
-//mode 0:新規　1:更新　3:確認(新規) 4:確認(更新)
 
 require "php_header.php";
+
 
 if($_POST["BTN"] == "send"){
     //入力内容の確認モード
@@ -27,15 +26,16 @@ if($_POST["BTN"] == "send"){
         }
         
         $subject = "WEBREZパスワード再設定";
-        $mail2=rot13encrypt($_POST["MAIL"]);
-        
+        $mail2=rot13encrypt2($_POST["MAIL"]);
+        $url=ROOT_URL."forget_pass.php?acc=".$mail2;
+        /*
         $s_name=$_SERVER['SCRIPT_NAME'];
         $dir_a=explode("/",$s_name,-1);
-
+        */
         $body = <<< "EOM"
             こちらのURLから情報を更新して下さい。
             
-            https://green-island.mixh.jp/SaleM/$dir_a[2]/forget_pass.php?acc=$mail2
+            $url
             EOM;
         if(FROM==""){
             //.env にメールアカウント情報が設定されてない場合、phpのsendmailで送付
