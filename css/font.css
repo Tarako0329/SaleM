@@ -1,0 +1,180 @@
+/*共通のCSS*/
+/*使えるフォント
+font-family: 'Allerta Stencil', sans-serif; 日本語なし　アルファベットライン入り
+font-family: 'Cabin Sketch', cursive;　日本語なし　アルファベット　鉛筆ぬり風
+font-family: 'Chewy', cursive;　日本語なし　アルファベット　太字かわいい系
+font-family: 'Fredericka the Great', cursive;　日本語なし　アルファベット　鉛筆ぬり風
+font-family: 'Kranky', cursive;　日本語なし　アルファベット　中抜き
+font-family: 'Londrina Outline', cursive;　日本語なし　アルファベット　中抜きカクカク
+font-family: 'Zen Kurenaido', sans-serif;　日本語あり　今使ってる
+font-family: 'Murecho', sans-serif;
+*/
+.parent {
+	background: linear-gradient(45deg,#007eff,#ff17b1);
+	border-radius: 512px;
+	padding: 3px;
+	width: 512;
+}
+.child{
+    background:#fff;
+    height:508px;
+    width:508px;
+    border-radius: 508px;
+}
+.font{
+/*    background-image:linear-gradient(to left top, var(--title-from), var(--title-to));*/
+    position: relative;
+    display: inline-block;
+    background-image:linear-gradient(to left top, blue, red);
+    text-align: center;
+    vertical-align: middle;
+    font-family: 'Fredoka One', cursive;
+    font-size:230px;
+    line-height: 500px;
+    -webkit-background-clip: text ;
+    -webkit-text-fill-color: transparent;
+    height:508px;
+    width:508px;
+    border:solid transparent 3px ; 
+    border-radius: 508px;
+    
+}
+
+
+:root {
+    --main-font:'Zen Kurenaido', sans-serif;
+    --tour-font:sans-serif;
+    --table-font:sans-serif;
+}
+table{
+    font-family:var(--table-font);
+}
+.common_body {
+    padding-top: 70px; /* ヘッダーの後ろに要素が隠れないようにするため */
+    font-family:var(--main-font);
+    font-size:1.3rem;
+}
+.btn{
+    /*bootstrap btn*/
+    font-size: 1.5rem;
+    padding-left:20px;
+    padding-right:20px;
+}
+.btn--chk{
+    font-weight:600;
+}
+.form-control{
+    font-size:1.5rem;
+    padding:0 5px;/*上下 左右*/
+}
+
+.line-green{
+    color:#1dcd00;
+}
+.facebook-blue{
+    color:#3B5998;
+}
+.twitter-blue{
+    color:#55acee;
+}
+.user_disp{
+    color:var(--user-disp-color);
+    font-weight: 400;
+}
+.header-color{
+    background-image:linear-gradient(to left top, var(--title-from), var(--title-to));
+}
+.logoff-color:before{
+	color: var(--user-disp-color);
+}
+.awesome-color-panel-border-same:before{
+	color: var(--panel-bd-color);
+}
+.rainbow-color,
+.rainbow-color:before{
+    /*文字レインボーカラー*/
+    color: #FF8C00;
+    background: -webkit-linear-gradient(0deg, #40E0D0, #FF8C00, #FF0080);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+html {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    font-size: 62.5%; /*ルートサイズ10px=1rem算出をしやすくするために*/
+    touch-action: manipulation; /*スマフォのダブルタップによるズームを防ぐ*/
+}
+.common_header{
+    height: 70px; /* 高さを70pxに指定 */
+    padding: 2px 2px; /* ヘッダーに上下左右それぞれ余白を指定 */
+    box-sizing: border-box; /* padding分を含んで幅を100%にするため */
+    position: fixed;  /*ウィンドウを基準に画面に固定 */
+    top: 0; /* 上下の固定位置を上から0pxにする */
+    left: 0; /* 左右の固定位置を左から0pxにする */
+    width: 100%;
+    z-index: 99;
+    display: flex;
+    font-weight: 700;
+}
+
+.title{
+    font-family: 'Kranky', cursive;
+    color:var(--title-color);
+    font-size: 3.0rem;
+    font-weight: 700;
+}
+.title > a{
+    color:inherit;
+}
+
+
+/*トップメニューボタン*/
+.btn--topmenu{
+    height:100%;     
+    width:100%; 
+    font-size: 2.2rem;
+}
+
+/*ボタンの見た目*/
+.btn-view{
+    color: var(--panel-font-color);               /*文字色*/
+    background-color: var(--panel-bk-color);      /*背景色*/
+    border:solid var(--panel-bd-color) 0.5px;     /*枠線*/
+
+    font-weight: 700;
+    line-height: 1.5;
+    position: relative;
+    display: inline-block;
+    padding: 1rem; /*ボタン文字エリアとボタン外枠の間*/
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+    text-align: center;
+    vertical-align: middle;
+    text-decoration: none;
+    /*letter-spacing: 0.1em; 文字と文字の間隔*/
+    border-radius: 0.5rem;
+    white-space: normal;  
+}
+.tour_modal{
+    font-family: var(--tour-font);
+
+}
+
+.tour_discription{
+    font-size:1.5rem;
+    line-height:1.6rem;
+}
+.tour_header{
+    font-size:2rem;
+    line-height:2rem;
+}
+
+
+
+

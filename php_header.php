@@ -20,8 +20,6 @@ require "functions.php";
 define("ROOT_URL",substr($_SERVER['SCRIPT_URI'],0,mb_strrpos($_SERVER['SCRIPT_URI'],"/")+1));
 define("EXEC_MODE",$_ENV["EXEC_MODE"]);
 
-deb_echo(ROOT_URL);
-deb_echo(EXEC_MODE."：uid_".$_SESSION["user_id"]);
 
 if(EXEC_MODE=="Test"){
     //テスト環境はミリ秒単位
@@ -77,10 +75,10 @@ $key = $_ENV["KEY"];
 $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
 
-//端末IDを発行し、１年の有効期限でCookieにセット
+//端末IDを発行し、10年の有効期限でCookieにセット
 if(!isset($_COOKIE['machin_id'])){
     $machin_id = getGUID();
-    setCookie("machin_id", $machin_id, time()+60*60*24*365, "/", null, TRUE, TRUE); 
+    setCookie("machin_id", $machin_id, time()+60*60*24*365*10, "/", null, TRUE, TRUE); 
 }else{
     $machin_id = $_COOKIE['machin_id'];
 }
@@ -91,7 +89,7 @@ define("MACHIN_ID", $machin_id);
 //スキンの取得
 $sql = "select value from PageDefVal where uid=? and machin=? and page=? and item=?";
 $stmt = $pdo_h->prepare($sql);
-$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+$stmt->bindValue(1, (!empty($_SESSION['user_id'])?$_SESSION['user_id']:NULL), PDO::PARAM_INT);
 $stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
 $stmt->bindValue(3, "menu.php", PDO::PARAM_STR);
 $stmt->bindValue(4, "COLOR", PDO::PARAM_STR);//name属性を指定

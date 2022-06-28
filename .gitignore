@@ -4,3 +4,4 @@ error_log
 qdmail.log
 *.log
 .bk
+backup

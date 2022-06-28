@@ -146,6 +146,9 @@ if($action=="logout"){
     <div class='container-fluid' style='padding-top:15px;'>
 
 <?php
+    deb_echo(ROOT_URL);
+    deb_echo(EXEC_MODE."：uid_".$_SESSION["user_id"]);
+
     if($logoff){
         if($_GET["ForcedLogout"]==true){
             echo "システム更新時に追加した機能を有効にするため、強制ログアウトしました。<br>お手数ですが、再度ログインしてご利用ください。<br><br>";

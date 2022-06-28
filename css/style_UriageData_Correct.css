@@ -1,5 +1,5 @@
 .common_body {
-    padding-top:105px;
+    padding-top:115px;
     padding-bottom:70px; /*フッターーの後ろに要素が隠れないようにするため */
     font-size:1.1rem;
 /*    font-family: 'Kosugi Maru', sans-serif;*/
@@ -10,8 +10,8 @@ INPUT{
 
 .common_footer{
     background: var(--footer-color);
-    height: 60px; /* 高さを70pxに指定 */
-    position: fixed; /* ウィンドウを基準に画面に固定 */
+    height: 60px; 
+    position: fixed; 
     bottom: 0;
     Right: 0;
     width: 100%;
@@ -27,7 +27,7 @@ INPUT{
 }
 .footer_update_area{
     position: fixed; /* ウィンドウを基準に画面に固定 */
-    height: 330px;
+    height: 290px;
     bottom: 0;
     left:0;
     padding-left:10px;
@@ -38,7 +38,7 @@ INPUT{
 }
 .header_menu{
     position: fixed; /* ウィンドウを基準に画面に固定 */
-    height: 40px;
+    height: 50px;
     top: 70px;
     left:0;
     padding-left:10px;
@@ -51,14 +51,16 @@ td,th{
 }
 th{
     position: sticky;
-    top:110px;
+    /*top:110px;*/
+    top:0px;
     background:#fff;
     height:35px;
     z-index: 100;
 }
 .tr_stiky{
     position: sticky; /*スマホ古いと動作が変になるのでやめる?*/
-    top:143px;
+    /*top:143px;*/
+    top:33px;
     background:#C3E5FF;
 }
 .kaikei{

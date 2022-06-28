@@ -194,6 +194,7 @@ if($rowcnt==0){
     //実績が無い場合
     $_SESSION["UriFrom"]="2000-01-01";
     $_SESSION["UriTo"]="2099-12-31";
+    $_SESSION["MSG"]="";
 
     param_clear();
     $Type="sum_events";
@@ -379,7 +380,7 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
     ?>
 </div>
 
-<body class='common_body' id='body'>
+<body class='common_body' id='body' >
     <div class='container-fluid'>
     
     <?php
@@ -390,8 +391,8 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
         $_SESSION["MSG"]="";
         
     ?>
-
-    <table class='table-striped table-bordered item_0' style='margin-top:10px'>
+    <div style='overflow:auto;' id='uritable'>
+    <table class='table-striped table-bordered item_0 tour_uri1' style='margin-top:10px;white-space: nowrap;'>
         <thead >
             <tr>
                 <th scope='col' class='d-none d-sm-table-cell'>売上日</th><th scope='col' class='d-none d-sm-table-cell'>Event/顧客</th><th scope='col' style='width:2rem;'>No</th>
@@ -429,6 +430,7 @@ foreach($result as $row){
 }
 ?>
     </table>
+    </div>
 <?php
 if($mode=="Update" || $mode=="del"){
 ?>
@@ -446,15 +448,12 @@ if($mode=="Update" || $mode=="del"){
 }
 ?>
     <!--修正エリア-->
-    <form class='form-horizontal update_areas footer_update_area' method='post' action='UriageData_Correct.php' style='display:none;' id='form2' onsubmit='return check_update()'>
+    <form class='form-horizontal update_areas footer_update_area tour_uri2' method='post' action='UriageData_Correct.php' style='display:none;' id='form2' onsubmit='return check_update()'>
     <hr>
-    １．修正したいデータをタップして絞り込んでください。<br>
-    　　(表示されているデータが更新対象となります。)<br><br>
-    ２．修正する項目をチェックして、値を入力して下さい。
     <input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
     <input type='hidden' name='mode' value='Update'>
-    <div>
-        <table class=''>
+    <div >
+        <table class='tour_uri3'>
         <tr>
             <td><input type='checkbox' name='chk_uridate' id='chk_uridate'></td>
             <td>売上日</td>
@@ -517,9 +516,12 @@ if($mode=="Update" || $mode=="del"){
         </tr>
         <tr >
             <td colspan='2'></td>
-            <td colspan='4' style='padding-top:5px;'><button type='submit' style='font-size:1.5rem;color:#fff' class='btn btn-primary'>確　認</button></td>
+            <td colspan='4' style='padding-top:5px;'><button type='submit' style='font-size:1.5rem;color:#fff' class='btn btn-primary tour_uri4'>確　認</button></td>
         </tr>
         </table>
+        <a href="#" style='color:inherit;position:fixed;bottom:250px;right:5px;' onclick='urihelp()'>
+            <i class="fa-regular fa-circle-question fa-2x awesome-color-panel-border-same"></i>
+        </a>
     </div>
     </form>
     </div>
@@ -615,6 +617,7 @@ if($mode=="Update" || $mode=="del"){
     </div>
 </div>
 <script type='text/javascript' language='javascript'>
+    
     var select = document.getElementById('zeikbn');
     var tanka = document.getElementById('UpUriTanka');
     var UpTanka = document.getElementById('UpTanka');
@@ -660,17 +663,23 @@ if($mode=="Update" || $mode=="del"){
     var update_areas=document.getElementsByClassName('update_areas');
     var mode_switch=document.getElementById('switch1');
     var body=document.getElementById('body');
-    
+    var uritable=document.getElementById('uritable');
+
     //mode_switch.onclick = function (){
     var chang_mode = function(){
+        let wh = window.innerHeight;//ブラウザの縦サイズ取得
+        var normal_vw = wh - 105 - 80;
+        var update_vw = wh - 105 - 340;
         if(mode_switch.checked==true && mode_switch.readOnly == false){
             update_areas[0].style.display='block';
             //[1].style.display='block';
             body.style.paddingBottom='330px';
+            uritable.style.height=update_vw +'px';
         }else{
             update_areas[0].style.display='none';
             //update_areas[1].style.display='none';
             body.style.paddingBottom='70px';
+            uritable.style.height= normal_vw +'px';
         }
     }
     chang_mode();
@@ -967,6 +976,158 @@ if($mode=="Update" || $mode=="del"){
         tutorial_9.start(tourFinish,'tutorial','');
     }else if(TourMilestone=="tutorial_9" && 'Updated'=='<?php echo $mode; ?>'){
         tutorial_10.start(tourFinish,'tutorial','save');
+    }
+
+
+    const tutorial_UriageShusei = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'tutorial_UriageShusei'
+    });
+    tutorial_UriageShusei.addStep({
+        title: `<p class='tour_header'>売上の修正</p>`,
+        text: `<p class='tour_discription'>売上明細エリアに表示されている内容を一括で修正します。
+                <br>青字の項目をタップすることで対象の絞り込みが出来ます。
+               </p>`,
+        attachTo: {
+            element: '.tour_uri1',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_UriageShusei.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_UriageShusei.next
+            }
+        ]
+    });
+    tutorial_UriageShusei.addStep({
+        title: `<p class='tour_header'>売上の修正</p>`,
+        text: `<p class='tour_discription'>日付、イベント名、商品名等をタップし、修正したいデータのみが表示されている状態にしてください。
+               </p>`,
+        attachTo: {
+            element: '.tour_uri1',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_UriageShusei.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_UriageShusei.next
+            }
+        ]
+    });
+    tutorial_UriageShusei.addStep({
+        title: `<p class='tour_header'>売上の修正</p>`,
+        text: `<p class='tour_discription'>ここで修正対象と修正値の選択・入力を行います。
+               </p>`,
+        attachTo: {
+            element: '.tour_uri2',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_UriageShusei.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_UriageShusei.next
+            }
+        ]
+    });
+    tutorial_UriageShusei.addStep({
+        title: `<p class='tour_header'>売上の修正</p>`,
+        text: `<p class='tour_discription'>例えば、X月X日のイベント名が間違えてた！
+                <br>といった場合、上の売上データで日付のみを選択した状態にします。
+               </p>`,
+        attachTo: {
+            element: '.tour_uri1',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_UriageShusei.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_UriageShusei.next
+            }
+        ]
+    });
+    tutorial_UriageShusei.addStep({
+        title: `<p class='tour_header'>売上の修正</p>`,
+        text: `<p class='tour_discription'>次に、こちらで「イベント名」にチェックを入れ
+                <br>その横の入力欄に本来のイベント名を入力します。
+               </p>`,
+        attachTo: {
+            element: '.tour_uri3',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_UriageShusei.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_UriageShusei.next
+            }
+        ]
+    });
+    tutorial_UriageShusei.addStep({
+        title: `<p class='tour_header'>売上の修正</p>`,
+        text: `<p class='tour_discription'>最後に「確認」ボタンをタップすると
+                <br>修正対象のデータと修正内容を確認する画面に移動しますので、問題なければ「更新」ボタンをタップします。
+                <br><br>間違えていた場合は「キャンセル」ボタンをタップしてください。
+               </p>`,
+        attachTo: {
+            element: '.tour_uri4',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_UriageShusei.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_UriageShusei.next
+            }
+        ]
+    });
+    tutorial_UriageShusei.addStep({
+        title: `<p class='tour_header'>売上の修正</p>`,
+        text: `<p class='tour_discription'>売上げの修正方法については以上となります。
+                <br>
+                <br>わからない事がありましたらトップ画面下の「お問い合わせ」よりお願いします。
+               </p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_UriageShusei.back
+            },
+            {
+                text: 'Finish',
+                action: tutorial_UriageShusei.complete
+            }
+        ]
+    });    
+    function urihelp(){
+        tutorial_UriageShusei.start(tourFinish,'urihelp','');
     }
 </script>    
 </html>
