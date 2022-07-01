@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang='ja'>
+<!--menu.php-->
 <?php
 /*関数メモ
 check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
@@ -121,7 +122,6 @@ if($action=="logout"){
 </head>
 
 <script>
-  
 </script>
 
 <header class='common_header header-color' style='display:block'>
@@ -166,11 +166,14 @@ if($action=="logout"){
     }
 
     $array = [
-        'レジ'=>['EVregi.php?mode=evrez&csrf_token='.$token]
-        ,'個別売上'=>['EVregi.php?mode=kobetu&csrf_token='.$token]
+//        'レジ'=>['EVregi.php?mode=evrez&csrf_token='.$token]
+//        ,'個別売上'=>['EVregi.php?mode=kobetu&csrf_token='.$token]
+        'レジ'=>['EVregi.php?evrez']
+        ,'個別売上'=>['EVregi.php?kobetu']
         ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token]
         ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token]
-        //,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko&csrf_token='.$token]
+//        ,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko&csrf_token='.$token]
+//        ,'出品在庫登録'=>['EVregi.php?shuppin_zaiko']
         ,'売上実績'=>['UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where&csrf_token='.$token]
         ,'売上分析'=>['analysis_menu.php?csrf_token='.$token]
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]
@@ -181,7 +184,7 @@ if($action=="logout"){
     
     //契約・解約関連は各時で実装したファイルを指定する
     $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', null));
-    $dir_path =  bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', null));
+    $dir_path = bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', null));
     
     if(EXEC_MODE!="Trial"){
         if($plan==0){
@@ -195,9 +198,16 @@ if($action=="logout"){
     $i=0;
     echo "<div class='row'>";
 	foreach(array_merge($array,$array2) as $key=>$vals){
-        echo "  <div class ='col-md-3 col-sm-6 col-6 menu_".$i."' style='padding:5px;' >\n";
-        echo "      <a href='".$vals[0]."' class='btn--topmenu btn-view'>".$key."\n";
-        echo "      </a>\n";
+        echo "  <div class ='col-md-3 col-sm-6 col-6 menu menu_".$i."' style='padding:5px;'>\n";
+        if($i==0){//通常レジ
+            echo "      <button class='btn--topmenu btn-view' onClick=postFormRG('".$vals[0]."','evrez','".$token."')>".$key."</button>\n";
+        }else if($i==1){//個別売り
+            echo "      <button class='btn--topmenu btn-view' onClick=postFormRG('".$vals[0]."','kobetu','".$token."')>".$key."</button>\n";
+        }/*else if($i==4){//在庫登録
+            echo "      <button class='btn--topmenu btn-view' onClick=postFormRG('".$vals[0]."','shuppin_zaiko','".$token."')>".$key."</button>\n";
+        }*/else{
+            echo "      <a href='".$vals[0]."' class='btn--topmenu btn-view'>".$key."</a>\n";
+        }
         echo "  </div>\n";
         $i++;
 	}
@@ -490,7 +500,51 @@ if($action=="logout"){
         tutorial_11.start(tourFinish,'tutorial','');    
     }
 </script>
+<!--pwa対応部-->
+<script>
+/*  //PWA対応
+    var menu = document.getElementsByClassName("menu");   //全メニュー
+    if(navigator.onLine){
+        alert('on-line');
+        for (let i = 0; i < menu.length; i++) {
+            menu.item(i).style.display = 'block';
+        }
+    }else{
+        alert('off-line');
+        for (let i = 1; i < menu.length; i++) {
+            menu.item(i).style.display = 'none';
+        }
+        
+    }
+*/    
+</script>
+<!--pwa対応部(メニューのURL_GETをPOSTに変更)-->
+<script>
+function postFormRG(url,mode,token) {
+ 
+    var form = document.createElement('form');
+    var request_mode = document.createElement('input');
+    var request_token = document.createElement('input');
+ 
+    form.method = 'POST';
+    form.action = url;
+ 
+    request_mode.type = 'hidden'; //入力フォームが表示されないように
+    request_mode.name = 'mode';
+    request_mode.value = mode;
 
+    request_token.type = 'hidden'; //入力フォームが表示されないように
+    request_token.name = 'csrf_token';
+    request_token.value = token;
+ 
+    form.appendChild(request_mode);
+    form.appendChild(request_token);
+    document.body.appendChild(form);
+ 
+    form.submit();
+ 
+}    
+</script>
 </html>
 <?php
     $pdo_h=null;

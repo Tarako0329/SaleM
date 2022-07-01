@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang='ja'>
+<!--Evregi.php-->    
 <?php
 /*関数メモ
 check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
@@ -15,14 +16,30 @@ csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェッ�
 csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
 */
 require "php_header.php";
+$time = date("Y/m/d H:i:s");
+$logfilename="sid_".$_SESSION['user_id'].".log";
+//file_put_contents("sql_log/".$logfilename,$time.",REFERER:".$_SERVER['HTTP_REFERER']."\n",FILE_APPEND);
 
-if(isset($_GET["csrf_token"]) || empty($_POST)){
-    if(csrf_chk_redirect($_GET["csrf_token"])==false){
-        $_SESSION["EMSG"]="セッションが正しくありませんでした。".$_GET["csrf_token"];
-        header("HTTP/1.1 301 Moved Permanently");
-        header("Location: index.php");
-        exit();
+
+if(EXEC_MODE!="Test"){
+//file_put_contents("sql_log/".$logfilename,$time.",cookie :".$_COOKIE['csrf_token']."\n",FILE_APPEND);
+//file_put_contents("sql_log/".$logfilename,$time.",post   :".$_POST['csrf_token']."\n",FILE_APPEND);
+//file_put_contents("sql_log/".$logfilename,$time.",session:".$_SESSION['csrf_token']."\n",FILE_APPEND);
+if(!empty($_POST)){
+    if(csrf_chk_nonsession()==false){//POST:COOKIEチェック
+        if(!empty($_SESSION["status"]) && ROOT_URL."EVregi.php"==substr($_SERVER['HTTP_REFERER'],0,strlen(ROOT_URL."EvRegi.php"))){
+            //リファイラが自身でかつstatusがセットされてる場合、問題なし
+        }else{
+            $_SESSION["EMSG"]="セッションが正しくありませんでした。".$_GET["csrf_token"];
+            header("HTTP/1.1 301 Moved Permanently");
+            header("Location: index.php");
+            exit();
+        }
     }
+}else{
+    echo "error:POST_less";
+    exit();
+}
 }
 
 //セッションのIDがクリアされた場合の再取得処理。
@@ -47,11 +64,14 @@ if($row[0]["yuukoukigen"]==""){
 
 
 $token = csrf_create();
-$alert_msg="";
-if(!empty($_SESSION["msg"])){
-    $alert_msg=$_SESSION["msg"];
-}
 
+$alert_msg=(!empty($_SESSION["msg"])?$_SESSION["msg"]:"");
+$RG_MODE=(!empty($_POST["mode"])?$_POST["mode"]:"");
+
+if($RG_MODE==""){
+    echo "error rezi mode nothing!";
+    exit();
+}
 
 //イベント名の取得
 //セッション->クッキー->DB
@@ -115,6 +135,7 @@ if($_SESSION["CTGL"] != "" ){
 }
 $next_categoly=$categoly+1;
 
+$sqlorder="";
 if($categoly==0){
     $sql_order="order by hyoujiNO,shouhinNM";
     $sql_group="group by categoly";
@@ -135,12 +156,14 @@ if($categoly==0){
 }
     
 //商品M取得
-if($_GET["mode"]=="shuppin_zaiko"){
+if($RG_MODE=="shuppin_zaiko"){
     //イベントレジモード以外はすべて表示する
     $sql = "select *,".$sql_select." from ShouhinMS where uid = ? ".$sqlorder;
 }else{
     $sql = "select *,".$sql_select." from ShouhinMS where hyoujiKBN1='on' and uid = ? ".$sqlorder;
 }
+$sql = "select *,".$sql_select." from ShouhinMS where uid = ? ".$sqlorder;
+
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
@@ -184,33 +207,36 @@ window.onload = function() {
         echo "    var suryou_".$row["shouhinCD"]."  = document.getElementById('suryou_".$row["shouhinCD"]."');\n" ;         //ボタンの注文数
         echo "    var btn_menu_".$row["shouhinCD"]." = document.getElementById('btn_menu_".$row["shouhinCD"]."');\n";       //ボタンのオブジェクト
         echo "    var items_".$row["shouhinCD"]." = document.getElementById('items_".$row["shouhinCD"]."');\n";             //商品パネル
-        echo "    var cnt_suryou_".$row["shouhinCD"]." = 0;\n";                                                             //ボタンのカウンタ
+        //echo "    var cnt_suryou_".$row["shouhinCD"]." = 0;\n";                                                             //ボタンのカウンタ
         echo "\n";
         //ボタンクリック時の動作関数
         echo "    //".rot13decrypt($row["shouhinNM"])."ボタンクリック時\n";
         echo "    btn_menu_".$row["shouhinCD"].".onclick = function (){\n";
         echo "        if(plus_minus[0].checked){\n";//通常モード（プラス）
-        echo "              cnt_suryou_".$row["shouhinCD"]." += 1;\n";
+        //echo "              cnt_suryou_".$row["shouhinCD"]." += 1;\n";
         echo "              total_pay += ".($row["tanka"] + $row["tanka_zei"]).";\n";
 
         echo "              total_pay_bk += ".($row["tanka"] + $row["tanka_zei"]).";\n";
 
         echo "              total_zei += ".$row["tanka_zei"].";\n";
-        echo "              suryou_".$row["shouhinCD"].".value = cnt_suryou_".$row["shouhinCD"].";\n";
+        //echo "              suryou_".$row["shouhinCD"].".value = cnt_suryou_".$row["shouhinCD"].";\n";
+        echo "              suryou_".$row["shouhinCD"].".value = parseInt(suryou_".$row["shouhinCD"].".value) + 1;\n";
         echo "              kaikei_disp.innerHTML = total_pay;\n";
         echo "              zei_disp.innerHTML = total_zei;\n";
         echo "        }else if(plus_minus[1].checked){\n";//減らすモード（マイナス）
-        echo "              if(cnt_suryou_".$row["shouhinCD"]."==0){\n";
+        //echo "              if(cnt_suryou_".$row["shouhinCD"]."==0){\n";
+        echo "              if(parseInt(suryou_".$row["shouhinCD"].".value)==0){\n";
         echo "                  window.alert('数量０以下には出来ません');\n";
         echo "                  exit;\n";
         echo "              }\n";
-        echo "              cnt_suryou_".$row["shouhinCD"]." -= 1;\n";
+        //echo "              cnt_suryou_".$row["shouhinCD"]." -= 1;\n";
         echo "              total_pay -= ".($row["tanka"] + $row["tanka_zei"]).";\n";
 
         echo "              total_pay_bk -= ".($row["tanka"] + $row["tanka_zei"]).";\n";
 
         echo "              total_zei -= ".$row["tanka_zei"].";\n";
-        echo "              suryou_".$row["shouhinCD"].".value = cnt_suryou_".$row["shouhinCD"].";\n";
+        //echo "              suryou_".$row["shouhinCD"].".value = cnt_suryou_".$row["shouhinCD"].";\n";
+        echo "              suryou_".$row["shouhinCD"].".value = parseInt(suryou_".$row["shouhinCD"].".value) - 1;\n";
         echo "              kaikei_disp.innerHTML = total_pay;\n";
         echo "              zei_disp.innerHTML = total_zei;\n";
         echo "        }\n";
@@ -232,20 +258,30 @@ window.onload = function() {
         btn.innerHTML="登録中";
         btn.disabled = true;
     }
+    var su = document.getElementsByClassName("su");
+    var items = document.getElementsByClassName("items");   //全メニュー
+    var show_items = document.getElementsByClassName("show_items"); //表示対象メニュー
     order_chk.onclick = function(){
         //注文確認ボタン。選択されてないメニューを消し、ボタンの表示を変更する。
         <?php
+        /*
         foreach($shouhiMS as $row){
             echo "if(cnt_suryou_".$row["shouhinCD"]."==0){items_".$row["shouhinCD"].".style.display = 'none';}";
         }
+        */
         ?>
+        for (let i = 0; i < su.length; i++) {
+            if(su.item(i).value == 0){
+                items.item(i).style.display = 'none';
+            }
+        }
         order_chk.style.display = 'none';
         btn_commit.style.display = 'block';
         dentaku.style.display = 'block';
         order_return.style.display = 'block';
         order_clear.style.display = 'none';
         <?php
-            if($_GET["mode"]<>"shuppin_zaiko"){ echo "CHOUSEI_AREA.style.display = 'block';\n";} //在庫登録モードでは割引ボタンを表示しない
+            if($RG_MODE<>"shuppin_zaiko"){ echo "CHOUSEI_AREA.style.display = 'block';\n";} //在庫登録モードでは割引ボタンを表示しない
         ?>
         //total_pay_bk = total_pay; //調整前金額を保存
     };
@@ -265,15 +301,16 @@ window.onload = function() {
         oturi.innerHTML = oturikin;
     };
 
-    var su = document.getElementsByClassName("su");
-    var items = document.getElementsByClassName("items");
     var reset_btn = document.getElementById("order_clear");
     var return_btn = document.getElementById("order_return");
     // リセットボタンのクリック処理
     reset_btn.onclick = function (){
         for (let i = 0; i < su.length; i++) {
             su.item(i).value = 0;
-            items.item(i).style.display = 'block';
+            //items.item(i).style.display = 'block';
+        }
+        for (let i = 0; i < show_items.length; i++) {
+            show_items.item(i).style.display = 'block';
         }
         kaikei_disp.innerHTML = 0;
         total_pay = 0;
@@ -281,17 +318,24 @@ window.onload = function() {
         zei_disp.innerHTML = 0;
         total_zei = 0;
         <?php
+        /*
         foreach($shouhiMS as $row){
-            echo "cnt_suryou_".$row["shouhinCD"]." = 0;\n";
+            echo "\t\tcnt_suryou_".$row["shouhinCD"]." = 0;\n";
         }
+        */
         ?>
         order_chk.style.display = 'block';
         btn_commit.style.display = 'none';
      };
      //戻るボタン
     return_btn.onclick = function(){
+        /*
         for (let i = 0; i < su.length; i++) {
             items.item(i).style.display = 'block';
+        }
+        */
+        for (let i = 0; i < show_items.length; i++) {
+            show_items.item(i).style.display = 'block';
         }
         order_return.style.display = 'none';
         order_clear.style.display = 'block';
@@ -375,17 +419,17 @@ window.onload = function() {
 
 <form method = "post" id="form1" action="EVregi_sql.php">
     <input type="hidden" name="csrf_token" value='<?php echo $token;?>'>
-    <input type="hidden" name="mode" value='<?php echo $_GET["mode"];?>'> <!--レジor個別売上or在庫登録-->
+    <input type="hidden" name="mode" value='<?php echo $RG_MODE;?>'> <!--レジor個別売上or在庫登録-->
     
 <header class="header-color common_header" style='display:block'>
     <div class="title yagou"><a href="menu.php"><?php echo $title;?></a></div>
     <span class='item_1'>
     <span style='color:var(--user-disp-color);font-weight:400;'>
-    <?php if($_GET["mode"]=="shuppin_zaiko"){echo "出店日：";}else{echo "売上日：";}?>
-    </span><input type='date' class='date' style='height:20%' name='KEIJOUBI' required="required" value='<?php if($_GET["mode"]<>"shuppin_zaiko"){echo (string)date("Y-m-d");} ?>'>
+    <?php if($RG_MODE=="shuppin_zaiko"){echo "出店日：";}else{echo "売上日：";}?>
+    </span><input type='date' class='date' style='height:20%' name='KEIJOUBI' required="required" value='<?php if($RG_MODE<>"shuppin_zaiko"){echo (string)date("Y-m-d");} ?>'>
     </span>
     <?php
-    if($_GET["mode"]=="kobetu"){
+    if($RG_MODE=="kobetu"){
     ?>
         <div class="event" style="font-family:inherit;"><input type="text" class="ev" name="KOKYAKU" required="required" placeholder="(必須)顧客名"></div>
         <input type="hidden" name="EV" value="">
@@ -410,7 +454,8 @@ window.onload = function() {
     ?>
     </select>
     <a href="#" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;' data-toggle='modal' data-target='#modal_help1'><i class="fa-regular fa-circle-question fa-lg logoff-color"></i></a>
-    <a class='item_15' href='EVregi_sql.php?CTGL=<?php echo $next_categoly; ?>&mode=<?php echo $_GET["mode"]; ?>' style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-solid fa-arrow-rotate-right fa-lg logoff-color"></i></a>
+    <!--<a class='item_15' href='EVregi_sql.php?CTGL=<?php echo $next_categoly; ?>&mode=<?php echo $RG_MODE; ?>' style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-solid fa-arrow-rotate-right fa-lg logoff-color"></i></a>-->
+    <a class='item_15' href='javascript:void(0)' onClick="postFormRG('EVregi_sql.php','<?php echo $RG_MODE; ?>','<?php echo $next_categoly; ?>')" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-solid fa-arrow-rotate-right fa-lg logoff-color"></i></a>
 </div>
 <div class='header-plus-minus text-center item_4' style='font-size:1.4rem;font-weight;700'>
     <i class="fa-regular fa-circle-question fa-lg logoff-color"></i><!--スペーシングのため白アイコンを表示-->
@@ -432,11 +477,12 @@ window.onload = function() {
         echo "</body></html>";
         exit();
     }
-    if($_GET["status"]=="success"){
+    if($_SESSION["status"]=="success"){
         echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-s' class='lead'></div></div></div></div>";
-    }elseif($_GET["status"]=="failed"){
+    }elseif($_SESSION["status"]=="failed"){
         echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-e' class='lead'></div></div></div></div>";
     }
+    $_SESSION["status"]="";
 ?>
     <div class="container-fluid">
         <div class='item_11 item_12'>
@@ -463,6 +509,8 @@ window.onload = function() {
     $i=0;
     $now=1;
     $bunrui="";
+    $disp=""; //ボタンの表示非表示（showを表示。ブランクは非表示）
+    $style="";
     
 	foreach($shouhiMS as $row){
 	    if($bunrui<>$row["categoly"]){
@@ -479,7 +527,11 @@ window.onload = function() {
 	        $bunrui=$row["categoly"];
 	        $now=$now+1;
 	    }
-        echo "  <div class ='col-md-3 col-sm-6 col-6 items' id='items_".$row["shouhinCD"]."'>\n";
+
+	    $disp=($row["hyoujiKBN1"]=="on"?"show_items":"");
+	    $style=($row["hyoujiKBN1"]=="on"?"":" style='display:none' ");
+	    
+        echo "  <div class ='col-md-3 col-sm-6 col-6 items ".$disp."' ".$style." id='items_".$row["shouhinCD"]."'>\n";
         echo "      <button type='button' class='btn-view btn--rezi' id='btn_menu_".$row["shouhinCD"]."'>".rot13decrypt($row["shouhinNM"])."\n";
         echo "      </button>\n";
         echo "      <div class='btn-view btn--rezi-minus bg-warning minus_disp' style='display:none;'></div>n";
@@ -530,7 +582,7 @@ window.onload = function() {
         <span style='font-size:1.6rem;'>お会計</span> ￥<span id='kaikei'>0</span>- <span style='font-size:1.6rem;'>内税</span>(<span id='utizei'>0</span>)
     </div>
     <div class='right1'>
-        <button type='button' class='btn--chk item_5' style='border-left:none;border-right:none;' id='dentaku' data-toggle='modal' data-target='#FcModal'><?php if($_GET["mode"]<>"shuppin_zaiko"){echo "釣　銭";} ?></button>
+        <button type='button' class='btn--chk item_5' style='border-left:none;border-right:none;' id='dentaku' data-toggle='modal' data-target='#FcModal'><?php if($RG_MODE<>"shuppin_zaiko"){echo "釣　銭";} ?></button>
     </div>
     <div class='right3 item_10'>
         <button type='button' class='btn--chk item_8' style=';' id='order_clear'>クリア</button>
@@ -1190,6 +1242,32 @@ window.onload = function() {
     }
     
 
+</script>
+<script>
+function postFormRG(url,mode,CTGL) {
+ 
+    var form = document.createElement('form');
+    var request_mode = document.createElement('input');
+    var request_CTGL = document.createElement('input');
+ 
+    form.method = 'POST';
+    form.action = url;
+ 
+    request_mode.type = 'hidden'; //入力フォームが表示されないように
+    request_mode.name = 'mode';
+    request_mode.value = mode;
+
+    request_CTGL.type = 'hidden'; //入力フォームが表示されないように
+    request_CTGL.name = 'CTGL';
+    request_CTGL.value = CTGL;
+ 
+    form.appendChild(request_mode);
+    form.appendChild(request_CTGL);
+    document.body.appendChild(form);
+ 
+    form.submit();
+ 
+}    
 </script>
 </html>
 <?php

@@ -1,7 +1,76 @@
 <?php
+/*関数メモ
+check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
+
+【想定して無いページからの遷移チェック】
+csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容を返す。(POSTorGETで遷移先に渡す)
+　　　　　　　 headerでリダイレクトされた場合、COOKIEにセットされないので注意。
+
+遷移先のチェック
+csrf_chk()                              ：COOKIE・SESSION・POSTのトークンチェック。
+csrf_chk_nonsession()                   ：COOKIE・POSTのトークンチェック。
+csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェック。
+csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
+
+log
+file_put_contents("sql_log/".$logfilename,$time.",\n",FILE_APPEND);
+
+*/
+
+//cookie:postのチェックのみ
+
 require "php_header.php";
+$time = date("Y/m/d H:i:s");
+$logfilename="sid_".$_SESSION['user_id'].".log";
+//file_put_contents("sql_log/".$logfilename,$time.",".$_COOKIE['csrf_token']."\n",FILE_APPEND);
+
+//リファイラーチェック
+if(ROOT_URL."EVregi.php"!==substr($_SERVER['HTTP_REFERER'],0,strlen(ROOT_URL."EvRegi.php"))){
+    echo $_SERVER['HTTP_REFERER'];
+    echo "\nアクセス元が不正です";
+    exit();
+}
 
 $rtn=check_session_userid($pdo_h);
+$MODE=(!empty($_POST["mode"])?$_POST["mode"]:"");
+
+if($_POST["CTGL"]<>""){
+    //メニューのカテゴリー区切り
+    $_SESSION["CTGL"] = $_POST["CTGL"];
+    $stmt = $pdo_h->prepare ( 'call PageDefVal_update(?,?,?,?,?)' );
+    $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+    $stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
+    $stmt->bindValue(3, "EVregi.php", PDO::PARAM_STR);
+    $stmt->bindValue(4, "CTGL", PDO::PARAM_STR);
+    $stmt->bindValue(5, $_POST["CTGL"], PDO::PARAM_STR);
+    $stmt->execute();
+    
+    //$token = csrf_create();
+    
+    $_SESSION["msg"]="カテゴリーサイズを変更しました。";
+    //header("HTTP/1.1 301 Moved Permanently");
+    //header("Location: EVregi.php?status=success&mode=".$_GET["mode"]."&csrf_token=".$token);
+    $_SESSION["status"]="success";
+    header("Location: EVregi.php?".$MODE,true,308);
+    exit();
+}
+
+if(!empty($_POST)){
+    file_put_contents("sql_log/".$logfilename,  $time.",POST:COOKIEチェック\n",  FILE_APPEND);
+    if(csrf_chk_nonsession()==false){//cookie:post
+        $_SESSION["EMSG"]="セッションが正しくありませんでした。";
+        header("HTTP/1.1 301 Moved Permanently");
+        header("Location: index.php");
+        exit();
+    }
+    
+}else{
+    //GET・POSTなしでのアクセスはあり得ない
+    echo "不正アクセスです！";
+    exit();
+}
+
+
 
 //入力画面の前回値を記録
 if($_POST["EV"]<>""){
@@ -15,41 +84,20 @@ if($_POST["EV"]<>""){
     $stmt->bindValue(5, $_POST["EV"], PDO::PARAM_STR);
     $stmt->execute();
 }
-if($_GET["CTGL"]<>""){
-    //メニューのカテゴリー区切り
-    $_SESSION["CTGL"] = $_GET["CTGL"];
-    $stmt = $pdo_h->prepare ( 'call PageDefVal_update(?,?,?,?,?)' );
-    $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-    $stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
-    $stmt->bindValue(3, "EVregi.php", PDO::PARAM_STR);
-    $stmt->bindValue(4, "CTGL", PDO::PARAM_STR);
-    $stmt->bindValue(5, $_GET["CTGL"], PDO::PARAM_STR);
-    $stmt->execute();
-    
-    $token = csrf_create();
-    
-    $_SESSION["msg"]="カテゴリーサイズを変更しました。";
-    header("HTTP/1.1 301 Moved Permanently");
-    header("Location: EVregi.php?status=success&mode=".$_GET["mode"]."&csrf_token=".$token);
-    exit();
-}
-if(!empty($_GET)){
-    if(csrf_chk_nonsession()==false){
-        $_SESSION["EMSG"]="セッションが正しくありませんでした。";
-        header("HTTP/1.1 301 Moved Permanently");
-        header("Location: index.php");
-        exit();
-    }
-}
-$token = csrf_create();
 
+$token = csrf_create();
+/*
+file_put_contents("sql_log/".$logfilename,$time.",cookie :".$_COOKIE['csrf_token']."\n",FILE_APPEND);
+file_put_contents("sql_log/".$logfilename,$time.",post   :".$_POST['csrf_token']."\n",FILE_APPEND);
+file_put_contents("sql_log/".$logfilename,$time.",session:".$_SESSION['csrf_token']."\n",FILE_APPEND);
+*/
 $E_Flg=0;
 $_SESSION["msg"]="登録処理が実行されませんでした。";
 $emsg="";
 
 //売上登録
-if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
-    $logfilename="sid_".$_SESSION['user_id'].".log";
+if($MODE == "evrez" || $MODE == "kobetu"){
+    //$logfilename="sid_".$_SESSION['user_id'].".log";
 
     $array = $_POST["ORDERS"];
     $sqlstr = "";
@@ -216,8 +264,11 @@ if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
             file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,COMMIT,success,売上No".$UriageNO."\n",FILE_APPEND);
             
             $_SESSION["msg"]="売上が登録されました。（売上№：".$UriageNO."）";
-            header("HTTP/1.1 301 Moved Permanently");
-            header("Location: EVregi.php?status=success&mode=".$_POST["mode"]."&csrf_token=".$token);
+            //header("HTTP/1.1 301 Moved Permanently");
+            //header("Location: EVregi.php?status=success&mode=".$_POST["mode"]."&csrf_token=".$token);
+            $_SESSION["status"]="success";
+            header("Location: EVregi.php?".$MODE,true,308);
+            
             $stmt = null;
             $pdo_h = null;
             exit();
@@ -248,7 +299,7 @@ if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
         $stmt = null;
         $pdo_h = null;        
     }
-}else if($_POST["mode"] == "shuppin_zaiko"){//在庫登録
+}else if($MODE == "shuppin_zaiko"){//在庫登録
     $array = $_POST["ORDERS"];
     $sqlstr = "";
 
@@ -298,8 +349,11 @@ if($_POST["mode"] == "evrez" || $_POST["mode"] == "kobetu"){
         if($E_Flg==0){
             $pdo_h->commit();
             $_SESSION["msg"]="在庫が登録されました。（在庫№：".$UriageNO."）";
-            header("HTTP/1.1 301 Moved Permanently");
-            header("Location: EVregi.php?status=success&mode=".$_POST["mode"]."&csrf_token=".$token);
+            //header("HTTP/1.1 301 Moved Permanently");
+            //header("Location: EVregi.php?status=success&mode=".$_POST["mode"]."&csrf_token=".$token);
+            $_SESSION["status"]="success";
+            header("Location: EVregi.php?".$MODE,true,308);
+
             $stmt = null;
             $pdo_h = null;
             exit();
@@ -340,8 +394,11 @@ if($E_Flg==1){
 $stmt = null;
 $pdo_h = null;
 //Failure
-header("HTTP/1.1 301 Moved Permanently");
-header("Location: EVregi.php?status=failed&mode=".$_POST["mode"]."&csrf_token=".$token);
+//header("HTTP/1.1 301 Moved Permanently");
+//header("Location: EVregi.php?status=failed&mode=".$_POST["mode"]."&csrf_token=".$token);
+$_SESSION["status"]="failed";
+header("Location: EVregi.php?".$MODE,true,308);
+
 exit();
 
 ?>

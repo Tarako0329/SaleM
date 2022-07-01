@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+<!--index.php-->
 <?php
 
 require "php_header.php";

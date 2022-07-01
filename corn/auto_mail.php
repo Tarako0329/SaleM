@@ -61,6 +61,9 @@ foreach($daybefor as $day){
             
             今後ともよろしくお願いします。
             
+            WebRez+へのアクセスはコチラ
+            https://webrez.green-island.mixh.jp/
+            
             EOM;
         if(FROM==""){
             //.env にメールアカウント情報が設定されてない場合、phpのsendmailで送付

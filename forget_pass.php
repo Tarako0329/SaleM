@@ -49,7 +49,7 @@ if($_POST["answer"]<>""){
     $result2=$stmt->fetchAll();
     if($cnt==1){
         $_SESSION["user_id"]=$result2[0]["uid"];
-        echo $_SESSION["uid"]."<br>";
+        echo $_SESSION["user_id"]."<br>";
         header("HTTP/1.1 301 Moved Permanently");
         header("Location: account_create.php?mode=1&csrf_token=".$token);
         exit();
