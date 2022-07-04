@@ -1,46 +1,37 @@
 // キャッシュするリソース(css、jsがあれば個別で追加)
-var resourcesToCache = [
-  '/css'
-  ,'/shepherd'
-  ,'/img'
-  ,'/script'
-];
-// キャッシュバージョン
-var CACHE_VERSION = 'ca-v_20220701';
-
-//キャッシュの保存
-self.addEventListener('install', function(e) {
-    console.log('[ServiceWorker] Install hoge');
-
-    caches.open(CACHE_VERSION)
-      .then(function(cache) {
-        console.log('cache.addAll');
-        cache.addAll(resourcesToCache);
-      });
-});
-
-self.addEventListener('activate', function(e) {
-  console.log('[ServiceWorker] Activate hoge');
-});
-
-// サービスワーカー有効化に必須
-self.addEventListener('fetch', function(event) {});
-
-/*
-const CACHE_VERSION = 'v2';
-const CACHE_NAME = `${registration.scope}!${CACHE_VERSION}`;
+const CACHE_VERSION = 'v1_';
+const CACHE_NAME = `${CACHE_VERSION}!${registration.scope}`;
 
 // キャッシュするファイルをセットする
 const urlsToCache = [
-  '.'
-  ,'/css'
-  ,'/shepherd'
+  '/css'
+  ,'/shepherd/shepherd.min.js'
+  ,'/shepherd/shepherd.css'
   ,'/img'
-  ,'/EVregi.php?evrez'
-  ,'/EVregi.php?kobetu'
-  ,'/menu.php'
+//  ,'/'
+//  ,'/EVregi.php?evrez'
+//  ,'/EVregi.php?kobetu'
+//  ,'/menu.php'
 ];
 
+
+self.addEventListener('install', function(e) {
+    //console.log('[ServiceWorker] Install hoge');
+    e.waitUntil(skipWaiting());
+});
+
+self.addEventListener('activate', function(e) {
+    //console.log('[ServiceWorker] Activate hoge');
+});
+
+// サービスワーカー有効化に必須
+self.addEventListener('fetch', function(event) {
+    //console.log('service worker fetch ... ' + event.request.url);
+});
+
+
+/*
+//新規開発中コード
 self.addEventListener('install', (event) => {
   event.waitUntil(
     // キャッシュを開く
@@ -50,7 +41,10 @@ self.addEventListener('install', (event) => {
       console.log('[ServiceWorker] Install hoge');
       return cache.addAll(urlsToCache);
     })
+    
   );
+  //serviceworker.jsが更新されたら即有効にする（デフォルトはいったん閉じてから有効となる）
+  event.waitUntil(skipWaiting());
 });
 
 self.addEventListener('activate', (event) => {

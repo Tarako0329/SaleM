@@ -156,6 +156,20 @@ if($action=="logout"){
             echo "ログオフしました。<br>";
         }
         echo "<a href='index.php'>再ログインする</a>";
+        echo "</body>\n";
+        ?>
+        <script>
+            //
+            window.navigator.serviceWorker.getRegistrations()
+            .then(registrations => {
+                for(let registration of registrations) {
+                    registration.unregister();
+                    console.log('Service Worker is delete');
+                }
+            });
+            //window.location.reload(true); 
+        </script>
+        <?php
         
         exit();
     }
@@ -168,12 +182,12 @@ if($action=="logout"){
     $array = [
 //        'レジ'=>['EVregi.php?mode=evrez&csrf_token='.$token]
 //        ,'個別売上'=>['EVregi.php?mode=kobetu&csrf_token='.$token]
-        'レジ'=>['EVregi.php?evrez']
-        ,'個別売上'=>['EVregi.php?kobetu']
+        'レジ'=>['EVregi.php?mode=evrez']
+        ,'個別売上'=>['EVregi.php?mode=kobetu']
         ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token]
         ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token]
 //        ,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko&csrf_token='.$token]
-//        ,'出品在庫登録'=>['EVregi.php?shuppin_zaiko']
+//        ,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko']
         ,'売上実績'=>['UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where&csrf_token='.$token]
         ,'売上分析'=>['analysis_menu.php?csrf_token='.$token]
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]

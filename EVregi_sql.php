@@ -21,6 +21,7 @@ file_put_contents("sql_log/".$logfilename,$time.",\n",FILE_APPEND);
 
 require "php_header.php";
 $time = date("Y/m/d H:i:s");
+$rtn=check_session_userid($pdo_h);
 $logfilename="sid_".$_SESSION['user_id'].".log";
 //file_put_contents("sql_log/".$logfilename,$time.",".$_COOKIE['csrf_token']."\n",FILE_APPEND);
 
@@ -31,7 +32,6 @@ if(ROOT_URL."EVregi.php"!==substr($_SERVER['HTTP_REFERER'],0,strlen(ROOT_URL."Ev
     exit();
 }
 
-$rtn=check_session_userid($pdo_h);
 $MODE=(!empty($_POST["mode"])?$_POST["mode"]:"");
 
 if($_POST["CTGL"]<>""){
@@ -51,7 +51,8 @@ if($_POST["CTGL"]<>""){
     //header("HTTP/1.1 301 Moved Permanently");
     //header("Location: EVregi.php?status=success&mode=".$_GET["mode"]."&csrf_token=".$token);
     $_SESSION["status"]="success";
-    header("Location: EVregi.php?".$MODE,true,308);
+    echo "カテゴリーサイズを変更しました";
+    header("Location: EVregi.php?mode=".$MODE,true,308);
     exit();
 }
 
@@ -267,7 +268,7 @@ if($MODE == "evrez" || $MODE == "kobetu"){
             //header("HTTP/1.1 301 Moved Permanently");
             //header("Location: EVregi.php?status=success&mode=".$_POST["mode"]."&csrf_token=".$token);
             $_SESSION["status"]="success";
-            header("Location: EVregi.php?".$MODE,true,308);
+            header("Location: EVregi.php?mode=".$MODE,true,308);
             
             $stmt = null;
             $pdo_h = null;
@@ -352,7 +353,7 @@ if($MODE == "evrez" || $MODE == "kobetu"){
             //header("HTTP/1.1 301 Moved Permanently");
             //header("Location: EVregi.php?status=success&mode=".$_POST["mode"]."&csrf_token=".$token);
             $_SESSION["status"]="success";
-            header("Location: EVregi.php?".$MODE,true,308);
+            header("Location: EVregi.php?mode=".$MODE,true,308);
 
             $stmt = null;
             $pdo_h = null;
@@ -397,7 +398,7 @@ $pdo_h = null;
 //header("HTTP/1.1 301 Moved Permanently");
 //header("Location: EVregi.php?status=failed&mode=".$_POST["mode"]."&csrf_token=".$token);
 $_SESSION["status"]="failed";
-header("Location: EVregi.php?".$MODE,true,308);
+header("Location: EVregi.php?mode=".$MODE,true,308);
 
 exit();
 

@@ -17,33 +17,35 @@ csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェ�
 */
 require "php_header.php";
 $time = date("Y/m/d H:i:s");
+//セッションのIDがクリアされた場合の再取得処理。
+$rtn=check_session_userid($pdo_h);
 $logfilename="sid_".$_SESSION['user_id'].".log";
 //file_put_contents("sql_log/".$logfilename,$time.",REFERER:".$_SERVER['HTTP_REFERER']."\n",FILE_APPEND);
 
-
-if(EXEC_MODE!="Test"){
+if(EXEC_MODE!=""){
 //file_put_contents("sql_log/".$logfilename,$time.",cookie :".$_COOKIE['csrf_token']."\n",FILE_APPEND);
 //file_put_contents("sql_log/".$logfilename,$time.",post   :".$_POST['csrf_token']."\n",FILE_APPEND);
 //file_put_contents("sql_log/".$logfilename,$time.",session:".$_SESSION['csrf_token']."\n",FILE_APPEND);
-if(!empty($_POST)){
+//if(!empty($_POST)){
     if(csrf_chk_nonsession()==false){//POST:COOKIEチェック
         if(!empty($_SESSION["status"]) && ROOT_URL."EVregi.php"==substr($_SERVER['HTTP_REFERER'],0,strlen(ROOT_URL."EvRegi.php"))){
             //リファイラが自身でかつstatusがセットされてる場合、問題なし
         }else{
-            $_SESSION["EMSG"]="セッションが正しくありませんでした。".$_GET["csrf_token"];
+            $_SESSION["EMSG"]="セッションが正しくありませんでした。".$_POST["csrf_token"];
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: index.php");
             exit();
         }
     }
+
+/*    
 }else{
     echo "error:POST_less";
     exit();
 }
+*/
 }
 
-//セッションのIDがクリアされた場合の再取得処理。
-$rtn=check_session_userid($pdo_h);
 
 //有効期限チェック
 $sql="select yuukoukigen from Users where uid=?";
@@ -66,9 +68,10 @@ if($row[0]["yuukoukigen"]==""){
 $token = csrf_create();
 
 $alert_msg=(!empty($_SESSION["msg"])?$_SESSION["msg"]:"");
-$RG_MODE=(!empty($_POST["mode"])?$_POST["mode"]:"");
+$RG_MODE=(!empty($_POST["mode"])?$_POST["mode"]:$_GET["mode"]);
 
 if($RG_MODE==""){
+    file_put_contents("sql_log/".$logfilename,$time.",post   :".var_dump($_POST)."\n",FILE_APPEND);
     echo "error rezi mode nothing!";
     exit();
 }
@@ -111,10 +114,13 @@ if($_SESSION["EV"] != "" ){
 }
 //メニューカテゴリー粒度(0:なし>1:大>2:中>3:小)
 //セッション->クッキー->DB
+$categoly=(!empty($_SESSION["CTGL"])?$_SESSION["CTGL"]:"");
+/*
 if($_SESSION["CTGL"] != "" ){
     $categoly = $_SESSION["CTGL"];
     //deb_echo("session");
-}else{
+}else*/
+if(empty($categoly)){
     $sql = "select value from PageDefVal where uid=? and machin=? and page=? and item=?";
     $stmt = $pdo_h->prepare($sql);
     $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
@@ -134,7 +140,7 @@ if($_SESSION["CTGL"] != "" ){
     } 
 }
 $next_categoly=$categoly+1;
-
+echo $next_categoly;
 $sqlorder="";
 if($categoly==0){
     $sql_order="order by hyoujiNO,shouhinNM";
