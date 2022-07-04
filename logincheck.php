@@ -161,8 +161,7 @@ function get_top($id, $pdo){
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($row['loginrez'] == "on") {
-        return "EVregi.php?mode=evrez&csrf_token=".csrf_create();
-        //return "EVregi.php"; EVregi.php?mode=evrez&csrf_token='.$token
+        return "EVregi.php?mode=evrez";
     }else{
         return "menu.php";
     }
@@ -199,8 +198,9 @@ function redirect_to_login() {
 * Welcome画面へのリダイレクト
 */
 function redirect_to_welcome($a) {
-  header("HTTP/1.1 301 Moved Permanently");
-  header("Location: ".$a);
+    $_SESSION["status"]="login_redirect";
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: ".$a);
 }
 
 

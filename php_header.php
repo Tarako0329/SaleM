@@ -23,7 +23,7 @@ define("EXEC_MODE",$_ENV["EXEC_MODE"]);
 
 if(EXEC_MODE=="Test"){
     //テスト環境はミリ秒単位
-    $time="1";
+    $time="3";
     //$time=date('Ymd-His');
     error_reporting( E_ALL );
 }else{

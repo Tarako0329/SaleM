@@ -1,15 +1,16 @@
 /*共通のCSS*/
 /*使えるフォント
-font-family: 'Allerta Stencil', sans-serif; 日本語なし　アルファベットライン入り
-font-family: 'Cabin Sketch', cursive;　日本語なし　アルファベット　鉛筆ぬり風
-font-family: 'Chewy', cursive;　日本語なし　アルファベット　太字かわいい系
-font-family: 'Fredericka the Great', cursive;　日本語なし　アルファベット　鉛筆ぬり風
-font-family: 'Kranky', cursive;　日本語なし　アルファベット　中抜き
-font-family: 'Londrina Outline', cursive;　日本語なし　アルファベット　中抜きカクカク
+font-family: 'Kranky', cursive;　日本語なし　アルファベット　中抜き　タイトルで使用
 font-family: 'Zen Kurenaido', sans-serif;　日本語あり　今使ってる
-font-family: 'Murecho', sans-serif;
 */
-
+@font-face {
+	font-family: 'Kranky';
+	src: url('Kranky-Regular.ttf');
+}
+@font-face {
+	font-family: 'Zen Kurenaido';
+	src: url('ZenKurenaido-Regular.ttf');
+}
 :root {
     --main-font:'Zen Kurenaido', sans-serif;
     --tour-font:sans-serif;

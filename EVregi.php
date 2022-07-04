@@ -30,6 +30,8 @@ if(EXEC_MODE!=""){
     if(csrf_chk_nonsession()==false){//POST:COOKIEチェック
         if(!empty($_SESSION["status"]) && ROOT_URL."EVregi.php"==substr($_SERVER['HTTP_REFERER'],0,strlen(ROOT_URL."EvRegi.php"))){
             //リファイラが自身でかつstatusがセットされてる場合、問題なし
+        }else if($_SESSION["status"]=="longin_redirect"){
+            $_SESSION["status"]="";
         }else{
             $_SESSION["EMSG"]="セッションが正しくありませんでした。".$_POST["csrf_token"];
             header("HTTP/1.1 301 Moved Permanently");
@@ -140,7 +142,7 @@ if(empty($categoly)){
     } 
 }
 $next_categoly=$categoly+1;
-echo $next_categoly;
+//echo $next_categoly;
 $sqlorder="";
 if($categoly==0){
     $sql_order="order by hyoujiNO,shouhinNM";
