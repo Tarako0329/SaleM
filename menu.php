@@ -184,7 +184,7 @@ if($action=="logout"){
         ,'個別売上'=>['EVregi.php?mode=kobetu','k_rez']
         ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token,'s_tou']
         ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token,'s_itiran']
-        ,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko','z_rez']
+        //,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko','z_rez']
         ,'売上実績'=>['UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where&csrf_token='.$token,'uri']
         ,'売上分析'=>['analysis_menu.php?csrf_token='.$token,'bunseki']
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token,'user']

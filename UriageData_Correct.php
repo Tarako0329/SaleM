@@ -398,9 +398,9 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
             <tr>
                 <th scope='col' class='d-none d-sm-table-cell'>売上日</th><th scope='col' class='d-none d-sm-table-cell'>Event/顧客</th><th scope='col' style='width:2rem;'>No</th>
                 <th>商品</th>
-                <?php if($Type=="sum_items"){echo "<th scope='col' style='width:3rem;'>出品数</th>";} ?>
+                <?php //if($Type=="sum_items"){echo "<th scope='col' style='width:3rem;'>出品数</th>";} ?>
                 <th scope='col' style='width:3rem;'>売上数</th>
-                <?php if($Type=="sum_items"){echo "<th scope='col' style='width:3rem;'>残数</th>";} ?>
+                <?php //if($Type=="sum_items"){echo "<th scope='col' style='width:3rem;'>残数</th>";} ?>
                 <th scope='col' style='width:3rem;' class='d-none d-sm-table-cell'>単価</th>
                 <th scope='col' style='width:5rem;'>売上</th><th scope='col' style='width:4rem;'>税</th><th scope='col' style='width:5rem;'>原価</th>
                 <th scope='col' style='width:5rem;'>粗利</th>
@@ -421,9 +421,9 @@ foreach($result as $row){
     echo "<td class='d-none d-sm-table-cell'><a href='UriageData_Correct.php?mode=select&ad2=".rot13encrypt2($row["Event"].$row["TokuisakiNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["Event"].$row["TokuisakiNM"]."</a></td>";
     echo "<td class='text-center'><a href='UriageData_Correct.php?mode=select&ad3=".rot13encrypt2($row["UriageNO"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["UriageNO"]."</a></td>";
     echo "<td><a href='UriageData_Correct.php?mode=select&ad4=".rot13encrypt2($row["ShouhinCD"])."&ad5=".rot13encrypt2($row["ShouhinNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".($row["ShouhinNM"])."</a></td>";
-    if($Type=="sum_items"){echo "<td class='text-right'>".$row["shuppin_su"]."</td>";}
+    //if($Type=="sum_items"){echo "<td class='text-right'>".$row["shuppin_su"]."</td>";}
     echo "<td class='text-right'>".$row["su"]."</td>";
-    if($Type=="sum_items"){echo "<td class='text-right'>".$row["zan_su"]."</td>";}
+    //if($Type=="sum_items"){echo "<td class='text-right'>".$row["zan_su"]."</td>";}
     echo "<td class='text-right d-none d-sm-table-cell'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td>";
     echo "<td class='text-right'>".$row["zei"]."</td><td class='text-right'>".$row["genka"]."</td><td class='text-right'>".$row["arari"]."</td>\n<td>";
     if(($Type=="rireki") && ($mode == "select") || ($mode == "Updated")){
