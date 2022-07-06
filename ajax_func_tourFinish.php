@@ -10,16 +10,12 @@
                             tourName    :tourName,
                             step        :step,
                             status      :status//ツアー完了："finish"　途中："save"
-                            //status      :'<?php echo $_SESSION["tour"];?>'//ツアー最後の画面は"finish"が入る
                         }
             },
         ).done(
             // 通信が成功した時
             function(data) {
                 //console.log("通信成功");
-                <?php
-                //deb_echo("alert('success：' + tourName + '：' + step + '：' + status);");
-                ?>
             }
         ).fail(
             // 通信が失敗した時

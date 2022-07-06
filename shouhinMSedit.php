@@ -220,7 +220,7 @@ $csrf_token=csrf_create();
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/css/shepherd.css"/>
 -->
 <script src="shepherd/shepherd.min.js?<?php echo $time; ?>"></script>
-<link rel="stylesheet" href="shepherd/shepherd.css"/>
+<link rel="stylesheet" href="shepherd/shepherd.css?<?php echo $time; ?>"/>
 <?php require "ajax_func_tourFinish.php";?>
 <script>
     const TourMilestone = '<?php echo $_SESSION["tour"];?>';

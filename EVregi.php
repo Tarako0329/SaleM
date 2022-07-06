@@ -16,16 +16,16 @@ csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェッ�
 csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
 */
 require "php_header.php";
-$time = date("Y/m/d H:i:s");
+$log_time = date("Y/m/d H:i:s");
 //セッションのIDがクリアされた場合の再取得処理。
 $rtn=check_session_userid($pdo_h);
 $logfilename="sid_".$_SESSION['user_id'].".log";
-//file_put_contents("sql_log/".$logfilename,$time.",REFERER:".$_SERVER['HTTP_REFERER']."\n",FILE_APPEND);
+//file_put_contents("sql_log/".$logfilename,$log_time.",REFERER:".$_SERVER['HTTP_REFERER']."\n",FILE_APPEND);
 
 if(EXEC_MODE!=""){
-//file_put_contents("sql_log/".$logfilename,$time.",cookie :".$_COOKIE['csrf_token']."\n",FILE_APPEND);
-//file_put_contents("sql_log/".$logfilename,$time.",post   :".$_POST['csrf_token']."\n",FILE_APPEND);
-//file_put_contents("sql_log/".$logfilename,$time.",session:".$_SESSION['csrf_token']."\n",FILE_APPEND);
+//file_put_contents("sql_log/".$logfilename,$log_time.",cookie :".$_COOKIE['csrf_token']."\n",FILE_APPEND);
+//file_put_contents("sql_log/".$logfilename,$log_time.",post   :".$_POST['csrf_token']."\n",FILE_APPEND);
+//file_put_contents("sql_log/".$logfilename,$log_time.",session:".$_SESSION['csrf_token']."\n",FILE_APPEND);
 //if(!empty($_POST)){
     if(csrf_chk_nonsession()==false){//POST:COOKIEチェック
         if(!empty($_SESSION["status"]) && ROOT_URL."EVregi.php"==substr($_SERVER['HTTP_REFERER'],0,strlen(ROOT_URL."EvRegi.php"))){
@@ -73,7 +73,7 @@ $alert_msg=(!empty($_SESSION["msg"])?$_SESSION["msg"]:"");
 $RG_MODE=(!empty($_POST["mode"])?$_POST["mode"]:$_GET["mode"]);
 
 if($RG_MODE==""){
-    file_put_contents("sql_log/".$logfilename,$time.",post   :".var_dump($_POST)."\n",FILE_APPEND);
+    file_put_contents("sql_log/".$logfilename,$log_time.",post   :".var_dump($_POST)."\n",FILE_APPEND);
     echo "error rezi mode nothing!";
     exit();
 }
@@ -164,12 +164,14 @@ if($categoly==0){
 }
     
 //商品M取得
+/*
 if($RG_MODE=="shuppin_zaiko"){
     //イベントレジモード以外はすべて表示する
     $sql = "select *,".$sql_select." from ShouhinMS where uid = ? ".$sqlorder;
 }else{
     $sql = "select *,".$sql_select." from ShouhinMS where hyoujiKBN1='on' and uid = ? ".$sqlorder;
 }
+*/
 $sql = "select *,".$sql_select." from ShouhinMS where uid = ? ".$sqlorder;
 
 $stmt = $pdo_h->prepare($sql);

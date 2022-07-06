@@ -180,19 +180,16 @@ if($action=="logout"){
     }
 
     $array = [
-//        'レジ'=>['EVregi.php?mode=evrez&csrf_token='.$token]
-//        ,'個別売上'=>['EVregi.php?mode=kobetu&csrf_token='.$token]
-        'レジ'=>['EVregi.php?mode=evrez']
-        ,'個別売上'=>['EVregi.php?mode=kobetu']
-        ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token]
-        ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token]
-//        ,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko&csrf_token='.$token]
-//        ,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko']
-        ,'売上実績'=>['UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where&csrf_token='.$token]
-        ,'売上分析'=>['analysis_menu.php?csrf_token='.$token]
-        ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token]
-        ,'会計連携'=>['output_menu.php?csrf_token='.$token]
-        ,'紹介者ID'=>['shoukai.php?csrf_token='.$token]
+        'レジ'=>['EVregi.php?mode=evrez','rez']
+        ,'個別売上'=>['EVregi.php?mode=kobetu','k_rez']
+        ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token,'s_tou']
+        ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token,'s_itiran']
+//        ,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko','z_rez']
+        ,'売上実績'=>['UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where&csrf_token='.$token,'uri']
+        ,'売上分析'=>['analysis_menu.php?csrf_token='.$token,'bunseki']
+        ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token,'user']
+        ,'会計連携'=>['output_menu.php?csrf_token='.$token,'kaikei']
+        ,'紹介者ID'=>['shoukai.php?csrf_token='.$token,'shoukai']
         //,'ヘルプ'=>['help_menu.php']
     ];
     
@@ -202,9 +199,9 @@ if($action=="logout"){
     
     if(EXEC_MODE!="Trial"){
         if($plan==0){
-            $array2 = ["本契約"=>[PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path]];
+            $array2 = ["本契約"=>[PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku']];
         }else{
-            $array2 = ['契約解除へ'=>['sub_cancel.php']];
+            $array2 = ['契約解除へ'=>['sub_cancel.php','kaijo']];
         }
     }else{
         $array2=array();
@@ -212,14 +209,15 @@ if($action=="logout"){
     $i=0;
     echo "<div class='row'>";
 	foreach(array_merge($array,$array2) as $key=>$vals){
-        echo "  <div class ='col-md-3 col-sm-6 col-6 menu menu_".$i."' style='padding:5px;'>\n";
-        if($i==0){//通常レジ
+        //echo "  <div class ='col-md-3 col-sm-6 col-6 menu menu_".$i."' style='padding:5px;'>\n";
+        echo "  <div class ='col-md-3 col-sm-6 col-6 menu menu_".$vals[1]."' style='padding:5px;'>\n";
+        if($vals[1]=="rez"){//通常レジ
             echo "      <button class='btn--topmenu btn-view' onClick=postFormRG('".$vals[0]."','evrez','".$token."')>".$key."</button>\n";
-        }else if($i==1){//個別売り
+        }else if($vals[1]=="k_rez"){//個別売り
             echo "      <button class='btn--topmenu btn-view' onClick=postFormRG('".$vals[0]."','kobetu','".$token."')>".$key."</button>\n";
-        }/*else if($i==4){//在庫登録
+        }else if($vals[1]=="z_rez"){//在庫登録
             echo "      <button class='btn--topmenu btn-view' onClick=postFormRG('".$vals[0]."','shuppin_zaiko','".$token."')>".$key."</button>\n";
-        }*/else{
+        }else{
             echo "      <a href='".$vals[0]."' class='btn--topmenu btn-view'>".$key."</a>\n";
         }
         echo "  </div>\n";
@@ -391,7 +389,7 @@ if($action=="logout"){
         title: `<p class='tour_header'>チュートリアル</p>`,
         text: `<p class='tour_discription'>「商品登録」ボタンをタップしてください。</p>`,
         attachTo: {
-            element: '.menu_2',
+            element: '.menu_s_tou',
             on: 'bottom'
         },
         cancelIcon:{
@@ -424,7 +422,7 @@ if($action=="logout"){
         title: `<p class='tour_header'>チュートリアル</p>`,
         text: `<p class='tour_discription'>「レジ」ボタンをタップしてください。</p>`,
         attachTo: {
-            element: '.menu_0',
+            element: '.menu_rez',
             on: 'bottom'
         },
         cancelIcon:{
@@ -460,7 +458,7 @@ if($action=="logout"){
         title: `<p class='tour_header'>チュートリアル</p>`,
         text: `<p class='tour_discription'>「売上実績」ボタンをタップしてください。</p>`,
         attachTo: {
-            element: '.menu_4',
+            element: '.menu_uri',
             on: 'bottom'
         },
         cancelIcon:{
@@ -496,7 +494,7 @@ if($action=="logout"){
         title: `<p class='tour_header'>チュートリアル</p>`,
         text: `<p class='tour_discription'>「商品一覧」ボタンをタップしてください。</p>`,
         attachTo: {
-            element: '.menu_3',
+            element: '.menu_s_itiran',
             on: 'bottom'
         },
         cancelIcon:{
