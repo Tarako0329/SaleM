@@ -303,7 +303,25 @@ if($MODE == "evrez" || $MODE == "kobetu"){
 }else if($MODE == "shuppin_zaiko"){//在庫登録
     $array = $_POST["ORDERS"];
     $sqlstr = "";
-
+    
+    //同日同イベントの在庫情報があったらクリアする（delete&insert)
+    $sqlstr = "select count(*) as cnt from Zaiko where uid=? and shuppindate=? and hokanbasho=?";
+    $stmt = $pdo_h->prepare($sqlstr);
+    
+    $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
+    $stmt->bindValue(2,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
+    $stmt->bindValue(3,  $_POST["EV"], PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if($row[0]["cnt"]!==0){
+        $sqlstr = "delete from Zaiko where uid=? and shuppindate=? and hokanbasho=?";
+        $stmt = $pdo_h->prepare($sqlstr);
+        $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
+        $stmt->bindValue(2,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
+        $stmt->bindValue(3,  $_POST["EV"], PDO::PARAM_INT);
+        $stmt->execute();
+    }
+    
     //在庫番号の取得
     $sqlstr = "select max(zaikoNO) as zaikoNO from Zaiko where uid=?";
     $stmt = $pdo_h->prepare($sqlstr);

@@ -125,38 +125,62 @@ if(0==0){
 if($mode=="select"){
     $wheresql="where uid = :user_id AND UriDate >= :UriDate AND UriDate <= :UriDateTo and concat(Event,TokuisakiNM) like :Event ";  //検索モーダル部
     $wheresql=$wheresql."AND UriDate like :UriDate2 AND UriageNO like :UriNO AND ShouhinCD like :shouhinCD ";    //絞り込み対応部
-    
-    if($Type=="rireki"){
-        //履歴明細取得
-        $sql = "select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData ".$wheresql." order by UriDate,Event,UriageNO";
-        $NextType=$Type;
-    }elseif($Type=="sum_items"){
-        //商品単位で集計
-        $sql = "select UriDate,'-' as UriageNO,Event,TokuisakiNM, ShouhinCD, ShouhinNM,0 as shuppin_su,sum(su) as su,0 as zan_su, tanka,sum(UriageKin) as UriageKin,sum(zei) as zei,sum(su*genka_tanka) as genka,sum(UriageKin-(su*genka_tanka)) as arari from UriageData ";
-        $sql = $sql.$wheresql." group by UriDate,Event,TokuisakiNM,ShouhinCD,ShouhinNM,tanka order by UriDate,Event,TokuisakiNM,ShouhinNM ";
-        //$sql = $sql."union all ";
+    for($i=0;$i<4;$i++){
+        if($Type=="rireki"){
+            //履歴明細取得
+            $sql = "select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData ".$wheresql." order by UriDate desc,Event,UriageNO";
+            $NextType=$Type;
+        }elseif($Type=="sum_items"){
+            //商品単位で集計
+            //$sql = "select UriDate,'-' as UriageNO,Event,TokuisakiNM, ShouhinCD, ShouhinNM,0 as shuppin_su,sum(su) as su,0 as zan_su, tanka,sum(UriageKin) as UriageKin,sum(zei) as zei,sum(su*genka_tanka) as genka,sum(UriageKin-(su*genka_tanka)) as arari from UriageData ";
+            //$sql = $sql.$wheresql." group by UriDate,Event,TokuisakiNM,ShouhinCD,ShouhinNM,tanka order by UriDate,Event,TokuisakiNM,ShouhinNM ";
+            $sql="select UriDate,UriageNO,Event,TokuisakiNM, ShouhinCD, ShouhinNM,shuppin_su,uri_su as su,zan_su, tanka,UriageKin,zei,genka,arari from UriageDataSummary ";
+            $sql = $sql.$wheresql."order by UriDate desc,Event,TokuisakiNM,ShouhinNM ";
+            
+            $NextType=$Type;
+        }elseif($Type=="sum_events"){
+            //イベント単位で集計
+            if($i==3){
+                //指定期間に実績がなかったらオール表示とする
+                $_SESSION["UriFrom"]="2000-01-01";
+                $_SESSION["UriTo"]="2099-12-31";
+            }
+            $sql = "select UriDate,'-' as UriageNO,Event,TokuisakiNM,'-' as ShouhinCD,'-' as ShouhinNM,0 as su,0 as tanka,sum(UriageKin) as UriageKin,sum(zei) as zei,sum(su*genka_tanka) as genka,sum(UriageKin-(su*genka_tanka)) as arari from UriageData ";
+            $sql = $sql.$wheresql." group by UriDate,Event,TokuisakiNM order by UriDate desc,Event,TokuisakiNM";
+            $NextType="rireki";
+        }
         
-        $NextType=$Type;
-    }elseif($Type=="sum_events"){
-        //イベント単位で集計
-        $sql = "select UriDate,'-' as UriageNO,Event,TokuisakiNM,'-' as ShouhinCD,'-' as ShouhinNM,0 as su,0 as tanka,sum(UriageKin) as UriageKin,sum(zei) as zei,sum(su*genka_tanka) as genka,sum(UriageKin-(su*genka_tanka)) as arari from UriageData ";
-        $sql = $sql.$wheresql." group by UriDate,Event,TokuisakiNM order by UriDate,Event,TokuisakiNM";
-        $NextType="rireki";
+        //削除した後に表示する履歴のwhere文をセッションに保存
+        $_SESSION["wheresql"]="where uid = :user_id AND UriDate >= '".$_SESSION["UriFrom"]."' AND UriDate <= '".$_SESSION["UriTo"]."' and concat(Event,TokuisakiNM) like '".$_SESSION["Event"]."' ";
+        $_SESSION["wheresql"]=$_SESSION["wheresql"]."AND UriDate like '".$_SESSION["Uridate2"]."' AND UriageNO like '".$_SESSION["UriNO"]."' AND ShouhinCD like '".$_SESSION["shouhinCD"]."' ";
+    
+        $stmt = $pdo_h->prepare( $sql );
+        $stmt->bindValue("UriDate", $_SESSION["UriFrom"], PDO::PARAM_STR);
+        $stmt->bindValue("UriDateTo", $_SESSION["UriTo"], PDO::PARAM_STR);
+        $stmt->bindValue("Event", $_SESSION["Event"], PDO::PARAM_STR);
+    
+        $stmt->bindValue("UriDate2", $_SESSION["Uridate2"], PDO::PARAM_STR);
+        $stmt->bindValue("UriNO", $_SESSION["UriNO"], PDO::PARAM_INT);
+        $stmt->bindValue("shouhinCD", $_SESSION["shouhinCD"], PDO::PARAM_INT);
+        
+        $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
+        $rtn=$stmt->execute();
+        if($rtn==false){
+            deb_echo("失敗した場合は不正値が渡されたとみなし、wheresqlを破棄<br>");
+            $_SESSION["wheresql"]="";
+        }
+        $result = $stmt->fetchAll();
+        $rowcnt = $stmt->rowCount();
+        if($rowcnt!==0){
+            break;
+        }else{
+            if($Type=="rireki"){
+                $Type="sum_items";
+            }elseif($Type=="sum_items"){
+                $Type="sum_events";
+            }
+        }
     }
-    
-    //削除した後に表示する履歴のwhere文をセッションに保存
-    $_SESSION["wheresql"]="where uid = :user_id AND UriDate >= '".$_SESSION["UriFrom"]."' AND UriDate <= '".$_SESSION["UriTo"]."' and concat(Event,TokuisakiNM) like '".$_SESSION["Event"]."' ";
-    $_SESSION["wheresql"]=$_SESSION["wheresql"]."AND UriDate like '".$_SESSION["Uridate2"]."' AND UriageNO like '".$_SESSION["UriNO"]."' AND ShouhinCD like '".$_SESSION["shouhinCD"]."' ";
-
-    $stmt = $pdo_h->prepare( $sql );
-    $stmt->bindValue("UriDate", $_SESSION["UriFrom"], PDO::PARAM_STR);
-    $stmt->bindValue("UriDateTo", $_SESSION["UriTo"], PDO::PARAM_STR);
-    $stmt->bindValue("Event", $_SESSION["Event"], PDO::PARAM_STR);
-
-    $stmt->bindValue("UriDate2", $_SESSION["Uridate2"], PDO::PARAM_STR);
-    $stmt->bindValue("UriNO", $_SESSION["UriNO"], PDO::PARAM_INT);
-    $stmt->bindValue("shouhinCD", $_SESSION["shouhinCD"], PDO::PARAM_INT);
-    
 }elseif($mode=="del"){
     //削除モード(確認)
     $btnm = "削　除";
@@ -166,6 +190,14 @@ if($mode=="select"){
     $stmt->bindValue("UriNO", $_SESSION["urino"], PDO::PARAM_INT);
     $stmt->bindValue("ShouhinCD", $_SESSION["cd"], PDO::PARAM_INT);
     //deb_echo($_SESSION["wheresql"]);
+    $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
+    $rtn=$stmt->execute();
+    if($rtn==false){
+        deb_echo("失敗した場合は不正値が渡されたとみなし、wheresqlを破棄<br>");
+        $_SESSION["wheresql"]="";
+    }
+    $result = $stmt->fetchAll();
+    //$rowcnt = $stmt->rowCount();
     
 }elseif($mode=="Updated" || $mode=="Update"){
     //更新対象・更新結果の表示
@@ -179,11 +211,19 @@ if($mode=="select"){
     $sql = "select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData ".$_SESSION["wheresql"]." order by UriageNO";
     //deb_echo($sql);
     $stmt = $pdo_h->prepare( $sql );
+    $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
+    $rtn=$stmt->execute();
+    if($rtn==false){
+        deb_echo("失敗した場合は不正値が渡されたとみなし、wheresqlを破棄<br>");
+        $_SESSION["wheresql"]="";
+    }
+    $result = $stmt->fetchAll();
+    //$rowcnt = $stmt->rowCount();
 }else{
     echo "想定外エラー";
     exit();
 }
-
+/*
 $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
 $rtn=$stmt->execute();
 if($rtn==false){
@@ -209,7 +249,7 @@ if($rowcnt==0){
     $result = $stmt->fetchAll();
     $msg="";
 }
-
+*/
 
 //税区分M取得
 $ZEIsql="select * from ZeiMS order by zeiKBN;";
@@ -387,20 +427,20 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
     <?php
         //アラート
         if($_SESSION["MSG"]!=""){
-            echo "<div class='container'><div class='row'><div class='col-12'><div style='padding:5px 40px;text-align:center;font-size:1.5rem;' id='alert-1' class='lead'></div></div></div></div>";
+            echo "<div class='container'><div class='row'><div class='col-12'><div style='padding:0px 40px;text-align:center;font-size:1.5rem;' id='alert-1' class='lead'></div></div></div></div>";
         }
         $_SESSION["MSG"]="";
         
     ?>
     <div style='overflow:auto;' id='uritable'>
-    <table class='table-striped table-bordered item_0 tour_uri1' style='margin-top:10px;white-space: nowrap;'>
+    <table class='table-striped table-bordered item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;white-space: nowrap;'>
         <thead >
             <tr>
                 <th scope='col' class='d-none d-sm-table-cell'>売上日</th><th scope='col' class='d-none d-sm-table-cell'>Event/顧客</th><th scope='col' style='width:2rem;'>No</th>
                 <th>商品</th>
-                <?php //if($Type=="sum_items"){echo "<th scope='col' style='width:3rem;'>出品数</th>";} ?>
+                <?php if($Type=="sum_items"){echo "<th scope='col' style='width:3rem;'>出品数</th>";} ?>
                 <th scope='col' style='width:3rem;'>売上数</th>
-                <?php //if($Type=="sum_items"){echo "<th scope='col' style='width:3rem;'>残数</th>";} ?>
+                <?php if($Type=="sum_items"){echo "<th scope='col' style='width:3rem;'>残数</th>";} ?>
                 <th scope='col' style='width:3rem;' class='d-none d-sm-table-cell'>単価</th>
                 <th scope='col' style='width:5rem;'>売上</th><th scope='col' style='width:4rem;'>税</th><th scope='col' style='width:5rem;'>原価</th>
                 <th scope='col' style='width:5rem;'>粗利</th>
@@ -412,18 +452,21 @@ $Goukei=0;
 $GoukeiZei=0;
 $GoukeiZeikomi=0;
 $uridate="";
+
+$colspan=($Type=="sum_items"?"10":8);
+
 foreach($result as $row){
     if($uridate!=$row["UriDate"].$row["Event"]){
-        echo "<tr class='tr_stiky'><td colspan='8' class='d-sm-none tr_stiky'><a href='UriageData_Correct.php?mode=select&ad1=".rot13encrypt2($row["UriDate"])."&Type=".$NextType."&csrf_token=".$csrf_create."'> 売上日：".$row["UriDate"]."</a> ";
+        echo "<tr class='tr_stiky'><td colspan='".$colspan."' class='d-sm-none tr_stiky'><a href='UriageData_Correct.php?mode=select&ad1=".rot13encrypt2($row["UriDate"])."&Type=".$NextType."&csrf_token=".$csrf_create."'> 売上日：".$row["UriDate"]."</a> ";
         echo "<a href='UriageData_Correct.php?mode=select&ad2=".rot13encrypt2($row["Event"].$row["TokuisakiNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>『".$row["Event"].$row["TokuisakiNM"]."』</a></td></tr>\n";
     }
     echo "<tr><td class='d-none d-sm-table-cell'><a href='UriageData_Correct.php?mode=select&ad1=".rot13encrypt2($row["UriDate"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["UriDate"]."</a></td>";
     echo "<td class='d-none d-sm-table-cell'><a href='UriageData_Correct.php?mode=select&ad2=".rot13encrypt2($row["Event"].$row["TokuisakiNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["Event"].$row["TokuisakiNM"]."</a></td>";
     echo "<td class='text-center'><a href='UriageData_Correct.php?mode=select&ad3=".rot13encrypt2($row["UriageNO"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["UriageNO"]."</a></td>";
     echo "<td><a href='UriageData_Correct.php?mode=select&ad4=".rot13encrypt2($row["ShouhinCD"])."&ad5=".rot13encrypt2($row["ShouhinNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".($row["ShouhinNM"])."</a></td>";
-    //if($Type=="sum_items"){echo "<td class='text-right'>".$row["shuppin_su"]."</td>";}
+    if($Type=="sum_items"){echo "<td class='text-right'>".$row["shuppin_su"]."</td>";}
     echo "<td class='text-right'>".$row["su"]."</td>";
-    //if($Type=="sum_items"){echo "<td class='text-right'>".$row["zan_su"]."</td>";}
+    if($Type=="sum_items"){echo "<td class='text-right'>".$row["zan_su"]."</td>";}
     echo "<td class='text-right d-none d-sm-table-cell'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td>";
     echo "<td class='text-right'>".$row["zei"]."</td><td class='text-right'>".$row["genka"]."</td><td class='text-right'>".$row["arari"]."</td>\n<td>";
     if(($Type=="rireki") && ($mode == "select") || ($mode == "Updated")){
@@ -461,7 +504,7 @@ if($mode=="Update" || $mode=="del"){
     <input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
     <input type='hidden' name='mode' value='Update'>
     <div >
-        <table class='tour_uri3'>
+        <table class='tour_uri3' style='width:90%;max-width:370px;'>
         <tr>
             <td><input type='checkbox' name='chk_uridate' id='chk_uridate'></td>
             <td>売上日</td>
@@ -669,6 +712,7 @@ if($mode=="Update" || $mode=="del"){
     }
 
     var update_areas=document.getElementsByClassName('update_areas');
+    var common_footer=document.getElementsByClassName('common_footer');
     var mode_switch=document.getElementById('switch1');
     var body=document.getElementById('body');
     var uritable=document.getElementById('uritable');
@@ -676,17 +720,22 @@ if($mode=="Update" || $mode=="del"){
     //mode_switch.onclick = function (){
     var chang_mode = function(){
         let wh = window.innerHeight;//ブラウザの縦サイズ取得
-        var normal_vw = wh - 105 - 80;
-        var update_vw = wh - 105 - 340;
+        
+        //ヘッダとフッタ分をマイナスして縦幅を算出
+        var normal_vw = wh - 105 - 120;
+        var update_vw = wh - 105 - 300;
+        console.log('full:' + wh +' normal:' + normal_vw + ' update_vw:' + update_vw);
         if(mode_switch.checked==true && mode_switch.readOnly == false){
             update_areas[0].style.display='block';
+            common_footer[0].style.display='none';
             //[1].style.display='block';
             body.style.paddingBottom='330px';
             uritable.style.height=update_vw +'px';
         }else{
             update_areas[0].style.display='none';
+            common_footer[0].style.display='flex';
             //update_areas[1].style.display='none';
-            body.style.paddingBottom='70px';
+            body.style.paddingBottom='100px';
             uritable.style.height= normal_vw +'px';
         }
     }

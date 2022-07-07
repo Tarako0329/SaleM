@@ -28,7 +28,7 @@ if(EXEC_MODE=="Test"){
     error_reporting( E_ALL );
 }else{
     //本番はリリースした日を指定
-    $time="20220706";
+    $time="20220707";
     //$time=date('Ymd');
     error_reporting( E_ALL & ~E_NOTICE );
 }

@@ -8,23 +8,6 @@ INPUT{
     height:20px;
 }
 
-.common_footer{
-    background: var(--footer-color);
-    height: 60px; 
-    position: fixed; 
-    bottom: 0;
-    Right: 0;
-    width: 100%;
-    display: flex;    
-    font-size:1.8rem;
-    z-index: 101;
-    border-top:var(--rez-border-top);
-    border-top-width:thin;
-    border-left:none;
-    border-right:none;
-    border-bottom:none;
-    border-color:var(--rez-border-color);
-}
 .footer_update_area{
     position: fixed; /* ウィンドウを基準に画面に固定 */
     height: 290px;
@@ -33,7 +16,7 @@ INPUT{
     padding-left:10px;
     padding-bottom:10px;
     width: 100%;
-    z-index: 101;
+    /*z-index: 101;*/
     background:#fff;
 }
 .header_menu{
@@ -63,6 +46,23 @@ th{
     top:33px;
     background:#C3E5FF;
 }
+.common_footer{
+    background: var(--footer-color);
+    height: 60px; 
+    position: fixed; 
+    bottom: 0;
+    Right: 0;
+    width: 100%;
+    display: flex;    
+    font-size:1.8rem;
+    z-index: 100;
+    border-top:var(--rez-border-top);
+    border-top-width:thin;
+    border-left:none;
+    border-right:none;
+    border-bottom:none;
+    border-color:var(--rez-border-color);
+}
 .kaikei{
     width:70%;
     height:100%;
@@ -76,6 +76,7 @@ th{
     max-width:250px;
     height:100%;
     text-align:center;
+    z-index: 101;
 }
 .btn--chk {
     /*確認ボタン*/
@@ -96,7 +97,7 @@ th{
         height: 80px; /* 高さを70pxに指定 */
     }
     .common_body {
-        padding-bottom:90px; /*フッターーの後ろに要素が隠れないようにするため */
+        padding-bottom:100px; /*フッターーの後ろに要素が隠れないようにするため */
     }
 }
 

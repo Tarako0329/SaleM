@@ -237,11 +237,13 @@ function rot13decrypt ($str) {
 
 function rot13encrypt2 ($str) {
 	//暗号化
-    return str_rot13(base64_encode($str));
+    //return str_rot13(base64_encode($str)); 復号化するときに文字化けが発生したので変更
+    return bin2hex(openssl_encrypt($str, 'AES-128-ECB', null));
 }
 function rot13decrypt2 ($str) {
 	//暗号化解除
-    return base64_decode(str_rot13($str));
+    //return base64_decode(str_rot13($str)); 復号化するときに文字化けが発生したので変更
+    return openssl_decrypt(hex2bin($str), 'AES-128-ECB', null);
 }
 
 // =========================================================
