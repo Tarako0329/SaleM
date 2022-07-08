@@ -14,6 +14,9 @@ csrf_chk()                              ：COOKIE・SESSION・POSTのトーク�
 csrf_chk_nonsession()                   ：COOKIE・POSTのトークンチェック。
 csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェック。
 csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
+
+チュートリアル
+start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステータス(finish;完了,save;保存(次回途中から始まる),'空白：$_SESSION["tour"]にnewで指定しtourNameをセット)'
 */
 
 require "php_header.php";
@@ -42,9 +45,6 @@ if($action=="color_change"){
     $stmt->bindValue(5, $color_No, PDO::PARAM_STR);
     $stmt->execute();
 }
-
-
-
 
 if($action=="logout"){
     $_SESSION = array();// セッション変数を全て解除する
@@ -109,8 +109,29 @@ if($action=="logout"){
     }else{
         $user=$row[0]["mail"];
     }
+
+    
+    //新機能リリース通知
+    $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.new_releace_001') as ToursLog FROM Users WHERE uid=?";
+    $stmt = $pdo_h->prepare($sqlstr);
+    $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    //deb_echo($row[0]["ToursLog"]);
+    if(empty($row[0]["ToursLog"])){
+        //新機能リリース通知 未確認
+        $bell_action="blink";
+        $bell_size="fa-2x";
+    }else{
+        //新機能リリース通知 確認済み
+        $bell_action="";
+        $bell_size="fa-lg";
+    }
+
 }
 ?>
+
+
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
@@ -130,7 +151,7 @@ if($action=="logout"){
     ?>
         <div class='yagou title'><a href='menu.php'><?php echo $title;?></a></div>
         <div class='user_disp'>LogIn：<?php echo $user; ?></div>
-        <div style='position:fixed;top:0;right:0;'><a href='menu.php?action=logout'><i class='fa-solid fa-right-from-bracket fa-lg logoff-color'></i></a></div>
+        <div style='position:fixed;top:3px;right:3px;'><a href='menu.php?action=logout'><i class='fa-solid fa-right-from-bracket fa-lg logoff-color'></i></a></div>
     <?php
     }else{
     ?>
@@ -138,7 +159,11 @@ if($action=="logout"){
     <?php
     }
     ?>
-    
+    <div class='<?php echo $bell_action;?> logoff-color' style='position:fixed;top:40px;right:5px;'>
+        <a href="#" style='color:inherit;' onclick='new_releace_start()'>
+            <i class="fa-regular fa-bell <?php echo $bell_size;?> logoff-color"></i>
+        </a>
+    </div>
 </header>
 
 <body class='common_body' >
@@ -258,6 +283,7 @@ if($action=="logout"){
             $_SESSION["tour"]=$row[0]["tutorial"];
         }
     }
+    
 ?>
 <script src="shepherd/shepherd.min.js?<?php echo $time; ?>"></script>
 <link rel="stylesheet" href="shepherd/shepherd.css?<?php echo $time; ?>"/>
@@ -511,10 +537,59 @@ if($action=="logout"){
     }else　if(TourMilestone=="tutorial_10"){
         tutorial_11.start(tourFinish,'tutorial','');    
     }
+    
+</script>
+<!--チュートリアル以外のヘルプ・出品在庫-->
+<script>
+    const shuppin_zaiko_help1 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'shuppin_zaiko_help1'
+    });
+    shuppin_zaiko_help1.addStep({
+        title: `<p class='tour_header'>出品在庫機能</p>`,
+        text: `<p class='tour_discription'>出品在庫機能をリリースしました。</p>`,
+        buttons: [
+            {
+                text: 'Next',
+                action: shuppin_zaiko_help1.nextAndSave
+            }
+        ],
+        cancelIcon:{
+            enabled:false
+        }
+    });
+    shuppin_zaiko_help1.addStep({
+        title: `<p class='tour_header'>出品在庫機能</p>`,
+        text: `<p class='tour_discription'>各イベントの出品数を登録できます。
+                <br>出品数を登録する事で、完売したのか、何が売れ残ったのかを把握できます。
+                <br>また、イベント終了時の在庫確認・レジ打ち漏れの確認も簡単になります。</p>`,
+       attachTo: {
+            element: '.menu_z_rez',
+            on: 'auto'
+        },
+        cancelIcon:{
+            enabled:false
+        }
+    });
+    function shuppin_zaiko_help_start(){
+        //start(ajax関数名(固定値),ツアー名称(チュートリアル等),ステータス(finish;完了,save;保存(次回途中から始まる),'空白：$_SESSION["tour"]にnewで指定しtourNameをセット)'
+        shuppin_zaiko_help1.start(tourFinish,'',''); 
+    }
+    function new_releace_start(){
+        //新機能のリリース通知はこの関数で呼び出すツアーを更新する
+        shuppin_zaiko_help1.start(tourFinish,'new_releace_001',''); 
+    }
 </script>
 <!--pwa対応部-->
 <script>
-/*  //PWA対応
+/*  //PWA対応 オフライン対応メニュー以外を非表示にする
     var menu = document.getElementsByClassName("menu");   //全メニュー
     if(navigator.onLine){
         alert('on-line');

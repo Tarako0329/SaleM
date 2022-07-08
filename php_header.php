@@ -23,12 +23,12 @@ define("EXEC_MODE",$_ENV["EXEC_MODE"]);
 
 if(EXEC_MODE=="Test"){
     //テスト環境はミリ秒単位
-    $time="3";
+    $time="4";
     //$time=date('Ymd-His');
     error_reporting( E_ALL );
 }else{
     //本番はリリースした日を指定
-    $time="20220707";
+    $time="20220708";
     //$time=date('Ymd');
     error_reporting( E_ALL & ~E_NOTICE );
 }

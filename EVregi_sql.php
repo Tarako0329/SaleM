@@ -265,8 +265,6 @@ if($MODE == "evrez" || $MODE == "kobetu"){
             file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,COMMIT,success,売上No".$UriageNO."\n",FILE_APPEND);
             
             $_SESSION["msg"]="売上が登録されました。（売上№：".$UriageNO."）";
-            //header("HTTP/1.1 301 Moved Permanently");
-            //header("Location: EVregi.php?status=success&mode=".$_POST["mode"]."&csrf_token=".$token);
             $_SESSION["status"]="success";
             header("Location: EVregi.php?mode=".$MODE,true,308);
             
@@ -304,47 +302,48 @@ if($MODE == "evrez" || $MODE == "kobetu"){
     $array = $_POST["ORDERS"];
     $sqlstr = "";
     
-    //同日同イベントの在庫情報があったらクリアする（delete&insert)
-    $sqlstr = "select count(*) as cnt from Zaiko where uid=? and shuppindate=? and hokanbasho=?";
-    $stmt = $pdo_h->prepare($sqlstr);
-    
-    $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
-    $stmt->bindValue(2,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
-    $stmt->bindValue(3,  $_POST["EV"], PDO::PARAM_INT);
-    $stmt->execute();
-    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    if($row[0]["cnt"]!==0){
-        $sqlstr = "delete from Zaiko where uid=? and shuppindate=? and hokanbasho=?";
+    try{
+        $pdo_h->beginTransaction();
+
+        //同日同イベントの在庫情報があったらクリアする（delete&insert)
+        $sqlstr = "select count(*) as cnt from Zaiko where uid=? and shuppindate=? and hokanbasho=?";
         $stmt = $pdo_h->prepare($sqlstr);
+        
         $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
         $stmt->bindValue(2,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
         $stmt->bindValue(3,  $_POST["EV"], PDO::PARAM_INT);
         $stmt->execute();
-    }
+        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        if($row[0]["cnt"]!==0){
+            $sqlstr = "delete from Zaiko where uid=? and shuppindate=? and hokanbasho=?";
+            $stmt = $pdo_h->prepare($sqlstr);
+            $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
+            $stmt->bindValue(2,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
+            $stmt->bindValue(3,  $_POST["EV"], PDO::PARAM_INT);
+            $stmt->execute();
+        }
+        
+        //在庫番号の取得
+        $sqlstr = "select max(zaikoNO) as zaikoNO from Zaiko where uid=?";
+        $stmt = $pdo_h->prepare($sqlstr);
+        $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+        $stmt->execute();
+        
+        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if(is_null($row[0]["zaikoNO"])){
+            //初回登録時は在庫NO[1]をセット
+            $zaikoNO = 1;
+        }else{
+            $zaikoNO = $row[0]["zaikoNO"]+1;
+        }
+        //echo (string)$UriageNO;
     
-    //在庫番号の取得
-    $sqlstr = "select max(zaikoNO) as zaikoNO from Zaiko where uid=?";
-    $stmt = $pdo_h->prepare($sqlstr);
-    $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-    $stmt->execute();
-    
-    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    if(is_null($row[0]["zaikoNO"])){
-        //初回登録時は在庫NO[1]をセット
-        $zaikoNO = 1;
-    }else{
-        $zaikoNO = $row[0]["zaikoNO"]+1;
-    }
-    //echo (string)$UriageNO;
-    
-    try{
-        $pdo_h->beginTransaction();
         $sqlstr = "insert into Zaiko(uid,sousa,shuppindate,zaikoNO,hokanbasho,shouhinCD,shouhinNM,su,genka_tanka) values(?,'entry',?,?,?,?,?,?,?)";
         foreach($array as $row){
             if($row["SU"]==0){
                 continue;
             }
-            //$sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime,genka_tanka) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)";
             $stmt = $pdo_h->prepare($sqlstr);
     
             $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
@@ -360,30 +359,27 @@ if($MODE == "evrez" || $MODE == "kobetu"){
             
             if($flg){
             }else{
-                $emsg="在庫登録のINSERTでエラー";
+                //1件でも失敗したらロールバック
+                $pdo_h->rollBack();
+                
+                $emsg=$emsg."/在庫登録のinsert処理が失敗し、rollBackが発生しました。";
+                $stmt = null;
+                $pdo_h = null;
+                //exit();
                 $E_Flg=1;
                 break;
             }
         }
-        if($E_Flg==0){
+        
+        if($E_Flg===0){
             $pdo_h->commit();
-            $_SESSION["msg"]="在庫が登録されました。（在庫№：".$UriageNO."）";
-            //header("HTTP/1.1 301 Moved Permanently");
-            //header("Location: EVregi.php?status=success&mode=".$_POST["mode"]."&csrf_token=".$token);
+            $_SESSION["msg"]="在庫が登録されました。（在庫№：".$zaikoNO."）";
             $_SESSION["status"]="success";
             header("Location: EVregi.php?mode=".$MODE,true,308);
-
             $stmt = null;
             $pdo_h = null;
             exit();
         }else{
-            //1件でも失敗したらロールバック
-            $pdo_h->rollBack();
-            
-            $emsg=$emsg."/insert処理が失敗し、rollBackが発生しました。";
-            $stmt = null;
-            $pdo_h = null;
-            //exit();
         }
     }catch (Exception $e) {
         $pdo_h->rollBack();
@@ -401,9 +397,11 @@ if($MODE == "evrez" || $MODE == "kobetu"){
     }
     
     
+    
 }else if($_POST["commit_btn"] == "stock_zaiko_commit"){//在庫登録
   //  
 }
+
 if($E_Flg==1){
     $_SESSION["msg"]= "登録が失敗しました。再度実行してもエラーとなる場合は、ご迷惑をおかけしますが復旧までお待ちください。エラーは管理者へ自動通知されました。";
     $emsg = $emsg."/UriNO::".$UriageNO."　uid::".$_SESSION['user_id'];
@@ -412,9 +410,7 @@ if($E_Flg==1){
 
 $stmt = null;
 $pdo_h = null;
-//Failure
-//header("HTTP/1.1 301 Moved Permanently");
-//header("Location: EVregi.php?status=failed&mode=".$_POST["mode"]."&csrf_token=".$token);
+
 $_SESSION["status"]="failed";
 header("Location: EVregi.php?mode=".$MODE,true,308);
 

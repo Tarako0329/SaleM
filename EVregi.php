@@ -22,16 +22,19 @@ $rtn=check_session_userid($pdo_h);
 $logfilename="sid_".$_SESSION['user_id'].".log";
 //file_put_contents("sql_log/".$logfilename,$log_time.",REFERER:".$_SERVER['HTTP_REFERER']."\n",FILE_APPEND);
 
+$status=(!empty($_SESSION["status"])?$_SESSION["status"]:"");
+$_SESSION["status"]="";
+
 if(EXEC_MODE!=""){
 //file_put_contents("sql_log/".$logfilename,$log_time.",cookie :".$_COOKIE['csrf_token']."\n",FILE_APPEND);
 //file_put_contents("sql_log/".$logfilename,$log_time.",post   :".$_POST['csrf_token']."\n",FILE_APPEND);
 //file_put_contents("sql_log/".$logfilename,$log_time.",session:".$_SESSION['csrf_token']."\n",FILE_APPEND);
 //if(!empty($_POST)){
     if(csrf_chk_nonsession()==false){//POST:COOKIEチェック
-        if(!empty($_SESSION["status"]) && ROOT_URL."EVregi.php"==substr($_SERVER['HTTP_REFERER'],0,strlen(ROOT_URL."EvRegi.php"))){
+        if(!empty($status) && ROOT_URL."EVregi.php"==substr($_SERVER['HTTP_REFERER'],0,strlen(ROOT_URL."EvRegi.php"))){
             //リファイラが自身でかつstatusがセットされてる場合、問題なし
-        }else if($_SESSION["status"]=="longin_redirect"){
-            $_SESSION["status"]="";
+        }else if($status=="longin_redirect"){
+            //$_SESSION["status"]="";
         }else{
             $_SESSION["EMSG"]="セッションが正しくありませんでした。".$_POST["csrf_token"];
             header("HTTP/1.1 301 Moved Permanently");
@@ -164,14 +167,6 @@ if($categoly==0){
 }
     
 //商品M取得
-/*
-if($RG_MODE=="shuppin_zaiko"){
-    //イベントレジモード以外はすべて表示する
-    $sql = "select *,".$sql_select." from ShouhinMS where uid = ? ".$sqlorder;
-}else{
-    $sql = "select *,".$sql_select." from ShouhinMS where hyoujiKBN1='on' and uid = ? ".$sqlorder;
-}
-*/
 $sql = "select *,".$sql_select." from ShouhinMS where uid = ? ".$sqlorder;
 
 $stmt = $pdo_h->prepare($sql);
@@ -487,12 +482,12 @@ window.onload = function() {
         echo "</body></html>";
         exit();
     }
-    if($_SESSION["status"]=="success"){
+    if($status=="success"){
         echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-s' class='lead'></div></div></div></div>";
-    }elseif($_SESSION["status"]=="failed"){
+    }elseif($status=="failed"){
         echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-e' class='lead'></div></div></div></div>";
     }
-    $_SESSION["status"]="";
+    //$_SESSION["status"]="";
 ?>
     <div class="container-fluid">
         <div class='item_11 item_12'>
@@ -537,9 +532,14 @@ window.onload = function() {
 	        $bunrui=$row["categoly"];
 	        $now=$now+1;
 	    }
-
-	    $disp=($row["hyoujiKBN1"]=="on"?"show_items":"");
-	    $style=($row["hyoujiKBN1"]=="on"?"":" style='display:none' ");
+        if($RG_MODE=="shuppin_zaiko"){
+            //在庫登録モードは全メニュー表示
+	        $disp="show_items";
+	        $style="";
+        }else{
+	        $disp=($row["hyoujiKBN1"]=="on"?"show_items":"");
+	        $style=($row["hyoujiKBN1"]=="on"?"":" style='display:none' ");
+        }
 	    
         echo "  <div class ='col-md-3 col-sm-6 col-6 items ".$disp."' ".$style." id='items_".$row["shouhinCD"]."'>\n";
         echo "      <button type='button' class='btn-view btn--rezi' id='btn_menu_".$row["shouhinCD"]."'>".rot13decrypt($row["shouhinNM"])."\n";
@@ -844,50 +844,6 @@ window.onload = function() {
             }
         ]
     });
-    /*
-    tutorial_5.addStep({
-        title: `<p class='tour_header'>チュートリアル</p>`,
-        text: `<p class='tour_discription'>お釣り計算機です。<br><br>（表示されてない場合は[BACK]を押して釣銭ボタンを押してください。</p>`,
-        buttons: [
-            {
-                text: 'back',
-                action: tutorial_5.back
-            },
-            {
-                text: 'Next',
-                action: tutorial_5.next
-            }
-        ]
-    });
-    tutorial_5.addStep({
-        title: `<p class='tour_header'>チュートリアル</p>`,
-        text: `<p class='tour_discription'>受取金額を入力して「計算」ボタンを押すとお釣りが表示されます。<br><br>ここでは計算するだけで、何も登録されません。</p>`,
-        attachTo: {
-            element: '.item_6',
-            on: 'auto'
-        },
-        buttons: [
-            {
-                text: 'Next',
-                action: tutorial_5.next
-            }
-        ]
-    });
-    tutorial_5.addStep({
-        title: `<p class='tour_header'>チュートリアル</p>`,
-        text: `<p class='tour_discription'>「閉じる」ボタンを押すか、枠外をタップすると前の画面に戻ります。</p>`,
-        attachTo: {
-            element: '.item_7',
-            on: 'top'
-        },
-        buttons: [
-            {
-                text: 'Next',
-                action: tutorial_5.next
-            }
-        ]
-    });
-    */
     tutorial_5.addStep({
         title: `<p class='tour_header'>チュートリアル</p>`,
         text: `<p class='tour_discription'>「クリア」ボタンを押すと、全ての数量を０にクリアします。</p>`,
@@ -972,26 +928,6 @@ window.onload = function() {
             }
         ]
     });
-    /*
-    tutorial_5.addStep({
-        title: `<p class='tour_header'>チュートリアル</p>`,
-        text: `<p class='tour_discription'>「割引・割増」ボタンが表示されてない場合、下の「確認」ボタンを押してください。</p>`,
-        attachTo: {
-            element: '.item_9',
-            on: 'top'
-        },
-        buttons: [
-            {
-                text: 'Back',
-                action: tutorial_5.back
-            },
-            {
-                text: 'Next',
-                action: tutorial_5.next
-            }
-        ]
-    });
-    */
     tutorial_5.addStep({
         title: `<p class='tour_header'>チュートリアル</p>`,
         text: `<p class='tour_discription'>「割引・割増」ボタンをタップしてください。
@@ -1092,9 +1028,6 @@ window.onload = function() {
             }
         ]
     });
-
-
-
 
 
     const tutorial_6 = new Shepherd.Tour({
@@ -1252,6 +1185,140 @@ window.onload = function() {
     }
     
 
+</script>
+<script>
+  
+    const shuppin_zaiko_help2 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: false,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'shuppin_zaiko_help2'
+    });
+    shuppin_zaiko_help2.addStep({
+        title: `<p class='tour_header'>出品在庫機能</p>`,
+        text: `<p class='tour_discription'>在庫の登録画面はレジ画面とほぼ同じです。</p>`,
+        buttons: [
+            {
+                text: 'Next',
+                action: shuppin_zaiko_help2.next
+            }
+        ]
+    });
+    shuppin_zaiko_help2.addStep({
+        title: `<p class='tour_header'>出品在庫機能</p>`,
+        text: `<p class='tour_discription'>イベント等の出店日を指定します。</p>`,
+        attachTo: {
+            element: '.item_1',
+            on: 'auto'
+        },
+        buttons: [
+            {
+                text: 'Next',
+                action: shuppin_zaiko_help2.next
+            }
+        ]
+    });
+    shuppin_zaiko_help2.addStep({
+        title: `<p class='tour_header'>出品在庫機能</p>`,
+        text: `<p class='tour_discription'>出店予定のイベント名を入力します。</p>`,
+        attachTo: {
+            element: '.item_2',
+            on: 'bottom'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: shuppin_zaiko_help2.back
+            },
+            {
+                text: 'Next',
+                action: shuppin_zaiko_help2.next
+            }
+        ]
+    });
+    shuppin_zaiko_help2.addStep({
+        title: `<p class='tour_header'>出品在庫機能</p>`,
+        text: `<p class='tour_discription'>後は通常のレジと同じ要領で、商品名を出品予定の数だけタップして、「確認」⇒「登録」と進みます。</p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: shuppin_zaiko_help2.back
+            },
+            {
+                text: 'Next',
+                action: shuppin_zaiko_help2.next
+            }
+        ]
+    });
+    shuppin_zaiko_help2.addStep({
+        title: `<p class='tour_header'>出品在庫機能（修正について）</p>`,
+        text: `<p class='tour_discription'>登録した内容が間違えていた場合、同じ日付・同じイベント名を入力し、全て打ち直して登録して下さい。
+                <br>すると、前回登録した内容は削除され、今回入力した内容が反映されます。</p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: shuppin_zaiko_help2.back
+            },
+            {
+                text: 'Next',
+                action: shuppin_zaiko_help2.next
+            }
+        ]
+    });
+    shuppin_zaiko_help2.addStep({
+        title: `<p class='tour_header'>出品在庫機能（削除について）</p>`,
+        text: `<p class='tour_discription'>登録した内容を削除したい場合、誤って登録した日付とイベント名を指定し、何も商品を選択せず、空で登録して下さい。</p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: shuppin_zaiko_help2.back
+            },
+            {
+                text: 'Next',
+                action: shuppin_zaiko_help2.next
+            }
+        ]
+    });
+    shuppin_zaiko_help2.addStep({
+        title: `<p class='tour_header'>出品在庫機能（登録結果について）</p>`,
+        text: `<p class='tour_discription'>登録した内容は「売上実績」画面を「商品集計」モードで表示すると、「出品数」という項目で確認することが出来ます。</p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: shuppin_zaiko_help2.back
+            },
+            {
+                text: 'Next',
+                action: shuppin_zaiko_help2.next
+            }
+        ]
+    });
+    shuppin_zaiko_help2.addStep({
+        title: `<p class='tour_header'>出品在庫機能</p>`,
+        text: `<p class='tour_discription'>出品在庫機能の説明は以上で終了です。</p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: shuppin_zaiko_help2.back
+            },
+            {
+                text: 'complete',
+                action: shuppin_zaiko_help2.complete
+            }
+        ]
+    });
+    
+    if(TourMilestone=="shuppin_zaiko_help1"){
+        shuppin_zaiko_help2.start(tourFinish,'new_releace_001','finish');
+    }
+    function help(){
+        shuppin_zaiko_help2.start(tourFinish,'','');
+    }
 </script>
 <script>
 function postFormRG(url,mode,CTGL) {
