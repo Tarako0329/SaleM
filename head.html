@@ -36,6 +36,7 @@
         	});
         }
         */
+        //alert("Are you ok?");
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('serviceworker.js')
                 .then(registration => {
@@ -51,6 +52,7 @@
                 .catch(err => {
                     // 登録失敗
                     console.log("Service Worker is Oops!!");
+                    alert("Service Worker is Oops!!");
             });
         }
 

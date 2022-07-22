@@ -14,8 +14,24 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
 
 $csrf_create = csrf_create();
 
+//デフォルトは登録順・降順
+if(!empty($_POST)){
+    $_SESSION["sort1"]=$_POST["sort1"];//並べ替え項目
+    $_SESSION["sort2"]=$_POST["sort2"];//昇順・降順
+}
+$sort1 =(!empty($_SESSION["sort1"])?$_SESSION["sort1"]:1);
+$sort2 =(!empty($_SESSION["sort2"])?$_SESSION["sort2"]:1);
+
 //商品マスタの取得
-$sql = "select * from ShouhinMS left join ZeiMS on ShouhinMS.zeiKBN=ZeiMS.zeiKBN where uid = ? order by shouhinCD";
+if($sort1==1){
+    $sql = "select * from ShouhinMS left join ZeiMS on ShouhinMS.zeiKBN=ZeiMS.zeiKBN where uid = ? order by shouhinCD";
+}else{
+    $sql = "select * from ShouhinMS left join ZeiMS on ShouhinMS.zeiKBN=ZeiMS.zeiKBN where uid = ? order by shouhinNM";
+}
+if($sort2==1){
+    $sql = $sql." desc";
+}
+
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
@@ -75,25 +91,37 @@ $ZKMS = $stmt2->fetchAll();
 
 <div class='header2'>
     <div>
-    画面を横にすると他の項目も表示されます。<br>
-    <div class='btn-group btn-group-toggle item_2' style='padding:0' data-toggle='buttons'>
-        <label class='btn btn-outline-primary active' style='font-size:1.2rem'>
-            <input type='radio' name='options' id='option1' value='zeikomi' onChange='zei_math_all()' autocomplete='off' checked> 税 込 入 力
-        </label>
-        <label class='btn btn-outline-primary' style='font-size:1.2rem'>
-            <input type='radio' name='options' id='option2' value='zeinuki' onChange='zei_math_all()' autocomplete='off'> 税 抜 入 力
-        </label>
+        <div class='btn-group btn-group-toggle item_2' style='padding:0' data-toggle='buttons'>
+            <label class='btn btn-outline-primary active' style='font-size:1.2rem'>
+                <input type='radio' name='options' id='option1' value='zeikomi' onChange='zei_math_all()' autocomplete='off' checked> 税込入力
+            </label>
+            <label class='btn btn-outline-primary' style='font-size:1.2rem'>
+                <input type='radio' name='options' id='option2' value='zeinuki' onChange='zei_math_all()' autocomplete='off'> 税抜入力
+            </label>
+        </div>
     </div>
-    </div>
-    <div>
-        <select id='hyouji' class='hyouji item_0'>
-            <option value='0' selected>全て表示</option>
-            <option value='1'>チェック</option>
-            <option value='2'>未チェック</option>
-        </select>
+    <div class='dipstyl' style='position:fixed;right:10px;'>
+        <div>
+            <select id='hyouji' class='form-control item_0'>
+                <option value='0' selected>全て表示</option>
+                <option value='1'>チェック</option>
+                <option value='2'>未チェック</option>
+            </select>
+        </div>
+        <div >
+            <form method='post' id='form2' action='shouhinMSList.php' style='display:flex;margin-left:5px;' class='item_01'>
+            <select class='form-control' id='sort' name='sort1' style='margin-bottom:5px;' onchange='send()'>
+                <option value='1' <?php echo ($sort1==1?"selected":"");?> >登録順</option>
+                <option value='2' <?php echo ($sort1==2?"selected":"");?> >名称順</option>
+            </select>
+            <button class='btn btn-primary' style='height:25px;padding:0px 10px;font-size:1.2rem;margin-top:0px;margin-left:5px;' type='submit' name='sort2' value='<?php if($sort2==1){echo "2";}else{echo "1";} ?>'>
+                <?php if($sort2==1){echo "▼";}else{echo "▲";} ?>
+            </button>
+            </form>
+        </div>
     </div>
     <?php if(empty($_SESSION["tour"])){?>
-    <a href="#" style='color:inherit;position:fixed;top:72px;right:5px;' onclick='help()'><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>
+    <a href="#" style='color:inherit;position:fixed;top:42px;right:5px;' onclick='help()'><i class="fa-regular fa-circle-question fa-lg logoff-color"></i></a>
     <?php }?>
 </div>
 
@@ -110,27 +138,27 @@ $ZKMS = $stmt2->fetchAll();
     <input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
 
     
-    <table class='table-striped item_1'>
+    <table class='table-striped item_1 '>
         <thead>
             <tr style='height:30px;'>
                 <th class='th1' scope='col' colspan='12' style='width:auto;padding:0px 5px 0px 0px;'>ID:商品名</th><th scope='col'>
             </tr>
             <tr style='height:30px;'>
-            <!--<th scope='col' style='width:2rem;padding:0;'>ID</th><th scope='col' style='width:auto;padding:0px 5px 0px 0px;'>商品名</th><th scope='col'>単価<br>変更</th><th scope='col' style='color:red;'>単価<br>(税抜)</th><th scope='col' >税区分</th>-->
             <th scope='col'>単価変更</th><th scope='col' style='color:red;'>単価(税抜)</th><th scope='col' >税区分</th>
-            <th scope='col' style='color:red;'>消費税</th><th scope='col'>原価</th><th scope='col' class='d-none d-sm-table-cell'>内容量</th><th scope='col' class='d-none d-sm-table-cell'>単位</th><th scope='col' class='d-none d-sm-table-cell'>分類1</th>
-            <th scope='col' class='d-none d-sm-table-cell'>分類2</th><th scope='col' class='d-none d-sm-table-cell'>分類3</th><th scope='col'>レジ</th><th scope='col' class='d-none d-sm-table-cell'>並順</th><th class='d-none d-sm-table-cell' style='width:4rem;'></th>
+            <th scope='col' style='color:red;'>消費税</th><th scope='col'>原価</th><th scope='col' class='d-none d-sm-table-cell'>内容量</th><th scope='col' class='d-none d-sm-table-cell'>単位</th>
+            <th scope='col' class='d-none d-sm-table-cell' style='padding-left:5px;'>分類1</th><th scope='col' class='d-none d-sm-table-cell' style='padding-left:5px;'>分類2</th><th scope='col' class='d-none d-sm-table-cell' style='padding-left:5px;'>分類3</th>
+            <th scope='col'>レジ</th><!--<th scope='col' class='d-none d-sm-table-cell'>並順</th>--><th class='d-none d-sm-table-cell' style='width:4rem;'></th>
             </tr>
             
         </thead>
-        <tbody>
+        <tbody id='tbody1'>
 <?php    
 $i=0;
 foreach($stmt as $row){
     $chk="";
     if($row["hyoujiKBN1"]=="on"){$chk="checked";}
     echo "<tr id='tr1_".$i."'>\n";
-    echo "<td style='font-size:1.7rem;font-weight:700;' colspan='12'>".$row["shouhinCD"]."：".rot13decrypt($row["shouhinNM"])."</td>";    //商品名
+    echo "<td style='font-size:1.7rem;font-weight:700;' colspan='12'>".$row["shouhinCD"]."：".$row["shouhinNM"]."</td>";    //商品名
     echo "</tr>\n";
     echo "<tr id='tr2_".$i."'>\n";
     echo "<td><input type='number' style='width:8rem;' id='new_tanka".$i."' onBlur='zei_math".$i."(this.value)' placeholder='新価格' ></td>";   //単価修正欄
@@ -148,13 +176,13 @@ foreach($stmt as $row){
     echo "<td><input type='number' name ='ORDERS[".$i."][genka]' style='width:6rem;' value='".$row["genka_tanka"]."'></td>";
     echo "<td class='d-none d-sm-table-cell'><input type='number' name ='ORDERS[".$i."][utisu]' style='width:6rem;' value='".$row["utisu"]."'></td>";
     echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][tani]' style='width:3rem;' value='".$row["tani"]."'></td>";
-    echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][bunrui1]' style='width:6rem;' value='".$row["bunrui1"]."'></td>";
-    echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][bunrui2]' style='width:6rem;' value='".$row["bunrui2"]."'></td>";
-    echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][bunrui3]' style='width:6rem;' value='".$row["bunrui3"]."'></td>";
-    echo "<td><input type='checkbox' id='chk_".$i."' name ='ORDERS[".$i."][hyoujiKBN1]' style='width:4rem;' ".$chk."></td>";
+    echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][bunrui1]' style='width:8rem;' value='".$row["bunrui1"]."'></td>";
+    echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][bunrui2]' style='width:8rem;' value='".$row["bunrui2"]."'></td>";
+    echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][bunrui3]' style='width:8rem;' value='".$row["bunrui3"]."'></td>";
+    echo "<td><input type='checkbox' id='chk_".$i."' name ='ORDERS[".$i."][hyoujiKBN1]' style='width:4rem;margin-top:5px;' ".$chk."></td>";
 //    echo "<td class='d-none d-sm-table-cell'><input type='number'   name ='ORDERS[".$i."][hyoujiKBN2]' style='width:4rem;' value='".$row["hyoujiKBN2"]."'></td>";
 //    echo "<td class='d-none d-sm-table-cell'><input type='number'   name ='ORDERS[".$i."][hyoujiKBN3]' style='width:4rem;' value='".$row["hyoujiKBN3"]."'></td>";
-    echo "<td class='d-none d-sm-table-cell'><input type='number' name ='ORDERS[".$i."][hyoujiNO]' style='width:4rem;' value='".$row["hyoujiNO"]."'></td>"; //並び順
+//    echo "<td class='d-none d-sm-table-cell'><input type='number' name ='ORDERS[".$i."][hyoujiNO]' style='width:4rem;' value='".$row["hyoujiNO"]."'></td>"; //並び順
     echo "<td class='d-none d-sm-table-cell' style='text-align:center;'><a href='shouhinDEL.php?cd=".$row["shouhinCD"]."&csrf_token=".$csrf_create."'><i class='fa-regular fa-trash-can'></i></a></td>"; //削除アイコン
     echo "</tr>\n";
     echo "<input type='hidden' name ='ORDERS[".$i."][shouhinCD]' value='".$row["shouhinCD"]."'>";
@@ -251,8 +279,8 @@ echo "      }\n";
 
 while($i>=0){
     echo "      disp".$i." = document.getElementById('chk_".$i."');\n";
-    echo "          tr1".$i." = document.getElementById('tr1_".$i."');\n";
-    echo "          tr2".$i." = document.getElementById('tr2_".$i."');\n";
+    echo "      tr1".$i." = document.getElementById('tr1_".$i."');\n";
+    echo "      tr2".$i." = document.getElementById('tr2_".$i."');\n";
     //echo "alert(disp".$i.".value + ':' + '".$i."');";
     echo "      if(disp".$i.".checked === true){\n";
     echo "          tr1".$i.".style.display=check;\n";
@@ -364,6 +392,26 @@ echo "</script>";
               </p>`,
         attachTo: {
             element: '.item_0',
+            on: 'bottom'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_12.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_12.next
+            }
+        ]
+    });
+    tutorial_12.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'> 商品の並び順はここで変更できます。
+                <br>三角マークは昇順・降順の切り替えに使います。
+                </p>`,
+        attachTo: {
+            element: '.item_01',
             on: 'bottom'
         },
         buttons: [
@@ -719,6 +767,25 @@ echo "</script>";
     });
     helpTour.addStep({
         title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'> 商品の並び順はここで変更できます。
+                <br>三角マークは昇順・降順の切り替えに使います。
+                </p>`,
+        attachTo: {
+            element: '.item_01',
+            on: 'bottom'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: helpTour.back
+            },
+            {
+                text: 'Next',
+                action: helpTour.next
+            }
+        ]
+    });    helpTour.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
         text: `<p class='tour_discription'>商品の価格を変更する際は「新価格」欄をタップして変更後の価格を入力して下さい。
               </p>`,
         attachTo: {
@@ -838,6 +905,12 @@ echo "</script>";
         helpTour.start(tourFinish,'help','');
     }
 
+</script>
+<script>
+    function send(){
+        const form2 = document.getElementById('form2');
+        form2.submit();
+    }
 </script>
 </html>
 <?php

@@ -122,10 +122,12 @@ if($action=="logout"){
         //新機能リリース通知 未確認
         $bell_action="blink";
         $bell_size="fa-2x";
+        $bell_msg="tap here!";
     }else{
         //新機能リリース通知 確認済み
         $bell_action="";
         $bell_size="fa-lg";
+        $bell_msg="";
     }
 
 }
@@ -159,9 +161,9 @@ if($action=="logout"){
     <?php
     }
     ?>
-    <div class='<?php echo $bell_action;?> logoff-color' style='position:fixed;top:40px;right:5px;'>
+    <div class='<?php echo $bell_action;?> logoff-color' style='position:fixed;top:35px;right:5px;'>
         <a href="#" style='color:inherit;' onclick='new_releace_start()'>
-            <i class="fa-regular fa-bell <?php echo $bell_size;?> logoff-color"></i>
+            <?php echo $bell_msg; ?><i class="fa-regular fa-bell <?php echo $bell_size;?> logoff-color"></i>
         </a>
     </div>
 </header>

@@ -1,5 +1,5 @@
 // キャッシュするリソース(css、jsがあれば個別で追加)
-const CACHE_VERSION = 'v23_';
+const CACHE_VERSION = 'v30_';
 const CACHE_NAME = `${CACHE_VERSION}!${registration.scope}`;
 
 // キャッシュするファイルをセットする
@@ -14,6 +14,9 @@ const urlsToCache = [
   ,'/img'
   ,'/favicon.ico'
   ,'/script'
+  ,'/script/index.js'
+  ,'/script/jquery-3.6.0.min.js'
+  ,'/script/popper.min.js'
 //  ,'/'
 //  ,'/EVregi.php?evrez'
 //  ,'/EVregi.php?kobetu'

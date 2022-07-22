@@ -363,6 +363,7 @@ $EVresult = $stmt->fetchAll();
     ?>
         
     };
+    };
     </script>
 
     
