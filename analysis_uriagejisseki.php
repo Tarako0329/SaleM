@@ -32,16 +32,18 @@ $csrf_create = csrf_create();
 //deb_echo("UID：".$_SESSION["user_id"]);
 
 if(!empty($_POST)){
-    $list = $_POST["list"];
+    $list = (empty($_POST["list"])?"%":$_POST["list"]);
     $analysis_type=$_POST["sum_tani"];
     $options=$_POST["options"];
     if($options=="ym"){
         $ymfrom = $_POST["ymfrom"];
         $ymto = $_POST["ymto"];
+        $ajax_func="getAllData('#Event','#ymfrom1','#ymto1','Event');";
     }else{
         //ymd指定
         $ymfrom = $_POST["ymfrom2"];
         $ymto = $_POST["ymto2"];
+        $ajax_func="getAllData('#Event','#ymfrom2','#ymto2','Event');";
     }
 }else{
     //初期はGETから
@@ -50,6 +52,7 @@ if(!empty($_POST)){
     $list = "%";
     $analysis_type=$_GET["sum_tani"];
     $options="ym";
+    $ajax_func="getAllData('#Event','#ymfrom1','#ymto1','Event');";
 }
 $tokui=$list;
 
@@ -152,7 +155,7 @@ $SLVsql = "select * from SerchValMS where type='yyyymm' order by Value";
 $stmt = $pdo_h->prepare($SLVsql);
 $stmt->execute();
 $SLVresult = $stmt->fetchAll();
-
+/*
 $EVsql = "select Event as LIST from UriageData where uid =? and Event <> '' group by Event ";
 $EVsql = $EVsql."union select TokuisakiNM as LIST from UriageData where uid =? and TokuisakiNM<>'' group by TokuisakiNM ";
 $stmt = $pdo_h->prepare($EVsql);
@@ -160,6 +163,8 @@ $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->bindValue(2, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
 $EVresult = $stmt->fetchAll();
+*/
+$_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
 
 ?>
 <head>
@@ -272,8 +277,9 @@ $EVresult = $stmt->fetchAll();
     ?>
         var ctx = document.getElementById('myChart');
         var data = {
+                labels: [
             <?php
-            echo "      labels: [";
+//            echo "      labels: [";
             $j=$min_hour;
             while($j<=$max_hour){
                 if($j>=0){
@@ -327,30 +333,10 @@ $EVresult = $stmt->fetchAll();
                 $j++;
             }
             echo "]}\n";
-            echo "      ]};\n";
-            /*
-            var data = {
-                labels: ["1月", "2月", "3月", "4月", "5月"],
-                datasets: [{
-                    label: 'プリンター',
-                    data: [880, 740, 900, 520, 930],
-                    borderColor: 'rgba(255, 100, 100, 1)',
-                    lineTension: 0,
-                    fill: false,
-                    borderWidth: 3
-                },
-                {
-                    label: 'パソコン',
-                    data: [1200, 1350, 1220, 1220, 1420],
-                    borderColor: 'rgba(100, 100, 255, 1)',
-                    lineTension: 0,
-                    fill: false,
-                    borderWidth: 3
-                }]
-            };
-            */
+//            echo "      ]};\n";
             ?>
-        
+            ]
+        };
         var options = {};
         
         var ex_chart = new Chart(ctx, {
@@ -362,6 +348,62 @@ $EVresult = $stmt->fetchAll();
     }
     ?>
         
+        function getAllData(List,date_from,date_to,get_list_type){
+            //検索用のイベント・顧客・商品リストを取得
+            //id名[List]のリストデータを[date_from]～[date_to]に発生した[get_list_type]に更新
+            $.ajax({
+                // 通信先ファイル名
+                type        : 'POST',
+                url         : 'ajax_get_event_list.php',
+                //dataType    : 'application/json',
+                data        :{
+                                user_id     :'<?php echo $_SESSION["user_id"];?>',
+                                date_from   :$(date_from)[0].value,
+                                date_to     :$(date_to)[0].value,
+                                list_type   :get_list_type //イベントリスト or 商品リスト
+                            }
+                },
+            ).done(
+                // 通信が成功した時
+                function(data) {
+                    //selectの子要素をすべて削除
+                    $(List).children().remove();
+                    $(List).append("<option value='%'>イベント名選択</option>\n");
+                    $(List).append("<option value='%'>全て</option>\n");
+                    // 取得したレコードをeachで順次取り出す
+                    $.each(data, function(key, value){
+                        // appendで追記していく
+                        if(get_list_type=='Event'){
+                            if(value.LIST == '<?php echo $_SESSION["Event"]; ?>'){
+                                $(List).append("<option value='" + value.LIST + "' selected>" + value.LIST + "</option>\n");
+                            }else{
+                                $(List).append("<option value='" + value.LIST + "'>" + value.LIST + "</option>\n");
+                            }
+                        }else if(get_list_type=='Shouhin'){
+                            $(List).append("<option value='" + value.CODE + "'>" + value.CODE+ ":" + value.LIST + "</option>\n");
+                        }
+                    });
+                    
+                    console.log("通信成功");
+                    console.log(data);
+                    
+                }
+            ).fail(
+                // 通信が失敗した時
+                function(XMLHttpRequest, textStatus, errorThrown){
+                    console.log("通信失敗2");
+                    console.log("XMLHttpRequest : " + XMLHttpRequest.status);
+                    console.log("textStatus     : " + textStatus);
+                    console.log("errorThrown    : " + errorThrown.message);
+                }
+            )};
+            
+        //起動時にリストを取得
+        //getAllData('#Event','#ymfrom1','#ymto1','Event');
+        
+        <?php
+        echo $ajax_func."\n";   //  "getAllData()
+        ?>
     
     };
     </script>
@@ -427,16 +469,20 @@ $EVresult = $stmt->fetchAll();
                 <option value='10' <?php if($analysis_type==10){echo "selected";} ?> >売れる勢い</option>
                 <option value='11' <?php if($analysis_type==11){echo "selected";} ?> >来客数推移</option>
             </select>
-            <select name='list' class='form-control' style='padding:0;width:auto;max-width:100%;display:inline-block;margin:5px' onchange='send()'>
+            <select name='list' class='form-control' style='padding:0;width:auto;max-width:100%;display:inline-block;margin:5px' onchange='send()' id='Event'>
+                <!--
                 <option value='%'>イベント・顧客の選択</option>
                 <option value='%'>全て</option>
                 <?php
+                /*
                 foreach($EVresult as $row){
                     echo "<option value='".$row["LIST"]."'".($list==$row["LIST"]?"selected":"").">".$row["LIST"]."</option>\n";
                 }
+                */
                 ?>
+                -->
             </select>
-            <button type='submit' class='btn btn-primary'>検　索</button>
+            <!--<button type='submit' class='btn btn-primary'>検　索</button>-->
         </form>
     </div>
     <div class='col-md-6'>

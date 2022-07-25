@@ -42,45 +42,26 @@ if(!empty($_POST)){
     $list = "%";
     $analysis_type=$_GET["sum_tani"];
 }
+//get_getsumatsu($ymfrom);
 //deb_echo($list);
 $cols=0;
-if($analysis_type==1 || empty($_POST)){//全商品（金額）
+if($analysis_type==1 ){//全商品（金額）
     $sqlstr = "select tmp.* ,sum(税抜売上) over() as 総売上 from (select ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ";
     $gp_sqlstr = "group by ShouhinNM) tmp order by 税抜売上 desc";
     $aryColumn = ["商品名","税抜売上"];
     $cols=2;
-}elseif($analysis_type==2 || empty($_POST)){//月毎
+}elseif($analysis_type==2 ){//イベントごと
     $sqlstr = "select tmp.* ,sum(税抜売上) over(PARTITION BY Event) as 総売上 from (select Event,ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ";
     $gp_sqlstr = "group by Event,ShouhinNM) tmp order by Event,税抜売上 desc";
     $aryColumn = ["商品名","税抜売上"];
     $cols=3;
-}/*elseif($_POST["sum_tani"]==3){//年ごと
-    $sqlstr = "select DATE_FORMAT(UriDate, '%Y') as 計上年月 ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
-    $gp_sqlstr = "group by DATE_FORMAT(UriDate, '%Y') order by DATE_FORMAT(UriDate, '%Y')";
-    $aryColumn = ["計上年度","税抜売上","消費税","税込売上"];
-}elseif($_POST["sum_tani"]==4){//製品名ごと売上金額ランキング
-}elseif($_POST["sum_tani"]==5){//製品名ごと売上数量ランキング
-    $sqlstr = "select ShouhinNM as ShouhinNM ,sum(Su) as 売上数 from UriageData ";
-    $gp_sqlstr = "group by ShouhinNM order by sum(Su) desc";
-    $aryColumn = ["商品名","売上数"];
-}elseif($_POST["sum_tani"]==7){//イベント・店舗別客単価ランキング
-    $sqlstr = "select A,ROUND(avg(客単価)) as 平均客単価 from ";
-    $sqlstr = $sqlstr." (select UriDate as 計上日 ,concat(Event,TokuisakiNM) as A ,UriageNO ,sum(UriageKin) as 客単価 from UriageData ";
-    $gp_sqlstr = "group by UriDate,concat(Event,TokuisakiNM),UriageNO ) as UriSum group by A order by avg(客単価) desc";
-    $aryColumn = ["Event/店舗","客単価"];
-}elseif($_POST["sum_tani"]==6){//客単価推移
-    //客単価一覧
-    $sqlstr = "select 計上日,ROUND(avg(税抜売上)) as 客単価,Event from ";
-    $sqlstr = $sqlstr." (select UriDate as 計上日 ,Event ,UriageNO ,sum(UriageKin) as 税抜売上 from UriageData ";
-    $gp_sqlstr = "group by UriDate,UriageNO ) as UriSum group by 計上日 order by 計上日";
-    $aryColumn = ["計上日","客単価","Event/店舗"];
-}   
-*/
+}
 $sqlstr = $sqlstr." where ShouhinCD<9900 and DATE_FORMAT(UriDate, '%Y%m') between :ymfrom and :ymto AND uid = :user_id ";
 $sqlstr = $sqlstr." AND (Event like :event OR TokuisakiNM like :tokui )";
 $sqlstr = $sqlstr." ".$gp_sqlstr;
 
 //deb_echo($sqlstr);
+$_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
 
 $stmt = $pdo_h->prepare( $sqlstr );
 $stmt->bindValue("ymfrom", $ymfrom, PDO::PARAM_INT);
@@ -108,7 +89,7 @@ $SLVsql = "select * from SerchValMS where type='yyyymm' order by Value";
 $stmt = $pdo_h->prepare($SLVsql);
 $stmt->execute();
 $SLVresult = $stmt->fetchAll();
-
+/*
 $EVsql = "select Event as LIST from UriageData where uid =? and Event <> '' group by Event ";
 $EVsql = $EVsql."union select TokuisakiNM as LIST from UriageData where uid =? and TokuisakiNM<>'' group by TokuisakiNM ";
 $stmt = $pdo_h->prepare($EVsql);
@@ -116,6 +97,7 @@ $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->bindValue(2, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
 $EVresult = $stmt->fetchAll();
+*/
 
 ?>
 <head>
@@ -129,102 +111,69 @@ $EVresult = $stmt->fetchAll();
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    
     
     <script>
-    window.onload = function() {
-        //アラート用
-        function alert(msg) {
-          return $('<div class="alert" role="alert"></div>')
-            .text(msg);
-        }
-        (function($){
-          const e = alert('<?php echo $_SESSION["MSG"]; ?>').addClass('alert-success');
-          // アラートを表示する
-          $('#alert-1').append(e);
-          /* 2秒後にアラートを消す
-          setTimeout(() => {
-            e.alert('close');
-          }, 3000);
-          */
-        })(jQuery);
-        /*
-        const ctx = document.getElementById('myChart').getContext('2d');
-        const myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: [
-                    <?php
-                    $i=0;
-                    foreach($result as $row){
-                        if($i!=0){
-                            echo ",";
-                        }
-                        if($row[0]===$row["ShouhinNM"]){
-                            echo "'".rot13decrypt($row["ShouhinNM"])."'";
-                            if($i==14){
-                                break;
-                            }
-                        }else{
-                            echo "'".$row[0]."'";
-                        }
-                        $i++;
-                    }
-                    ?>
-                    ],
-                datasets: [{
-                    label: '売上金額(税抜)<?php if($row[0]===$row["ShouhinNM"]){
-                            echo "TOP15";
-                        }?>',
-                    data: [
-                        <?php
-                        $i=0;
-                        foreach($result as $row){
-                            if($i!=0){
-                                echo ",";
-                            }
-                            echo "'".$row[1]."'";
-                            if($row[0]===$row["ShouhinNM"] && $i==14){
-                                break;
-                            }
-                            $i++;
-                        }
-                        ?>
-                        ],
-                    backgroundColor:[
-                        <?php
-                        $i=0;
-                        foreach($result as $row){
-                            if($i!=0){
-                                echo ",";
-                            }
-                            echo "'rgba('+(~~(256 * Math.random()))+','+(~~(256 * Math.random()))+','+ (~~(256 * Math.random()))+', 0.5)'\n";
-                            if($row[0]===$row["ShouhinNM"] && $i==14){
-                                break;
-                            }
-                            $i++;
-                        }
-                        ?>
-                        ],
-                    //borderWidth: 1,
-                    maxBarThickness:20,
-                    barPercentage:0.9
-                }]
-            },
-            options: {
-                scales: {
-                    x: {
-                        //beginAtZero: true
-                    }
-                },
-                indexAxis: 'y'
-            }
-        });
-    };
-    */
+
     </script>
 
     
     <TITLE><?php echo $title." 売上分析";?></TITLE>
 </head>
- 
+<script>
+    window.onload = function(){
+        function getAllData(List,date_from,date_to,get_list_type){
+            //検索用のイベント・顧客・商品リストを取得
+            //id名[List]のリストデータを[date_from]～[date_to]に発生した[get_list_type]に更新
+            $.ajax({
+                // 通信先ファイル名
+                type        : 'POST',
+                url         : 'ajax_get_event_list.php',
+                //dataType    : 'application/json',
+                data        :{
+                                user_id     :'<?php echo $_SESSION["user_id"];?>',
+                                date_from   :$(date_from)[0].value,
+                                date_to     :$(date_to)[0].value,
+                                list_type   :get_list_type //イベントリスト or 商品リスト
+                            }
+                },
+            ).done(
+                // 通信が成功した時
+                function(data) {
+                    //selectの子要素をすべて削除
+                    $(List).children().remove();
+                    $(List).append("<option value='%'>イベント名選択</option>\n");
+                    $(List).append("<option value='%'>全て</option>\n");
+                    // 取得したレコードをeachで順次取り出す
+                    $.each(data, function(key, value){
+                        // appendで追記していく
+                        if(get_list_type=='Event'){
+                            if(value.LIST == '<?php echo $_SESSION["Event"]; ?>'){
+                                $(List).append("<option value='" + value.LIST + "' selected>" + value.LIST + "</option>\n");
+                            }else{
+                                $(List).append("<option value='" + value.LIST + "'>" + value.LIST + "</option>\n");
+                            }
+                        }else if(get_list_type=='Shouhin'){
+                            $(List).append("<option value='" + value.CODE + "'>" + value.CODE+ ":" + value.LIST + "</option>\n");
+                        }
+                    });
+                    
+                    //console.log("通信成功");
+                    //console.log(data);
+                    
+                }
+            ).fail(
+                // 通信が失敗した時
+                function(XMLHttpRequest, textStatus, errorThrown){
+                    console.log("通信失敗2");
+                    console.log("XMLHttpRequest : " + XMLHttpRequest.status);
+                    console.log("textStatus     : " + textStatus);
+                    console.log("errorThrown    : " + errorThrown.message);
+                }
+            )};
+            
+        //起動時にリストを取得
+        getAllData('#Event','#uridate','#uridateto','Event');
+        
+    };
+</script>
 <header class="header-color common_header" style="flex-wrap:wrap;height:50px">
     <div class="title" style="width: 100%;"><a href="analysis_menu.php?csrf_token=<?php echo $csrf_create; ?>"><?php echo $title;?></a></div>
 
@@ -234,9 +183,9 @@ $EVresult = $stmt->fetchAll();
     <div class="container-fluid">
     <div class="row">
     <div class="col-md-3" style='padding:5px;background:white'>
-        <form class="form" method="post" action="analysis_abc.php" style='font-size:1.5rem'>
+        <form class="form" method="post" action="analysis_abc.php" style='font-size:1.5rem' id='form1'>
             集計期間:
-            <select name='ymfrom' class="form-control" style="padding:0;width:11rem;display:inline-block;margin:5px">
+            <select name='ymfrom' class="form-control" style="padding:0;width:11rem;display:inline-block;margin:5px" onchange='send()' id='uridate'>
             <?php
             foreach($SLVresult as $row){
                 if($ymfrom==$row["Value"]){
@@ -247,7 +196,7 @@ $EVresult = $stmt->fetchAll();
             ?>
             </select>
             から
-            <select name='ymto' class="form-control" style="padding:0;width:11rem;display:inline-block;margin:5px">
+            <select name='ymto' class="form-control" style="padding:0;width:11rem;display:inline-block;margin:5px" onchange='send()' id='uridateto'>
             <?php
             foreach($SLVresult as $row){
                 if($ymto==$row["Value"]){
@@ -257,37 +206,30 @@ $EVresult = $stmt->fetchAll();
             }
             ?>
             </select>
-            <select name='sum_tani' class="form-control" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px"><!--集計単位-->
+            
+            <select name='sum_tani' class="form-control" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px" onchange='send()' ><!--集計単位-->
                 <option value='1' <?php if($analysis_type==1){echo "selected";} ?> >商品別ABC分析</option>
                 <option value='2' <?php if($analysis_type==2){echo "selected";} ?>>イベント・店舗/商品別ABC分析</option>
-                <!--
-                <option value='3' <?php if($_POST["sum_tani"]==3){echo "selected";} ?> >売上実績(年計)</option>
-                <option value='4' <?php if($_POST["sum_tani"]==4){echo "selected";} ?> >売上ランキング(金額)</option>
-                <option value='5' <?php if($_POST["sum_tani"]==5){echo "selected";} ?> >売上ランキング(個数)</option>
-                <option value='6' <?php if($_POST["sum_tani"]==6){echo "selected";} ?> >客単価推移</option>
-                <option value='6' <?php if($_POST["sum_tani"]==7){echo "selected";} ?> >客単価ランキング</option>
-                -->
             </select>
-            <select name='list' class="form-control" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px">
+            <select name='list' class="form-control" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px" onchange='send()' id='Event' >
+            <!--
             <option value='%'>場所・顧客</option>
             <option value='%'>全て</option>
             <?php
+            /*
             foreach($EVresult as $row){
                 if($list==$row["LIST"]){
                     echo "<option value='".$row["LIST"]."' selected>".$row["LIST"]."</option>\n";
                 }
                 echo "<option value='".$row["LIST"]."'>".$row["LIST"]."</option>\n";
             }
+            */
             ?>
+            -->
             </select>
-            <button type='submit' class='btn btn-primary' style='padding:0;hight:55px;width:100px;margin:2px;'>検　索</button>
+            <!--<button type='submit' class='btn btn-primary' style='padding:0;hight:55px;width:100px;margin:2px;'>検　索</button>-->
         </form>
     </div>
-    <!--
-    <div class="col-md-6">
-        <canvas id="myChart" width="95%" height="100%-55px" ></canvas>
-    </div>
-    -->
     <div class="col-md-9" style='padding:5px'>
     <?php
         drow_table_abc($aryColumn,$result,$cols);
@@ -300,7 +242,13 @@ $EVresult = $stmt->fetchAll();
 <footer>
 </footer>
 -->
-
+<script>
+    function send(){
+        const form1 = document.getElementById('form1');
+        form1.submit();
+    }
+    
+</script>
 </html>
 <?php
 $EVresult  = null;

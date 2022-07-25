@@ -565,16 +565,6 @@ function rtn_wildcard($word){
 }
 
 
-
-
-
-
-
-
-
-
-
-
 // =========================================================
 // 登録メール(メールサーバーを使わない場合PHPから送信)
 // =========================================================
@@ -594,7 +584,14 @@ function touroku_mail($to,$subject,$body){
     return 1;
 }
 
-
+function get_getsumatsu($ym){
+    if(strlen($ym)<>6){
+        return $ym;
+    }
+    $yyyymm = substr($ym,0,4)."-".substr($ym,4,2);
+    
+    return date('Y-m-d',strtotime($yyyymm.' last day of this month'));
+}
 
 
 

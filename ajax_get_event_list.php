@@ -13,6 +13,11 @@ $dotenv->load();
 define("DNS","mysql:host=".$_ENV["SV"].";dbname=".$_ENV["DBNAME"].";charset=utf8");
 define("USER_NAME", $_ENV["DBUSER"]);
 define("PASSWORD", $_ENV["PASS"]);
+
+$ymfrom=(strlen($_POST['date_from'])==6?substr($_POST['date_from'],0,4)."-".substr($_POST['date_from'],4,2)."-01":$_POST['date_from']);
+$ymto=get_getsumatsu($_POST['date_to']);
+
+
 // DBとの接続
 $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
@@ -23,8 +28,10 @@ if($_POST["list_type"]=="Event"){
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $_POST['user_id'], PDO::PARAM_INT);
     $stmt->bindValue(2, $_POST['user_id'], PDO::PARAM_INT);
-    $stmt->bindValue(3, $_POST['date_from'], PDO::PARAM_STR);
-    $stmt->bindValue(4, $_POST['date_to'], PDO::PARAM_STR);
+//    $stmt->bindValue(3, $_POST['date_from'], PDO::PARAM_STR);
+//    $stmt->bindValue(4, $_POST['date_to'], PDO::PARAM_STR);
+    $stmt->bindValue(3, $ymfrom, PDO::PARAM_STR);
+    $stmt->bindValue(4, $ymto, PDO::PARAM_STR);
 
     
 }else if($_POST["list_type"]=="Shouhin"){
@@ -32,8 +39,10 @@ if($_POST["list_type"]=="Event"){
     $sqlstr = $sqlstr."where uid =? and UriDate >= ? and UriDate <= ? and shouhinCD <= 9900 group by shouhinCD,shouhinNM order by shouhinCD";
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $_POST['user_id'], PDO::PARAM_INT);
-    $stmt->bindValue(2, $_POST['date_from'], PDO::PARAM_STR);
-    $stmt->bindValue(3, $_POST['date_to'], PDO::PARAM_STR);
+//    $stmt->bindValue(2, $_POST['date_from'], PDO::PARAM_STR);
+//    $stmt->bindValue(3, $_POST['date_to'], PDO::PARAM_STR);
+    $stmt->bindValue(2, $ymfrom, PDO::PARAM_STR);
+    $stmt->bindValue(3, $ymto, PDO::PARAM_STR);
 }
 
 
