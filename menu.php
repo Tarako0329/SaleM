@@ -112,7 +112,7 @@ if($action=="logout"){
 
     
     //新機能リリース通知
-    $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.new_releace_001') as ToursLog FROM Users WHERE uid=?";
+    $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.new_releace_002') as ToursLog FROM Users WHERE uid=?";
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
     $stmt->execute();
@@ -122,7 +122,7 @@ if($action=="logout"){
         //新機能リリース通知 未確認
         $bell_action="blink";
         $bell_size="fa-2x";
-        $bell_msg="tap here!";
+        $bell_msg="tap here！";
     }else{
         //新機能リリース通知 確認済み
         $bell_action="";
@@ -162,7 +162,7 @@ if($action=="logout"){
     }
     ?>
     <div class='<?php echo $bell_action;?> logoff-color' style='position:fixed;top:35px;right:5px;'>
-        <a href="#" style='color:inherit;' onclick='new_releace_start()'>
+        <a href="#" style='color:var(--user-disp-color);' onclick='new_releace_start()'>
             <?php echo $bell_msg; ?><i class="fa-regular fa-bell <?php echo $bell_size;?> logoff-color"></i>
         </a>
     </div>
@@ -554,6 +554,7 @@ if($action=="logout"){
         },
         tourName:'shuppin_zaiko_help1'
     });
+    /*
     shuppin_zaiko_help1.addStep({
         title: `<p class='tour_header'>出品在庫機能</p>`,
         text: `<p class='tour_discription'>出品在庫機能をリリースしました。</p>`,
@@ -567,6 +568,7 @@ if($action=="logout"){
             enabled:false
         }
     });
+    */
     shuppin_zaiko_help1.addStep({
         title: `<p class='tour_header'>出品在庫機能</p>`,
         text: `<p class='tour_discription'>各イベントの出品数を登録できます。
@@ -584,9 +586,52 @@ if($action=="logout"){
         //start(ajax関数名(固定値),ツアー名称(チュートリアル等),ステータス(finish;完了,save;保存(次回途中から始まる),'空白：$_SESSION["tour"]にnewで指定しtourNameをセット)'
         shuppin_zaiko_help1.start(tourFinish,'',''); 
     }
+</script>
+<script>
+    const new_releace_002 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'new_releace_002'
+    });
+    new_releace_002.addStep({
+        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+        text: `<p class='tour_discription'>売上時の天気、気温を記録できるようになりました。
+            <br>
+            <br>この機能により、将来的に売上分析の指標として、天気・気温と売上の相関関係を提供できるようになります。</p>`,
+        buttons: [
+            {
+                text: 'Next',
+                action: new_releace_002.nextAndSave
+            }
+        ],
+        cancelIcon:{
+            enabled:false
+        }
+    });
+    new_releace_002.addStep({
+        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+        text: `<p class='tour_discription'>端末のGPS機能を使用します。
+                <br>レジ画面を開く際に「位置情報を・・・」と聞かれますので「有効」にしてください。
+                <br>
+                <br>それでは「レジ」をタップしてください。</p>`,
+       attachTo: {
+            element: '.menu_rez',
+            on: 'auto'
+        },
+        cancelIcon:{
+            enabled:false
+        }
+    });
     function new_releace_start(){
         //新機能のリリース通知はこの関数で呼び出すツアーを更新する
-        shuppin_zaiko_help1.start(tourFinish,'new_releace_001',''); 
+        //shuppin_zaiko_help1.start(tourFinish,'new_releace_001','');
+        new_releace_002.start(tourFinish,'new_releace_002',''); 
     }
 </script>
 <!--pwa対応部-->

@@ -57,7 +57,7 @@ if($_POST["CTGL"]<>""){
 }
 
 if(!empty($_POST)){
-    file_put_contents("sql_log/".$logfilename,  $time.",POST:COOKIEチェック\n",  FILE_APPEND);
+    //file_put_contents("sql_log/".$logfilename,  $time.",POST:COOKIEチェック\n",  FILE_APPEND);
     if(csrf_chk_nonsession()==false){//cookie:post
         $_SESSION["EMSG"]="セッションが正しくありませんでした。";
         header("HTTP/1.1 301 Moved Permanently");
@@ -95,6 +95,7 @@ file_put_contents("sql_log/".$logfilename,$time.",session:".$_SESSION['csrf_toke
 $E_Flg=0;
 $_SESSION["msg"]="登録処理が実行されませんでした。";
 $emsg="";
+$ins_cnt=0;
 
 //売上登録
 if($MODE == "evrez" || $MODE == "kobetu"){
@@ -125,7 +126,6 @@ if($MODE == "evrez" || $MODE == "kobetu"){
             if($row["SU"]==0){
                 continue;
             }
-            //$sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime,genka_tanka) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)";
             $stmt = $pdo_h->prepare($sqlstr);
             
             $time = date("Y/m/d H:i:s");
@@ -149,6 +149,7 @@ if($MODE == "evrez" || $MODE == "kobetu"){
             $flg=$stmt->execute();
             
             if($flg){
+                $ins_cnt++;
                 $emsg="売上のINSERTは正常終了\n";
                 file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,success,".$_SESSION['user_id']."/".$UriageNO."/".$_POST["EV"].$_POST["KOKYAKU"]."/".$row["CD"]."/".$row["SU"]."/".$row["TANKA"]."/".$row["ZEI"]."/".$row["GENKA_TANKA"]."\n",FILE_APPEND);
             }else{
@@ -258,6 +259,40 @@ if($MODE == "evrez" || $MODE == "kobetu"){
                
             }
             //exit();
+        }
+        
+        //位置情報、天気情報の付与（uid,売上No,緯度、経度、住所、天気、気温、体感温度、天気アイコンping,無効FLG,insdate,update）
+        if(empty($_POST["nonadd"]) && $ins_cnt>0){
+            $tenki=get_weather("insert",$_POST['lat'],$_POST['lon']);
+            file_put_contents("sql_log/".$logfilename,$time.",gio/weather :".$_POST['address']."/".$tenki[0]."/".$tenki[1]."/".$tenki[2]."\n",FILE_APPEND);
+            
+            $sqlstr="INSERT INTO `UriageData_GioWeather`(`uid`, `UriNo`, `lat`, `lon`, `weather`, `description`, `temp`, `feels_like`, `icon`) VALUES(?,?,?,?,?,?,?,?,?)";
+            $stmt = $pdo_h->prepare($sqlstr);
+            $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
+            $stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
+            $stmt->bindValue(3,  $_POST['lat'], PDO::PARAM_INT);
+            $stmt->bindValue(4,  $_POST['lon'], PDO::PARAM_INT);
+            $stmt->bindValue(5,  $tenki[0], PDO::PARAM_STR);
+            $stmt->bindValue(6,  $tenki[1], PDO::PARAM_INT);
+            $stmt->bindValue(7,  $tenki[2], PDO::PARAM_INT);
+            $stmt->bindValue(8,  $tenki[3], PDO::PARAM_INT);
+            $stmt->bindValue(9,  $tenki[4], PDO::PARAM_STR);
+            $stmt->execute();
+            $_SESSION["nonadd"]="";
+        }else{
+            $_SESSION["nonadd"]="checked";
+        }
+        
+        //クッキーが空、もしくは住所がxxxx何丁目単位で変更された場合のみ、クッキーを更新する。
+        //PC_クロームではjavascriptでクッキーの更新が出来ているが、iphoen_pwaだと機能しないため
+        if(empty($_COOKIE["address"]) || $_COOKIE["address"] <> $_POST['address']){
+            setCookie("address", $_POST['address'], time()+60*60*10, "/", null, TRUE, TRUE);
+        }
+        if(empty($_COOKIE["lat"]) || $_COOKIE["address"] <> $_POST['address']){
+            setCookie("lat", $_POST['lat'], time()+60*60*10, "/", null, TRUE, TRUE);
+        }
+        if(empty($_COOKIE["lon"]) || $_COOKIE["address"] <> $_POST['address']){
+            setCookie("lon", $_POST['lon'], time()+60*60*10, "/", null, TRUE, TRUE);
         }
         
         if($E_Flg==0){

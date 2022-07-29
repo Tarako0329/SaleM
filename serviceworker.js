@@ -1,5 +1,5 @@
 // キャッシュするリソース(css、jsがあれば個別で追加)
-const CACHE_VERSION = 'v30_';
+const CACHE_VERSION = 'v31_';
 const CACHE_NAME = `${CACHE_VERSION}!${registration.scope}`;
 
 // キャッシュするファイルをセットする

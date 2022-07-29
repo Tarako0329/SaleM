@@ -2,10 +2,7 @@
     width: 60%;
     height: 70%;
 }
-.event{
-    width: 40%;
-    height: 100%;
-}
+
 INPUT.ev{
     /*INPUT イベント名・店舗名部*/
     border-right:none;

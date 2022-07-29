@@ -593,8 +593,44 @@ function get_getsumatsu($ym){
     return date('Y-m-d',strtotime($yyyymm.' last day of this month'));
 }
 
+// =========================================================
+// 天気取得
+// =========================================================
+function get_weather( $type = null,$lat,$lon ){
+    $appid = "5e249157cc62de62ed49bbd1461d0057";
+    $url = "http://api.openweathermap.org/data/2.5/weather?lat=".$lat."&lon=".$lon."&units=metric&APPID=" . $appid;
+    //https://api.openweathermap.org/data/2.5/weather?lat=35.68482289197964&lon=139.78277993493018&units=metric&APPID=5e249157cc62de62ed49bbd1461d0057
+    //35.68482289197964, 139.78277993493018
+    $json = file_get_contents( $url );
+    $json = mb_convert_encoding( $json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN' );
+    $json_decode = json_decode( $json );
+    
+    //現在の天気
+    if( $type  === "weather" ){
+        $out = $json_decode->weather[0]->main;
+    
+    //現在の天気アイコン
+    }elseif( $type === "icon" ){
+        $out = "<img src='https://openweathermap.org/img/wn/" . $json_decode->weather[0]->icon . "@2x.png'>";
+    
+    //現在の気温
+    }elseif( $type  === "temp" ){
+        $out = $json_decode->main->temp;
+    
+    //DB登録（現在の天気・気温・体感温度）
+    }elseif( $type  === "insert" ){
+        $out[0] = $json_decode->weather[0]->main;
+        $out[1] = $json_decode->weather[0]->description;
+        $out[2] = $json_decode->main->temp;
+        $out[3] = $json_decode->main->feels_like;
+        $out[4] = $json_decode->weather[0]->icon . ".png";
+    //パラメータがないときは配列を出力
+    }else{
+      $out = $json_decode;
+    }
 
-
+    return $out;
+}
 
 
 

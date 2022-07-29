@@ -289,6 +289,8 @@ window.onload = function() {
             if($RG_MODE<>"shuppin_zaiko"){ echo "CHOUSEI_AREA.style.display = 'block';\n";} //在庫登録モードでは割引ボタンを表示しない
         ?>
         //total_pay_bk = total_pay; //調整前金額を保存
+        //位置情報取得
+        get_gio();
     };
     
     dentaku.onclick = function(){
@@ -435,17 +437,26 @@ window.onload = function() {
     </span>
     <?php
     if($RG_MODE=="kobetu"){
-    ?>
-        <div class="event" style="font-family:inherit;"><input type="text" class="ev" name="KOKYAKU" required="required" placeholder="(必須)顧客名"></div>
-        <input type="hidden" name="EV" value="">
-    <?php
+        echo "<input type='text' class='ev' name='KOKYAKU' required='required' placeholder='顧客名'>\n";
+        echo "<input type='hidden' name='EV' value=''>\n";
     }else{
-    ?>
-        <div class="event" style="font-family:inherit;"><input type="text" class="ev item_2" name="EV" value="<?php echo $event ?>" required="required" placeholder="(必須)イベント名等"></div>
-        <input type="hidden" name="KOKYAKU" value="">
-    <?php
+        echo "<input type='text' class='ev item_2' name='EV' value='". $event."' required='required' placeholder='イベント名等'>\n";
+        echo "<input type='hidden' name='KOKYAKU' value=''>\n";
+    }
+    
+    if($RG_MODE!=="evrez"){
+        $dispnone="display:none;";
+        $checked="checked";
+    }else{
+        $dispnone="";
+        $checked="";
+        $_SESSION["nonadd"]="";
     }
     ?>
+    <div style='<?php echo $dispnone; ?>font-size:12px;position:fixed;top:55px;right:15px;color:var(--user-disp-color);max-width:50%;'>
+        <input type='checkbox' name='nonadd' id='nonadd' onclick='gio_onoff()' <?php echo $_SESSION["nonadd"].$checked; ?>>
+        <label for='nonadd' id='address_disp' class='item_101' <?php if($_SESSION["nonadd"]=="checked"){echo "style='text-decoration:line-through;'";} ?> ><?php echo (empty($_COOKIE["address"])?"":$_COOKIE["address"]); ?></label>
+    </div>
 </header>
 <div class='header-select header-color' >
     <select class='form-control item_16' style='font-size:1.2rem;padding:0;'> <!--width:80%;-->
@@ -459,8 +470,9 @@ window.onload = function() {
     ?>
     </select>
     <a href="#" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;' data-toggle='modal' data-target='#modal_help1'><i class="fa-regular fa-circle-question fa-lg logoff-color"></i></a>
-    <!--<a class='item_15' href='EVregi_sql.php?CTGL=<?php echo $next_categoly; ?>&mode=<?php echo $RG_MODE; ?>' style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-solid fa-arrow-rotate-right fa-lg logoff-color"></i></a>-->
-    <a class='item_15' href='javascript:void(0)' onClick="postFormRG('EVregi_sql.php','<?php echo $RG_MODE; ?>','<?php echo $next_categoly; ?>')" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'><i class="fa-solid fa-arrow-rotate-right fa-lg logoff-color"></i></a>
+    <a class='item_15' href='javascript:void(0)' onClick="postFormRG('EVregi_sql.php','<?php echo $RG_MODE; ?>','<?php echo $next_categoly; ?>')" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'>
+        <i class="fa-solid fa-arrow-rotate-right fa-lg logoff-color"></i>
+    </a>
 </div>
 <div class='header-plus-minus text-center item_4' style='font-size:1.4rem;font-weight;700'>
     <i class="fa-regular fa-circle-question fa-lg logoff-color"></i><!--スペーシングのため白アイコンを表示-->
@@ -475,7 +487,7 @@ window.onload = function() {
     <a href="#" style='color:inherit;margin-left:5px;margin-top:10px;' data-toggle='modal' data-target='#modal_help2'><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>
 </div>
 <body class='common_body'>
-    
+   
 <?php
     if(isset($emsg)){//
         echo $emsg;
@@ -491,20 +503,21 @@ window.onload = function() {
 ?>
     <div class="container-fluid">
         <div class='item_11 item_12'>
-        <div class="row text-center" style='padding-top:5px;display:none;' id='CHOUSEI_AREA'>
-            <button type='button' class='btn-view btn-changeVal ' style="padding:0.1rem;width:300px;font-size:2.2rem;" id="CHOUSEI_BTN" >割引・割増</button>
-        </div>
-        
-
-        <div class="row " style="display:none" id="CHOUSEI">
-            <div class="col-1 col-md-0" ></div>
-            <div class="col-10 col-md-7" style="font-size: 2.2rem;">
-                お会計額：￥<span id="maekin">0</span> ⇒
-                <input type="number" placeholder="変更後の金額を入力。"　class='order tanka' style=" width:100%;border:solid;border-top:none;border-right:none;border-left:none;" name="CHOUSEI_GAKU" id="CHOUSEI_GAKU">
-                <br>
+            <div class="row text-center" style='padding-top:5px;display:none;' id='CHOUSEI_AREA'>
+                <hr>
+                <div>
+                    <button type='button' class='btn-view btn-changeVal ' style="padding:0.1rem;width:300px;font-size:2.2rem;" id="CHOUSEI_BTN" >割引・割増</button>
+                </div>
             </div>
-            <div class="col-1" ></div>
-        </div>
+            <div class="row " style="display:none" id="CHOUSEI">
+                <div class="col-1 col-md-0" ></div>
+                <div class="col-10 col-md-7" style="font-size: 2.2rem;">
+                    お会計額：￥<span id="maekin">0</span> ⇒
+                    <input type="number" placeholder="変更後の金額を入力。"　class='order tanka' style=" width:100%;border:solid;border-top:none;border-right:none;border-left:none;" name="CHOUSEI_GAKU" id="CHOUSEI_GAKU">
+                    <br>
+                </div>
+                <div class="col-1" ></div>
+            </div>
         </div>
         <hr>
 
@@ -603,6 +616,10 @@ window.onload = function() {
         <button type='button' class='btn--chk ' style='border-left:none;border-right:none;' id='order_chk'>確　認</button>
     </div>
 </footer>
+<input type='hidden' name='address' id='address' value='<?php echo (empty($_COOKIE["address"])?"":$_COOKIE["address"]); ?>'>
+<input type='hidden' name='lat' id='lat' value='<?php echo (empty($_COOKIE["lat"])?"":$_COOKIE["lat"]); ?>'>
+<input type='hidden' name='lon' id='lon' value='<?php echo (empty($_COOKIE["lon"])?"":$_COOKIE["lon"]); ?>'>
+
 </form>
 <!--モーダル電卓(FcModal)-->
 <div class='modal fade' id='FcModal' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
@@ -715,6 +732,24 @@ window.onload = function() {
         text: `<p class='tour_discription'>出店しているイベント名を入力します。<br><br>今回は適当に入れてください。</p>`,
         attachTo: {
             element: '.item_2',
+            on: 'bottom'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: tutorial_5.back
+            },
+            {
+                text: 'Next',
+                action: tutorial_5.next
+            }
+        ]
+    });
+    tutorial_5.addStep({
+        title: `<p class='tour_header'>チュートリアル</p>`,
+        text: `<p class='tour_discription'>大まかな出店場所を表示してます。<br><br>端末のGPS機能を使用してます。<br>明らかに変な住所が表示されている場合はチェックを入れて無効にしてください。</p>`,
+        attachTo: {
+            element: '.item_101',
             on: 'bottom'
         },
         buttons: [
@@ -1185,9 +1220,8 @@ window.onload = function() {
     }
     
 
-</script>
+</script><!--チュートリアル-->
 <script>
-  
     const shuppin_zaiko_help2 = new Shepherd.Tour({
         useModalOverlay: true,
         defaultStepOptions: {
@@ -1313,39 +1347,254 @@ window.onload = function() {
         ]
     });
     
-    if(TourMilestone=="shuppin_zaiko_help1"){
-        shuppin_zaiko_help2.start(tourFinish,'new_releace_001','finish');
-    }
     function help(){
         shuppin_zaiko_help2.start(tourFinish,'','');
     }
+</script><!--出品在庫機能help-->
+<script>
+    const new_releace_002 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: false,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'new_releace_002'
+    });
+    new_releace_002.addStep({
+        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+        text: `<p class='tour_discription'>大まかな出店場所を表示してます。<br><br>端末のGPS機能を使用してます。</p>`,
+        attachTo: {
+            element: '.item_101',
+            on: 'bottom'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: new_releace_002.back
+            },
+            {
+                text: 'Next',
+                action: new_releace_002.next
+            }
+        ]
+    });
+    new_releace_002.addStep({
+        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+        text: `<p class='tour_discription'>ここに表示されている住所から天気・気温を取得します。<br><br>明らかに変な住所が表示されている場合はチェックを入れて無効にしてください。</p>`,
+        attachTo: {
+            element: '.item_101',
+            on: 'bottom'
+        },
+        buttons: [
+            {
+                text: 'Back',
+                action: new_releace_002.back
+            },
+            {
+                text: 'Next',
+                action: new_releace_002.next
+            }
+        ]
+    });
+    new_releace_002.addStep({
+        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+        text: `<p class='tour_discription'>次の売上から、『売上実績』の画面に売上時の天気、気温が表示されるようになります。</p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: new_releace_002.back
+            },
+            {
+                text: 'Next',
+                action: new_releace_002.next
+            }
+        ]
+    });
+    new_releace_002.addStep({
+        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+        text: `<p class='tour_discription'>今回の追加機能は以上となります。</p>`,
+        buttons: [
+            {
+                text: 'Back',
+                action: new_releace_002.back
+            },
+            {
+                text: 'OK',
+                action: new_releace_002.next
+            }
+        ]
+    });
+     if(TourMilestone=="new_releace_002"){
+        new_releace_002.start(tourFinish,'new_releace_002','finish');
+    }
+   
+</script><!--天気機能リリースヘルプ（次回機能リリース時は不要となる）-->
+<script>
+    function postFormRG(url,mode,CTGL) {
+     
+        var form = document.createElement('form');
+        var request_mode = document.createElement('input');
+        var request_CTGL = document.createElement('input');
+     
+        form.method = 'POST';
+        form.action = url;
+     
+        request_mode.type = 'hidden'; //入力フォームが表示されないように
+        request_mode.name = 'mode';
+        request_mode.value = mode;
+    
+        request_CTGL.type = 'hidden'; //入力フォームが表示されないように
+        request_CTGL.name = 'CTGL';
+        request_CTGL.value = CTGL;
+     
+        form.appendChild(request_mode);
+        form.appendChild(request_CTGL);
+        document.body.appendChild(form);
+     
+        form.submit();
+     
+    }    
 </script>
 <script>
-function postFormRG(url,mode,CTGL) {
- 
-    var form = document.createElement('form');
-    var request_mode = document.createElement('input');
-    var request_CTGL = document.createElement('input');
- 
-    form.method = 'POST';
-    form.action = url;
- 
-    request_mode.type = 'hidden'; //入力フォームが表示されないように
-    request_mode.name = 'mode';
-    request_mode.value = mode;
+    /*ジオ・コーディング*/
+    /** 変換表を入れる場所 */
+    var GSI = {};
+    let today = new Date();
+    today.setTime(today.getTime() + 10*60*60*1000);
+    let limit = today.toGMTString();
+    let address = '';
 
-    request_CTGL.type = 'hidden'; //入力フォームが表示されないように
-    request_CTGL.name = 'CTGL';
-    request_CTGL.value = CTGL;
- 
-    form.appendChild(request_mode);
-    form.appendChild(request_CTGL);
-    document.body.appendChild(form);
- 
-    form.submit();
- 
-}    
-</script>
+    const latEle = document.querySelector('#lat');
+    const lonEle = document.querySelector('#lon');
+    const addressEle = document.querySelector('#address');
+    const address_disp = document.querySelector('#address_disp');
+    //const address_disp2 = document.querySelector('#address_disp2');
+
+    /*
+    * 緯度経度を画面表示
+    */
+    const setGeoLoc = (coords) => {
+        latEle.value = `${coords.latitude}`;
+        lonEle.value = `${coords.longitude}`;
+        document.cookie = `lat=${coords.latitude};expires=` + limit;
+        document.cookie = `lon=${coords.longitude};expires=` + limit;
+        //alert(`緯度: ${coords.latitude}` + "/" + `経度: ${coords.longitude}`);
+    }
+    /*
+    * 緯度経度から住所を取得して表示
+    */
+    const getAddress = async (coords) => {
+        // 逆ジオコーディング API
+        const url = new URL('https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress');
+        url.searchParams.set('lat', coords.latitude);
+        url.searchParams.set('lon', coords.longitude);
+        const res = await fetch(url.toString());
+        const json = await res.json();
+        const data = json.results;  
+        
+        // 変換表から都道府県などを取得
+        const muniData = GSI.MUNI_ARRAY[json.results.muniCd];
+        // 都道府県コード,都道府県名,市区町村コード,市区町村名 に分割
+        const [prefCode, pref, muniCode, city] = muniData.split(',');   
+        // 画面に反映
+        address_disp.textContent = `${city}${data.lv01Nm}`;
+        //address_disp2.textContent = `${pref}${city}${data.lv01Nm}`;
+        address.value = `${city}${data.lv01Nm}`;
+        document.cookie = `address=${city}${data.lv01Nm};expires=` + limit;
+        //alert(`${pref} ${city} ${data.lv01Nm}`);
+    };
+    /*
+    * 位置情報 API の実行(イベントリスナ)
+    */
+    let get_gio = function (){
+        navigator.geolocation.getCurrentPosition(
+            geoLoc => {
+                setGeoLoc(geoLoc.coords);
+                getAddress(geoLoc.coords);
+            },
+            err => console.error({err}),
+        );
+    }
+    if(address_disp.textContent==""){
+        get_gio();
+        address=address_disp.textContent;
+    }else{
+        address=address_disp.textContent;
+    }
+    
+    let gio_onoff = function(){
+        if(address_disp.style.textDecoration=='line-through'){
+            address_disp.style.textDecoration='';
+            gio_on.start(tourFinish,'','');
+        }else{
+            address_disp.style.textDecoration='line-through';
+            gio_off.start(tourFinish,'','');
+        }
+    }
+    
+    // NOTE: 後から読み込みたいので CodePen 上では JS で処理
+    const script = document.createElement('script');
+    script.src = 'https://maps.gsi.go.jp/js/muni.js';
+    document.body.insertAdjacentElement('afterEnd', script);    
+
+    const gio_on = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: false,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'gio_on'
+    });
+    gio_on.addStep({
+        title: `<p class='tour_header'>位置情報</p>`,
+        text: `<p class='tour_discription'>位置情報は有効です。
+            <br>
+            <br>現在地が正しくない場合、同じ場所を再度タップして無効にしてください。
+            <br>
+            <br>現在地：${address}
+            <br></p>`,
+        buttons: [
+            {
+                text: 'OK',
+                action: gio_on.next
+            }
+        ]
+    });
+    const gio_off = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: false,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'gio_off'
+    });
+    gio_off.addStep({
+        title: `<p class='tour_header'>位置情報</p>`,
+        text: `<p class='tour_discription'>位置情報は無効です。
+            <br>
+            <br>現在地に問題が無い場合、同じ場所を再度タップして有効にしてください。
+            <br>
+            <br>現在地：${address}
+            <br></p>`,
+        buttons: [
+            {
+                text: 'OK',
+                action: gio_off.next
+            }
+        ]
+    });
+    
+    
+</script><!--ジオコーディング-->
 </html>
 <?php
 $stmt = null;
