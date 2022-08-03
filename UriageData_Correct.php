@@ -128,11 +128,14 @@ if($mode=="select"){
     for($i=0;$i<4;$i++){
         if($Type=="rireki"){
             //履歴明細取得
-            $sql = "select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData ".$wheresql." order by UriDate desc,Event,UriageNO";
+            //$sql = "select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData ".$wheresql." order by UriDate desc,Event,UriageNO";
+            $sql = "select U.*,UGW.icon,UGW.temp,UGW.description from (select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData ".$wheresql.") as U left join UriageData_GioWeather as UGW on U.uid = UGW.uid and U.UriageNO = UGW.UriNo order by U.UriDate desc,U.Event,U.UriageNO";
+            
             $NextType=$Type;
         }elseif($Type=="sum_items"){
             //商品単位で集計
-            $sql="select UriDate,UriageNO,Event,TokuisakiNM, ShouhinCD, ShouhinNM,shuppin_su,uri_su as su,zan_su, tanka,UriageKin,zei,genka,arari from UriageDataSummary ";
+            //$sql="select UriDate,UriageNO,Event,TokuisakiNM, ShouhinCD, ShouhinNM,shuppin_su,uri_su as su,zan_su, tanka,UriageKin,zei,genka,arari from UriageDataSummary ";
+            $sql="select UriDate,UriageNO,Event,TokuisakiNM, ShouhinCD, ShouhinNM,shuppin_su,uri_su as su,zan_su, tanka,UriageKin,zei,genka,arari,icon,max_temp,min_temp from UriageDataSummary ";
             $sql = $sql.$wheresql."order by UriDate desc,Event,TokuisakiNM,ShouhinNM ";
             
             $NextType=$Type;
@@ -227,33 +230,6 @@ if($mode=="select"){
     echo "想定外エラー";
     exit();
 }
-/*
-$stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
-$rtn=$stmt->execute();
-if($rtn==false){
-    deb_echo("失敗した場合は不正値が渡されたとみなし、wheresqlを破棄<br>");
-    $_SESSION["wheresql"]="";
-}
-$result = $stmt->fetchAll();
-$rowcnt = $stmt->rowCount();
-if($rowcnt==0){
-    //実績が無い場合
-    $_SESSION["UriFrom"]="2000-01-01";
-    $_SESSION["UriTo"]="2099-12-31";
-    $_SESSION["MSG"]="";
-
-    param_clear();
-    $Type="sum_events";
-    $NextType="rireki";
-    $sql = "select UriDate,'-' as UriageNO,Event,TokuisakiNM,'-' as ShouhinCD,'-' as ShouhinNM,0 as su,0 as tanka,sum(UriageKin) as UriageKin,sum(zei) as zei,sum(su*genka_tanka) as genka,sum(UriageKin-(su*genka_tanka)) as arari from UriageData ";
-    $sql = $sql."where uid=:user_id group by UriDate,Event,TokuisakiNM order by UriDate,Event,TokuisakiNM";
-    $stmt = $pdo_h->prepare( $sql );
-    $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
-    $rtn=$stmt->execute();
-    $result = $stmt->fetchAll();
-    $msg="";
-}
-*/
 
 //税区分M取得
 $ZEIsql="select * from ZeiMS order by zeiKBN;";
@@ -440,7 +416,10 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
     <table class='table-striped table-bordered item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;white-space: nowrap;'>
         <thead >
             <tr>
-                <th scope='col' class='d-none d-sm-table-cell'>売上日</th><th scope='col' class='d-none d-sm-table-cell'>Event/顧客</th><th scope='col' style='width:2rem;'>No</th>
+                <!--
+                <th scope='col' class='d-none d-sm-table-cell'>売上日</th><th scope='col' class='d-none d-sm-table-cell'>Event/顧客</th>
+                -->
+                <th scope='col' style='width:2rem;'>No</th>
                 <th>商品</th>
                 <?php if($Type=="sum_items"){echo "<th scope='col' style='width:3rem;'>出品数</th>";} ?>
                 <th scope='col' style='width:3rem;'>売上数</th>
@@ -448,6 +427,7 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
                 <th scope='col' style='width:3rem;' class='d-none d-sm-table-cell'>単価</th>
                 <th scope='col' style='width:5rem;'>売上</th><th scope='col' style='width:4rem;'>税</th><th scope='col' style='width:5rem;'>原価</th>
                 <th scope='col' style='width:5rem;'>粗利</th>
+                <th scope='col' class='d-none d-sm-table-cell'></th>
                 <th scope='col'></th>
             </tr>
         </thead>
@@ -457,29 +437,39 @@ $GoukeiZei=0;
 $GoukeiZeikomi=0;
 $uridate="";
 
-$colspan=($Type=="sum_items"?"10":"8");
+//$colspan=($Type=="sum_items"?"10":"8");
+$colspan=($Type=="sum_items"?"12":"10");
 
 foreach($result as $row){
     if($uridate!=$row["UriDate"].$row["Event"]){
-        echo "<tr class='tr_stiky'><td colspan='".$colspan."' class='d-sm-none tr_stiky'><a href='UriageData_Correct.php?mode=select&ad1=".rot13encrypt2($row["UriDate"])."&Type=".$NextType."&csrf_token=".$csrf_create."'> 売上日：".$row["UriDate"]."</a> ";
+        //echo "<tr class='tr_stiky'><td colspan='".$colspan."' class='d-sm-none tr_stiky'><a href='UriageData_Correct.php?mode=select&ad1=".rot13encrypt2($row["UriDate"])."&Type=".$NextType."&csrf_token=".$csrf_create."'> 売上日：".$row["UriDate"]."</a> ";
+        //echo "<a href='UriageData_Correct.php?mode=select&ad2=".rot13encrypt2($row["Event"].$row["TokuisakiNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>『".$row["Event"].$row["TokuisakiNM"]."』</a>";
+        echo "<tr class='tr_stiky'><td colspan='".$colspan."' class='tr_stiky'><a href='UriageData_Correct.php?mode=select&ad1=".rot13encrypt2($row["UriDate"])."&Type=".$NextType."&csrf_token=".$csrf_create."'> 売上日：".$row["UriDate"]."</a> ";
         echo "<a href='UriageData_Correct.php?mode=select&ad2=".rot13encrypt2($row["Event"].$row["TokuisakiNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>『".$row["Event"].$row["TokuisakiNM"]."』</a>";
         if(!empty($row["icon"])){echo "<img style='height:20px;' src='https://openweathermap.org/img/wn/".$row["icon"]."'>（<span style='color:red;'>".$row["max_temp"]."</span>/<span style='color:blue;'>".$row["min_temp"]."</span>）";}
         echo "</td></tr>\n";
     }
-    echo "<tr><td class='d-none d-sm-table-cell'><a href='UriageData_Correct.php?mode=select&ad1=".rot13encrypt2($row["UriDate"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["UriDate"]."</a></td>";
-    echo "<td class='d-none d-sm-table-cell'><a href='UriageData_Correct.php?mode=select&ad2=".rot13encrypt2($row["Event"].$row["TokuisakiNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["Event"].$row["TokuisakiNM"]."</a></td>";
+    //echo "<tr><td class='d-none d-sm-table-cell'><a href='UriageData_Correct.php?mode=select&ad1=".rot13encrypt2($row["UriDate"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["UriDate"]."</a></td>";
+    //echo "<td class='d-none d-sm-table-cell'><a href='UriageData_Correct.php?mode=select&ad2=".rot13encrypt2($row["Event"].$row["TokuisakiNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["Event"].$row["TokuisakiNM"]."</a></td>";
     echo "<td class='text-center'><a href='UriageData_Correct.php?mode=select&ad3=".rot13encrypt2($row["UriageNO"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["UriageNO"]."</a></td>";
     echo "<td><a href='UriageData_Correct.php?mode=select&ad4=".rot13encrypt2($row["ShouhinCD"])."&ad5=".rot13encrypt2($row["ShouhinNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".($row["ShouhinNM"])."</a></td>";
     if($Type=="sum_items"){echo "<td class='text-right'>".$row["shuppin_su"]."</td>";}
     echo "<td class='text-right'>".$row["su"]."</td>";
     if($Type=="sum_items"){echo "<td class='text-right'>".$row["zan_su"]."</td>";}
     echo "<td class='text-right d-none d-sm-table-cell'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td>";
-    echo "<td class='text-right'>".$row["zei"]."</td><td class='text-right'>".$row["genka"]."</td><td class='text-right'>".$row["arari"]."</td>\n<td>";
+    echo "<td class='text-right'>".$row["zei"]."</td><td class='text-right'>".$row["genka"]."</td><td class='text-right'>".$row["arari"]."</td>\n";
     if(($Type=="rireki") && ($mode == "select") || ($mode == "Updated")){
         //履歴表示の時だけ削除可能
-        echo "<a href='UriageData_Correct.php?cd=".$row["ShouhinCD"]."&urino=".$row["UriageNO"]."&csrf_token=".$csrf_create."&mode=del'><i class='fa-regular fa-trash-can'></i></a>";
+        if(!empty($row["icon"])){
+            echo "<td class='d-none d-sm-table-cell'><img style='height:20px;' src='https://openweathermap.org/img/wn/".$row["icon"]."'>（<span>".$row["temp"]."℃ </span><span>".$row["description"]."</span>）</td>";
+        }else{
+            echo "<td class='d-none d-sm-table-cell'></td>";
+        }
+        echo "<td><a href='UriageData_Correct.php?cd=".$row["ShouhinCD"]."&urino=".$row["UriageNO"]."&csrf_token=".$csrf_create."&mode=del'><i class='fa-regular fa-trash-can'></i></a></td>";
+    }else{
+        echo "<td class='d-none d-sm-table-cell'></td><td></td>";
     }
-    echo "</td></tr>\n";
+    echo "</tr>\n";
     $Goukei = $Goukei + $row["UriageKin"];
     $GoukeiZei = $GoukeiZei + $row["zei"];
     $GoukeiZeikomi = $GoukeiZeikomi + $row["UriageKin"] + $row["zei"];
