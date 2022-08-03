@@ -1499,9 +1499,9 @@ window.onload = function() {
         const muniData = GSI.MUNI_ARRAY[json.results.muniCd];
         // 都道府県コード,都道府県名,市区町村コード,市区町村名 に分割
         const [prefCode, pref, muniCode, city] = muniData.split(',');   
+        //${pref}${city}${data.lv01Nm}->県・市区町村・番地
         // 画面に反映
         address_disp.textContent = `${city}${data.lv01Nm}`;
-        //address_disp2.textContent = `${pref}${city}${data.lv01Nm}`;
         address.value = `${city}${data.lv01Nm}`;
         document.cookie = `address=${city}${data.lv01Nm};expires=` + limit;
         //alert(`${pref} ${city} ${data.lv01Nm}`);
@@ -1510,6 +1510,9 @@ window.onload = function() {
     * 位置情報 API の実行(イベントリスナ)
     */
     let get_gio = function (){
+        <?php
+        if(EXEC_MODE<>'Trial'){
+        ?>
         navigator.geolocation.getCurrentPosition(
             geoLoc => {
                 setGeoLoc(geoLoc.coords);
@@ -1517,6 +1520,13 @@ window.onload = function() {
             },
             err => console.error({err}),
         );
+        <?php
+        }else{
+            echo "address_disp.textContent = '東京都中央区（仮）';";
+            echo "latEle.value = 34.6816512;";
+            echo "lonEle.value = 135.4792960;";
+        }
+        ?>
     }
     if(address_disp.textContent==""){
         get_gio();
