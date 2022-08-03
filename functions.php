@@ -108,6 +108,23 @@ function check_session_userid($pdo_h){
             header("Location: index.php");
             exit();
         }
+        //取得できたIDがDBに存在するか確認
+        $sqlstr="select * from Users where uid=?";
+        $stmt = $pdo_h->prepare($sqlstr);
+        $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+        if (count($rows) == 0) {
+            //IDは取得できたがDB側にデータが無い場合もID再発行
+            $_SESSION["EMSG"]="ユーザーＩＤの再取得に失敗しました。";
+            $_SESSION["user_id"]="";
+    	    //Cookie のトークンを削除
+    	    setCookie("webrez_token", '', -1, "/", null, TRUE, TRUE); // secure, httponly
+            header("HTTP/1.1 301 Moved Permanently");
+            header("Location: index.php");
+            exit();
+        }
 
     }
     
@@ -597,10 +614,8 @@ function get_getsumatsu($ym){
 // 天気取得
 // =========================================================
 function get_weather( $type = null,$lat,$lon ){
-    $appid = "5e249157cc62de62ed49bbd1461d0057";
-    $url = "http://api.openweathermap.org/data/2.5/weather?lat=".$lat."&lon=".$lon."&units=metric&APPID=" . $appid;
-    //https://api.openweathermap.org/data/2.5/weather?lat=35.68482289197964&lon=139.78277993493018&units=metric&APPID=5e249157cc62de62ed49bbd1461d0057
-    //35.68482289197964, 139.78277993493018
+    $url = "http://api.openweathermap.org/data/2.5/weather?lat=".$lat."&lon=".$lon."&units=metric&APPID=" .WEATHER_ID;
+
     $json = file_get_contents( $url );
     $json = mb_convert_encoding( $json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN' );
     $json_decode = json_decode( $json );

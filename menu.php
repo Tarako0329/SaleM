@@ -21,6 +21,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
 
 require "php_header.php";
 $rtn=check_session_userid($pdo_h);
+//deb_echo($_SESSION["user_id"]);
 $token = csrf_create();
 $logoff=false;
 $Max_color_No=2;

@@ -66,6 +66,9 @@ define("PLAN_Y", $_ENV["PLAN_Y"]);
 define("PAY_CONTRACT_URL", $_ENV["PAY_contract_url"]);
 define("PAY_CANCEL_URL", $_ENV["PAY_cancel_url"]);
 
+//WEATHER_ID
+define("WEATHER_ID", $_ENV["WEATHER_ID"]);
+
 //サイトタイトルの取得
 $title = $_ENV["TITLE"];
 
