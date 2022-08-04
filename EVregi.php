@@ -42,13 +42,6 @@ if(EXEC_MODE!=""){
             exit();
         }
     }
-
-/*    
-}else{
-    echo "error:POST_less";
-    exit();
-}
-*/
 }
 
 
@@ -71,6 +64,20 @@ if($row[0]["yuukoukigen"]==""){
 
 
 $token = csrf_create();
+/*
+if(empty($_COOKIE["address"]) && !empty($_SESSION["address"]) ){
+    setCookie("address", $_SESSION['address'], time()+60*60*10, "/", null, TRUE, TRUE);
+    $_SESSION["address"]="";
+}
+if(empty($_COOKIE["lat"]) && !empty($_SESSION["lat"]) ){
+    setCookie("lat", $_SESSION['lat'], time()+60*60*10, "/", null, TRUE, TRUE);
+    $_SESSION["lat"]="";
+}
+if(empty($_COOKIE["lon"]) && !empty($_SESSION["lon"]) ){
+    setCookie("lon", $_SESSION['lon'], time()+60*60*10, "/", null, TRUE, TRUE);
+    $_SESSION["lon"]="";
+}
+*/
 
 $alert_msg=(!empty($_SESSION["msg"])?$_SESSION["msg"]:"");
 $RG_MODE=(!empty($_POST["mode"])?$_POST["mode"]:$_GET["mode"]);
@@ -1479,8 +1486,8 @@ window.onload = function() {
     const setGeoLoc = (coords) => {
         latEle.value = `${coords.latitude}`;
         lonEle.value = `${coords.longitude}`;
-        document.cookie = `lat=${coords.latitude};expires=` + limit;
-        document.cookie = `lon=${coords.longitude};expires=` + limit;
+        document.cookie = `lat=${coords.latitude};expires=${limit};Secure; `;
+        document.cookie = `lon=${coords.longitude};expires=${limit};Secure; `;
         //alert(`緯度: ${coords.latitude}` + "/" + `経度: ${coords.longitude}`);
     }
     /*
@@ -1503,13 +1510,14 @@ window.onload = function() {
         // 画面に反映
         address_disp.textContent = `${city}${data.lv01Nm}`;
         address.value = `${city}${data.lv01Nm}`;
-        document.cookie = `address=${city}${data.lv01Nm};expires=` + limit;
+        document.cookie = `address=${city}${data.lv01Nm};expires=${limit};Secure; `;
         //alert(`${pref} ${city} ${data.lv01Nm}`);
     };
     /*
     * 位置情報 API の実行(イベントリスナ)
     */
     let get_gio = function (){
+        console.log('exec get_gio')
         <?php
         if(EXEC_MODE<>'Trial'){
         ?>
@@ -1607,6 +1615,7 @@ window.onload = function() {
 </script><!--ジオコーディング-->
 </html>
 <?php
+
 $stmt = null;
 $pdo_h = null;
 ?>

@@ -141,29 +141,12 @@ if($rtn==false){
 }
 $result=$stmt->fetchAll();
 
-/*
-
-//売上実績商品リスト（修正モーダル用）
-$SHsql = "select ShouhinCD,ShouhinNM from UriageData where uid =? group by ShouhinCD,ShouhinNM order by ShouhinCD,ShouhinNM";
-$stmt = $pdo_h->prepare($SHsql);
-$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-$stmt->execute();
-$SHresult = $stmt->fetchAll();
-*/
 //検索年月リスト
 $SLVsql = "select * from SerchValMS where type='yyyymm' order by Value";
 $stmt = $pdo_h->prepare($SLVsql);
 $stmt->execute();
 $SLVresult = $stmt->fetchAll();
-/*
-$EVsql = "select Event as LIST from UriageData where uid =? and Event <> '' group by Event ";
-$EVsql = $EVsql."union select TokuisakiNM as LIST from UriageData where uid =? and TokuisakiNM<>'' group by TokuisakiNM ";
-$stmt = $pdo_h->prepare($EVsql);
-$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-$stmt->bindValue(2, $_SESSION['user_id'], PDO::PARAM_INT);
-$stmt->execute();
-$EVresult = $stmt->fetchAll();
-*/
+
 $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
 
 ?>
@@ -471,15 +454,7 @@ $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
             </select>
             <select name='list' class='form-control' style='padding:0;width:auto;max-width:100%;display:inline-block;margin:5px' onchange='send()' id='Event'>
                 <!--
-                <option value='%'>イベント・顧客の選択</option>
-                <option value='%'>全て</option>
-                <?php
-                /*
-                foreach($EVresult as $row){
-                    echo "<option value='".$row["LIST"]."'".($list==$row["LIST"]?"selected":"").">".$row["LIST"]."</option>\n";
-                }
-                */
-                ?>
+                ajaxで取得
                 -->
             </select>
             <!--<button type='submit' class='btn btn-primary'>検　索</button>-->

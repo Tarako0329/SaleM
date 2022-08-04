@@ -306,16 +306,21 @@ if($MODE == "evrez" || $MODE == "kobetu"){
         
         //クッキーが空、もしくは住所がxxxx何丁目単位で変更された場合のみ、クッキーを更新する。
         //PC_クロームではjavascriptでクッキーの更新が出来ているが、iphoen_pwaだと機能しないため
+        /*
         if(empty($_COOKIE["address"]) || $_COOKIE["address"] <> $_POST['address']){
             setCookie("address", $_POST['address'], time()+60*60*10, "/", null, TRUE, TRUE);
+            $_SESSION["address"]=$_POST['address'];
         }
         if(empty($_COOKIE["lat"]) || $_COOKIE["address"] <> $_POST['address']){
             setCookie("lat", $_POST['lat'], time()+60*60*10, "/", null, TRUE, TRUE);
+            $_SESSION["lat"]=$_POST['lat'];
         }
         if(empty($_COOKIE["lon"]) || $_COOKIE["address"] <> $_POST['address']){
             setCookie("lon", $_POST['lon'], time()+60*60*10, "/", null, TRUE, TRUE);
+            $_SESSION["lon"]=$_POST['lon'];
         }
-        
+        echo $_COOKIE["address"]."::".$_SESSION["address"]."<br>";
+        */
         if($E_Flg==0){
             $pdo_h->commit();
             file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,COMMIT,success,売上No".$UriageNO."\n",FILE_APPEND);
