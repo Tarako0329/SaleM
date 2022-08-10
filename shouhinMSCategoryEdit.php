@@ -14,36 +14,11 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
 
 $csrf_create = csrf_create();
 
-//デフォルトは登録順・降順
-if(!empty($_POST)){
-    $_SESSION["sort1"]=$_POST["sort1"];//並べ替え項目
-    $_SESSION["sort2"]=$_POST["sort2"];//昇順・降順
-}
-$sort1 =(!empty($_SESSION["sort1"])?$_SESSION["sort1"]:1);
-$sort2 =(!empty($_SESSION["sort2"])?$_SESSION["sort2"]:1);
-
 //商品マスタの取得
-/*
-if($sort1==1){
-    $sql = "select * from ShouhinMS left join ZeiMS on ShouhinMS.zeiKBN=ZeiMS.zeiKBN where uid = ? order by shouhinCD";
-}else{
-    $sql = "select * from ShouhinMS left join ZeiMS on ShouhinMS.zeiKBN=ZeiMS.zeiKBN where uid = ? order by shouhinNM";
-}
-if($sort2==1){
-    $sql = $sql." desc";
-}
-*/
 $sql = "select * from ShouhinMS left join ZeiMS on ShouhinMS.zeiKBN=ZeiMS.zeiKBN where uid = ? order by bunrui1 desc,bunrui2,bunrui3,shouhinNM";
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
-
-
-
-//税区分MSリスト取得
-$sqlstr="select * from ZeiMS order by zeiKBN;";
-$stmt2 = $pdo_h->query($sqlstr);
-$ZKMS = $stmt2->fetchAll();
 
 ?>
 <head>
@@ -132,7 +107,7 @@ $ZKMS = $stmt2->fetchAll();
         //分類を選択したときにカテゴリーリストを更新
         $('#categry').change(function(){
             getCategory('#categry');
-            $('#categry_send').val($('#categry').val());
+            //$('#categry_send').val($('#categry').val());
         });
 
         function getCategory_sujest(get_list_type,serch_word){
@@ -199,60 +174,51 @@ $ZKMS = $stmt2->fetchAll();
                 
             })
         });
-        
+        /*
         $('#upd_bunrui_write').change(function(){
             $('#upd_bunrui_send').val($('#upd_bunrui_write').val());
         });
-
+        */
 
     };    
 
 </script>
+<!--
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-
-<header class='header-color common_header' style='flex-wrap:wrap'>
-    <div class='title' style='width: 100%;'><a href='menu.php'><?php echo $title;?></a></div>
-    <p style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>  取扱商品 カテゴリー一括修正 画面</p>
-    <?php 
-    if(empty($_SESSION["tour"])){
-        echo "<a href='#' style='color:inherit;position:fixed;top:5px;right:5px;' onclick='help()'><i class='fa-regular fa-circle-question fa-lg logoff-color'></i></a>";
-    }
-    ?>
-    <div class='dipstyl' style='position:fixed;right:5px;top:35px'>
-        <div >
-            <form method='post' id='form2' action='shouhinMSList.php' style='display:flex;margin-left:5px;' class='item_01'>
-            <select class='form-control' id='sort' name='sort1' style='margin-bottom:5px;' onchange='send()'>
-                <option value='1' <?php echo ($sort1==1?"selected":"");?> >登録順</option>
-                <option value='2' <?php echo ($sort1==2?"selected":"");?> >名称順</option>
-            </select>
-            <button class='btn btn-primary' style='height:25px;padding:0px 10px;font-size:1.2rem;margin-top:0px;margin-left:5px;' type='submit' name='sort2' value='<?php if($sort2==1){echo "2";}else{echo "1";} ?>'>
-                <?php if($sort2==1){echo "▼";}else{echo "▲";} ?>
-            </button>
-            </form>
-        </div>
-    </div>
-</header>
-
-<div class='header2'>
-    <div style='display:flex;height:25px;margin:5px;'>
-        <select class='form-control' id='categry' style='width:100px;'>
-            <option>項目選択</option>
-            <option value='cate1' <?php echo ($categry==1?"selected":"");?> >分類１</option>
-            <option value='cate2' <?php echo ($categry==2?"selected":"");?> >分類２</option>
-            <option value='cate3' <?php echo ($categry==3?"selected":"");?> >分類３</option>
-        </select>
-        <select class='form-control' id='over_cate' disabled style='width:200px;margin-left:5px' >
-            <!--ajaxでセット-->
-        </select>
-    </div>
-    <div style='display:block;margin:5px;'>
-        <input type='text' id='upd_bunrui_write' class='form-control' style='max-width:305px;'>
-    </div>
-    
-</div>
+-->
+<script src="script/jquery-ui-1.12.1.min.js"></script>
+<link rel="stylesheet" href="css/jQuery-UI-1.12.1.min.css">
 
 <body class='common_body media_body'>
+    <header class='header-color common_header' style='flex-wrap:wrap'>
+        <div class='title' style='width: 100%;'><a href='menu.php'><?php echo $title;?></a></div>
+        <p style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>  取扱商品 カテゴリー一括修正 画面</p>
+        <?php 
+        if(empty($_SESSION["tour"])){
+            echo "<a href='#' style='color:inherit;position:fixed;top:5px;right:5px;' onclick='help()'><i class='fa-regular fa-circle-question fa-lg logoff-color'></i></a>";
+        }
+        ?>
+    </header>
+    <form method='post' id='form1' action='shouhinMSCategoryEdit_sql.php'>
+    <div class='header2'>
+        <div style='display:flex;height:25px;margin:5px;'>
+            <select class='form-control' id='categry' name='categry' style='width:100px;' required='required'>
+                <option value=''>項目選択</option>
+                <option value='cate1' <?php echo ($categry==1?"selected":"");?> >カテゴリー１</option>
+                <option value='cate2' <?php echo ($categry==2?"selected":"");?> >カテゴリー２</option>
+                <option value='cate3' <?php echo ($categry==3?"selected":"");?> >カテゴリー３</option>
+            </select>
+            <select class='form-control' id='over_cate' disabled style='width:200px;margin-left:5px' >
+                <!--ajaxでセット-->
+            </select>
+        </div>
+        <div style='display:block;margin:5px;'>
+            <input type='text' name='upd_bunrui' required='required' placeholder='カテゴリー名を入力' id='upd_bunrui_write' class='form-control' style='max-width:305px;'>
+        </div>
+        
+    </div>
+
     <?php
         //echo $_SESSION["MSG"]."<br>";
         if($_SESSION["MSG"]!=""){
@@ -261,11 +227,12 @@ $ZKMS = $stmt2->fetchAll();
         $_SESSION["MSG"]="";
     ?>
     <div class='container-fluid'>
-    <form method='post' id='form1' action='shouhinMSCategoryEdit_sql.php'>
+    
     <input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
+    <!--
     <input type='hidden' name='upd_bunrui' id='upd_bunrui_send' value=''>
     <input type='hidden' name='categry' id='categry_send' value=''>
-    
+    -->
     <table class='table-striped table-bordered item_1 MSLIST'>
         <thead>
             <tr style='height:30px;'>
@@ -319,14 +286,15 @@ foreach($stmt as $row){
         </tbody>
     </table>
     </div>
-</body>
 
-<footer class='common_footer'>
-    <dev class='left1 item_3'>
-        <button type='submit' class='btn--chk' style='border-radius:0;' name='commit_btn' >登　録</button>
-    </dev>
-</footer>
-</form>
+
+    <footer class='common_footer'>
+        <dev class='left1 item_3'>
+            <button type='submit' class='btn--chk' style='border-radius:0;' name='commit_btn' >登　録</button>
+        </dev>
+    </footer>
+    </form>
+</body>
 <!--シェパードナビshepherd
 <script src="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/js/shepherd.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/css/shepherd.css"/>
