@@ -23,6 +23,7 @@ $sort1 =(!empty($_SESSION["sort1"])?$_SESSION["sort1"]:1);
 $sort2 =(!empty($_SESSION["sort2"])?$_SESSION["sort2"]:1);
 
 //商品マスタの取得
+/*
 if($sort1==1){
     $sql = "select * from ShouhinMS left join ZeiMS on ShouhinMS.zeiKBN=ZeiMS.zeiKBN where uid = ? order by shouhinCD";
 }else{
@@ -31,7 +32,8 @@ if($sort1==1){
 if($sort2==1){
     $sql = $sql." desc";
 }
-
+*/
+$sql = "select * from ShouhinMS left join ZeiMS on ShouhinMS.zeiKBN=ZeiMS.zeiKBN where uid = ? order by bunrui1 desc,bunrui2,bunrui3,shouhinNM";
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
@@ -50,7 +52,7 @@ $ZKMS = $stmt2->fetchAll();
     include "head.html" 
     ?>
     <!--ページ専用CSS-->
-    <link rel='stylesheet' href='css/style_ShouhinMSL.css?<?php echo $time; ?>' >
+    <link rel='stylesheet' href='css/style_ShouhinMSCategoryEdit.css?<?php echo $time; ?>' >
     <TITLE><?php echo $title." 取扱商品 確認・編集";?></TITLE>
 </head>
 <script>
@@ -80,37 +82,144 @@ $ZKMS = $stmt2->fetchAll();
           }, 3000);
           */
         })(jQuery);
-          
+
+        function getCategory(get_list_type){
+            //商品マスタのカテゴリーリストを取得
+            let List = $('#over_cate');
+            if($(get_list_type)[0].value=='cate1'){
+                $(List).attr("disabled", true);
+                return 0;
+            }
+            
+            $.ajax({
+                // 通信先ファイル名
+                type        : 'POST',
+                url         : 'ajax_get_MSCategory_list.php',
+                //dataType    : 'application/json',
+                data        :{
+                                user_id     :'<?php echo $_SESSION["user_id"];?>',
+                                list_type   :$(get_list_type)[0].value //カテ１ or カテ１＞カテ２
+                            }
+                },
+            ).done(
+                // 通信が成功した時
+                function(data) {
+                    //selectの子要素をすべて削除
+                    $(List).attr("disabled", false);
+                    $(List).children().remove();
+                    $(List).append("<option value=''>上位分類を選択</option>\n");
+                    // 取得したレコードをeachで順次取り出す
+                    $.each(data, function(key, value){
+                        // appendで追記していく
+                        if(value.LIST == '<?php echo $_SESSION["Event"]; ?>'){
+                            $(List).append("<option value='" + value.LIST + "' selected>" + value.LIST + "</option>\n");
+                        }else{
+                            $(List).append("<option value='" + value.LIST + "'>" + value.LIST + "</option>\n");
+                        }
+                    });
+                    console.log("通信成功");
+                }
+            ).fail(
+                // 通信が失敗した時
+                function(XMLHttpRequest, textStatus, errorThrown){
+                    console.log("通信失敗2");
+                    console.log("XMLHttpRequest : " + XMLHttpRequest.status);
+                    console.log("textStatus     : " + textStatus);
+                    console.log("errorThrown    : " + errorThrown.message);
+                }
+            )
+        };
+        //分類を選択したときにカテゴリーリストを更新
+        $('#categry').change(function(){
+            getCategory('#categry');
+            $('#categry_send').val($('#categry').val());
+        });
+
+        function getCategory_sujest(get_list_type,serch_word){
+            $.ajax({
+                // 通信先ファイル名
+                type        : 'POST',
+                url         : 'ajax_get_MSCategory_list.php',
+                //dataType    : 'application/json',
+                data        :{
+                                user_id     :'<?php echo $_SESSION["user_id"];?>',
+                                list_type   :$(get_list_type)[0].value, //カテ１ or カテ１＞カテ２
+                                serch_word  :$(serch_word)[0].value
+                            }
+                },
+            ).done(
+                // 通信が成功した時
+                function(data) {
+                    let words=[];
+                    $.each(data, function(key, value){
+                        words.push(value.LIST);
+                    });
+                    
+                    $('#upd_bunrui_write').autocomplete({
+                        source: words
+                    });
+                    
+                    console.log("通信成功");
+                }
+            ).fail(
+                // 通信が失敗した時
+                function(XMLHttpRequest, textStatus, errorThrown){
+                    console.log("通信失敗2");
+                    console.log("XMLHttpRequest : " + XMLHttpRequest.status);
+                    console.log("textStatus     : " + textStatus);
+                    console.log("errorThrown    : " + errorThrown.message);
+                }
+            )
+        };
+
+        $('#over_cate').change(function(){
+            getCategory_sujest('#categry','#over_cate');
+            let i=0;
+            $('.MSLIST tbody tr').each(function(index,elm){
+                //table>tr 内のcheckboxにチェックが入ってる行のみ表示するサンプル
+                /*
+                if(i!=0){i--;}
+                if($(elm).find('input:checkbox').length > 0){
+                    if($(elm).find('input:checkbox').is(':checked')){
+                        //$(elm).css({'display':'table-row'});
+                    }else{
+                        $(elm).hide();
+                        i=2;
+                    }
+                }else if(i!=0){
+                    $(elm).hide();
+                }
+                */
+                if($(elm).children().children("td").prevObject[2].innerText.indexOf($('#over_cate').val())===0){
+                    //console.log(elm.innerText);
+                    $(elm).css({'display':'table-row'});
+                }else{
+                    $(elm).hide();
+                }
+                
+            })
+        });
+        
+        $('#upd_bunrui_write').change(function(){
+            $('#upd_bunrui_send').val($('#upd_bunrui_write').val());
+        });
+
+
     };    
 
 </script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
 <header class='header-color common_header' style='flex-wrap:wrap'>
     <div class='title' style='width: 100%;'><a href='menu.php'><?php echo $title;?></a></div>
-    <p style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>  取扱商品 確認・編集 画面</p>
-    <?php if(empty($_SESSION["tour"])){?>
-    <a href="#" style='color:inherit;position:fixed;top:42px;right:5px;' onclick='help()'><i class="fa-regular fa-circle-question fa-lg logoff-color"></i></a>
-    <?php }?>
-</header>
-
-<div class='header2'>
-    <div>
-        <div class='btn-group btn-group-toggle item_2' style='padding:0' data-toggle='buttons'>
-            <label class='btn btn-outline-primary active' style='font-size:1.2rem'>
-                <input type='radio' name='options' id='option1' value='zeikomi' onChange='zei_math_all()' autocomplete='off' checked> 税込入力
-            </label>
-            <label class='btn btn-outline-primary' style='font-size:1.2rem'>
-                <input type='radio' name='options' id='option2' value='zeinuki' onChange='zei_math_all()' autocomplete='off'> 税抜入力
-            </label>
-        </div>
-    </div>
-    <div class='dipstyl' style='position:fixed;right:10px;'>
-        <div>
-            <select id='hyouji' class='form-control item_0'>
-                <option value='0' selected>全て表示</option>
-                <option value='1'>チェック</option>
-                <option value='2'>未チェック</option>
-            </select>
-        </div>
+    <p style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>  取扱商品 カテゴリー一括修正 画面</p>
+    <?php 
+    if(empty($_SESSION["tour"])){
+        echo "<a href='#' style='color:inherit;position:fixed;top:5px;right:5px;' onclick='help()'><i class='fa-regular fa-circle-question fa-lg logoff-color'></i></a>";
+    }
+    ?>
+    <div class='dipstyl' style='position:fixed;right:5px;top:35px'>
         <div >
             <form method='post' id='form2' action='shouhinMSList.php' style='display:flex;margin-left:5px;' class='item_01'>
             <select class='form-control' id='sort' name='sort1' style='margin-bottom:5px;' onchange='send()'>
@@ -123,9 +232,27 @@ $ZKMS = $stmt2->fetchAll();
             </form>
         </div>
     </div>
+</header>
+
+<div class='header2'>
+    <div style='display:flex;height:25px;margin:5px;'>
+        <select class='form-control' id='categry' style='width:100px;'>
+            <option>項目選択</option>
+            <option value='cate1' <?php echo ($categry==1?"selected":"");?> >分類１</option>
+            <option value='cate2' <?php echo ($categry==2?"selected":"");?> >分類２</option>
+            <option value='cate3' <?php echo ($categry==3?"selected":"");?> >分類３</option>
+        </select>
+        <select class='form-control' id='over_cate' disabled style='width:200px;margin-left:5px' >
+            <!--ajaxでセット-->
+        </select>
+    </div>
+    <div style='display:block;margin:5px;'>
+        <input type='text' id='upd_bunrui_write' class='form-control' style='max-width:305px;'>
+    </div>
+    
 </div>
 
-<body class='common_body media_body'>    
+<body class='common_body media_body'>
     <?php
         //echo $_SESSION["MSG"]."<br>";
         if($_SESSION["MSG"]!=""){
@@ -134,167 +261,60 @@ $ZKMS = $stmt2->fetchAll();
         $_SESSION["MSG"]="";
     ?>
     <div class='container-fluid'>
-    <form method='post' id='form1' action='shouhinMSList_sql.php'>
+    <form method='post' id='form1' action='shouhinMSCategoryEdit_sql.php'>
     <input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
-
+    <input type='hidden' name='upd_bunrui' id='upd_bunrui_send' value=''>
+    <input type='hidden' name='categry' id='categry_send' value=''>
     
-    <table class='table-striped item_1 '>
+    <table class='table-striped table-bordered item_1 MSLIST'>
         <thead>
             <tr style='height:30px;'>
-                <th class='th1' scope='col' colspan='12' style='width:auto;padding:0px 5px 0px 0px;'>ID:商品名</th><th scope='col'></th>
+                <th class='th1' scope='col' style='width:auto;padding:0px 5px 0px 0px;'>レ</th>
+                <!--<th class='th1' scope='col' style='width:auto;padding:0px 5px 0px 0px;' colspan='4'> ID:商品名</th>-->
+                <th class='th1' scope='col' style='width:auto;padding:0px 5px 0px 0px;' > ID:商品名</th>
+                <th class='th1' scope='col' style='width:auto;padding:0px 5px 0px 0px;' > カテゴリー(1>2>3)</th>
             </tr>
+            <!--
             <tr style='height:30px;'>
-            <th scope='col'>単価変更</th><th scope='col' style='color:red;'>単価(税抜)</th><th scope='col' >税区分</th>
-            <th scope='col' style='color:red;'>消費税</th><th scope='col'>原価</th><th scope='col' class='d-none d-sm-table-cell'>内容量</th><th scope='col' class='d-none d-sm-table-cell'>単位</th>
-            <th scope='col' class='d-none d-sm-table-cell' style='padding-left:5px;'>分類1</th><th scope='col' class='d-none d-sm-table-cell' style='padding-left:5px;'>分類2</th><th scope='col' class='d-none d-sm-table-cell' style='padding-left:5px;'>分類3</th>
-            <th scope='col'>レジ</th><th class='d-none d-sm-table-cell' style='width:4rem;'></th>
+                <th></th>
+                <th scope='col' style='width:auto;'>単価(税込)</th>
+                <th scope='col' style='padding-left:5px;'>分類1</th>
+                <th scope='col' style='padding-left:5px;'>分類2</th>
+                <th scope='col' style='padding-left:5px;'>分類3</th>
             </tr>
-            
+            -->
         </thead>
         <tbody id='tbody1'>
 <?php    
 $i=0;
 foreach($stmt as $row){
-    $chk="";
-    if($row["hyoujiKBN1"]=="on"){$chk="checked";}
-    echo "<tr id='tr1_".$i."'>\n";
-    echo "<td style='font-size:1.7rem;font-weight:700;' colspan='12'>".$row["shouhinCD"]."：".$row["shouhinNM"]."</td>";    //商品名
+    $zeikomitanka=$row["tanka"]+$row["tanka_zei"];
+    $category=(!empty($row["bunrui1"])?$row["bunrui1"].">":"");
+    $category=$category.(!empty($row["bunrui2"])?$row["bunrui2"].">":"");
+    $category=$category.(!empty($row["bunrui3"])?$row["bunrui3"]:"");
+    
+    echo "<tr id='tr1_".$i."' >\n";
+    echo "<td><input type='checkbox' id='chk_".$i."' name ='ORDERS[".$i."][chk]' style='width:2rem;padding-left:10px;'></td>";
+    //echo "<td style='font-size:1.5rem;font-weight:700;' colspan='4'>".$row["shouhinCD"]."：".$row["shouhinNM"]."</td>";    //商品名
+    echo "<td style=''>".$row["shouhinCD"].":".$row["shouhinNM"]."</td>";    //商品名
+    /*
     echo "</tr>\n";
-    echo "<tr id='tr2_".$i."'>\n";
-    echo "<td><input type='number' style='width:8rem;' id='new_tanka".$i."' onBlur='zei_math".$i."(this.value)' placeholder='新価格' ></td>";   //単価修正欄
-    echo "<td><input type='number' readonly='readonly' id ='ORDERS[".$i."][tanka]' name ='ORDERS[".$i."][tanka]' style='width:7rem;background-color:#a3a3a3;' value='".$row["tanka"]."'></td>"; //登録単価
-    echo "<td><select id ='ORDERS[".$i."][zeikbn]' onchange='zei_math".$i."(new_tanka".$i.".value)' name ='ORDERS[".$i."][zeikbn]' style='width:8rem;height:30px;'>";     //税区分
-        foreach($ZKMS as $row2){
-            if($row["zeiKBN"]==$row2["zeiKBN"]){
-                echo "<option value='".$row2["zeiKBN"]."' selected>".$row2["hyoujimei"]."</option>\n";
-            }else{
-                echo "<option value='".$row2["zeiKBN"]."'>".$row2["hyoujimei"]."</option>\n";
-            }
-        }
-    echo "</select>";
-    echo "<td><input type='number' readonly='readonly' id ='ORDERS[".$i."][shouhizei]' name ='ORDERS[".$i."][shouhizei]' style='width:6rem;background-color:#a3a3a3;' value='".$row["tanka_zei"]."'></td>";
-    echo "<td><input type='number' name ='ORDERS[".$i."][genka]' style='width:6rem;' value='".$row["genka_tanka"]."'></td>";
-    echo "<td class='d-none d-sm-table-cell'><input type='number' name ='ORDERS[".$i."][utisu]' style='width:6rem;' value='".$row["utisu"]."'></td>";
-    echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][tani]' style='width:3rem;' value='".$row["tani"]."'></td>";
-    echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][bunrui1]' style='width:8rem;' value='".$row["bunrui1"]."'></td>";
-    echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][bunrui2]' style='width:8rem;' value='".$row["bunrui2"]."'></td>";
-    echo "<td class='d-none d-sm-table-cell'><input type='text'   name ='ORDERS[".$i."][bunrui3]' style='width:8rem;' value='".$row["bunrui3"]."'></td>";
-    echo "<td><input type='checkbox' id='chk_".$i."' name ='ORDERS[".$i."][hyoujiKBN1]' style='width:4rem;margin-top:5px;' ".$chk."></td>";
-//    echo "<td class='d-none d-sm-table-cell'><input type='number'   name ='ORDERS[".$i."][hyoujiKBN2]' style='width:4rem;' value='".$row["hyoujiKBN2"]."'></td>";
-//    echo "<td class='d-none d-sm-table-cell'><input type='number'   name ='ORDERS[".$i."][hyoujiKBN3]' style='width:4rem;' value='".$row["hyoujiKBN3"]."'></td>";
-//    echo "<td class='d-none d-sm-table-cell'><input type='number' name ='ORDERS[".$i."][hyoujiNO]' style='width:4rem;' value='".$row["hyoujiNO"]."'></td>"; //並び順
-    echo "<td class='d-none d-sm-table-cell' style='text-align:center;'><a href='shouhinDEL.php?cd=".$row["shouhinCD"]."&csrf_token=".$csrf_create."'><i class='fa-regular fa-trash-can'></i></a></td>"; //削除アイコン
+    echo "<tr id='tr2_".$i."' style='font-size:1.8rem;'>\n";
+    echo "<td></td>";
+    echo "<td class='text-right' style='padding-right:10px;'>".$zeikomitanka."</td>"; //登録単価
+    echo "<td style='padding-left:5px;'>".$row["bunrui1"]."</td>";
+    echo "<td style='padding-left:5px;'>".$row["bunrui2"]."</td>";
+    echo "<td style='padding-left:5px;'>".$row["bunrui3"]."</td>";
+    */
+    echo "<td style='padding-left:5px;'>".$category."</td>";
     echo "</tr>\n";
     echo "<input type='hidden' name ='ORDERS[".$i."][shouhinCD]' value='".$row["shouhinCD"]."'>";
 
-    //JAVA SCRIPT
-    echo "    <script type='text/javascript' language='javascript'>\n";
-    echo "        var select".$i." = document.getElementById('ORDERS[".$i."][zeikbn]');\n";
-    echo "        var tanka".$i." = document.getElementById('ORDERS[".$i."][tanka]');\n";
-    echo "        var shouhizei".$i." = document.getElementById('ORDERS[".$i."][shouhizei]');\n";
-    echo "        var kominuki".$i." = document.getElementsByName('options');\n";
-    
-    echo "        var zei_math".$i." = function(new_tanka){\n"; //税計算関数
-    echo "            if(new_tanka==''){\n";
-    echo "                switch(select".$i.".value){\n";
-    echo "                    case '0':\n";
-    echo "                        shouhizei".$i.".value=0;\n";
-    echo "                        break;\n";
-    echo "                    case '1001':\n";
-    echo "                        shouhizei".$i.".value=Math.round(tanka".$i.".value * (8 / 100));\n";
-    echo "                        break;\n";
-    echo "                    case '1101':\n";
-    echo "                        shouhizei".$i.".value=Math.round(tanka".$i.".value * (10 / 100));\n";
-    echo "                        break;\n";
-    echo "                }\n";
-    echo "            }else if(select".$i.".value=='0'){\n";
-    echo "                tanka".$i.".value=new_tanka;\n";
-    echo "                shouhizei".$i.".value=0;\n";
-    echo "            }else if(kominuki".$i."[0].checked){//税込\n";
-    echo "                switch(select".$i.".value){\n";
-    echo "                    case '1001':\n";
-    echo "                        tanka".$i.".value=Math.round(new_tanka / (1 + 8 / 100));\n";
-    echo "                        shouhizei".$i.".value=new_tanka - Math.round(new_tanka / (1 + 8 / 100));\n";
-    echo "                        break;\n";
-    echo "                    case '1101':\n";
-    echo "                        tanka".$i.".value=Math.round(new_tanka / (1 + 10 / 100));\n";
-    echo "                        shouhizei".$i.".value=new_tanka - Math.round(new_tanka / (1 + 10 / 100));\n";
-    echo "                        break;\n";
-    echo "                }\n";
-    echo "            }else if(kominuki".$i."[1].checked){//税抜\n";
-    echo "                switch(select".$i.".value){\n";
-    echo "                    case '1001':\n";
-    echo "                        tanka".$i.".value=new_tanka;\n";
-    echo "                        shouhizei".$i.".value=Math.round(new_tanka * (8 / 100));\n";
-    echo "                        break;\n";
-    echo "                    case '1101':\n";
-    echo "                        tanka".$i.".value=new_tanka;\n";
-    echo "                        shouhizei".$i.".value=Math.round(new_tanka * (10 / 100));\n";
-    echo "                        break;\n";
-    echo "                }\n";
-    echo "            }else{\n";
-    echo "                //\n";
-    echo "            }\n";
-    echo "        }\n";
-    echo "    </script>\n";
+
 
     $i = $i+1;
 }
-$i--;
-$kensu=$i;
 
-//JAVA SCRIPT
-echo "<script type='text/javascript' language='javascript'>\n";
-echo "  var zei_math_all=function(){\n";
-while($i>=0){
-    echo "      zei_math".$i."(new_tanka".$i.".value);\n";
-    $i--;
-}
-echo "  }\n";
-
-$i=$kensu;
-echo "  var hyouji = document.getElementById('hyouji');\n";
-echo "  var disp;\n";
-echo "  var tr1;\n";
-echo "  var tr2;\n";
-echo "  hyouji.onchange=function(){\n";
-echo "      switch(hyouji.value){\n";
-echo "      case '1':\n"; //全件->チェックのみ
-echo "          check='table-row';\n";
-echo "          nocheck='none';\n";
-//echo "          hyouji.innerHTML='checked⇒no-checked';\n";
-echo "          break;\n";
-echo "      case '2':\n";//チェックのみ->未チェックのみ
-echo "          check='none';\n";
-echo "          nocheck='table-row';\n";
-//echo "          hyouji.innerHTML='no-checked⇒all';\n";
-echo "          break;\n";
-echo "      case '0':\n";//未チェックのみ->全件
-echo "          check='table-row';\n";
-echo "          nocheck='table-row';\n";
-//echo "          hyouji.innerHTML='all⇒checked';\n";
-echo "          break;\n";
-echo "      }\n";
-
-
-while($i>=0){
-    echo "      disp".$i." = document.getElementById('chk_".$i."');\n";
-    echo "      tr1".$i." = document.getElementById('tr1_".$i."');\n";
-    echo "      tr2".$i." = document.getElementById('tr2_".$i."');\n";
-    //echo "alert(disp".$i.".value + ':' + '".$i."');";
-    echo "      if(disp".$i.".checked === true){\n";
-    echo "          tr1".$i.".style.display=check;\n";
-    echo "          tr2".$i.".style.display=check;\n";
-    echo "      }else{\n";
-    echo "          tr1".$i.".style.display=nocheck;\n";
-    echo "          tr2".$i.".style.display=nocheck;\n";
-    echo "      }\n";
-    $i--;
-}
-
-echo "  };\n";
-
-echo "</script>";
 ?>
         </tbody>
     </table>

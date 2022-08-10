@@ -53,6 +53,7 @@ $token = csrf_create();
     $array = [
          '売上金額ランキング'=>['analysis_uriagejisseki.php?sum_tani=4&csrf_token='.$token,'商品ごとの売上金額ランキングを表示。']
         ,'売上個数ランキング'=>['analysis_uriagejisseki.php?sum_tani=5&csrf_token='.$token,'商品ごとの売上個数ランキングを表示。']
+        ,'売上カテゴリー別集計'=>['analysis_uriagejisseki.php?sum_tani=12&csrf_token='.$token,'カテゴリーごとの売上を集計し、円グラフで表示。']
         ,'客単価実績'=>['analysis_uriagejisseki.php?sum_tani=6&csrf_token='.$token,'日ごとの平均客単価を表示します。']
         ,'平均客単価ランキング'=>['analysis_uriagejisseki.php?sum_tani=7&csrf_token='.$token,'イベントごとの平均客単価を算出し、ランキングを表示。']
         ,'来客数実績'=>['analysis_uriagejisseki.php?sum_tani=8&csrf_token='.$token,'日ごとの来客数（会計数）を表示。']

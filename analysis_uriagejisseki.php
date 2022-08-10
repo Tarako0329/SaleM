@@ -56,45 +56,53 @@ if(!empty($_POST)){
 }
 $tokui=$list;
 
-
+$chart_type="";
 //deb_echo($list);
 if($analysis_type==1){//日ごと
     $sqlstr = "select UriDate as 計上年月 ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
     $gp_sqlstr = "group by UriDate order by UriDate";
     $aryColumn = ["計上日","税抜売上","消費税","税込売上"];
+    $chart_type="bar";
 }elseif($analysis_type==2){//月毎
     $sqlstr = "select DATE_FORMAT(UriDate, '%Y/%m') as 計上年月 ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
     $gp_sqlstr = "group by DATE_FORMAT(UriDate, '%Y%m') order by DATE_FORMAT(UriDate, '%Y%m')";
     $aryColumn = ["計上年月","税抜売上","消費税","税込売上"];
+    $chart_type="bar";
 }elseif($analysis_type==3){//年ごと
     $sqlstr = "select DATE_FORMAT(UriDate, '%Y') as 計上年月 ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
     $gp_sqlstr = "group by DATE_FORMAT(UriDate, '%Y') order by DATE_FORMAT(UriDate, '%Y')";
     $aryColumn = ["計上年度","税抜売上","消費税","税込売上"];
+    $chart_type="bar";
 }elseif($analysis_type==4){//製品名ごと売上金額ランキング
     $sqlstr = "select ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
     $gp_sqlstr = "group by ShouhinNM order by sum(UriageKin) desc";
     $aryColumn = ["商品名","税抜売上","消費税","税込売上"];
+    $chart_type="bar";
 }elseif($analysis_type==5){//製品名ごと売上数量ランキング
     $sqlstr = "select ShouhinNM as ShouhinNM ,sum(Su) as 売上数 from UriageData ";
     $gp_sqlstr = "group by ShouhinNM order by sum(Su) desc";
     $aryColumn = ["商品名","売上数"];
+    $chart_type="bar";
 }elseif($analysis_type==6){//客単価推移
     //客単価一覧
     $sqlstr = "select 計上日,ROUND(avg(税抜売上)) as 客単価,Event from ";
     $sqlstr = $sqlstr." (select UriDate as 計上日 ,Event ,UriageNO ,sum(UriageKin) as 税抜売上 from UriageData ";
     $gp_sqlstr = "group by UriDate,UriageNO ) as UriSum group by 計上日 order by 計上日";
     $aryColumn = ["計上日","客単価","Event/店舗"];
+    $chart_type="bar";
 }elseif($analysis_type==7){//イベント・店舗別客単価ランキング
     $sqlstr = "select KYAKU,ROUND(avg(客単価)) as 平均客単価 from ";
     $sqlstr = $sqlstr." (select UriDate as 計上日 ,concat(Event,TokuisakiNM) as KYAKU ,UriageNO ,sum(UriageKin) as 客単価 from UriageData ";
     $gp_sqlstr = "group by UriDate,concat(Event,TokuisakiNM),UriageNO ) as UriSum group by KYAKU order by avg(客単価) desc";
     $aryColumn = ["Event/店舗","客単価"];
+    $chart_type="bar";
 }elseif($analysis_type==8){//イベント・店舗別来客数推移
     $sqlstr = "select UriDate,sum(来客カウント) as 来客数,Event from ";
     $sqlstr = $sqlstr." (select uid, UriDate, Event, TokuisakiNM, UriageNO,0 as ShouhinCD, 1 as 来客カウント from UriageData where Event <>'' ";
     $sqlstr = $sqlstr." group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriSum ";
     $gp_sqlstr = "group by UriDate,Event order by UriDate";
     $aryColumn = ["計上日","来客数","Event/店舗"];
+    $chart_type="bar";
     
     $tokui="xxxx";//来客数の場合は個別売りを除く
 }elseif($analysis_type==9){//イベント・店舗別来客数ランキング
@@ -103,26 +111,40 @@ if($analysis_type==1){//日ごと
     $sqlstr = $sqlstr." group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriSum ";
     $gp_sqlstr = "group by UriDate,Event) as Urisum2 group by Event order by ROUND(avg(来客数)) desc";
     $aryColumn = ["Event/店舗","平均来客数"];
+    $chart_type="bar";
 
     $tokui="xxxx";//来客数の場合は個別売りを除く
 }elseif($analysis_type==10){//商品の売れる勢い
     $sqlstr = "select ShouhinNM as NAME,concat(time_format(insDatetime,'%H'), '時') as Hour,sum(su) as COUNT from UriageData ";
     $gp_sqlstr = "group by ShouhinNM,time_format(insDatetime,'%H') order by ShouhinNM,time_format(insDatetime,'%H')";
     $aryColumn = ["商品名","時","個数"];
+    $chart_type="line";
     
     $tokui="xxxx";//時間別推移の場合は個別売りを除く
 }elseif($analysis_type==11){//来客数推移
     $sqlstr = "select tmp.Event as NAME ,tmp.Hour as Hour,count(*) as COUNT from (select Event,concat(time_format(insDatetime,'%H'), '時') as Hour,UriageNO from UriageData ";
     $gp_sqlstr = "group by Event,concat(time_format(insDatetime,'%H'), '時'),UriageNO) as tmp group by tmp.Event,tmp.Hour order by tmp.Event,tmp.Hour";
     $aryColumn = ["イベント名","時","人数"];
+    $chart_type="line";
     
     $tokui="xxxx";//時間別推移の場合は個別売りを除く
+}elseif($analysis_type==12){//ジャンル別実績
+    $sqlstr = "select if(bunrui1<>'',bunrui1,'未分類'),sum(UriageKin) as Uriage from UriageData inner join ShouhinMS on UriageData.uid=ShouhinMS.uid and UriageData.shouhinCD=ShouhinMS.shouhinCD ";
+    $gp_sqlstr = "group by bunrui1 order by sum(UriageKin) desc";
+    $aryColumn = ["カテゴリー","売上"];
+    $chart_type="doughnut";
+/*memo
+    $sql_select="if(bunrui1<>'',bunrui1,'未分類') as categoly";
+    $sql_select="concat(if(bunrui1<>'',bunrui1,'未分類'),'>',if(bunrui2<>'',bunrui2,'未分類')) as categoly";
+    $sql_select="concat(if(bunrui1<>'',bunrui1,'未分類'),'>',if(bunrui2<>'',bunrui2,'未分類'),'>',if(bunrui3<>'',bunrui3,'未分類')) as categoly";
+*/
+    
 }
 
 if($options=="ym"){
-    $sqlstr = $sqlstr." where ShouhinCD<9900 and DATE_FORMAT(UriDate, '%Y%m') between :ymfrom and :ymto AND uid = :user_id ";
+    $sqlstr = $sqlstr." where UriageData.ShouhinCD<9900 and DATE_FORMAT(UriDate, '%Y%m') between :ymfrom and :ymto AND UriageData.uid = :user_id ";
 }else{
-    $sqlstr = $sqlstr." where ShouhinCD<9900 and UriDate between :ymfrom and :ymto AND uid = :user_id ";
+    $sqlstr = $sqlstr." where UriageData.ShouhinCD<9900 and UriDate between :ymfrom and :ymto AND UriageData.uid = :user_id ";
 }
 $sqlstr = $sqlstr." AND ((TokuisakiNM ='' and Event like :event) OR (Event = '' and TokuisakiNM like :tokui ))";
 $sqlstr = $sqlstr." ".$gp_sqlstr;
@@ -164,11 +186,13 @@ $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
     window.onload = function() {
 
     <?php
-    if($analysis_type!=10 && $analysis_type!=11){
+    //if($analysis_type!=10 && $analysis_type!=11 && $analysis_type!=12){//横棒グラフ
+    if($chart_type==="bar" || $chart_type == "doughnut"){//横棒orドーナッツグラフ
     ?>
         const ctx = document.getElementById('myChart').getContext('2d');
         const myChart = new Chart(ctx, {
-            type: 'bar',
+            //type: 'bar',
+            type: '<?php echo $chart_type; ?>',
             data: {
                 labels: [
                     <?php
@@ -222,23 +246,34 @@ $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
                             $i++;
                         }
                         ?>
-                        ],
+                        ]
                     //borderWidth: 1,
-                    maxBarThickness:20,
-                    barPercentage:0.9
+                    <?php
+                    if($chart_type==="bar"){
+                        echo ",maxBarThickness:20,";
+                        echo "barPercentage:0.9";
+                    }
+                    ?>
                 }]
             },
             options: {
+                <?php
+                if($chart_type==="bar"){
+                ?>
                 scales: {
                     x: {
                         //beginAtZero: true
                     }
                 },
                 indexAxis: 'y'
+                <?php
+                }
+                ?>
             }
         });
     <?php
-    }else if($analysis_type==10 || $analysis_type==11){
+    //}else if($analysis_type==10 || $analysis_type==11){//折れ線グラフ
+    }elseif($chart_type==="line"){
         $label="";  //商品名を格納
         $j=0;       //0～23までのカウンタ
         $urisu=0;   //売上総数の保持
@@ -262,7 +297,6 @@ $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
         var data = {
                 labels: [
             <?php
-//            echo "      labels: [";
             $j=$min_hour;
             while($j<=$max_hour){
                 if($j>=0){
@@ -451,6 +485,7 @@ $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
                 <option value='9' <?php if($analysis_type==9){echo "selected";} ?> >平均来客数ランキング</option>
                 <option value='10' <?php if($analysis_type==10){echo "selected";} ?> >売れる勢い</option>
                 <option value='11' <?php if($analysis_type==11){echo "selected";} ?> >来客数推移</option>
+                <option value='12' <?php if($analysis_type==12){echo "selected";} ?> >ジャンル別売上比</option>
             </select>
             <select name='list' class='form-control' style='padding:0;width:auto;max-width:100%;display:inline-block;margin:5px' onchange='send()' id='Event'>
                 <!--

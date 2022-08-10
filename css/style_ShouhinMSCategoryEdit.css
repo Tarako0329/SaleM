@@ -3,56 +3,21 @@
     .common_header{
         position:fixed;
     }
-    .header2{
-        top: 70px;
-        height: 60px; /* 高さを指定 */
-    }
     .th1{
-        top:130px;
+        top:150px;
     }
     th{
-        top:159px;
-    }
-    .hyouji{
-        top:95px;
-    }
-    .media_body{
-        padding-top:130px;
+        top:179px;
     }
     .dipstyl{
         display:block;
     }
 }
-/*デバイスが横向きの場合*/
-@media (orientation: landscape){
-    .common_header{
-        display:none;
-    }
-    .header2{
-        top:0px;
-        height: 40px; /* 高さを指定 */
-    }
-    .th1{
-        top:30px;
-    }
-    th{
-        top:55px;
-    }
-    .hyouji{
-        top:25px;
-    }
-    .media_body{
-        padding-top:40px;
-    }
-    .dipstyl{
-        display:flex;
-    }
-}
 
 .common_body {
+    padding-top:150px;
     padding-bottom:90px; /*フッターーの後ろに要素が隠れないようにするため */
     font-size:1.5rem;
-    /*padding-top:130px;*/
 }
 .yagou{
     width: 100%;
@@ -105,6 +70,8 @@ INPUT{
     border-color:var(--rez-border-color);
 }
 .header2{
+    top: 70px;
+    height: 80px; /* 高さを指定 */
     
     padding: 5px 2px; /* ヘッダーに上下左右それぞれ余白を指定 */
     box-sizing: border-box; /* padding分を含んで幅を100%にするため */
@@ -114,7 +81,7 @@ INPUT{
     width: 100%;
     z-index: 99;
     background:#fff;
-    display:flex;
+    display:block;
 }
 .th1{
     position: sticky;
@@ -123,9 +90,4 @@ INPUT{
 th{
     position: sticky;
     background:#fff;
-}
-.hyouji{
-    position:fixed;
-    /*top:95px;*/
-    right:0;
 }
