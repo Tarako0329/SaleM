@@ -2129,7 +2129,9 @@ $this->debugEchoLf($this->to);
 	function sendBase(){
 		// stack bcc for allways bcc
 		unset( $stack_bcc ) ;
-		if( 0 != count( $this->allways_bcc ) ){
+		// (is_countable(  )?count(  ):0);
+		//if( 0 != count( $this->allways_bcc ) ){
+		if( 0 != (is_countable( $this->allways_bcc )?count( $this->allways_bcc ):0) ){
 			$stack_bcc = $this->bcc ;
 			$this->bcc( $this->allways_bcc , null , true );
 		}
@@ -2152,7 +2154,8 @@ $this->debugEchoLf($this->to);
 		$this->extractrecipient() ;
 		$fg = true;
 		$fg_debug = ( 2 > $this->debug ) && !$this->render_mode;
-		if( $fg_debug && (  ( 0 === count( $this->error ) ) && ( 0 === count( $this->error_stack ) ) ) || $this->ignore_error ) {
+//		if( $fg_debug && (  ( 0 === count( $this->error ) ) && ( 0 === count( $this->error_stack ) ) ) || $this->ignore_error ) {
+		if( $fg_debug && (  ( 0 === (is_countable( $this->error )?count( $this->error ):0) ) && ( 0 === (is_countable( $this->error_stack )?count( $this->error_stack ):0) ) ) || $this->ignore_error ) {
 			//
 			//  mail or SMTP or sendmail
 			//

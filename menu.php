@@ -223,8 +223,12 @@ if($action=="logout"){
     ];
     
     //契約・解約関連は各時で実装したファイルを指定する
+    /*
     $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', null));
     $dir_path = bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', null));
+    */
+    $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', "1"));
+    $dir_path = bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', "1"));
     
     if(EXEC_MODE!="Trial"){
         if($plan==0){

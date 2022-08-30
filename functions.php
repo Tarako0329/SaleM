@@ -1,5 +1,24 @@
 <?php
 // =========================================================
+// 数字を3桁カンマ区切りで返す(整数のみ対応)
+// =========================================================
+function return_num_disp($number) {
+    if(preg_match('/[^0-9]/',$number)==0){//0～9以外が存在して無い場合、数値として処理
+        $shori_moji_su = mb_strlen($number) - 3;
+        
+        while($shori_moji_su > 0){
+            $return_number = $return_number.",".mb_substr($number,$shori_moji_su,3);
+            $zan_mojisu = $shori_moji_su;
+            $shori_moji_su = $shori_moji_su - 3;
+        }
+        
+        $return_number = mb_substr($number,0,$zan_mojisu).$return_number;
+    }else{
+        $return_number = $number;
+    }
+    return $return_number;
+}
+// =========================================================
 // トークンを作成
 // =========================================================
 function get_token() {
@@ -255,12 +274,14 @@ function rot13decrypt ($str) {
 function rot13encrypt2 ($str) {
 	//暗号化
     //return str_rot13(base64_encode($str)); 復号化するときに文字化けが発生したので変更
-    return bin2hex(openssl_encrypt($str, 'AES-128-ECB', null));
+    //return bin2hex(openssl_encrypt($str, 'AES-128-ECB', null));
+    return bin2hex(openssl_encrypt($str, "AES-128-ECB", "1"));
 }
 function rot13decrypt2 ($str) {
 	//暗号化解除
     //return base64_decode(str_rot13($str)); 復号化するときに文字化けが発生したので変更
-    return openssl_decrypt(hex2bin($str), 'AES-128-ECB', null);
+    //return openssl_decrypt(hex2bin($str), 'AES-128-ECB', null);
+    return openssl_decrypt(hex2bin($str), "AES-128-ECB", "1");
 }
 
 // =========================================================
@@ -384,18 +405,18 @@ function drow_table($aryColumn,$result){
                 }
                 
                 if($row["ShouhinNM"]===$row[$i]){
-                    $val = rot13decrypt($row["ShouhinNM"]);
+                    $val = $row["ShouhinNM"];
                 }else{
                     $val = $row[$i];
                 }
-                echo "<td".$right.">".$val."</td>";    
+                echo "<td".$right.">".return_num_disp($val)."</td>";    
             }
             echo "</tr>\n";
         }
         
         echo "<thead><tr><th>合計</th>";
         for($i=1;isset($row_sum[$i])==true;$i++){
-            echo "<th class='text-right'>".$row_sum[$i]."</th>";
+            echo "<th class='text-right'>".return_num_disp($row_sum[$i])."</th>";
         }
         echo "</tr></thead>\n";
         echo "</table>\n";    
@@ -447,12 +468,12 @@ function drow_table_abc($aryColumn,$result,$cols){
                         $rank="C";
                     }
                 }
-                echo "<td".$right.">".$val."</td>";    
+                echo "<td".$right.">".return_num_disp($val)."</td>";    
             }
             echo "<td class='text-center'>".$rank."</td>";
             echo "</tr>\n";
         }
-        echo "<thead><tr><th>合計</th><th class='text-right'>".$row["総売上"]."</th></tr></thead>";
+        echo "<thead><tr><th>合計</th><th class='text-right'>".return_num_disp($row["総売上"])."</th></tr></thead>";
         echo "</table>\n";
     }elseif($cols==3){
         
@@ -497,7 +518,7 @@ function drow_table_abc($aryColumn,$result,$cols){
                 }
                 
                 if($row["ShouhinNM"]===$row[$i]){
-                    $val = rot13decrypt($row["ShouhinNM"]);
+                    $val = $row["ShouhinNM"];
                 }else{
                     $val = $row[$i];
                 }
@@ -512,12 +533,12 @@ function drow_table_abc($aryColumn,$result,$cols){
                         $rank="C";
                     }
                 }
-                echo "<td".$right.">".$val."</td>";    
+                echo "<td".$right.">".return_num_disp($val)."</td>";    
             }
             echo "<td class='text-center'>".$rank."</td>";
             echo "</tr>\n";
         }
-        echo "<thead><tr><th>合計</th><th class='text-right'>".$row["総売上"]."</th></tr></thead>";
+        echo "<thead><tr><th>合計</th><th class='text-right'>".return_num_disp($row["総売上"])."</th></tr></thead>";
         echo "</table>\n";
         echo "</div></div>";
         

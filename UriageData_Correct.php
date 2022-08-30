@@ -437,27 +437,22 @@ $GoukeiZei=0;
 $GoukeiZeikomi=0;
 $uridate="";
 
-//$colspan=($Type=="sum_items"?"10":"8");
 $colspan=($Type=="sum_items"?"12":"10");
 
 foreach($result as $row){
     if($uridate!=$row["UriDate"].$row["Event"]){
-        //echo "<tr class='tr_stiky'><td colspan='".$colspan."' class='d-sm-none tr_stiky'><a href='UriageData_Correct.php?mode=select&ad1=".rot13encrypt2($row["UriDate"])."&Type=".$NextType."&csrf_token=".$csrf_create."'> 売上日：".$row["UriDate"]."</a> ";
-        //echo "<a href='UriageData_Correct.php?mode=select&ad2=".rot13encrypt2($row["Event"].$row["TokuisakiNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>『".$row["Event"].$row["TokuisakiNM"]."』</a>";
         echo "<tr class='tr_stiky'><td colspan='".$colspan."' class='tr_stiky'><a href='UriageData_Correct.php?mode=select&ad1=".rot13encrypt2($row["UriDate"])."&Type=".$NextType."&csrf_token=".$csrf_create."'> 売上日：".$row["UriDate"]."</a> ";
         echo "<a href='UriageData_Correct.php?mode=select&ad2=".rot13encrypt2($row["Event"].$row["TokuisakiNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>『".$row["Event"].$row["TokuisakiNM"]."』</a>";
         if(!empty($row["icon"])){echo "<img style='height:20px;' src='https://openweathermap.org/img/wn/".$row["icon"]."'>（<span style='color:red;'>".$row["max_temp"]."</span>/<span style='color:blue;'>".$row["min_temp"]."</span>）";}
         echo "</td></tr>\n";
     }
-    //echo "<tr><td class='d-none d-sm-table-cell'><a href='UriageData_Correct.php?mode=select&ad1=".rot13encrypt2($row["UriDate"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["UriDate"]."</a></td>";
-    //echo "<td class='d-none d-sm-table-cell'><a href='UriageData_Correct.php?mode=select&ad2=".rot13encrypt2($row["Event"].$row["TokuisakiNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["Event"].$row["TokuisakiNM"]."</a></td>";
     echo "<td class='text-center'><a href='UriageData_Correct.php?mode=select&ad3=".rot13encrypt2($row["UriageNO"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["UriageNO"]."</a></td>";
     echo "<td><a href='UriageData_Correct.php?mode=select&ad4=".rot13encrypt2($row["ShouhinCD"])."&ad5=".rot13encrypt2($row["ShouhinNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".($row["ShouhinNM"])."</a></td>";
     if($Type=="sum_items"){echo "<td class='text-right'>".$row["shuppin_su"]."</td>";}
     echo "<td class='text-right'>".$row["su"]."</td>";
     if($Type=="sum_items"){echo "<td class='text-right'>".$row["zan_su"]."</td>";}
-    echo "<td class='text-right d-none d-sm-table-cell'>".$row["tanka"]."</td><td class='text-right'>".$row["UriageKin"]."</td>";
-    echo "<td class='text-right'>".$row["zei"]."</td><td class='text-right'>".$row["genka"]."</td><td class='text-right'>".$row["arari"]."</td>\n";
+    echo "<td class='text-right d-none d-sm-table-cell'>".return_num_disp($row["tanka"])."</td><td class='text-right'>".return_num_disp($row["UriageKin"])."</td>";
+    echo "<td class='text-right'>".$row["zei"]."</td><td class='text-right'>".return_num_disp($row["genka"])."</td><td class='text-right'>".return_num_disp($row["arari"])."</td>\n";
     if(($Type=="rireki") && ($mode == "select") || ($mode == "Updated")){
         //履歴表示の時だけ削除可能
         if(!empty($row["icon"])){
@@ -576,8 +571,8 @@ if($mode=="Update" || $mode=="del"){
 
 <footer class='common_footer'>
     <div class='kaikei'>
-        合計(税込)：￥<?php echo $GoukeiZeikomi ?>-<br>
-        <span style='font-size:1.3rem;'>内訳(本体+税)：￥<?php echo $Goukei." + ".$GoukeiZei ?></span>
+        合計(税込)：￥<?php echo return_num_disp($GoukeiZeikomi) ?>-<br>
+        <span style='font-size:1.3rem;'>内訳(本体+税)：￥<?php echo return_num_disp($Goukei)." + ".return_num_disp($GoukeiZei) ?></span>
     </div>
     <div class='right1 item_1'>
         <button type='button' class='btn--chk' style='border-radius:0;' data-toggle='modal' data-target='#UriModal'>検　索</button>

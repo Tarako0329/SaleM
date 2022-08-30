@@ -55,8 +55,8 @@ if($row[0]["yuukoukigen"]==""){
     //本契約済み
 }elseif($row[0]["yuukoukigen"] < date("Y-m-d")){
     //お試し期間終了
-    $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', null));
-    $dir_path =  bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', null));
+    $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', 1));
+    $dir_path =  bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', 1));
     
     //echo row[0]["yuukoukigen"] ;
     $emsg="お試し期間、もしくは解約後有効期間が終了しました。<br>継続してご利用頂ける場合は<a href='".PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path."'>こちらから本契約をお願い致します </a>";
@@ -233,7 +233,8 @@ window.onload = function() {
         echo "              total_zei += ".$row["tanka_zei"].";\n";
         //echo "              suryou_".$row["shouhinCD"].".value = cnt_suryou_".$row["shouhinCD"].";\n";
         echo "              suryou_".$row["shouhinCD"].".value = parseInt(suryou_".$row["shouhinCD"].".value) + 1;\n";
-        echo "              kaikei_disp.innerHTML = total_pay;\n";
+//        echo "              kaikei_disp.innerHTML = total_pay;\n";
+        echo "              kaikei_disp.innerHTML = total_pay.toLocaleString();\n";
         echo "              zei_disp.innerHTML = total_zei;\n";
         echo "        }else if(plus_minus[1].checked){\n";//減らすモード（マイナス）
         //echo "              if(cnt_suryou_".$row["shouhinCD"]."==0){\n";

@@ -17,6 +17,9 @@ csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェ�
 
 require "php_header.php";
 
+//var_dump($_GET);
+//var_dump($_POST);
+
 if(isset($_GET["csrf_token"]) || empty($_POST)){
     if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。①";
@@ -45,6 +48,8 @@ if(!empty($_POST)){
         $ymto = $_POST["ymto2"];
         $ajax_func="getAllData('#Event','#ymfrom2','#ymto2','Event');";
     }
+    $category=(!empty($_POST["category"])?$_POST["category"]:"")."%";
+    $category_lv=(!empty($_POST["category_lv"])?$_POST["category_lv"]:"0");
 }else{
     //初期はGETから
     $ymfrom = (int)((string)date('Y')."01");
@@ -53,6 +58,8 @@ if(!empty($_POST)){
     $analysis_type=$_GET["sum_tani"];
     $options="ym";
     $ajax_func="getAllData('#Event','#ymfrom1','#ymto1','Event');";
+    $category="%";
+    $category_lv="0";
 }
 $tokui=$list;
 
@@ -129,8 +136,24 @@ if($analysis_type==1){//日ごと
     
     $tokui="xxxx";//時間別推移の場合は個別売りを除く
 }elseif($analysis_type==12){//ジャンル別実績
-    $sqlstr = "select if(bunrui1<>'',bunrui1,'未分類'),sum(UriageKin) as Uriage from UriageData inner join ShouhinMS on UriageData.uid=ShouhinMS.uid and UriageData.shouhinCD=ShouhinMS.shouhinCD ";
-    $gp_sqlstr = "group by bunrui1 order by sum(UriageKin) desc";
+    if($category_lv==="0"){
+        $sql_category = "if(bunrui1<>'',bunrui1,'未分類')";
+        $category="%";
+    }elseif($category_lv==="1"){
+//        $sql_category = "if(bunrui2<>'',bunrui2,'未分類')";
+        $sql_category = "concat(if(bunrui1<>'',bunrui1,'未分類'),'>',if(bunrui2<>'',bunrui2,'未分類'))";
+        
+    }elseif($category_lv==="2"){
+//        $sql_category = "if(bunrui3<>'',bunrui3,'未分類')";
+        $sql_category = "concat(if(bunrui1<>'',bunrui1,'未分類'),'>',if(bunrui2<>'',bunrui2,'未分類'),'>',if(bunrui3<>'',bunrui3,'未分類'))";
+        $category_lv=-1;
+    }else{
+        $sql_category = "";
+        $sql_category_where="";
+    }
+    $sql_category_where = " AND ".$sql_category." LIKE '".$category."'";
+    $sqlstr = "select ".$sql_category.",sum(UriageKin) as Uriage from UriageData inner join ShouhinMS on UriageData.uid=ShouhinMS.uid and UriageData.shouhinCD=ShouhinMS.shouhinCD ";
+    $gp_sqlstr = "group by ".$sql_category." order by sum(UriageKin) desc";
     $aryColumn = ["カテゴリー","売上"];
     $chart_type="doughnut";
 /*memo
@@ -147,6 +170,8 @@ if($options=="ym"){
     $sqlstr = $sqlstr." where UriageData.ShouhinCD<9900 and UriDate between :ymfrom and :ymto AND UriageData.uid = :user_id ";
 }
 $sqlstr = $sqlstr." AND ((TokuisakiNM ='' and Event like :event) OR (Event = '' and TokuisakiNM like :tokui ))";
+$sqlstr = $sqlstr.(!empty($sql_category_where)?$sql_category_where:"");
+
 $sqlstr = $sqlstr." ".$gp_sqlstr;
 
 //deb_echo($sqlstr);
@@ -260,17 +285,39 @@ $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
                 <?php
                 if($chart_type==="bar"){
                 ?>
-                scales: {
-                    x: {
-                        //beginAtZero: true
+                    scales: {
+                        x: {
+                            //beginAtZero: true
+                        }
+                    },
+                    indexAxis: 'y'
+                <?php
+                }else{
+                ?>
+                    events: ['click'],
+                    onClick: function (e, el,chart) {
+                        if (! el || el.length === 0) return;
+                        console.log('onClick : label ' + el[0]._model);
+                        
+                        //以下の記述でオブジェクト全体をみることができるよ
+                        /*
+                        console.dir(el);
+                        console.dir(e);
+                        console.dir(chart);
+                        console.log(chart.data.labels[el[0].index]);
+                        
+                        var s = "_datasetIndex="  + el[0].datasetIndex + " _lindex=" + el[0].index + " labels=" + el[0].chart 
+                        console.log(s);
+                        */
+                        send2(chart.data.labels[el[0].index],<?php echo ($category_lv+1); ?>);
                     }
-                },
-                indexAxis: 'y'
                 <?php
                 }
                 ?>
             }
+            
         });
+
     <?php
     //}else if($analysis_type==10 || $analysis_type==11){//折れ線グラフ
     }elseif($chart_type==="line"){
@@ -477,6 +524,7 @@ $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
                 <option value='1' <?php if($analysis_type==1){echo "selected";} ?> >売上実績(日計)</option>
                 <option value='2' <?php if($analysis_type==2){echo "selected";} ?>>売上実績(月計)</option>
                 <option value='3' <?php if($analysis_type==3){echo "selected";} ?> >売上実績(年計)</option>
+                <option value='12' <?php if($analysis_type==12){echo "selected";} ?> >ジャンル別売上比</option>
                 <option value='4' <?php if($analysis_type==4){echo "selected";} ?> >売上ランキング(金額)</option>
                 <option value='5' <?php if($analysis_type==5){echo "selected";} ?> >売上ランキング(個数)</option>
                 <option value='6' <?php if($analysis_type==6){echo "selected";} ?> >客単価実績(イベントごと)</option>
@@ -485,7 +533,6 @@ $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
                 <option value='9' <?php if($analysis_type==9){echo "selected";} ?> >平均来客数ランキング</option>
                 <option value='10' <?php if($analysis_type==10){echo "selected";} ?> >売れる勢い</option>
                 <option value='11' <?php if($analysis_type==11){echo "selected";} ?> >来客数推移</option>
-                <option value='12' <?php if($analysis_type==12){echo "selected";} ?> >ジャンル別売上比</option>
             </select>
             <select name='list' class='form-control' style='padding:0;width:auto;max-width:100%;display:inline-block;margin:5px' onchange='send()' id='Event'>
                 <!--
@@ -533,6 +580,23 @@ $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
     }
     function send(){
         const form1 = document.getElementById('form1');
+        form1.submit();
+    }
+    function send2(category,lv){
+        const form1 = document.getElementById('form1');
+
+        let req = document.createElement('input');
+        req.type = 'hidden';
+        req.name = 'category';
+        req.value = category;
+        form1.appendChild(req);
+
+        let req2 = document.createElement('input');
+        req2.type = 'hidden';
+        req2.name = 'category_lv';
+        req2.value = lv;
+        form1.appendChild(req2);
+
         form1.submit();
     }
 </script>
