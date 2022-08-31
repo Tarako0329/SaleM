@@ -62,7 +62,7 @@ function check_auto_login($cookie_token, $pdo) {
     	//自動ログイン失敗
     
     	//Cookie のトークンを削除
-    	setCookie("webrez_token", '', -1, "/", null, TRUE, TRUE); // secure, httponly
+    	setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly
     
     	 //古くなったトークンを削除
     	delete_old_token($cookie_token, $pdo);
@@ -82,7 +82,7 @@ function check_session_userid($pdo_h){
         }else if((!empty($_SESSION["user_id"]) && empty($_COOKIE["user_id"])) || (!empty($_SESSION["user_id"]) && $_COOKIE["user_id"] != $_SESSION["user_id"])){
             //クッキーが空　もしくは　セッションありかつセッション＜＞クッキーの場合
             //クッキーにセッションの値をセットする
-            setCookie("user_id", $_SESSION["user_id"], time()+60*60*24, "/", null, TRUE, TRUE);
+            setCookie("user_id", $_SESSION["user_id"], time()+60*60*24, "/", "", TRUE, TRUE);
         }else if(!empty($_COOKIE["user_id"]) && empty($_SESSION["user_id"])){
             //セッションが空の場合、クッキーからIDを取得する
             $_SESSION["user_id"]=$_COOKIE["user_id"];
@@ -139,7 +139,7 @@ function check_session_userid($pdo_h){
             $_SESSION["EMSG"]="ユーザーＩＤの再取得に失敗しました。";
             $_SESSION["user_id"]="";
     	    //Cookie のトークンを削除
-    	    setCookie("webrez_token", '', -1, "/", null, TRUE, TRUE); // secure, httponly
+    	    setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: index.php");
             exit();
@@ -179,7 +179,7 @@ function csrf_chk_nonsession(){
     $cookie_token = (!empty($_COOKIE['csrf_token'])?$_COOKIE['csrf_token']:"");
 
     unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
-    setCookie("csrf_token", '', -1, "/", null, TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
+    setCookie("csrf_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
 
     if ($csrf_token != $cookie_token) {
         //不正アクセス
@@ -198,7 +198,7 @@ function csrf_chk_nonsession_get($csrf_token){
     $cookie_token = $_COOKIE['csrf_token'];
 
     unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
-    setCookie("csrf_token", '', -1, "/", null, TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
+    setCookie("csrf_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
 
     if ($csrf_token != $cookie_token) {
         //不正アクセス
@@ -216,7 +216,7 @@ function csrf_chk_redirect($csrf_token){
     //リダイレクト用GET版 引数にGETを渡す
     $session_token = (!empty($_SESSION['csrf_token'])?$_SESSION['csrf_token']:"");
     unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
-    setCookie("csrf_token", '', -1, "/", null, TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
+    setCookie("csrf_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
 
     if ($csrf_token != $session_token) {
         //不正アクセス
@@ -235,7 +235,7 @@ function csrf_create(){
 
 	//自動ログインのトークンを１週間の有効期限でCookieにセット
     //setCookie("webrez_token", $token, time()+60*60*24*7, "/", null, TRUE, TRUE); // secure, httponly
-    setCookie("csrf_token", $token, time()+60*60*24*2, "/", null, TRUE, TRUE);
+    setCookie("csrf_token", $token, time()+60*60*24*2, "/", "", TRUE, TRUE);
     
     return $token;
 }

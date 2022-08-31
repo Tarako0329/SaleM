@@ -34,7 +34,8 @@ if(ROOT_URL."EVregi.php"!==substr($_SERVER['HTTP_REFERER'],0,strlen(ROOT_URL."Ev
 
 $MODE=(!empty($_POST["mode"])?$_POST["mode"]:"");
 
-if($_POST["CTGL"]<>""){
+//if($_POST["CTGL"]<>""){
+if(filter_input(INPUT_POST,'CTGL')<>""){
     //メニューのカテゴリー区切り
     $_SESSION["CTGL"] = $_POST["CTGL"];
     $stmt = $pdo_h->prepare ( 'call PageDefVal_update(?,?,?,?,?)' );
@@ -74,7 +75,8 @@ if(!empty($_POST)){
 
 
 //入力画面の前回値を記録
-if($_POST["EV"]<>""){
+//if($_POST["EV"]<>""){
+if(filter_input(INPUT_POST,"EV")<>""    ){
     //イベント名
     $_SESSION["EV"] = $_POST["EV"];
     $stmt = $pdo_h->prepare ( 'call PageDefVal_update(?,?,?,?,?)' );
@@ -122,12 +124,17 @@ if($MODE == "evrez" || $MODE == "kobetu"){
     try{
         $pdo_h->beginTransaction();
         $sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime,genka_tanka) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)";
-        $sqllog = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime,genka_tanka) ";
-        $sqllog = $sqllog."values(".$_SESSION['user_id'].",".$UriageNO.",'".$_POST["KEIJOUBI"]."','".$time."','".$_POST["EV"]."','".$_POST["KOKYAKU"]."','".$row["CD"]."','".$row["NM"]."','".$row["SU"]."','".$row["UTISU"]."','".$row["TANKA"]."','".($row["SU"] * $row["TANKA"])."','".($row["SU"] * $row["ZEI"])."','".$row["ZEIKBN"]."',0,'".$row["GENKA_TANKA"]."')";
+        //$sqllog = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime,genka_tanka) ";
+        //$sqllog = $sqllog."values(".$_SESSION['user_id'].",".$UriageNO.",'".$_POST["KEIJOUBI"]."','".$time."','".$_POST["EV"]."','".$_POST["KOKYAKU"]."','".$row["CD"]."','".$row["NM"]."','".$row["SU"]."','".$row["UTISU"]."','".$row["TANKA"]."','".($row["SU"] * $row["TANKA"])."','".($row["SU"] * $row["ZEI"])."','".$row["ZEIKBN"]."',0,'".$row["GENKA_TANKA"]."')";
         foreach($array as $row){
             if($row["SU"]==0){
                 continue;
             }
+            
+            $sqllog = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime,genka_tanka) ";
+            $sqllog = $sqllog."values(".$_SESSION['user_id'].",".$UriageNO.",'".filter_input(INPUT_POST,'KEIJOUBI')."','".$time."','".filter_input(INPUT_POST,'EV')."','".filter_input(INPUT_POST,'KOKYAKU')."','".$row["CD"]."','".$row["NM"]."','".$row["SU"]."','".$row["UTISU"]."','".$row["TANKA"]."','".($row["SU"] * $row["TANKA"])."','".($row["SU"] * $row["ZEI"])."','".$row["ZEIKBN"]."',0,'".$row["GENKA_TANKA"]."')";
+            
+            
             $stmt = $pdo_h->prepare($sqlstr);
             
             $time = date("Y/m/d H:i:s");

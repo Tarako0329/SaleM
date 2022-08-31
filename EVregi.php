@@ -64,20 +64,6 @@ if($row[0]["yuukoukigen"]==""){
 
 
 $token = csrf_create();
-/*
-if(empty($_COOKIE["address"]) && !empty($_SESSION["address"]) ){
-    setCookie("address", $_SESSION['address'], time()+60*60*10, "/", null, TRUE, TRUE);
-    $_SESSION["address"]="";
-}
-if(empty($_COOKIE["lat"]) && !empty($_SESSION["lat"]) ){
-    setCookie("lat", $_SESSION['lat'], time()+60*60*10, "/", null, TRUE, TRUE);
-    $_SESSION["lat"]="";
-}
-if(empty($_COOKIE["lon"]) && !empty($_SESSION["lon"]) ){
-    setCookie("lon", $_SESSION['lon'], time()+60*60*10, "/", null, TRUE, TRUE);
-    $_SESSION["lon"]="";
-}
-*/
 
 $alert_msg=(!empty($_SESSION["msg"])?$_SESSION["msg"]:"");
 $RG_MODE=(!empty($_POST["mode"])?$_POST["mode"]:$_GET["mode"]);
