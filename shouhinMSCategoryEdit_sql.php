@@ -23,11 +23,21 @@ $sqlstr = "";
 
 $pdo_h->beginTransaction();
 $E_Flg=0;
+
+if($_POST["categry"]=="cate1"){
+    $col="bunrui1";
+}elseif($_POST["categry"]=="cate2"){
+    $col="bunrui2";
+}elseif($_POST["categry"]=="cate3"){
+    $col="bunrui3";
+}
+
+
 foreach($array as $row){
     if($row["chk"]!="on"){
         continue;
     }
-    
+    /*
     if($_POST["categry"]=="cate1"){
         $col="bunrui1";
     }elseif($_POST["categry"]=="cate2"){
@@ -35,7 +45,7 @@ foreach($array as $row){
     }elseif($_POST["categry"]=="cate3"){
         $col="bunrui3";
     }
-    
+    */
     $sqlstr = "update ShouhinMS set ".$col."=? where shouhinCD=? and uid=?";
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $_POST["upd_bunrui"], PDO::PARAM_STR);

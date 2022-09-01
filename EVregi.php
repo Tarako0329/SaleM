@@ -443,6 +443,7 @@ window.onload = function() {
         echo "<input type='hidden' name='KOKYAKU' value=''>\n";
     }
     
+    $_SESSION["nonadd"]=(!empty($_SESSION["nonadd"])?$_SESSION["nonadd"]:"");
     if($RG_MODE!=="evrez"){
         $dispnone="display:none;";
         $checked="checked";

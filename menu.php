@@ -55,7 +55,7 @@ if($action=="logout"){
     if (isset($_COOKIE[session_name()])) {
         setCookie(session_name(), '', -1, "/", '.'.MAIN_DOMAIN, TRUE, TRUE); 
     }
-    setCookie("webrez_token", '', -1, "/", null, TRUE, TRUE); 
+    setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); 
 
     session_destroy();// 最終的に、セッションを破壊する
     $logoff=true;

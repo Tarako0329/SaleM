@@ -86,7 +86,7 @@ $stmt->execute();
                     // 取得したレコードをeachで順次取り出す
                     $.each(data, function(key, value){
                         // appendで追記していく
-                        if(value.LIST == '<?php echo $_SESSION["Event"]; ?>'){
+                        if(value.LIST == '<?php echo (!empty($_SESSION["Event"])?$_SESSION["Event"]:""); ?>'){
                             $(List).append("<option value='" + value.LIST + "' selected>" + value.LIST + "</option>\n");
                         }else{
                             $(List).append("<option value='" + value.LIST + "'>" + value.LIST + "</option>\n");
@@ -205,9 +205,9 @@ $stmt->execute();
         <div style='display:flex;height:25px;margin:5px;'>
             <select class='form-control' id='categry' name='categry' style='width:100px;' required='required'>
                 <option value=''>項目選択</option>
-                <option value='cate1' <?php echo ($categry==1?"selected":"");?> >カテゴリー１</option>
-                <option value='cate2' <?php echo ($categry==2?"selected":"");?> >カテゴリー２</option>
-                <option value='cate3' <?php echo ($categry==3?"selected":"");?> >カテゴリー３</option>
+                <option value='cate1' <?php /*echo ($categry==1?"selected":"");*/?> >カテゴリー１</option>
+                <option value='cate2' <?php /*echo ($categry==2?"selected":"");*/?> >カテゴリー２</option>
+                <option value='cate3' <?php /*echo ($categry==3?"selected":"");*/?> >カテゴリー３</option>
             </select>
             <select class='form-control' id='over_cate' disabled style='width:200px;margin-left:5px' >
                 <!--ajaxでセット-->

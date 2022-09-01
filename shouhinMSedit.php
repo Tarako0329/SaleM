@@ -34,6 +34,10 @@ $rtn=check_session_userid($pdo_h);
 $sqlstr="select * from ZeiMS order by zeiKBN;";
 $stmt = $pdo_h->query($sqlstr);
 $csrf_token=csrf_create();
+
+$success_msg = (!empty($_SESSION["MSG"])?$_SESSION["MSG"]:"");
+$_SESSION["MSG"]=null;
+
 ?>
 <head>
     <?php 
@@ -51,7 +55,7 @@ $csrf_token=csrf_create();
             .text(msg);
         }
         (function($){
-          const e = alert('<?php echo $_SESSION["MSG"]; ?>').addClass('alert-success');
+          const e = alert('<?php echo $success_msg; ?>').addClass('alert-success');
           // アラートを表示する
           $('#alert-1').append(e);
           /* 2秒後にアラートを消す
@@ -84,11 +88,12 @@ $csrf_token=csrf_create();
     <a href="#" style='color:inherit;position:fixed;top:75px;right:5px;' onclick='help()'><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>
     <?php }?>
     <?php
-        //echo $_SESSION["MSG"]."<br>";
-        if($_SESSION["MSG"]!=""){
+        //echo $success_msg."<br>";
+        //if($_SESSION["MSG"]!=""){
+        if(!empty($success_msg)){
             echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-1' class='lead '></div></div></div></div>";
         }
-        $_SESSION["MSG"]="";
+        //$_SESSION["MSG"]="";
     ?>
     <form method="post" id="form1" class="form" action="shouhinMSedit_sql.php">
         <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">

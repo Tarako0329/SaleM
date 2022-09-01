@@ -64,6 +64,7 @@ if(!empty($_POST)){
 $tokui=$list;
 
 $chart_type="";
+$top15="off";
 //deb_echo($list);
 if($analysis_type==1){//日ごと
     $sqlstr = "select UriDate as 計上年月 ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
@@ -85,28 +86,31 @@ if($analysis_type==1){//日ごと
     $gp_sqlstr = "group by ShouhinNM order by sum(UriageKin) desc";
     $aryColumn = ["商品名","税抜売上","消費税","税込売上"];
     $chart_type="bar";
+    $top15="on";
 }elseif($analysis_type==5){//製品名ごと売上数量ランキング
     $sqlstr = "select ShouhinNM as ShouhinNM ,sum(Su) as 売上数 from UriageData ";
     $gp_sqlstr = "group by ShouhinNM order by sum(Su) desc";
     $aryColumn = ["商品名","売上数"];
     $chart_type="bar";
+    $top15="on";
 }elseif($analysis_type==6){//客単価推移
     //客単価一覧
     $sqlstr = "select 計上日,ROUND(avg(税抜売上)) as 客単価,Event from ";
-    $sqlstr = $sqlstr." (select UriDate as 計上日 ,Event ,UriageNO ,sum(UriageKin) as 税抜売上 from UriageData ";
-    $gp_sqlstr = "group by UriDate,UriageNO ) as UriSum group by 計上日 order by 計上日";
+    $sqlstr = $sqlstr." (select UriDate as 計上日 ,concat(Event,TokuisakiNM) as Event ,UriageNO ,sum(UriageKin) as 税抜売上 from UriageData ";
+    $gp_sqlstr = "group by UriDate,UriageNO ) as UriageData group by 計上日 order by 計上日";
     $aryColumn = ["計上日","客単価","Event/店舗"];
     $chart_type="bar";
 }elseif($analysis_type==7){//イベント・店舗別客単価ランキング
     $sqlstr = "select KYAKU,ROUND(avg(客単価)) as 平均客単価 from ";
     $sqlstr = $sqlstr." (select UriDate as 計上日 ,concat(Event,TokuisakiNM) as KYAKU ,UriageNO ,sum(UriageKin) as 客単価 from UriageData ";
-    $gp_sqlstr = "group by UriDate,concat(Event,TokuisakiNM),UriageNO ) as UriSum group by KYAKU order by avg(客単価) desc";
+    $gp_sqlstr = "group by UriDate,concat(Event,TokuisakiNM),UriageNO ) as UriageData group by KYAKU order by avg(客単価) desc";
     $aryColumn = ["Event/店舗","客単価"];
     $chart_type="bar";
+    $top15="on";
 }elseif($analysis_type==8){//イベント・店舗別来客数推移
     $sqlstr = "select UriDate,sum(来客カウント) as 来客数,Event from ";
     $sqlstr = $sqlstr." (select uid, UriDate, Event, TokuisakiNM, UriageNO,0 as ShouhinCD, 1 as 来客カウント from UriageData where Event <>'' ";
-    $sqlstr = $sqlstr." group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriSum ";
+    $sqlstr = $sqlstr." group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriageData ";
     $gp_sqlstr = "group by UriDate,Event order by UriDate";
     $aryColumn = ["計上日","来客数","Event/店舗"];
     $chart_type="bar";
@@ -115,12 +119,13 @@ if($analysis_type==1){//日ごと
 }elseif($analysis_type==9){//イベント・店舗別来客数ランキング
     $sqlstr = "select Event,ROUND(avg(来客数)) as 平均来客数 from (select UriDate,sum(来客カウント) as 来客数,Event from ";
     $sqlstr = $sqlstr." (select uid, UriDate, Event, TokuisakiNM, UriageNO,0 as ShouhinCD, 1 as 来客カウント from UriageData where Event <>'' ";
-    $sqlstr = $sqlstr." group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriSum ";
+    $sqlstr = $sqlstr." group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriageData ";
     $gp_sqlstr = "group by UriDate,Event) as Urisum2 group by Event order by ROUND(avg(来客数)) desc";
     $aryColumn = ["Event/店舗","平均来客数"];
     $chart_type="bar";
-
+    
     $tokui="xxxx";//来客数の場合は個別売りを除く
+    $top15="on";
 }elseif($analysis_type==10){//商品の売れる勢い
     $sqlstr = "select ShouhinNM as NAME,concat(time_format(insDatetime,'%H'), '時') as Hour,sum(su) as COUNT from UriageData ";
     $gp_sqlstr = "group by ShouhinNM,time_format(insDatetime,'%H') order by ShouhinNM,time_format(insDatetime,'%H')";
@@ -226,8 +231,11 @@ $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
                         if($i!=0){
                             echo ",";
                         }
-                        if($row[0]===$row["ShouhinNM"]){
-                            echo "'".rot13decrypt($row["ShouhinNM"])."'";
+                        $ShouhinNM = (!empty($row["ShouhinNM"])?$row["ShouhinNM"]:"");
+                        //if($row[0]===$row["ShouhinNM"]){
+                        //    echo "'".$row["ShouhinNM"]."'";
+                        if($row[0]===$ShouhinNM){
+                            echo "'".$ShouhinNM."'";
                             if($i==14){
                                 break;
                             }
@@ -239,9 +247,13 @@ $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
                     ?>
                     ],
                 datasets: [{
-                    label: '<?php echo $aryColumn[1];if($row[0]===$row["ShouhinNM"]){
-                            echo "TOP15";
-                        }?>',
+                    label: '<?php 
+                            echo $aryColumn[1];
+                            //if($row[0]===$row["ShouhinNM"]){
+                            if($top15==="on"){
+                                echo "TOP15";
+                            }
+                        ?>',
                     data: [
                         <?php
                         $i=0;
@@ -249,8 +261,10 @@ $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
                             if($i!=0){
                                 echo ",";
                             }
+                            $ShouhinNM = (!empty($row["ShouhinNM"])?$row["ShouhinNM"]:"");
                             echo "'".$row[1]."'";
-                            if($row[0]===$row["ShouhinNM"] && $i==14){
+                            //if($row[0]===$row["ShouhinNM"] && $i==14){
+                            if($row[0]===$ShouhinNM && $i==14){
                                 break;
                             }
                             $i++;
@@ -264,8 +278,10 @@ $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
                             if($i!=0){
                                 echo ",";
                             }
+                            $ShouhinNM = (!empty($row["ShouhinNM"])?$row["ShouhinNM"]:"");
                             echo "'rgba('+(~~(256 * Math.random()))+','+(~~(256 * Math.random()))+','+ (~~(256 * Math.random()))+', 0.5)'\n";
-                            if($row[0]===$row["ShouhinNM"] && $i==14){
+                            //if($row[0]===$row["ShouhinNM"] && $i==14){
+                            if($row[0]===$ShouhinNM && $i==14){
                                 break;
                             }
                             $i++;
@@ -328,12 +344,22 @@ $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
         $max_hour=0;    //時間軸の最大値
         foreach($result as $row){
             //取得したデータの中で最小時間をセット
+            $row_Hour = (!empty($row["Hour"])?$row["Hour"]:"");
+            /*
             if($min_hour>$row["Hour"]){
                 $min_hour=$row["Hour"];
             }
             //取得したデータの中で最大時間をセット
             if($max_hour<$row["Hour"]){
                 $max_hour=$row["Hour"];
+            }
+            */
+            if($min_hour>$row_Hour){
+                $min_hour=$row_Hour;
+            }
+            //取得したデータの中で最大時間をセット
+            if($max_hour<$row_Hour){
+                $max_hour=$row_Hour;
             }
         }
         //最初に売れた時間帯の2時間前から最後に売れた1時間後までを時間軸に使用

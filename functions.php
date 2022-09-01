@@ -384,6 +384,8 @@ function getGUID(){
 // 表(table)の出力
 // =========================================================
 function drow_table($aryColumn,$result){
+    //var_dump($result);
+    try{
         echo "<table class='table-striped table-bordered' style='margin: auto;'>\n";
         echo "<thead><tr>\n";
         foreach($aryColumn as $value){
@@ -397,22 +399,31 @@ function drow_table($aryColumn,$result){
             
             echo "<tr>";
             for($i=0;isset($row[$i])==true;$i++){
+                $right = null;
+                $row_sum[$i]=null;
+                /*
                 if(preg_match('/[^0-9|^%,%]/',$row[$i])==0){//0～9とカンマ以外が存在して無い場合、数値として右寄せ
                     $right = " class='text-right' ";
-                    $row_sum[$i]=$row_sum[$i]+$row[$i];
+                    $row_sum[$i]=$row_sum[$i] + $row[$i];
                 }elseif(preg_match('/[^0-9]/',$row[$i])==0){//0～9以外が存在して無い場合、数値として右寄せ
+                */
+                if(preg_match('/[^0-9]/',(!empty($row[$i])?$row[$i]:"-"))==0){//0～9以外が存在して無い場合、数値として右寄せ
                     $right = " class='text-right' ";
-                    $row_sum[$i]=$row_sum[$i]+$row[$i];
+                    $row_sum[$i]=$row_sum[$i] + $row[$i];
                 }else{
                     $right = "";
                     $row_sum[$i]="";
                 }
                 
-                if($row["ShouhinNM"]===$row[$i]){
-                    $val = $row["ShouhinNM"];
+                $ShouhinNM=(!empty($row["ShouhinNM"])?$row["ShouhinNM"]:"");
+                //if($row["ShouhinNM"]===$row[$i]){
+                //    $val = $row["ShouhinNM"];
+                if($ShouhinNM===$row[$i]){
+                    $val = $ShouhinNM;
                 }else{
                     $val = $row[$i];
                 }
+
                 echo "<td".$right.">".return_num_disp($val)."</td>";    
             }
             echo "</tr>\n";
@@ -423,7 +434,11 @@ function drow_table($aryColumn,$result){
             echo "<th class='text-right'>".return_num_disp($row_sum[$i])."</th>";
         }
         echo "</tr></thead>\n";
-        echo "</table>\n";    
+        echo "</table>\n";
+    }catch(Exception $e){
+        echo '捕捉した例外: ',  $e->getMessage(), "\n";
+
+    }
 }
 
 // =========================================================
