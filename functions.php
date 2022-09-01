@@ -3,8 +3,12 @@
 // 数字を3桁カンマ区切りで返す(整数のみ対応)
 // =========================================================
 function return_num_disp($number) {
+    //$return_number = "";
+    //$zan_mojisu = 0;
+    $return_number = null;
     if(preg_match('/[^0-9]/',$number)==0){//0～9以外が存在して無い場合、数値として処理
         $shori_moji_su = mb_strlen($number) - 3;
+        $zan_mojisu = null;
         
         while($shori_moji_su > 0){
             $return_number = $return_number.",".mb_substr($number,$shori_moji_su,3);
@@ -362,7 +366,7 @@ function getGUID(){
         return com_create_guid();
     }
     else {
-        mt_srand((double)microtime()*10000);//optional for php 4.2.0 and up.
+        mt_srand((int)microtime()*10000);//optional for php 4.2.0 and up.
         $charid = strtoupper(md5(uniqid(rand(), true)));
         $hyphen = chr(45);// "-"
         $uuid = chr(123)// "{"

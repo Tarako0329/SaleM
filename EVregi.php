@@ -36,7 +36,8 @@ if(EXEC_MODE!=""){
         }else if($status=="longin_redirect"){
             //$_SESSION["status"]="";
         }else{
-            $_SESSION["EMSG"]="セッションが正しくありませんでした。".$_POST["csrf_token"];
+            //$_SESSION["EMSG"]="セッションが正しくありませんでした。".$_POST["csrf_token"];
+            $_SESSION["EMSG"]="セッションが正しくありませんでした。".filter_input(INPUT_POST,"csrf_token");
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: index.php");
             exit();
@@ -75,11 +76,15 @@ if($RG_MODE==""){
 }
 
 //イベント名の取得
-//セッション->クッキー->DB
+//セッション -> DB
+/*
 if($_SESSION["EV"] != "" ){
-    $event = $_SESSION["EV"];
+    
     //deb_echo("session");
 }else{
+*/
+$event = (!empty($_SESSION["EV"])?$_SESSION["EV"]:"");
+if(empty($event)){
     $sql = "select value,updatetime from PageDefVal where uid=? and machin=? and page=? and item=?";
     $stmt = $pdo_h->prepare($sql);
     $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
@@ -111,7 +116,7 @@ if($_SESSION["EV"] != "" ){
     } 
 }
 //メニューカテゴリー粒度(0:なし>1:大>2:中>3:小)
-//セッション->クッキー->DB
+//セッション-> DB
 $categoly=(!empty($_SESSION["CTGL"])?$_SESSION["CTGL"]:"");
 /*
 if($_SESSION["CTGL"] != "" ){
@@ -208,7 +213,7 @@ window.onload = function() {
         //echo "    var cnt_suryou_".$row["shouhinCD"]." = 0;\n";                                                             //ボタンのカウンタ
         echo "\n";
         //ボタンクリック時の動作関数
-        echo "    //".rot13decrypt($row["shouhinNM"])."ボタンクリック時\n";
+        echo "    //".$row["shouhinNM"]."ボタンクリック時\n";
         echo "    btn_menu_".$row["shouhinCD"].".onclick = function (){\n";
         echo "        if(plus_minus[0].checked){\n";//通常モード（プラス）
         //echo "              cnt_suryou_".$row["shouhinCD"]." += 1;\n";

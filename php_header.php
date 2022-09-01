@@ -83,7 +83,7 @@ $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 //端末IDを発行し、10年の有効期限でCookieにセット
 if(!isset($_COOKIE['machin_id'])){
     $machin_id = getGUID();
-    setCookie("machin_id", $machin_id, time()+60*60*24*365*10, "/", null, TRUE, TRUE); 
+    setCookie("machin_id", $machin_id, time()+60*60*24*365*10, "/", "", TRUE, TRUE); 
 }else{
     $machin_id = $_COOKIE['machin_id'];
 }

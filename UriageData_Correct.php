@@ -128,13 +128,13 @@ if($mode=="select"){
     for($i=0;$i<4;$i++){
         if($Type=="rireki"){
             //履歴明細取得
-            //$sql = "select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData ".$wheresql." order by UriDate desc,Event,UriageNO";
-            $sql = "select U.*,UGW.icon,UGW.temp,UGW.description from (select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData ".$wheresql.") as U left join UriageData_GioWeather as UGW on U.uid = UGW.uid and U.UriageNO = UGW.UriNo order by U.UriDate desc,U.Event,U.UriageNO";
+            $sql = "select U.*,UGW.icon,UGW.temp,UGW.description, max(UGW.temp) OVER (PARTITION BY U.uid,U.UriDate,U.Event) as max_temp, min(UGW.temp) OVER (PARTITION BY U.uid,U.UriDate,U.Event) as min_temp ";
+            $sql = $sql."from (select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData ".$wheresql.") as U ";
+            $sql = $sql."left join UriageData_GioWeather as UGW on U.uid = UGW.uid and U.UriageNO = UGW.UriNo order by U.UriDate desc,U.Event,U.UriageNO";
             
             $NextType=$Type;
         }elseif($Type=="sum_items"){
             //商品単位で集計
-            //$sql="select UriDate,UriageNO,Event,TokuisakiNM, ShouhinCD, ShouhinNM,shuppin_su,uri_su as su,zan_su, tanka,UriageKin,zei,genka,arari from UriageDataSummary ";
             $sql="select UriDate,UriageNO,Event,TokuisakiNM, ShouhinCD, ShouhinNM,shuppin_su,uri_su as su,zan_su, tanka,UriageKin,zei,genka,arari,icon,max_temp,min_temp from UriageDataSummary ";
             $sql = $sql.$wheresql."order by UriDate desc,Event,TokuisakiNM,ShouhinNM ";
             
@@ -148,10 +148,6 @@ if($mode=="select"){
             }
             $sql = "select U.UriDate,'-' as UriageNO,U.Event,U.TokuisakiNM,'-' as ShouhinCD,'-' as ShouhinNM,0 as su,0 as tanka,sum(U.UriageKin) as UriageKin,sum(U.zei) as zei,sum(U.su*U.genka_tanka) as genka,sum(U.UriageKin-(U.su*U.genka_tanka)) as arari ";
             $sql = $sql.",max(UGW.icon) as icon,max(UGW.temp) as max_temp,min(UGW.temp) as min_temp ";
-            /*
-            $sql = $sql."from UriageData as U left join UriageData_GioWeather as UGW on U.uid = UGW.uid and U.UriageNO = UGW.UriNo ";
-            $sql = $sql.$wheresql." group by U.UriDate,U.Event,U.TokuisakiNM order by U.UriDate desc,U.Event,U.TokuisakiNM";
-            */
             $sql = $sql."from (select * from UriageData ".$wheresql.") as U left join UriageData_GioWeather as UGW on U.uid = UGW.uid and U.UriageNO = UGW.UriNo ";
             $sql = $sql." group by U.UriDate,U.Event,U.TokuisakiNM order by U.UriDate desc,U.Event,U.TokuisakiNM";
             $NextType="rireki";
@@ -443,7 +439,9 @@ foreach($result as $row){
     if($uridate!=$row["UriDate"].$row["Event"]){
         echo "<tr class='tr_stiky'><td colspan='".$colspan."' class='tr_stiky'><a href='UriageData_Correct.php?mode=select&ad1=".rot13encrypt2($row["UriDate"])."&Type=".$NextType."&csrf_token=".$csrf_create."'> 売上日：".$row["UriDate"]."</a> ";
         echo "<a href='UriageData_Correct.php?mode=select&ad2=".rot13encrypt2($row["Event"].$row["TokuisakiNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>『".$row["Event"].$row["TokuisakiNM"]."』</a>";
-        if(!empty($row["icon"])){echo "<img style='height:20px;' src='https://openweathermap.org/img/wn/".$row["icon"]."'>（<span style='color:red;'>".$row["max_temp"]."</span>/<span style='color:blue;'>".$row["min_temp"]."</span>）";}
+        if(!empty($row["icon"])){
+            echo "<img style='height:20px;' src='https://openweathermap.org/img/wn/".$row["icon"]."'>（<span style='color:red;'>".$row["max_temp"]."</span>/<span style='color:blue;'>".$row["min_temp"]."</span>）";
+        }
         echo "</td></tr>\n";
     }
     echo "<td class='text-center'><a href='UriageData_Correct.php?mode=select&ad3=".rot13encrypt2($row["UriageNO"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["UriageNO"]."</a></td>";

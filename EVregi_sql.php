@@ -126,13 +126,19 @@ if($MODE == "evrez" || $MODE == "kobetu"){
         $sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime,genka_tanka) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)";
         //$sqllog = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime,genka_tanka) ";
         //$sqllog = $sqllog."values(".$_SESSION['user_id'].",".$UriageNO.",'".$_POST["KEIJOUBI"]."','".$time."','".$_POST["EV"]."','".$_POST["KOKYAKU"]."','".$row["CD"]."','".$row["NM"]."','".$row["SU"]."','".$row["UTISU"]."','".$row["TANKA"]."','".($row["SU"] * $row["TANKA"])."','".($row["SU"] * $row["ZEI"])."','".$row["ZEIKBN"]."',0,'".$row["GENKA_TANKA"]."')";
+        
+        $KEIJOUBI = filter_input(INPUT_POST,'KEIJOUBI');
+        $EV = filter_input(INPUT_POST,'EV');
+        $KOKYAKU = filter_input(INPUT_POST,'KOKYAKU');
+        
         foreach($array as $row){
             if($row["SU"]==0){
+                //売上数０はスキップ
                 continue;
             }
             
             $sqllog = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime,genka_tanka) ";
-            $sqllog = $sqllog."values(".$_SESSION['user_id'].",".$UriageNO.",'".filter_input(INPUT_POST,'KEIJOUBI')."','".$time."','".filter_input(INPUT_POST,'EV')."','".filter_input(INPUT_POST,'KOKYAKU')."','".$row["CD"]."','".$row["NM"]."','".$row["SU"]."','".$row["UTISU"]."','".$row["TANKA"]."','".($row["SU"] * $row["TANKA"])."','".($row["SU"] * $row["ZEI"])."','".$row["ZEIKBN"]."',0,'".$row["GENKA_TANKA"]."')";
+            $sqllog = $sqllog."values(".$_SESSION['user_id'].",".$UriageNO.",'".$KEIJOUBI."','".$time."','".$EV."','".$KOKYAKU."','".$row["CD"]."','".$row["NM"]."','".$row["SU"]."','".$row["UTISU"]."','".$row["TANKA"]."','".($row["SU"] * $row["TANKA"])."','".($row["SU"] * $row["ZEI"])."','".$row["ZEIKBN"]."',0,'".$row["GENKA_TANKA"]."')";
             
             
             $stmt = $pdo_h->prepare($sqlstr);
@@ -141,10 +147,13 @@ if($MODE == "evrez" || $MODE == "kobetu"){
             
             $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
             $stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
-            $stmt->bindValue(3,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
+            //$stmt->bindValue(3,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
+            $stmt->bindValue(3,  $KEIJOUBI, PDO::PARAM_STR);
             $stmt->bindValue(4,  $time, PDO::PARAM_STR);
-            $stmt->bindValue(5,  $_POST["EV"], PDO::PARAM_INT);
-            $stmt->bindValue(6,  $_POST["KOKYAKU"], PDO::PARAM_STR);
+            //$stmt->bindValue(5,  $_POST["EV"], PDO::PARAM_INT);
+            $stmt->bindValue(5,  $EV, PDO::PARAM_INT);
+            //$stmt->bindValue(6,  $_POST["KOKYAKU"], PDO::PARAM_STR);
+            $stmt->bindValue(6,  $KOKYAKU, PDO::PARAM_STR);
             $stmt->bindValue(7,  $row["CD"], PDO::PARAM_INT);                       //商品CD
             $stmt->bindValue(8,  $row["NM"], PDO::PARAM_STR);                       //商品名
             $stmt->bindValue(9,  $row["SU"], PDO::PARAM_INT);                       //数量
