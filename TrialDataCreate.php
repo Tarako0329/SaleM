@@ -15,7 +15,7 @@ $stmt->bindValue(6, date("Y-m-d"), PDO::PARAM_STR);
 $stmt->bindValue(7, $kigen, PDO::PARAM_STR);
 $stmt->bindValue(8, '', PDO::PARAM_STR);
 $stmt->bindValue(9, 'トライアル太郎', PDO::PARAM_STR);
-$stmt->bindValue(10, 'トライアル株式会社', PDO::PARAM_STR);
+$stmt->bindValue(10, 'おためしパン屋さん', PDO::PARAM_STR);
 $stmt->bindValue(11, '1231234', PDO::PARAM_STR);
 $stmt->bindValue(12, '都道府県', PDO::PARAM_STR);
 $stmt->bindValue(13, '市区町村', PDO::PARAM_STR);

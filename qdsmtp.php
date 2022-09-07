@@ -538,7 +538,7 @@ class QdsmtpBase extends QdsmtpError{
 
 			do{
 				list( $st , $_message ) = $this->getMessage( $fp );
-				$message .= trim( $_message ) . $this->smtpLFC;
+				$message .= trim( (!empty($_message)?$_message:"") ) . $this->smtpLFC;
 				if( !$st ){
 					return array( $this->errorGather('getMessage error',__LINE__), $message , $st );
 				}

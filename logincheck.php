@@ -104,7 +104,7 @@ try {
     	register_token($id, $token, $pdo);
     
     	//自動ログインのトークンを１週間の有効期限でCookieにセット
-    	setCookie("webrez_token", $token, time()+60*60*24*7, "/", null, TRUE, TRUE); // secure, httponly
+    	setCookie("webrez_token", $token, time()+60*60*24*7, "/", "", TRUE, TRUE); // secure, httponly
     
     	if ($auto_result) {
     	 //古いトークンの削除
@@ -132,7 +132,7 @@ try {
 * 通常のログイン処理。成功時はuidを返す。
 */
 function check_user($mail_id, $password, $pdo,$key) {
-    //プレースホルダで SQL 作成
+    
     $sql = "select uid,loginrez from Users where mail=? and password=?;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(1, $mail_id, PDO::PARAM_STR);
@@ -192,6 +192,7 @@ function register_token($id, $token, $pdo) {
 function redirect_to_login() {
   header("HTTP/1.1 301 Moved Permanently");
   header("Location: index.php");
+  exit();
 }
 
 /*
@@ -201,6 +202,7 @@ function redirect_to_welcome($a) {
     $_SESSION["status"]="login_redirect";
     header("HTTP/1.1 301 Moved Permanently");
     header("Location: ".$a);
+    exit();
 }
 
 

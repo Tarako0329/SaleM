@@ -27,6 +27,9 @@ $logoff=false;
 $Max_color_No=2;
 
 $action="";
+$bell_action="";
+$bell_size="fa-lg";
+$bell_msg="";
 
 if(!empty($_GET["action"])){
     $action = $_GET["action"];
@@ -126,9 +129,6 @@ if($action=="logout"){
         $bell_msg="tap here！";
     }else{
         //新機能リリース通知 確認済み
-        $bell_action="";
-        $bell_size="fa-lg";
-        $bell_msg="";
     }
 
 }

@@ -22,6 +22,16 @@ INPUT.ev{
     background:transparent;
     padding:0;
 }
+/*電卓ボタン*/
+.btn--dentaku{
+    font-size: 2.0rem;
+    width:100%;
+    height:100%;
+}
+.dentaku--cellsize{
+    width:25%;
+    height:60px;
+}
 /*レジボタン*/
 .btn--rezi{
     height:70%;     
@@ -181,9 +191,8 @@ INPUT.su{
     border-color:var(--rez-border-color);
     
 }
-
+/*
 #azukari{
-    /*お釣り計算*/
     border-right:none;
     border-left:none;
     border-top:none;
@@ -191,13 +200,11 @@ INPUT.su{
     text-align:center;
     font-size: 5rem;
     font-weight: 600;
-    /*color: #fff;*/
-    /*height:80%;     */
     width:90%;
     background: #fff;
     padding:0;
 }
-
+*/
 .btn-updown{
     color: var(--btn-updown-font-color);
     background: var(--btn-updown-color);

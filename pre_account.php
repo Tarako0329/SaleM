@@ -6,13 +6,16 @@
 require "php_header.php";
 
 $shoukai="";
+$choufuku_flg=0;
+$okflg=0;
 if(!empty($_GET["shoukai"])){
     $shoukai=$_GET["shoukai"];
 }elseif(!empty($_POST["shoukai"])){
     $shoukai=$_POST["shoukai"];
 }
 
-if($_POST["BTN"] == "send"){
+//if($_POST["BTN"] == "send"){
+if(filter_input(INPUT_POST,"BTN") == "send"){
     //入力内容の確認モード
     //新規の場合メールアドレスの重複チェック
     $sqlstr="select count(*) as kensu from Users where mail=?";
@@ -43,7 +46,7 @@ if($_POST["BTN"] == "send"){
         if(FROM==""){
             //.env にメールアカウント情報が設定されてない場合、phpのsendmailで送付
             define("FROM", "information@WEBREZ.jp");
-            $okflg=touroku_mail($to,$subject,$body);
+            $okflg = touroku_mail($to,$subject,$body);
         }else{
             //qdmailでメール送付
             $okflg = send_mail($to,$subject,$body);
@@ -75,6 +78,8 @@ if($_POST["BTN"] == "send"){
         echo "このメールアドレスは登録済みです。<a href='index.php'>TOP画面</a>に戻ってログインして下さい。<br>パスワードを忘れた場合は<a href='forget_pass_sendurl.php'>コチラ</a>からパスワードの再設定をお願いします。<br>";
     }elseif($okflg==1){
         echo $_POST['MAIL']." へ登録用のURLを記載したメールを送信いたしました。メールが届いてない場合、メールアドレスが間違えているか、迷惑メールになっている可能性があります。<br>送信元アドレスは ".FROM. "となります。";
+    }elseif($okflg<>1){
+        echo $_POST['MAIL']." への登録用メール送信が失敗しました。";
     }
     if($shoukai<>""){
         echo "<br>紹介者CD付き登録画面<br>紹介者CD：".$shoukai;
@@ -83,12 +88,12 @@ if($_POST["BTN"] == "send"){
     <div class="container" style="padding-top:15px;">
     <div class="col-12 col-md-8">
     <form method="post" action="pre_account.php" style="font-size:1.5rem">
-        <input type="hidden" name="csrf_token" value="<?php echo $token; ?>">
-        <input type="hidden" name="MODE" value=<?php echo $mode; ?>>
+        <!--<input type="hidden" name="csrf_token" value="<?php /*echo $token;*/ ?>">-->
+        
         <input type="hidden" name="shoukai" value=<?php echo $shoukai; ?>>
         <div class="form-group">
             <label for="mail" >メールアドレスを入力し、送信ボタンを押してください。<br>入力されたメールアドレスに登録用URLが送信されます。</label>
-            <input type="email" maxlength="40" class="form-control" id="mail" name="MAIL" required="required" placeholder="必須" <?php if($mode>=3){echo "readonly='readonly' ";} if($mode>=1){echo "value='".secho($_SESSION["MAIL"])."'";}  ?>>
+            <input type="email" maxlength="40" class="form-control" id="mail" name="MAIL" required="required" placeholder="必須" >
         </div>
         <div class="col-2 col-md-1" style=" padding:0; margin-top:10px;">
             <button type="submit" class="btn btn-primary" style="font-size:1.5rem" name="BTN" value="send">送 信</button>

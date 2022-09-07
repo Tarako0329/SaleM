@@ -4,10 +4,13 @@
 
 require "php_header.php";
 
+$okflg="";
+$undefined_flg=0;
 
-if($_POST["BTN"] == "send"){
-    //入力内容の確認モード
-    //新規の場合メールアドレスの重複チェック
+//if($_POST["BTN"] == "send"){
+if(filter_input(INPUT_POST,"BTN") == "send"){
+    //メールアドレスが登録されている事を確認
+
     $sqlstr="select count(*) as kensu from Users where mail=?";
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $_POST["MAIL"], PDO::PARAM_STR);
@@ -16,14 +19,18 @@ if($_POST["BTN"] == "send"){
     $col1 = $row[0]["kensu"];
 
     if($col1==0){
-        $choufuku_flg=1;
+        //登録なし
+        $undefined_flg=1;
     }else{
-        //登録用メール送信
+        //パスワード再設定メール送信
+        /*
         if($_POST["NEW_MAIL"]<>""){
             $to = $_POST["NEW_MAIL"];
         }else{
             $to = $_POST["MAIL"];
         }
+        */
+        $to = (!empty($_POST["NEW_MAIL"])?$_POST["NEW_MAIL"]:$_POST["MAIL"]);
         
         $subject = "WEBREZパスワード再設定";
         $mail2=rot13encrypt2($_POST["MAIL"]);
@@ -46,8 +53,6 @@ if($_POST["BTN"] == "send"){
             $okflg = send_mail($to,$subject,$body);
         }
     }
-}else{
-    //echo "登録が失敗しました。";
 }
 
 ?>
@@ -69,7 +74,7 @@ if($_POST["BTN"] == "send"){
     <div class="container" style="padding-top:15px;">
     <div class='col-12 col-md-8' style="font-size:1.5rem;font-weight:800;">
     <?php
-    if($choufuku_flg==1){
+    if($undefined_flg==1){
         //メールアドレスの検索結果が１件以上の場合
         echo "このメールアドレスは登録されてません。入力に間違いがないか、ご確認ください。<br>";
     }elseif($okflg==1){
@@ -80,7 +85,7 @@ if($_POST["BTN"] == "send"){
     <br>
     <div class="col-12 col-md-8">
     <form method="post" action="forget_pass_sendurl.php" style="font-size:1.5rem">
-        <input type="hidden" name="csrf_token" value="<?php echo $token; ?>">
+        <!--<input type="hidden" name="csrf_token" value="<?php /*echo $token;*/ ?>">-->
         
         <div class="form-group">
             <label for="mail" >WEBREZに登録したメールアドレスを入力し、送信ボタンを押してください。<br>入力されたメールアドレスにパスワード更新用のURLが送信されます。</label>

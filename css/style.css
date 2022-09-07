@@ -139,9 +139,14 @@ html {
     border-radius: 0.5rem;
     white-space: normal;  
 }
+.btn-view:active,
+button:active,
+a:active{
+    transform:translateY(3px);
+    
+}
 .tour_modal{
     font-family: var(--tour-font);
-
 }
 
 .tour_discription{

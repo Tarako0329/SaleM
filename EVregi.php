@@ -77,12 +77,7 @@ if($RG_MODE==""){
 
 //イベント名の取得
 //セッション -> DB
-/*
-if($_SESSION["EV"] != "" ){
-    
-    //deb_echo("session");
-}else{
-*/
+
 $event = (!empty($_SESSION["EV"])?$_SESSION["EV"]:"");
 if(empty($event)){
     $sql = "select value,updatetime from PageDefVal where uid=? and machin=? and page=? and item=?";
@@ -118,11 +113,6 @@ if(empty($event)){
 //メニューカテゴリー粒度(0:なし>1:大>2:中>3:小)
 //セッション-> DB
 $categoly=(!empty($_SESSION["CTGL"])?$_SESSION["CTGL"]:"");
-/*
-if($_SESSION["CTGL"] != "" ){
-    $categoly = $_SESSION["CTGL"];
-    //deb_echo("session");
-}else*/
 if(empty($categoly)){
     $sql = "select value from PageDefVal where uid=? and machin=? and page=? and item=?";
     $stmt = $pdo_h->prepare($sql);
@@ -192,57 +182,56 @@ $shouhiMS_bunrui = $stmt->fetchAll();
 </head>
 
 <script>
+//フッター合計支払金額を保持
+var total_pay = 0;     //税込総支払額
+var total_zei = 0;     //総支払額の内税
+var total_pay_bk = 0;  //値引値増前の金額を保持し、会計確定せずに戻る際にtotal_payに返す
+
 window.onload = function() {
 
-     // オブジェクトと変数の準備
-     var kaikei_disp = document.getElementById("kaikei");
-     var zei_disp = document.getElementById("utizei");
-     var plus_minus = document.getElementsByName('options');
-     //フッター合計支払金額を保持
-     var total_pay = 0;     //税込総支払額
-     var total_zei = 0;     //総支払額の内税
-     var total_pay_bk = 0;  //値引値増前の金額を保持し、会計確定せずに戻る際にtotal_payに返す
-     
-     //PHPで繰り返し表示。メニューボタン数に応じて準備する
+    // オブジェクトと変数の準備
+    var kaikei_disp = document.getElementById("kaikei");
+    var zei_disp = document.getElementById("utizei");
+    var plus_minus = document.getElementsByName('options');
+    //フッター合計支払金額を保持
+    /*
+    var total_pay = 0;     //税込総支払額
+    var total_zei = 0;     //総支払額の内税
+    var total_pay_bk = 0;  //値引値増前の金額を保持し、会計確定せずに戻る際にtotal_payに返す
+    */
+    //PHPで繰り返し表示。メニューボタン数に応じて準備する
 <?php     
     foreach($shouhiMS as $row){
         echo "\n";
         echo "    var suryou_".$row["shouhinCD"]."  = document.getElementById('suryou_".$row["shouhinCD"]."');\n" ;         //ボタンの注文数
         echo "    var btn_menu_".$row["shouhinCD"]." = document.getElementById('btn_menu_".$row["shouhinCD"]."');\n";       //ボタンのオブジェクト
         echo "    var items_".$row["shouhinCD"]." = document.getElementById('items_".$row["shouhinCD"]."');\n";             //商品パネル
-        //echo "    var cnt_suryou_".$row["shouhinCD"]." = 0;\n";                                                             //ボタンのカウンタ
         echo "\n";
         //ボタンクリック時の動作関数
         echo "    //".$row["shouhinNM"]."ボタンクリック時\n";
         echo "    btn_menu_".$row["shouhinCD"].".onclick = function (){\n";
         echo "        if(plus_minus[0].checked){\n";//通常モード（プラス）
-        //echo "              cnt_suryou_".$row["shouhinCD"]." += 1;\n";
         echo "              total_pay += ".($row["tanka"] + $row["tanka_zei"]).";\n";
 
         echo "              total_pay_bk += ".($row["tanka"] + $row["tanka_zei"]).";\n";
 
         echo "              total_zei += ".$row["tanka_zei"].";\n";
-        //echo "              suryou_".$row["shouhinCD"].".value = cnt_suryou_".$row["shouhinCD"].";\n";
         echo "              suryou_".$row["shouhinCD"].".value = parseInt(suryou_".$row["shouhinCD"].".value) + 1;\n";
-//        echo "              kaikei_disp.innerHTML = total_pay;\n";
         echo "              kaikei_disp.innerHTML = total_pay.toLocaleString();\n";
-        echo "              zei_disp.innerHTML = total_zei;\n";
+        echo "              zei_disp.innerHTML = total_zei.toLocaleString();\n";
         echo "        }else if(plus_minus[1].checked){\n";//減らすモード（マイナス）
-        //echo "              if(cnt_suryou_".$row["shouhinCD"]."==0){\n";
         echo "              if(parseInt(suryou_".$row["shouhinCD"].".value)==0){\n";
         echo "                  window.alert('数量０以下には出来ません');\n";
-        echo "                  exit;\n";
+        echo "                  return;\n";
         echo "              }\n";
-        //echo "              cnt_suryou_".$row["shouhinCD"]." -= 1;\n";
         echo "              total_pay -= ".($row["tanka"] + $row["tanka_zei"]).";\n";
 
         echo "              total_pay_bk -= ".($row["tanka"] + $row["tanka_zei"]).";\n";
 
         echo "              total_zei -= ".$row["tanka_zei"].";\n";
-        //echo "              suryou_".$row["shouhinCD"].".value = cnt_suryou_".$row["shouhinCD"].";\n";
         echo "              suryou_".$row["shouhinCD"].".value = parseInt(suryou_".$row["shouhinCD"].".value) - 1;\n";
-        echo "              kaikei_disp.innerHTML = total_pay;\n";
-        echo "              zei_disp.innerHTML = total_zei;\n";
+        echo "              kaikei_disp.innerHTML = total_pay.toLocaleString();\n";
+        echo "              zei_disp.innerHTML = total_zei.toLocaleString();\n";
         echo "        }\n";
         echo "    };\n";
         echo "\n";
@@ -267,13 +256,6 @@ window.onload = function() {
     var show_items = document.getElementsByClassName("show_items"); //表示対象メニュー
     order_chk.onclick = function(){
         //注文確認ボタン。選択されてないメニューを消し、ボタンの表示を変更する。
-        <?php
-        /*
-        foreach($shouhiMS as $row){
-            echo "if(cnt_suryou_".$row["shouhinCD"]."==0){items_".$row["shouhinCD"].".style.display = 'none';}";
-        }
-        */
-        ?>
         for (let i = 0; i < su.length; i++) {
             if(su.item(i).value == 0){
                 items.item(i).style.display = 'none';
@@ -294,26 +276,29 @@ window.onload = function() {
     
     dentaku.onclick = function(){
         //電卓モーダルに会計金額を表示
-        seikyuu.innerHTML = total_pay;
+        seikyuu.innerHTML = total_pay.toLocaleString();
     };
 
-    //計算ボタン
+    //計算ボタン*電卓のパネルタップ時に自動計算としたので以下不要コメントアウト
+    /*
     var keisan = document.getElementById('keisan');
     var azukari = document.getElementById('azukari');
+    
+        
     keisan.onclick = function(){
         //電卓モーダルに会計金額を表示
-        var azukarikin = azukari.value;
-        var oturikin = azukarikin - total_pay;
+        let azukarikin = azukari.value;
+        let oturikin = azukarikin - total_pay;
         oturi.innerHTML = oturikin;
     };
-
+    */
+    
     var reset_btn = document.getElementById("order_clear");
     var return_btn = document.getElementById("order_return");
     // リセットボタンのクリック処理
     reset_btn.onclick = function (){
         for (let i = 0; i < su.length; i++) {
             su.item(i).value = 0;
-            //items.item(i).style.display = 'block';
         }
         for (let i = 0; i < show_items.length; i++) {
             show_items.item(i).style.display = 'block';
@@ -323,23 +308,11 @@ window.onload = function() {
         total_pay_bk = 0;
         zei_disp.innerHTML = 0;
         total_zei = 0;
-        <?php
-        /*
-        foreach($shouhiMS as $row){
-            echo "\t\tcnt_suryou_".$row["shouhinCD"]." = 0;\n";
-        }
-        */
-        ?>
         order_chk.style.display = 'block';
         btn_commit.style.display = 'none';
      };
      //戻るボタン
     return_btn.onclick = function(){
-        /*
-        for (let i = 0; i < su.length; i++) {
-            items.item(i).style.display = 'block';
-        }
-        */
         for (let i = 0; i < show_items.length; i++) {
             show_items.item(i).style.display = 'block';
         }
@@ -358,12 +331,12 @@ window.onload = function() {
         CHOUSEI_BTN.style.display = 'none';
         CHOUSEI.style.display = 'block';
         //total_pay_bk = total_pay
-        return_btn = document.getElementById("maekin");
-        maekin.innerHTML = total_pay_bk;
+        //return_btn = document.getElementById("maekin");
+        maekin.innerHTML = total_pay_bk.toLocaleString();
     }
     CHOUSEI_GAKU.onchange = function(){
         total_pay = CHOUSEI_GAKU.value;
-        kaikei_disp.innerHTML = total_pay;
+        kaikei_disp.innerHTML = Number(total_pay).toLocaleString();
     }
 
      var plus_mode = document.getElementById("plus_mode");
@@ -629,17 +602,57 @@ window.onload = function() {
                 <!--<div class='modal-title' id='myModalLabel'>電　卓</div>-->
             </div>
             <div class='modal-body'>
-                <label>お預り</label><br>
-                <input type='number' id='azukari'><br>
+                
+                <!--電卓-->
+                <table style='margin:auto;width:86%'>
+                    <tbody>
+                    <tr><td colspan='3' style='text-align:center;background:lightgreen;color:#fff;font-size:2.0rem;font-weight:600;'>計　算</td></tr>
+                    <tr><td class='dentaku--cellsize'><button class='btn btn-primary btn--dentaku' onclick='dentaku_btn(this)'>7</button></td><td class='dentaku--cellsize'><button class='btn btn-primary btn--dentaku' onclick='dentaku_btn(this)'>8</button></td><td class='dentaku--cellsize'><button class='btn btn-primary btn--dentaku' onclick='dentaku_btn(this)'>9</button></td></tr>
+                    <tr><td class='dentaku--cellsize'><button class='btn btn-primary btn--dentaku' onclick='dentaku_btn(this)'>4</button></td><td class='dentaku--cellsize'><button class='btn btn-primary btn--dentaku' onclick='dentaku_btn(this)'>5</button></td><td class='dentaku--cellsize'><button class='btn btn-primary btn--dentaku' onclick='dentaku_btn(this)'>6</button></td></tr>
+                    <tr><td class='dentaku--cellsize'><button class='btn btn-primary btn--dentaku' onclick='dentaku_btn(this)'>1</button></td><td class='dentaku--cellsize'><button class='btn btn-primary btn--dentaku' onclick='dentaku_btn(this)'>2</button></td><td class='dentaku--cellsize'><button class='btn btn-primary btn--dentaku' onclick='dentaku_btn(this)'>3</button></td></tr>
+                    <tr><td class='dentaku--cellsize'><button class='btn btn-primary btn--dentaku' onclick='dentaku_btn(this)'>0</button></td><td class='dentaku--cellsize'><button class='btn btn-primary btn--dentaku' onclick='dentaku_btn(this)'>00</button></td><td class='dentaku--cellsize'><button class='btn btn-primary btn--dentaku' onclick='dentaku_btn(this)'>C</button></td></tr>
+                    <tr><td colspan='3' class='dentaku--cellsize'><button class='btn btn-primary btn--dentaku' onclick='dentaku_btn(this)'>ちょうど</button></td></tr>
+                    </tbody>
+                </table>
+                
+                <div style='margin:0 7%'>
+                <input type='hidden' id='azukari_val'>
+                <input type='hidden' id='oturi_val'>
+
+                <p>お預り：￥<span id='azukari'>0</span></p>
                 <p>お会計：￥<span id='seikyuu'>0</span></p>
-                <button type='button' id='keisan'>計　算</button>
                 <p>お釣り：￥<span id='oturi'>0</span></p>    
-            </div>
+                </div>
             <div class='modal-footer'>
-                <!--<button type='button' class='btn btn-default' data-dismiss='modal'>閉じる</button>-->
-                <button type='button'  class='item_7' data-dismiss='modal'>閉じる</button>
+                <button type='button'  class='item_7 btn btn-primary' data-dismiss='modal' style='font-size: 2.0rem;width:100%;'>閉じる</button>
             </div>
+            <script>
+                function dentaku_btn(btn){
+                    let azukarikin = azukari_val.value;
+                    const seikyu = total_pay;
+                    let oturikin
+                    
+                    if(btn.innerHTML =='C'){
+                        azukari_val.value = 0;
+                        azukari.innerHTML = '0';
+                        azukarikin = '0';
+                    }else if(btn.innerHTML =='ちょうど'){
+                        azukarikin = seikyu;
+                        azukari_val.value = Number(seikyu);
+                        azukari.innerHTML = Number(seikyu).toLocaleString();
+                    }else{
+                        azukarikin = "" + azukarikin + btn.innerHTML;
+                        azukari_val.value = Number(azukarikin);
+                        azukari.innerHTML = Number(azukarikin).toLocaleString();
+                    }
+                    oturikin = azukarikin - seikyu;
+                    
+                    oturi_val.value = oturikin;
+                    oturi.innerHTML = oturikin.toLocaleString();
+                }
+            </script>
         </div>
+    </div>
     </div>
 </div>
 

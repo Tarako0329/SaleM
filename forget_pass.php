@@ -36,7 +36,8 @@ $stmt->bindValue(1, $mail, PDO::PARAM_STR);
 $rtn=$stmt->execute();
 $result=$stmt->fetchAll();
 
-if($_POST["answer"]<>""){
+//if($_POST["answer"]<>""){
+if(filter_input(INPUT_POST,"answer")){
     $sqlstr = "select * from Users where mail=? and answer=?";
 
     //deb_echo($sqlstr);
