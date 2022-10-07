@@ -20,7 +20,7 @@ $log_time = date("Y/m/d H:i:s");
 //セッションのIDがクリアされた場合の再取得処理。
 $rtn=check_session_userid($pdo_h);
 $logfilename="sid_".$_SESSION['user_id'].".log";
-//file_put_contents("sql_log/".$logfilename,$log_time.",REFERER:".$_SERVER['HTTP_REFERER']."\n",FILE_APPEND);
+//file_put_contents("sql_log/".$logfilename, $log_time.",REFERER:".$_SERVER['HTTP_REFERER']."\n", FILE_APPEND);
 
 $status=(!empty($_SESSION["status"])?$_SESSION["status"]:"");
 $_SESSION["status"]="";
@@ -36,7 +36,6 @@ if(EXEC_MODE!=""){
         }else if($status=="longin_redirect"){
             //$_SESSION["status"]="";
         }else{
-            //$_SESSION["EMSG"]="セッションが正しくありませんでした。".$_POST["csrf_token"];
             $_SESSION["EMSG"]="セッションが正しくありませんでした。".filter_input(INPUT_POST,"csrf_token");
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: index.php");
@@ -192,7 +191,7 @@ window.onload = function() {
     // オブジェクトと変数の準備
     var kaikei_disp = document.getElementById("kaikei");
     var zei_disp = document.getElementById("utizei");
-    var plus_minus = document.getElementsByName('options');
+    //var plus_minus = document.getElementsByName('options');
     //フッター合計支払金額を保持
     /*
     var total_pay = 0;     //税込総支払額
@@ -200,7 +199,8 @@ window.onload = function() {
     var total_pay_bk = 0;  //値引値増前の金額を保持し、会計確定せずに戻る際にtotal_payに返す
     */
     //PHPで繰り返し表示。メニューボタン数に応じて準備する
-<?php     
+<?php
+/*
     foreach($shouhiMS as $row){
         echo "\n";
         echo "    var suryou_".$row["shouhinCD"]."  = document.getElementById('suryou_".$row["shouhinCD"]."');\n" ;         //ボタンの注文数
@@ -236,7 +236,10 @@ window.onload = function() {
         echo "    };\n";
         echo "\n";
     }
+*/    
 ?>
+    
+    
     //確認・確定ボタン
     var order_chk = document.getElementById('order_chk');
     var btn_commit = document.getElementById('btn_commit');
@@ -311,7 +314,7 @@ window.onload = function() {
         order_chk.style.display = 'block';
         btn_commit.style.display = 'none';
      };
-     //戻るボタン
+    //戻るボタン
     return_btn.onclick = function(){
         for (let i = 0; i < show_items.length; i++) {
             show_items.item(i).style.display = 'block';
@@ -330,8 +333,6 @@ window.onload = function() {
     CHOUSEI_BTN.onclick = function(){
         CHOUSEI_BTN.style.display = 'none';
         CHOUSEI.style.display = 'block';
-        //total_pay_bk = total_pay
-        //return_btn = document.getElementById("maekin");
         maekin.innerHTML = total_pay_bk.toLocaleString();
     }
     CHOUSEI_GAKU.onchange = function(){
@@ -341,19 +342,16 @@ window.onload = function() {
 
      var plus_mode = document.getElementById("plus_mode");
      var minus_mode = document.getElementById("minus_mode");
-     //var plus_disp = document.getElementById("plus_disp");
      var minus_disp = document.getElementsByClassName('minus_disp');
      minus_mode.onclick = function(){
         for (let i = 0; i < minus_disp.length; i++) {
             minus_disp.item(i).style.display = 'block';
         }
-        //plus_disp.style.display = 'none';
      }
      plus_mode.onclick = function(){
         for (let i = 0; i < minus_disp.length; i++) {
             minus_disp.item(i).style.display = 'none';
         }
-        //plus_disp.style.display = 'block';
      }
 
 
@@ -528,7 +526,8 @@ window.onload = function() {
         }
 	    
         echo "  <div class ='col-md-3 col-sm-6 col-6 items ".$disp."' ".$style." id='items_".$row["shouhinCD"]."'>\n";
-        echo "      <button type='button' class='btn-view btn--rezi' id='btn_menu_".$row["shouhinCD"]."'>".rot13decrypt($row["shouhinNM"])."\n";
+        //echo "      <button type='button' class='btn-view btn--rezi' id='btn_menu_".$row["shouhinCD"]."'>".($row["shouhinNM"])."\n";
+        echo "      <button type='button' class='btn-view btn--rezi' id='btn_menu_".$row["shouhinCD"]."' onclick='order_cnt(".$row["tanka"].",".$row["tanka_zei"].",getElementById(\"suryou_".$row["shouhinCD"]."\"))'>".($row["shouhinNM"])."\n";
         echo "      </button>\n";
         echo "      <div class='btn-view btn--rezi-minus bg-warning minus_disp' style='display:none;'></div>n";
         echo "      <input type='hidden' name ='ORDERS[".$i."][CD]' value = '".$row["shouhinCD"]."'>\n";
@@ -569,6 +568,35 @@ window.onload = function() {
             return false;
           });
         });        
+        //注文ボタン
+        function order_cnt(TANKA,TANKA_ZEI,obj_id_SHOUHIN_cnt){
+            let plus_minus = document.getElementsByName('options');
+            let kaikei_disp = document.getElementById("kaikei");
+            let zei_disp = document.getElementById("utizei");
+            
+            if(plus_minus[0].checked){//通常モード（プラス）
+                  total_pay += TANKA + TANKA_ZEI;
+                  total_pay_bk += TANKA + TANKA_ZEI;
+                  total_zei += TANKA_ZEI;
+    
+                  obj_id_SHOUHIN_cnt.value = parseInt(obj_id_SHOUHIN_cnt.value) + 1;
+                  kaikei_disp.innerHTML = total_pay.toLocaleString();
+                  zei_disp.innerHTML = total_zei.toLocaleString();
+            }else if(plus_minus[1].checked){//減らすモード（マイナス）
+                  if(parseInt(obj_id_SHOUHIN_cnt.value)==0){
+                      window.alert('数量０以下には出来ません');
+                      return;
+                  }
+                  total_pay -= TANKA + TANKA_ZEI;
+                  total_pay_bk -= TANKA + TANKA_ZEI;
+                  total_zei -= TANKA_ZEI;
+    
+                  obj_id_SHOUHIN_cnt.value = parseInt(obj_id_SHOUHIN_cnt.value) - 1;
+                  kaikei_disp.innerHTML = total_pay.toLocaleString();
+                  zei_disp.innerHTML = total_zei.toLocaleString();
+            }
+        }
+    
         
     </script>
 </body>

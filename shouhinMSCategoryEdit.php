@@ -63,6 +63,12 @@ $stmt->execute();
             let List = $('#over_cate');
             if($(get_list_type)[0].value=='cate1'){
                 $(List).attr("disabled", true);
+                $(List).children().remove();
+                $('.MSLIST tbody tr').each(function(index,elm){
+                    $(elm).css({'display':'table-row'});
+                });
+                $(List).append("<option value='*'>上位分類を選択</option>\n");
+                getCategory_sujest('#categry','#over_cate');
                 return 0;
             }
             
@@ -92,12 +98,12 @@ $stmt->execute();
                             $(List).append("<option value='" + value.LIST + "'>" + value.LIST + "</option>\n");
                         }
                     });
-                    console.log("通信成功");
+                    console.log("getCategory_通信成功");
                 }
             ).fail(
                 // 通信が失敗した時
                 function(XMLHttpRequest, textStatus, errorThrown){
-                    console.log("通信失敗2");
+                    console.log("getCategory_通信失敗2");
                     console.log("XMLHttpRequest : " + XMLHttpRequest.status);
                     console.log("textStatus     : " + textStatus);
                     console.log("errorThrown    : " + errorThrown.message);
@@ -131,15 +137,15 @@ $stmt->execute();
                     });
                     
                     $('#upd_bunrui_write').autocomplete({
-                        source: words
+                        source: words,
+                        minLength: 0
                     });
-                    
-                    console.log("通信成功");
+                    console.log("getCategory_sujest_通信成功");
                 }
             ).fail(
                 // 通信が失敗した時
                 function(XMLHttpRequest, textStatus, errorThrown){
-                    console.log("通信失敗2");
+                    console.log("getCategory_sujest_通信失敗2");
                     console.log("XMLHttpRequest : " + XMLHttpRequest.status);
                     console.log("textStatus     : " + textStatus);
                     console.log("errorThrown    : " + errorThrown.message);
@@ -174,6 +180,13 @@ $stmt->execute();
                 
             })
         });
+                     $("#upd_bunrui_write").focusin(function(){
+                        // 第1引数：searchを設定した場合、データを絞り込みを実行
+                        // 第2引数：検索対象のキーワード。空文字を指定した場合、全ての入力候補を表示
+                        $(this).autocomplete("search","");
+                    });
+       
+        getCategory_sujest('#categry','#over_cate');
         /*
         $('#upd_bunrui_write').change(function(){
             $('#upd_bunrui_send').val($('#upd_bunrui_write').val());
@@ -205,11 +218,12 @@ $stmt->execute();
         <div style='display:flex;height:25px;margin:5px;'>
             <select class='form-control' id='categry' name='categry' style='width:100px;' required='required'>
                 <option value=''>項目選択</option>
-                <option value='cate1' <?php /*echo ($categry==1?"selected":"");*/?> >カテゴリー１</option>
-                <option value='cate2' <?php /*echo ($categry==2?"selected":"");*/?> >カテゴリー２</option>
+                <option value='cate1' <?php echo "selected";?> >カテゴリー１</option>
+                <option value='cate2' >カテゴリー２</option>
                 <option value='cate3' <?php /*echo ($categry==3?"selected":"");*/?> >カテゴリー３</option>
             </select>
             <select class='form-control' id='over_cate' disabled style='width:200px;margin-left:5px' >
+                <option value='*' selected>上位分類を選択</option>
                 <!--ajaxでセット-->
             </select>
         </div>
@@ -233,6 +247,7 @@ $stmt->execute();
     <input type='hidden' name='upd_bunrui' id='upd_bunrui_send' value=''>
     <input type='hidden' name='categry' id='categry_send' value=''>
     -->
+    
     <table class='table-striped table-bordered item_1 MSLIST'>
         <thead>
             <tr style='height:30px;'>
@@ -241,19 +256,11 @@ $stmt->execute();
                 <th class='th1' scope='col' style='width:auto;padding:0px 5px 0px 0px;' > ID:商品名</th>
                 <th class='th1' scope='col' style='width:auto;padding:0px 5px 0px 0px;' > カテゴリー(1>2>3)</th>
             </tr>
-            <!--
-            <tr style='height:30px;'>
-                <th></th>
-                <th scope='col' style='width:auto;'>単価(税込)</th>
-                <th scope='col' style='padding-left:5px;'>分類1</th>
-                <th scope='col' style='padding-left:5px;'>分類2</th>
-                <th scope='col' style='padding-left:5px;'>分類3</th>
-            </tr>
-            -->
         </thead>
         <tbody id='tbody1'>
 <?php    
 $i=0;
+
 foreach($stmt as $row){
     $zeikomitanka=$row["tanka"]+$row["tanka_zei"];
     $category=(!empty($row["bunrui1"])?$row["bunrui1"].">":"");
@@ -262,17 +269,7 @@ foreach($stmt as $row){
     
     echo "<tr id='tr1_".$i."' >\n";
     echo "<td><input type='checkbox' id='chk_".$i."' name ='ORDERS[".$i."][chk]' style='width:2rem;padding-left:10px;'></td>";
-    //echo "<td style='font-size:1.5rem;font-weight:700;' colspan='4'>".$row["shouhinCD"]."：".$row["shouhinNM"]."</td>";    //商品名
     echo "<td style=''>".$row["shouhinCD"].":".$row["shouhinNM"]."</td>";    //商品名
-    /*
-    echo "</tr>\n";
-    echo "<tr id='tr2_".$i."' style='font-size:1.8rem;'>\n";
-    echo "<td></td>";
-    echo "<td class='text-right' style='padding-right:10px;'>".$zeikomitanka."</td>"; //登録単価
-    echo "<td style='padding-left:5px;'>".$row["bunrui1"]."</td>";
-    echo "<td style='padding-left:5px;'>".$row["bunrui2"]."</td>";
-    echo "<td style='padding-left:5px;'>".$row["bunrui3"]."</td>";
-    */
     echo "<td style='padding-left:5px;'>".$category."</td>";
     echo "</tr>\n";
     echo "<input type='hidden' name ='ORDERS[".$i."][shouhinCD]' value='".$row["shouhinCD"]."'>";
@@ -285,6 +282,7 @@ foreach($stmt as $row){
 ?>
         </tbody>
     </table>
+    
     </div>
 
 

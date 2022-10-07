@@ -23,12 +23,12 @@ define("EXEC_MODE",$_ENV["EXEC_MODE"]);
 
 if(EXEC_MODE=="Test"){
     //テスト環境はミリ秒単位
-    $time="8";
-    //$time=date('Ymd-His');
+    //$time="8";
+    $time=date('Ymd-His');
     error_reporting( E_ALL );
 }else{
     //本番はリリースした日を指定
-    $time="20220908";
+    $time="20220908-01";
     //$time=date('Ymd');
     error_reporting( E_ALL & ~E_NOTICE );
 }
@@ -102,6 +102,8 @@ $stmt->execute();
 
 if($stmt->rowCount()==0){
     $color_No = 0;
+    file_put_contents("sql_log/pglog.log", $log_time."php_header.php@Cannot Get skin_color_cd：session_uid=[".(!empty($_SESSION['user_id'])?$_SESSION['user_id']:"NULL")."] /MACHIN_ID=[".MACHIN_ID."]\n", FILE_APPEND);
+
     //deb_echo("NULL");
 }else{
     $buf = $stmt->fetch();
