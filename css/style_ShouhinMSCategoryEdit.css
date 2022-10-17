@@ -26,11 +26,11 @@
 INPUT{
     height:30px;
 }
-
+/* 共通css(style.css)に移動
 .common_footer{
     background:var(--footer-color);
-    height:55px; /* 高さを50pxに指定 */
-    position: fixed; /* ウィンドウを基準に画面に固定 */
+    height:55px; 
+    position: fixed; 
     padding:0;
     bottom: 0;
     Right: 0;
@@ -46,7 +46,7 @@ INPUT{
     border-color:var(--rez-border-color);
 }
 .left1{
-    /*登録ボタンエリア*/
+    登録ボタンエリア
     width:30%;
     max-width:250px;
     height:100%;
@@ -55,20 +55,22 @@ INPUT{
 }
 
 .btn--chk {
-    /*登録ボタン*/
+    登録ボタン
     color: var(--chk-font-color);
     background-color:var(--chk-color);
     height:100%; 
-    width:100%;
+    width:80%;
+    margin:auto;
     font-size: 2rem;
-    margin:0;
     border-top:none;
     border-right:var(--rez-border-top);
     border-right-width:thin;
-    border-left:none;
+    border-left:var(--rez-border-top);
+    border-left-width:thin;
     border-bottom:none;
     border-color:var(--rez-border-color);
 }
+*/
 .header2{
     top: 70px;
     height: 80px; /* 高さを指定 */

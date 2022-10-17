@@ -287,9 +287,12 @@ foreach($stmt as $row){
 
 
     <footer class='common_footer'>
+        <!--
         <dev class='left1 item_3'>
             <button type='submit' class='btn--chk' style='border-radius:0;' name='commit_btn' >登　録</button>
         </dev>
+        -->
+        <button type='submit' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >登　録</button>
     </footer>
     </form>
 </body>

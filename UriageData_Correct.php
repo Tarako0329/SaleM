@@ -146,6 +146,7 @@ if($mode=="select"){
                 $_SESSION["UriFrom"]="2000-01-01";
                 $_SESSION["UriTo"]="2099-12-31";
             }
+            $_SESSION["MSG"]="";
             $sql = "select U.UriDate,'-' as UriageNO,U.Event,U.TokuisakiNM,'-' as ShouhinCD,'-' as ShouhinNM,0 as su,0 as tanka,sum(U.UriageKin) as UriageKin,sum(U.zei) as zei,sum(U.su*U.genka_tanka) as genka,sum(U.UriageKin-(U.su*U.genka_tanka)) as arari ";
             $sql = $sql.",max(UGW.icon) as icon,max(UGW.temp) as max_temp,min(UGW.temp) as min_temp ";
             $sql = $sql."from (select * from UriageData ".$wheresql.") as U left join UriageData_GioWeather as UGW on U.uid = UGW.uid and U.UriageNO = UGW.UriNo ";
@@ -374,7 +375,6 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
 <header class='header-color common_header' style='flex-wrap:wrap'>
     <div class='title' style='width: 100%;'><a href='menu.php'><?php echo $title;?></a></div>
     <div style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'> <?php echo $joken;?></div>
-    <!--<div style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'> 修正モード </div>-->
 </header>
 <div class='header_menu'>
     <div style='position:fixed;right:5px;top:70px;' class='item_2'>
@@ -389,9 +389,9 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
         <a href="#" style='color:inherit;margin-left:-6px;margin-top:10px;' data-toggle='modal' data-target='#modal_help1'>
             <i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i>
         </a>
-        <a href='UriageData_Correct.php?mode=select&Type=sum_events&display=all&csrf_token=<?php echo $csrf_create; ?>' class='btn-view' style='padding:4px;'>イベント集計</a>
-        <a href='UriageData_Correct.php?mode=select&Type=sum_items&csrf_token=<?php echo $csrf_create; ?>' class='btn-view' style='padding:4px;'>商品集計</a>
-        <a href='UriageData_Correct.php?mode=select&Type=rireki&csrf_token=<?php echo $csrf_create; ?>' class='btn-view' style='padding:4px;'>会計明細</a>
+        <a href='UriageData_Correct.php?mode=select&Type=sum_events&display=all&csrf_token=<?php echo $csrf_create; ?>' class='btn-view' style='padding:4px;width:30%;'>イベント集計</a>
+        <a href='UriageData_Correct.php?mode=select&Type=sum_items&csrf_token=<?php echo $csrf_create; ?>' class='btn-view' style='padding:4px;width:30%;'>商品集計</a>
+        <a href='UriageData_Correct.php?mode=select&Type=rireki&csrf_token=<?php echo $csrf_create; ?>' class='btn-view' style='padding:4px;width:30%;'>会計明細</a>
     </div>
     <?php
         echo "<p style='font-size:1.3rem'>".$msg."</p>\n";

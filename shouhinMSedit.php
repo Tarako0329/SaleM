@@ -104,7 +104,7 @@ $_SESSION["MSG"]=null;
             </div>
             <tr class='item_3'>
                 <td></td>
-                <td>└
+                <td>
                     <div class="btn-group btn-group-toggle" style="padding:0" data-toggle="buttons">
                         <label class="btn btn-outline-primary active" style="font-size:1.2rem">
                             <input type="radio" onchange="zei_math()" name="options" id="option1" value="zeikomi" autocomplete="off" checked> 税込
@@ -113,7 +113,6 @@ $_SESSION["MSG"]=null;
                             <input type="radio" onchange="zei_math()" name="options" id="option2" value="zeinuki" autocomplete="off"> 税抜
                         </label>
                     </div>
-                    ┘
                 </td>
             </tr>
             <tr class='item_4'><td>税区分</td>
@@ -144,15 +143,20 @@ $_SESSION["MSG"]=null;
                     <small id="genka" class="form-text text-muted">おおよその原材料費</small>
                 </td>
             </tr>
-            <tr class='item_7'><td>内容量</td><td><input type="number" class="form-control" style="width:95%" id="utisu" name="utisu" placeholder="1箱12個入りの場合「12」等"></td></tr>
+            <tr class='item_7'><td>内容量</td><td><input type="number" class="form-control" style="width:95%" id="utisu" name="utisu" placeholder="個数・グラム等"></td></tr>
             <tr class='item_8'><td>単位</td><td><input type="text" class="form-control" style="width:95%" id="tani" name="tani" placeholder="内容量の単位（g,個）等"></td></tr>
+            <tr>
+                <td colspan='2'>
+                <hr aria-describedby="setumei">
+                <small id="setumei" class="form-text text-muted">カテゴリー別画面でまとめて登録可能です</small>
+                </td>
+            </tr>
             <tr class='item_9'><td>大カテゴリー</td><td><input type="text" class="form-control" style="width:95%" id="bunrui1" name="bunrui1" placeholder="例：物販"></td></tr>
             <tr class='item_10'><td>中カテゴリー</td><td><input type="text" class="form-control" style="width:95%" id="bunrui2" name="bunrui2" placeholder="例：食品"></td></tr>
             <tr class='item_11'><td>小カテゴリー</td><td><input type="text" class="form-control" style="width:95%" id="bunrui3" name="bunrui3" placeholder="例：惣菜"></td></tr>
             <tr class='item_12'><td>レジ対象</td><td><label for="hyoujiKBN1" style="float:left;width:8rem;">
                      <input type="checkbox" style="vertical-align:middle;" id="hyoujiKBN1" name="hyoujiKBN1" checked="checked">表示する
                 </label></td></tr>
-            <!--<tr><td>表示順</td><td><input type="text" class="form-control" style="width:50%" id="hyoujiNO" name="hyoujiNO" placeholder="レジ表示順。未指定の場合は「カテゴリー大>中>小>商品名」の五十音順" value=0></td></tr>-->
         </table>
         <input type="hidden" class="form-control" style="width:50%" id="hyoujiNO" name="hyoujiNO" placeholder="レジ表示順。未指定の場合は「カテゴリー大>中>小>商品名」の五十音順" value=0>
         <input type="hidden" class="form-control" id="hyoujiKBN2" name="hyoujiKBN2" value="">
@@ -171,12 +175,14 @@ $_SESSION["MSG"]=null;
             </div>
         </div>
         -->
-        <br>
-        <button type="submit" class="btn btn-primary item_13" name="btn" value="登録" >登  録</button>
+        <footer class='common_footer'>
+            <button type='submit' class='btn--chk item_13' style='border-radius:0;' name='btn' value="登録" >登　録</button>
+        </footer>
+        
     </form>
     </div>
 
-    <script type="text/javascript" language="javascript">
+    <script>
         var select = document.getElementById('zeikbn');
         var tanka = document.getElementById('tanka');
         var new_tanka = document.getElementById('new_tanka');

@@ -157,7 +157,41 @@ a:active{
     font-size:2rem;
     line-height:2rem;
 }
-
+.common_footer{
+    /*商品マスタ系画面のフッターエリア*/
+    background:var(--footer-color);
+    height:65px; 
+    position: fixed; 
+    padding:0;
+    bottom: 0;
+    Right: 0;
+    width: 100%;
+    display: flex;    
+    z-index: 99;
+    border-top:var(--rez-border-top);
+    border-top-width:thin;
+    border-left:none;
+    border-right:none;
+    border-bottom:none;
+    border-color:var(--rez-border-color);
+}
+.btn--chk {
+    /*商品マスタ系画面の登録ボタン*/
+    color: var(--chk-font-color);
+    background-color:var(--chk-color);
+    height:100%; 
+    width:80%;
+    margin:auto;
+    font-size: 3rem;
+    font-weight:700;
+    border-top:none;
+    border-right:var(--rez-border-top);
+    border-right-width:thin;
+    border-left:var(--rez-border-top);
+    border-left-width:thin;
+    border-bottom:none;
+    border-color:var(--rez-border-color);
+}
 
 
 

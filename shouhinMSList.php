@@ -125,6 +125,7 @@ $ZKMS = $stmt2->fetchAll();
     </div>
 </div>
 
+<form method='post' id='form1' action='shouhinMSList_sql.php'>
 <body class='common_body media_body'>    
     <?php
         //echo $_SESSION["MSG"]."<br>";
@@ -134,10 +135,9 @@ $ZKMS = $stmt2->fetchAll();
         $_SESSION["MSG"]="";
     ?>
     <div class='container-fluid'>
-    <form method='post' id='form1' action='shouhinMSList_sql.php'>
+    
     <input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
 
-    
     <table class='table-striped item_1 '>
         <thead>
             <tr style='height:30px;'>
@@ -302,9 +302,12 @@ echo "</script>";
 </body>
 
 <footer class='common_footer'>
+    <!--
     <dev class='left1 item_3'>
         <button type='submit' class='btn--chk' style='border-radius:0;' name='commit_btn' >登　録</button>
     </dev>
+    -->
+    <button type='submit' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >登　録</button>
 </footer>
 </form>
 <!--シェパードナビshepherd
