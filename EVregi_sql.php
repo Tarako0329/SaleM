@@ -337,6 +337,7 @@ if($MODE == "evrez" || $MODE == "kobetu"){
         }
         echo $_COOKIE["address"]."::".$_SESSION["address"]."<br>";
         */
+        
         if($E_Flg==0){
             $pdo_h->commit();
             file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,COMMIT,success,売上No".$UriageNO."\n",FILE_APPEND);

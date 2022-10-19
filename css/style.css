@@ -19,6 +19,13 @@ font-family: 'Zen Kurenaido', sans-serif;　日本語あり　今使ってる
 table{
     font-family:var(--table-font);
 }
+.result_table{
+    font-size:15px;
+}
+.result_table th{
+    background:var(--panel-bk-color);
+    color:var(--panel-font-color);
+}
 /*点滅クラス*/
 .blink {
 	animation: blinking 0.8s ease-in-out infinite alternate;

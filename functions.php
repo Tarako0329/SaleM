@@ -394,7 +394,7 @@ function getGUID(){
 function drow_table($aryColumn,$result){
     //var_dump($result);
     try{
-        echo "<table class='table-striped table-bordered' style='margin: auto;'>\n";
+        echo "<table class='table-striped table-bordered result_table' >\n";
         echo "<thead><tr>\n";
         foreach($aryColumn as $value){
             echo "<th>".$value."</th>";
@@ -409,14 +409,8 @@ function drow_table($aryColumn,$result){
             for($i=0;isset($row[$i])==true;$i++){
                 $right = null;
                 $row_sum[$i]=null;
-                /*
-                if(preg_match('/[^0-9|^%,%]/',$row[$i])==0){//0～9とカンマ以外が存在して無い場合、数値として右寄せ
-                    $right = " class='text-right' ";
-                    $row_sum[$i]=$row_sum[$i] + $row[$i];
-                }elseif(preg_match('/[^0-9]/',$row[$i])==0){//0～9以外が存在して無い場合、数値として右寄せ
-                */
                 if(preg_match('/[^0-9]/',(!empty($row[$i])?$row[$i]:"-"))==0){//0～9以外が存在して無い場合、数値として右寄せ
-                    $right = " class='text-right' ";
+                    $right = " class='text-right'  style='padding-left:20px;'";
                     $row_sum[$i]=$row_sum[$i] + $row[$i];
                 }else{
                     $right = "";
@@ -424,8 +418,6 @@ function drow_table($aryColumn,$result){
                 }
                 
                 $ShouhinNM=(!empty($row["ShouhinNM"])?$row["ShouhinNM"]:"");
-                //if($row["ShouhinNM"]===$row[$i]){
-                //    $val = $row["ShouhinNM"];
                 if($ShouhinNM===$row[$i]){
                     $val = $ShouhinNM;
                 }else{
@@ -456,7 +448,7 @@ function drow_table_abc($aryColumn,$result,$cols){
     //２カラムの場合は１表、３カラムの場合は３カラム目が大分類として分類ごとに表を作成
 
     if($cols==2){
-        echo "<table class='table-striped table-bordered' style='margin: auto;'>\n";
+        echo "<table class='table-striped table-bordered result_table' >\n";
         echo "<thead><tr>\n";
         foreach($aryColumn as $value){
             echo "<th>".$value."</th>";
@@ -472,9 +464,9 @@ function drow_table_abc($aryColumn,$result,$cols){
                     continue;//３カラム目はスキップ
                 }
                 if(preg_match('/[^0-9|^%,%]/',$row[$i])==0){//0～9とカンマ以外が存在して無い場合、数値として右寄せ
-                    $right = " class='text-right' ";
+                    $right = " class='text-right'  style='padding-left:20px;'";
                 }elseif(preg_match('/[^0-9]/',$row[$i])==0){//0～9以外が存在して無い場合、数値として右寄せ
-                    $right = " class='text-right' ";
+                    $right = " class='text-right'  style='padding-left:20px;'";
                 }else{
                     $right = "";
                 }
@@ -500,7 +492,7 @@ function drow_table_abc($aryColumn,$result,$cols){
             echo "<td class='text-center'>".$rank."</td>";
             echo "</tr>\n";
         }
-        echo "<thead><tr><th>合計</th><th class='text-right'>".return_num_disp($row["総売上"])."</th></tr></thead>";
+        echo "<thead><tr><th>合計</th><th class='text-right'>".return_num_disp($row["総売上"])."</th><th></th></tr></thead>";
         echo "</table>\n";
     }elseif($cols==3){
         
@@ -514,13 +506,13 @@ function drow_table_abc($aryColumn,$result,$cols){
             
             if($Event_old!=$row["Event"]){
                 if($Event_old!="x"){
-                    echo "<thead><tr><th>合計</th><th class='text-right'>".$row["総売上"]."</th></tr></thead>";
+                    echo "<thead><tr><th>合計</th><th class='text-right'>".$row["総売上"]."</th><th></th></tr></thead>";
                     echo "</table>\n";
                     echo "</div>";
                 }
                 echo "<div class='col-md-3' style='padding:5px;background:white'>";
                 echo "<label for='".$row["Event"]."' style='text-align:center;font-weight:700;display:block;'>『".$row["Event"]."』<br>のABC分析</label>\n";
-                echo "<table class='table-striped table-bordered' style='margin:auto;' id='".$row["Event"]."'>\n";
+                echo "<table class='table-striped table-bordered result_table' id='".$row["Event"]."'>\n";
                 echo "<thead><tr>\n";
                 foreach($aryColumn as $value){
                     echo "<th>".$value."</th>";
@@ -565,7 +557,7 @@ function drow_table_abc($aryColumn,$result,$cols){
             echo "<td class='text-center'>".$rank."</td>";
             echo "</tr>\n";
         }
-        echo "<thead><tr><th>合計</th><th class='text-right'>".return_num_disp($row["総売上"])."</th></tr></thead>";
+        echo "<thead><tr><th>合計</th><th class='text-right'>".return_num_disp($row["総売上"])."</th><th></th></tr></thead>";
         echo "</table>\n";
         echo "</div></div>";
         

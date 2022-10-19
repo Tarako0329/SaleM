@@ -191,55 +191,7 @@ window.onload = function() {
     // オブジェクトと変数の準備
     var kaikei_disp = document.getElementById("kaikei");
     var zei_disp = document.getElementById("utizei");
-    //var plus_minus = document.getElementsByName('options');
-    //フッター合計支払金額を保持
-    /*
-    var total_pay = 0;     //税込総支払額
-    var total_zei = 0;     //総支払額の内税
-    var total_pay_bk = 0;  //値引値増前の金額を保持し、会計確定せずに戻る際にtotal_payに返す
-    */
-    //PHPで繰り返し表示。メニューボタン数に応じて準備する
-<?php
-/*
-    foreach($shouhiMS as $row){
-        echo "\n";
-        echo "    var suryou_".$row["shouhinCD"]."  = document.getElementById('suryou_".$row["shouhinCD"]."');\n" ;         //ボタンの注文数
-        echo "    var btn_menu_".$row["shouhinCD"]." = document.getElementById('btn_menu_".$row["shouhinCD"]."');\n";       //ボタンのオブジェクト
-        echo "    var items_".$row["shouhinCD"]." = document.getElementById('items_".$row["shouhinCD"]."');\n";             //商品パネル
-        echo "\n";
-        //ボタンクリック時の動作関数
-        echo "    //".$row["shouhinNM"]."ボタンクリック時\n";
-        echo "    btn_menu_".$row["shouhinCD"].".onclick = function (){\n";
-        echo "        if(plus_minus[0].checked){\n";//通常モード（プラス）
-        echo "              total_pay += ".($row["tanka"] + $row["tanka_zei"]).";\n";
 
-        echo "              total_pay_bk += ".($row["tanka"] + $row["tanka_zei"]).";\n";
-
-        echo "              total_zei += ".$row["tanka_zei"].";\n";
-        echo "              suryou_".$row["shouhinCD"].".value = parseInt(suryou_".$row["shouhinCD"].".value) + 1;\n";
-        echo "              kaikei_disp.innerHTML = total_pay.toLocaleString();\n";
-        echo "              zei_disp.innerHTML = total_zei.toLocaleString();\n";
-        echo "        }else if(plus_minus[1].checked){\n";//減らすモード（マイナス）
-        echo "              if(parseInt(suryou_".$row["shouhinCD"].".value)==0){\n";
-        echo "                  window.alert('数量０以下には出来ません');\n";
-        echo "                  return;\n";
-        echo "              }\n";
-        echo "              total_pay -= ".($row["tanka"] + $row["tanka_zei"]).";\n";
-
-        echo "              total_pay_bk -= ".($row["tanka"] + $row["tanka_zei"]).";\n";
-
-        echo "              total_zei -= ".$row["tanka_zei"].";\n";
-        echo "              suryou_".$row["shouhinCD"].".value = parseInt(suryou_".$row["shouhinCD"].".value) - 1;\n";
-        echo "              kaikei_disp.innerHTML = total_pay.toLocaleString();\n";
-        echo "              zei_disp.innerHTML = total_zei.toLocaleString();\n";
-        echo "        }\n";
-        echo "    };\n";
-        echo "\n";
-    }
-*/    
-?>
-    
-    
     //確認・確定ボタン
     var order_chk = document.getElementById('order_chk');
     var btn_commit = document.getElementById('btn_commit');
@@ -282,20 +234,7 @@ window.onload = function() {
         seikyuu.innerHTML = total_pay.toLocaleString();
     };
 
-    //計算ボタン*電卓のパネルタップ時に自動計算としたので以下不要コメントアウト
-    /*
-    var keisan = document.getElementById('keisan');
-    var azukari = document.getElementById('azukari');
-    
-        
-    keisan.onclick = function(){
-        //電卓モーダルに会計金額を表示
-        let azukarikin = azukari.value;
-        let oturikin = azukarikin - total_pay;
-        oturi.innerHTML = oturikin;
-    };
-    */
-    
+
     var reset_btn = document.getElementById("order_clear");
     var return_btn = document.getElementById("order_return");
     // リセットボタンのクリック処理
@@ -446,6 +385,7 @@ window.onload = function() {
     </a>
 </div>
 <div class='header-plus-minus text-center item_4' style='font-size:1.4rem;font-weight;700'>
+    <span style='position:fixed;top:95px;left:10px;' id='gio_exec'></span><!--開発モードでGET_GIO実行時の通知に使用-->
     <i class="fa-regular fa-circle-question fa-lg logoff-color"></i><!--スペーシングのため白アイコンを表示-->
     <div class='btn-group btn-group-toggle' style='padding:0;' data-toggle='buttons'>
         <label class='btn btn-outline-primary active' id='plus_mode'>
@@ -1512,6 +1452,7 @@ window.onload = function() {
     const lonEle = document.querySelector('#lon');
     const addressEle = document.querySelector('#address');
     const address_disp = document.querySelector('#address_disp');
+    const gio_exec = document.querySelector('#gio_exec');
     //const address_disp2 = document.querySelector('#address_disp2');
 
     /*
@@ -1545,13 +1486,16 @@ window.onload = function() {
         address_disp.textContent = `${city}${data.lv01Nm}`;
         address.value = `${city}${data.lv01Nm}`;
         document.cookie = `address=${city}${data.lv01Nm};expires=${limit};Secure; `;
-        //alert(`${pref} ${city} ${data.lv01Nm}`);
+        //console.log(`${pref} ${city} ${data.lv01Nm}`);
     };
     /*
     * 位置情報 API の実行(イベントリスナ)
     */
     let get_gio = function (){
-        console.log('exec get_gio')
+        console.log('[EXEC get_gio]')
+        <?php
+        if(EXEC_MODE=='Test'){ echo "gio_exec.textContent='[EXEC get_gio]';";}
+        ?>
         <?php
         if(EXEC_MODE<>'Trial'){
         ?>
@@ -1587,7 +1531,7 @@ window.onload = function() {
         }
     }
     
-    // NOTE: 後から読み込みたいので CodePen 上では JS で処理
+    
     const script = document.createElement('script');
     script.src = 'https://maps.gsi.go.jp/js/muni.js';
     document.body.insertAdjacentElement('afterEnd', script);    

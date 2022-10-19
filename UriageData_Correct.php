@@ -377,21 +377,22 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
     <div style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'> <?php echo $joken;?></div>
 </header>
 <div class='header_menu'>
-    <div style='position:fixed;right:5px;top:70px;' class='item_2'>
-        <p style='margin-bottom:0px'>修正モード</p>
-        <div class="switchArea">
-            <input type="checkbox" id="switch1" onClick='chang_mode()' <?php if($_SESSION["UriageData_Correct_mode"]==="true"){echo "checked";} if($mode=="Update"){echo " readOnly ='readOnly' disabled ";} ?>>
-            <label for="switch1" <?php if($mode=="Update"){echo " style='border-color:gray;'";}?>><span></span></label>
-            <div id="swImg" <?php if($mode=="Update"){echo " style='background:gray;'";}?>></div>
-        </div>
-    </div>
-    <div style='padding-top:2px;<?php if($mode=="Update"){echo "display:none;";}?>'>
+    <div style='font-size:13px;width:80%;padding-top:2px;<?php if($mode=="Update"){echo "display:none;";}?>'>
         <a href="#" style='color:inherit;margin-left:-6px;margin-top:10px;' data-toggle='modal' data-target='#modal_help1'>
             <i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i>
         </a>
         <a href='UriageData_Correct.php?mode=select&Type=sum_events&display=all&csrf_token=<?php echo $csrf_create; ?>' class='btn-view' style='padding:4px;width:30%;'>イベント集計</a>
         <a href='UriageData_Correct.php?mode=select&Type=sum_items&csrf_token=<?php echo $csrf_create; ?>' class='btn-view' style='padding:4px;width:30%;'>商品集計</a>
         <a href='UriageData_Correct.php?mode=select&Type=rireki&csrf_token=<?php echo $csrf_create; ?>' class='btn-view' style='padding:4px;width:30%;'>会計明細</a>
+    </div>
+    <!--<div style='position:fixed;right:5px;top:70px;width:20%;' class='item_2'>-->
+    <div style='width:20%;max-width:60px;' class='item_2'>
+        <span style='margin-bottom:0px'>修正モード</span>
+        <div class="switchArea">
+            <input type="checkbox" id="switch1" onClick='chang_mode()' <?php if($_SESSION["UriageData_Correct_mode"]==="true"){echo "checked";} if($mode=="Update"){echo " readOnly ='readOnly' disabled ";} ?>>
+            <label for="switch1" <?php if($mode=="Update"){echo " style='border-color:gray;'";}?>><span></span></label>
+            <div id="swImg" <?php if($mode=="Update"){echo " style='background:gray;'";}?>></div>
+        </div>
     </div>
     <?php
         echo "<p style='font-size:1.3rem'>".$msg."</p>\n";
@@ -409,22 +410,21 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
         
     ?>
     <div style='overflow:auto;' id='uritable'>
-    <table class='table-striped table-bordered item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;white-space: nowrap;'>
-        <thead >
+    <table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
+        <thead>
             <tr>
-                <!--
-                <th scope='col' class='d-none d-sm-table-cell'>売上日</th><th scope='col' class='d-none d-sm-table-cell'>Event/顧客</th>
-                -->
-                <th scope='col' style='width:2rem;'>No</th>
-                <th>商品</th>
-                <?php if($Type=="sum_items"){echo "<th scope='col' style='width:3rem;'>出品数</th>";} ?>
-                <th scope='col' style='width:3rem;'>売上数</th>
-                <?php if($Type=="sum_items"){echo "<th scope='col' style='width:3rem;'>残数</th>";} ?>
-                <th scope='col' style='width:3rem;' class='d-none d-sm-table-cell'>単価</th>
-                <th scope='col' style='width:5rem;'>売上</th><th scope='col' style='width:4rem;'>税</th><th scope='col' style='width:5rem;'>原価</th>
-                <th scope='col' style='width:5rem;'>粗利</th>
-                <th scope='col' class='d-none d-sm-table-cell'></th>
-                <th scope='col'></th>
+                <th scope='col' style='width:35px;'>No</th>
+                <th scope='col' style='width:130px;'>商品</th>
+                <?php if($Type=="sum_items"){echo "<th scope='col' style='width:35px;'>出品数</th>";} ?>
+                <th scope='col' style='width:40px;'>売数</th>
+                <?php if($Type=="sum_items"){echo "<th scope='col' style='width:35px;'>残数</th>";} ?>
+                <th scope='col' style='width:60px;' class='d-none d-sm-table-cell'>単価</th>
+                <th scope='col' style='width:60px;'>売上</th>
+                <th scope='col' style='width:60px;' class='d-none d-sm-table-cell'>税</th>
+                <th scope='col' style='width:50px;'>原価</th>
+                <th scope='col' style='width:60px;'>粗利</th>
+                <th scope='col' class='d-none d-sm-table-cell'>天候</th>
+                <th scope='col' style='width:20px;'></th>
             </tr>
         </thead>
 <?php    
@@ -437,20 +437,20 @@ $colspan=($Type=="sum_items"?"12":"10");
 
 foreach($result as $row){
     if($uridate!=$row["UriDate"].$row["Event"]){
-        echo "<tr class='tr_stiky'><td colspan='".$colspan."' class='tr_stiky'><a href='UriageData_Correct.php?mode=select&ad1=".rot13encrypt2($row["UriDate"])."&Type=".$NextType."&csrf_token=".$csrf_create."'> 売上日：".$row["UriDate"]."</a> ";
+        echo "<tr class='tr_stiky'><td colspan='".$colspan."' class='tr_stiky' style='white-space:nowrap;'><a href='UriageData_Correct.php?mode=select&ad1=".rot13encrypt2($row["UriDate"])."&Type=".$NextType."&csrf_token=".$csrf_create."'> 売上日：".$row["UriDate"]."</a> ";
         echo "<a href='UriageData_Correct.php?mode=select&ad2=".rot13encrypt2($row["Event"].$row["TokuisakiNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>『".$row["Event"].$row["TokuisakiNM"]."』</a>";
         if(!empty($row["icon"])){
             echo "<img style='height:20px;' src='https://openweathermap.org/img/wn/".$row["icon"]."'>（<span style='color:red;'>".$row["max_temp"]."</span>/<span style='color:blue;'>".$row["min_temp"]."</span>）";
         }
         echo "</td></tr>\n";
     }
-    echo "<td class='text-center'><a href='UriageData_Correct.php?mode=select&ad3=".rot13encrypt2($row["UriageNO"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["UriageNO"]."</a></td>";
+    echo "<tr><td class='text-center'><a href='UriageData_Correct.php?mode=select&ad3=".rot13encrypt2($row["UriageNO"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["UriageNO"]."</a></td>";
     echo "<td><a href='UriageData_Correct.php?mode=select&ad4=".rot13encrypt2($row["ShouhinCD"])."&ad5=".rot13encrypt2($row["ShouhinNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".($row["ShouhinNM"])."</a></td>";
     if($Type=="sum_items"){echo "<td class='text-right'>".$row["shuppin_su"]."</td>";}
     echo "<td class='text-right'>".$row["su"]."</td>";
     if($Type=="sum_items"){echo "<td class='text-right'>".$row["zan_su"]."</td>";}
     echo "<td class='text-right d-none d-sm-table-cell'>".return_num_disp($row["tanka"])."</td><td class='text-right'>".return_num_disp($row["UriageKin"])."</td>";
-    echo "<td class='text-right'>".$row["zei"]."</td><td class='text-right'>".return_num_disp($row["genka"])."</td><td class='text-right'>".return_num_disp($row["arari"])."</td>\n";
+    echo "<td class='text-right d-none d-sm-table-cell'>".$row["zei"]."</td><td class='text-right'>".return_num_disp($row["genka"])."</td><td class='text-right'>".return_num_disp($row["arari"])."</td>\n";
     if(($Type=="rireki") && ($mode == "select") || ($mode == "Updated")){
         //履歴表示の時だけ削除可能
         if(!empty($row["icon"])){
