@@ -381,9 +381,9 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
         <a href="#" style='color:inherit;margin-left:-6px;margin-top:10px;' data-toggle='modal' data-target='#modal_help1'>
             <i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i>
         </a>
-        <a href='UriageData_Correct.php?mode=select&Type=sum_events&display=all&csrf_token=<?php echo $csrf_create; ?>' class='btn-view' style='padding:4px;width:30%;'>イベント集計</a>
-        <a href='UriageData_Correct.php?mode=select&Type=sum_items&csrf_token=<?php echo $csrf_create; ?>' class='btn-view' style='padding:4px;width:30%;'>商品集計</a>
-        <a href='UriageData_Correct.php?mode=select&Type=rireki&csrf_token=<?php echo $csrf_create; ?>' class='btn-view' style='padding:4px;width:30%;'>会計明細</a>
+        <a href='UriageData_Correct.php?mode=select&Type=sum_events&display=all&csrf_token=<?php echo $csrf_create; ?>' class='btn-view' >イベント集計</a>
+        <a href='UriageData_Correct.php?mode=select&Type=sum_items&csrf_token=<?php echo $csrf_create; ?>' class='btn-view' >商品集計</a>
+        <a href='UriageData_Correct.php?mode=select&Type=rireki&csrf_token=<?php echo $csrf_create; ?>' class='btn-view' >会計明細</a>
     </div>
     <!--<div style='position:fixed;right:5px;top:70px;width:20%;' class='item_2'>-->
     <div style='width:20%;max-width:60px;' class='item_2'>
@@ -413,10 +413,10 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
     <table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
         <thead>
             <tr>
-                <th scope='col' style='width:35px;'>No</th>
+                <th scope='col' style='width:20px;'></th>
                 <th scope='col' style='width:130px;'>商品</th>
                 <?php if($Type=="sum_items"){echo "<th scope='col' style='width:35px;'>出品数</th>";} ?>
-                <th scope='col' style='width:40px;'>売数</th>
+                <th scope='col' style='width:30px;'>数</th>
                 <?php if($Type=="sum_items"){echo "<th scope='col' style='width:35px;'>残数</th>";} ?>
                 <th scope='col' style='width:60px;' class='d-none d-sm-table-cell'>単価</th>
                 <th scope='col' style='width:60px;'>売上</th>
@@ -434,7 +434,7 @@ $GoukeiZeikomi=0;
 $uridate="";
 
 $colspan=($Type=="sum_items"?"12":"10");
-
+$mark="";
 foreach($result as $row){
     if($uridate!=$row["UriDate"].$row["Event"]){
         echo "<tr class='tr_stiky'><td colspan='".$colspan."' class='tr_stiky' style='white-space:nowrap;'><a href='UriageData_Correct.php?mode=select&ad1=".rot13encrypt2($row["UriDate"])."&Type=".$NextType."&csrf_token=".$csrf_create."'> 売上日：".$row["UriDate"]."</a> ";
@@ -444,7 +444,11 @@ foreach($result as $row){
         }
         echo "</td></tr>\n";
     }
-    echo "<tr><td class='text-center'><a href='UriageData_Correct.php?mode=select&ad3=".rot13encrypt2($row["UriageNO"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["UriageNO"]."</a></td>";
+    if($row["UriageNO"] !=="-"){
+        $mark=($row["UriageNO"]%2?"★":"☆");
+    }
+    //echo "<tr><td class='text-center'><a href='UriageData_Correct.php?mode=select&ad3=".rot13encrypt2($row["UriageNO"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$row["UriageNO"]."</a></td>";
+    echo "<tr><td class='text-center'><a href='UriageData_Correct.php?mode=select&ad3=".rot13encrypt2($row["UriageNO"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$mark."</a></td>";
     echo "<td><a href='UriageData_Correct.php?mode=select&ad4=".rot13encrypt2($row["ShouhinCD"])."&ad5=".rot13encrypt2($row["ShouhinNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".($row["ShouhinNM"])."</a></td>";
     if($Type=="sum_items"){echo "<td class='text-right'>".$row["shuppin_su"]."</td>";}
     echo "<td class='text-right'>".$row["su"]."</td>";
@@ -656,7 +660,7 @@ if($mode=="Update" || $mode=="del"){
         </div>
     </div>
 </div>
-<script type='text/javascript' language='javascript'>
+<script>
     
     var select = document.getElementById('zeikbn');
     var tanka = document.getElementById('UpUriTanka');
@@ -711,7 +715,7 @@ if($mode=="Update" || $mode=="del"){
         let wh = window.innerHeight;//ブラウザの縦サイズ取得
         
         //ヘッダとフッタ分をマイナスして縦幅を算出
-        var normal_vw = wh - 105 - 120;
+        var normal_vw = wh - 105 - 110;
         var update_vw = wh - 105 - 300;
         console.log('full:' + wh +' normal:' + normal_vw + ' update_vw:' + update_vw);
         if(mode_switch.checked==true && mode_switch.readOnly == false){

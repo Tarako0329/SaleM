@@ -23,7 +23,10 @@ $logfilename="sid_".$_SESSION['user_id'].".log";
 //file_put_contents("sql_log/".$logfilename, $log_time.",REFERER:".$_SERVER['HTTP_REFERER']."\n", FILE_APPEND);
 
 $status=(!empty($_SESSION["status"])?$_SESSION["status"]:"");
+//$event_aria=(empty($_COOKIE["address"])?"":urldecode($_COOKIE["address"]));
+//$event_aria="住所サンプル";
 $_SESSION["status"]="";
+$HTTP_REFERER=(empty($_SERVER['HTTP_REFERER'])?"":$_SERVER['HTTP_REFERER']);
 
 if(EXEC_MODE!=""){
 //file_put_contents("sql_log/".$logfilename,$log_time.",cookie :".$_COOKIE['csrf_token']."\n",FILE_APPEND);
@@ -31,7 +34,8 @@ if(EXEC_MODE!=""){
 //file_put_contents("sql_log/".$logfilename,$log_time.",session:".$_SESSION['csrf_token']."\n",FILE_APPEND);
 //if(!empty($_POST)){
     if(csrf_chk_nonsession()==false){//POST:COOKIEチェック
-        if(!empty($status) && ROOT_URL."EVregi.php"==substr($_SERVER['HTTP_REFERER'],0,strlen(ROOT_URL."EvRegi.php"))){
+        //if(!empty($status) && ROOT_URL."EVregi.php"==substr($_SERVER['HTTP_REFERER'],0,strlen(ROOT_URL."EvRegi.php"))){
+        if(!empty($status) && ROOT_URL."EVregi.php"==substr($HTTP_REFERER,0,strlen(ROOT_URL."EvRegi.php"))){
             //リファイラが自身でかつstatusがセットされてる場合、問題なし
         }else if($status=="longin_redirect"){
             //$_SESSION["status"]="";
@@ -169,6 +173,15 @@ $stmt->execute();
 $shouhiMS_bunrui = $stmt->fetchAll();
 //deb_echo($next_categoly);
 
+//今日の売上
+$sql = "select * from UriageData where uid = ? and UriDate = ? order by insDatetime desc";
+$stmt = $pdo_h->prepare($sql);
+$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+$stmt->bindValue(2, (string)date("Y-m-d"), PDO::PARAM_STR);
+$stmt->execute();
+$UriageList = $stmt->fetchAll();
+
+
 ?>
 <head>
     <?php 
@@ -177,6 +190,7 @@ $shouhiMS_bunrui = $stmt->fetchAll();
     ?>
     <!--ページ専用CSS-->
     <link rel="stylesheet" href="css/style_EVregi.css?<?php echo $time; ?>" >
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
     <TITLE><?php echo $title." レジ";?></TITLE>
 </head>
 
@@ -363,9 +377,9 @@ window.onload = function() {
         $_SESSION["nonadd"]="";
     }
     ?>
-    <div style='<?php echo $dispnone; ?>font-size:12px;position:fixed;top:55px;right:15px;color:var(--user-disp-color);max-width:50%;'>
+    <div class='address_disp' style='<?php echo $dispnone; ?> position:fixed;top:55px;right:5px;color:var(--user-disp-color);max-width:50%;height:15px;'>
         <input type='checkbox' name='nonadd' id='nonadd' onclick='gio_onoff()' <?php echo $_SESSION["nonadd"].$checked; ?>>
-        <label for='nonadd' id='address_disp' class='item_101' <?php if($_SESSION["nonadd"]=="checked"){echo "style='text-decoration:line-through;'";} ?> ><?php echo (empty($_COOKIE["address"])?"":$_COOKIE["address"]); ?></label>
+        <label for='nonadd' id='address_disp' class='item_101' title='' <?php if($_SESSION["nonadd"]=="checked"){echo "style='text-decoration:line-through;'";} ?> ><?php //echo $event_aria; ?></label>
     </div>
 </header>
 <div class='header-select header-color' >
@@ -395,7 +409,14 @@ window.onload = function() {
             <input type='radio' name='options' value='minus' autocomplete='off'>　▼　
         </label>
     </div>
-    <a href="#" style='color:inherit;margin-left:5px;margin-top:10px;' data-toggle='modal' data-target='#modal_help2'><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>
+    <a href="#" style='color:inherit;margin-left:5px;margin-top:10px;' data-toggle='modal' data-target='#modal_help2'>
+        <i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i>
+    </a>
+    <a href="#" style='color:inherit;position:fixed;top:110px;right:10px;' data-toggle='modal' data-target='#modal_uriagelist'>
+        <i class="fa-solid fa-cash-register fa-2x awesome-color-panel-border-same"></i>
+    </a>
+    
+    
 </div>
 <body class='common_body'>
    
@@ -466,7 +487,6 @@ window.onload = function() {
         }
 	    
         echo "  <div class ='col-md-3 col-sm-6 col-6 items ".$disp."' ".$style." id='items_".$row["shouhinCD"]."'>\n";
-        //echo "      <button type='button' class='btn-view btn--rezi' id='btn_menu_".$row["shouhinCD"]."'>".($row["shouhinNM"])."\n";
         echo "      <button type='button' class='btn-view btn--rezi' id='btn_menu_".$row["shouhinCD"]."' onclick='order_cnt(".$row["tanka"].",".$row["tanka_zei"].",getElementById(\"suryou_".$row["shouhinCD"]."\"))'>".($row["shouhinNM"])."\n";
         echo "      </button>\n";
         echo "      <div class='btn-view btn--rezi-minus bg-warning minus_disp' style='display:none;'></div>n";
@@ -636,7 +656,6 @@ window.onload = function() {
                 タップするごとに（大分類⇒中分類⇒小分類⇒50音順）の順番でループします。<br>
             </div>
             <div class='modal-footer'>
-                <!--<button type='button' class='btn btn-default' data-dismiss='modal'>閉じる</button>-->
                 <button type='button'  data-dismiss='modal'>閉じる</button>
             </div>
         </div>
@@ -672,6 +691,61 @@ window.onload = function() {
     </div>
 </div>
 
+<!--売上リスト-->
+<div class='modal fade' id='modal_uriagelist' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
+    <div class='modal-dialog  modal-dialog-centered' >
+        <div class='modal-content' style='font-size:1.2rem; font-weight:400;'>
+            <div class='modal-header'>
+                <div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;font-weight:600;' class='lead alert-success'>本日の売上</div></div></div></div>
+            </div>
+            <div class='modal-body'>
+                <div class='urilist'>
+                <table class="table table-sm" style='font-family:"Meiryo UI";'>
+                    <thead class='header-color' style='color:var(--title-color);'>
+                        <tr>
+                            <th>No</th>
+                            <th>時刻</th>
+                            <th>商品</th>
+                            <th>数量</th>
+                            <th>税込売上</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                        <?php
+                        $No=0;
+                        $color="";
+                        $Goukei = 0;
+                        foreach($UriageList as $row){
+                            if($No == 0){
+                                $color="class='table-success'";
+                                $No=$row["UriageNO"];
+                            }elseif($No != $row["UriageNO"]){
+                                if(empty($color)){
+                                    $color="class='table-active'";
+                                }else{
+                                    $color="";
+                                }
+                                $No=$row["UriageNO"];
+                            }
+                            $ZeikomiUri=$row["UriageKin"] + $row["zei"];
+                            $Goukei = $Goukei + $ZeikomiUri;
+                            echo "<tr ".$color."><td>".$row["UriageNO"]."</td>";
+                            echo "<td>".substr($row["insDatetime"],11)."</td>";
+                            echo "<td>".$row["ShouhinNM"]."</td>";
+                            echo "<td>".$row["su"]."</td>";
+                            echo "<td>".return_num_disp($ZeikomiUri)."</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+            <div class='modal-footer' style='font-size:2.5rem;font-weight:600;'>
+                合計：<?php echo return_num_disp($Goukei); ?> 円
+            </div>
+        </div>
+    </div>
+</div>
 
 <!--シェパードナビ
 <script src="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/js/shepherd.min.js"></script>
@@ -1453,8 +1527,9 @@ window.onload = function() {
     const addressEle = document.querySelector('#address');
     const address_disp = document.querySelector('#address_disp');
     const gio_exec = document.querySelector('#gio_exec');
-    //const address_disp2 = document.querySelector('#address_disp2');
-
+    
+    let return_jusho = $.cookie('address',unescape);
+    console.log("起動時クッキー：" + return_jusho);
     /*
     * 緯度経度を画面表示
     */
@@ -1484,17 +1559,29 @@ window.onload = function() {
         //${pref}${city}${data.lv01Nm}->県・市区町村・番地
         // 画面に反映
         address_disp.textContent = `${city}${data.lv01Nm}`;
+        address_disp.title = `${city}${data.lv01Nm}`;
         address.value = `${city}${data.lv01Nm}`;
-        document.cookie = `address=${city}${data.lv01Nm};expires=${limit};Secure; `;
-        //console.log(`${pref} ${city} ${data.lv01Nm}`);
+        //alert(`${city}${data.lv01Nm}`);
+        
+        
+        let jusho = escape(`${city}${data.lv01Nm}`);
+        
+        //document.cookie = `address=${jusho};expires=${limit};Secure; `;
+        $.cookie('address',jusho,{secure: true,expires :0.5})
+        /*
+        console.log(`${pref} ${city} ${data.lv01Nm}`);
+        
+        //let return_jusho = $.cookie('address',unescape);
+        //alert(return_jusho);
+        */
     };
     /*
     * 位置情報 API の実行(イベントリスナ)
     */
     let get_gio = function (){
-        console.log('[EXEC get_gio]')
+        console.log('[EXEC Gio]')
         <?php
-        if(EXEC_MODE=='Test'){ echo "gio_exec.textContent='[EXEC get_gio]';";}
+        if(EXEC_MODE=='Test'){ echo "gio_exec.textContent='[EXEC Gio]';";}
         ?>
         <?php
         if(EXEC_MODE<>'Trial'){
@@ -1514,11 +1601,14 @@ window.onload = function() {
         }
         ?>
     }
-    if(address_disp.textContent==""){
+
+    //if(address_disp.textContent==""){
+    if(return_jusho==""){
         get_gio();
         address=address_disp.textContent;
     }else{
-        address=address_disp.textContent;
+        address=return_jusho;
+        address_disp.textContent=return_jusho;
     }
     
     let gio_onoff = function(){

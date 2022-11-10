@@ -34,9 +34,14 @@ INPUT.ev{
 }
 /*レジボタン*/
 .btn--rezi{
-    height:70%;     
+    height:70%;
     width:100%; 
     font-size: 2.0rem;
+}
+@media screen and (max-width:400px) { 
+    .btn--rezi{
+        font-size: 1.8rem;
+    }
 }
 /*レジボタン マイナスマーク*/
 .btn--rezi-minus{
@@ -71,7 +76,7 @@ INPUT.date{
     color: #fff;
 
     height:30%;
-    width:12rem;
+    width:9rem;
     background:transparent;
     padding:0;
 }
@@ -87,6 +92,12 @@ INPUT{
     background:transparent;
     text-align:center;
     font-size: 0;
+}
+@media screen and (max-width:400px) { 
+    .items{
+        height:10rem; 
+        
+    }
 }
 .ordered{
     width:100%;
@@ -191,20 +202,7 @@ INPUT.su{
     border-color:var(--rez-border-color);
     
 }
-/*
-#azukari{
-    border-right:none;
-    border-left:none;
-    border-top:none;
-    border-color:#808080;
-    text-align:center;
-    font-size: 5rem;
-    font-weight: 600;
-    width:90%;
-    background: #fff;
-    padding:0;
-}
-*/
+
 .btn-updown{
     color: var(--btn-updown-font-color);
     background: var(--btn-updown-color);
@@ -288,6 +286,32 @@ INPUT.su{
     -webkit-box-sizing: inherit;
     box-sizing: inherit;
 }
+
+.urilist{
+    height:450px;
+    overflow:auto;
+}
+@media screen and (max-height:600px) { 
+.urilist{
+    height:340px;
+}
+}
+.address_disp{
+    font-size:12px;
+    /*
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    */
+}
+@media screen and (max-width:400px) { 
+.address_disp{
+    font-size:9px;
+}
+}
+
+
+
 
 
 

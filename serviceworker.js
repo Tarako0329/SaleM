@@ -1,5 +1,6 @@
 // キャッシュするリソース(css、jsがあれば個別で追加)
-const CACHE_VERSION = 'v38_';
+//キャッシュ利用部分を止める
+const CACHE_VERSION = 'v39_';
 const CACHE_NAME = `${CACHE_VERSION}!${registration.scope}`;
 
 // キャッシュするファイルをセットする
@@ -22,13 +23,32 @@ const urlsToCache = [
 ];
 
 //サービスワーカーインストール
-/*
+
 self.addEventListener('install', function(e) {
     console.log('[ServiceWorker] Install hoge');
     e.waitUntil(skipWaiting());
 });
-*/
+
+
+//サービスワーカーアクティブ
+
+self.addEventListener('activate', function(e) {
+    console.log('[ServiceWorker] Activate hoge');
+});
+
+
+// サービスワーカーフェッチ
+
+self.addEventListener('fetch', function(event) {
+    console.log('service worker fetch ... ' + event.request.url);
+});
+
+
+
+
 //新規開発中コード
+//サービスワーカーインストール
+/*
 self.addEventListener('install', (event) => {
   event.waitUntil(
     // キャッシュを開く
@@ -47,11 +67,6 @@ self.addEventListener('install', (event) => {
 
 
 //サービスワーカーアクティブ
-/*
-self.addEventListener('activate', function(e) {
-    console.log('[ServiceWorker] Activate hoge');
-});
-*/
 self.addEventListener('activate', (event) => {
     console.log('[ServiceWorker] Activate hoge');
     event.waitUntil(
@@ -73,12 +88,8 @@ self.addEventListener('activate', (event) => {
 
 
 
+
 // サービスワーカーフェッチ
-/*
-self.addEventListener('fetch', function(event) {
-    console.log('service worker fetch ... ' + event.request.url);
-});
-*/
 
 self.addEventListener('fetch', (event) => {
     //console.log('service worker fetch ... ' + event.request.url);
@@ -119,8 +130,6 @@ self.addEventListener('fetch', (event) => {
                             cache.put(event.request, responseToCache);
                             //cache.put(event.request, response);
                         });
-                    /*
-                    */
                     }
                     console.log('[ServiceWorker] fetch return other URL:' + event.request.url + ' status:'+ response.status + ' type:' + response.type);
                     return response;
@@ -129,71 +138,7 @@ self.addEventListener('fetch', (event) => {
             }
         )
     );
-
 });
 
-
-
-/*
-
-self.addEventListener('activate', (event) => {
-    console.log('[ServiceWorker] Activate hoge');
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return cacheNames.filter((cacheName) => {
-            // このスコープに所属していて且つCACHE_NAMEではないキャッシュを探す
-            return cacheName.startsWith(`${registration.scope}!`) &&
-                   cacheName !== CACHE_NAME;
-        });
-        }).then((cachesToDelete) => {
-            return Promise.all(cachesToDelete.map((cacheName) => {
-            // いらないキャッシュを削除する
-            return caches.delete(cacheName);
-            }));
-        })
-    );
-});
-
-self.addEventListener('fetch', (event) => {
-
-    event.respondWith(
-        caches.match(event.request)
-        .then((response) => {
-            // キャッシュ内に該当レスポンスがあれば、それを返す
-            if (response) {
-                console.log('[ServiceWorker] fetch return cache');
-                return response;
-            }
-            // 重要：リクエストを clone する。リクエストは Stream なので
-            // 一度しか処理できない。ここではキャッシュ用、fetch 用と2回
-            // 必要なので、リクエストは clone しないといけない
-            let fetchRequest = event.request.clone();
-
-            return fetch(fetchRequest)
-            .then((response) => {
-                if (!response || response.status !== 200 || response.type !== 'basic') {
-                    // キャッシュする必要のないタイプのレスポンスならそのまま返す
-                    console.log('[ServiceWorker] fetch return http');
-                    return response;
-                }
-                //return response;
-
-            
-                // 重要：レスポンスを clone する。レスポンスは Stream で
-                // ブラウザ用とキャッシュ用の2回必要。なので clone して
-                // 2つの Stream があるようにする
-                let responseToCache = response.clone();
-
-                caches.open(CACHE_NAME)
-                .then((cache) => {
-                    cache.put(event.request, responseToCache);
-                });
-                console.log('[ServiceWorker] fetch return cache&update');
-                return response;
-            
-            });
-        })
-    );
-
-});
 */
+

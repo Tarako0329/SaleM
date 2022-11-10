@@ -24,6 +24,7 @@ $sqlstr = "";
 $pdo_h->beginTransaction();
 $E_Flg=0;
 foreach($array as $row){
+    //var_dump($row);
     $sqlstr="select * from ZeiMS where zeiKBN=?;";
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $row["zeikbn"], PDO::PARAM_INT);
@@ -40,8 +41,10 @@ foreach($array as $row){
     $stmt->bindValue(6, $row["bunrui1"], PDO::PARAM_STR);
     $stmt->bindValue(7, $row["bunrui2"], PDO::PARAM_STR);
     $stmt->bindValue(8, $row["bunrui3"], PDO::PARAM_STR);
-    $stmt->bindValue(9, $row["hyoujiKBN1"], PDO::PARAM_STR);
-    $stmt->bindValue(10,$row["hyoujiNO"], PDO::PARAM_INT);
+    //$stmt->bindValue(9, $row["hyoujiKBN1"], PDO::PARAM_STR);
+    $stmt->bindValue(9, (empty($row["hyoujiKBN1"])?"":$row["hyoujiKBN1"]), PDO::PARAM_STR);
+    //$stmt->bindValue(10,$row["hyoujiNO"], PDO::PARAM_INT); 表示順は不使用
+    $stmt->bindValue(10,0, PDO::PARAM_INT);
     $stmt->bindValue(11,$row["genka"], PDO::PARAM_INT);
     $stmt->bindValue(12,$row["shouhinCD"], PDO::PARAM_INT);
     $stmt->bindValue(13,$_SESSION['user_id'], PDO::PARAM_INT);
@@ -73,6 +76,7 @@ $pdo_h = null;
 
 header("HTTP/1.1 301 Moved Permanently");
 header("Location: shouhinMSList.php?csrf_token=".$csrf_create);
+
 exit();
 
 ?>

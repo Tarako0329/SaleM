@@ -112,7 +112,12 @@ html {
 .title > a{
     color:inherit;
 }
-
+@media screen and (max-width:389px) { 
+.title{
+    font-size: 2.5rem;
+}
+    
+}
 
 /*トップメニューボタン*/
 .btn--topmenu{
@@ -120,7 +125,11 @@ html {
     width:100%; 
     font-size: 2.2rem;
 }
-
+@media screen and (max-width:400px) {
+.btn--topmenu{
+    font-size: 1.8rem;
+}
+}
 /*ボタンの見た目*/
 .btn-view{
     color: var(--panel-font-color);               /*文字色*/

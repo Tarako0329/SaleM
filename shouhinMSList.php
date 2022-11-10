@@ -13,6 +13,7 @@ if(isset($_GET["csrf_token"]) || empty($_POST)){
 }
 
 $csrf_create = csrf_create();
+$MSG = (empty($_SESSION["MSG"])?"":$_SESSION["MSG"]);
 
 //デフォルトは登録順・降順
 if(!empty($_POST)){
@@ -71,7 +72,7 @@ $ZKMS = $stmt2->fetchAll();
             .text(msg);
         }
         (function($){
-          const e = alert('<?php echo $_SESSION["MSG"]; ?>').addClass('alert-success');
+          const e = alert('<?php echo $MSG; ?>').addClass('alert-success');
           // アラートを表示する
           $('#alert-1').append(e);
           /* 2秒後にアラートを消す
@@ -129,7 +130,7 @@ $ZKMS = $stmt2->fetchAll();
 <body class='common_body media_body'>    
     <?php
         //echo $_SESSION["MSG"]."<br>";
-        if($_SESSION["MSG"]!=""){
+        if($MSG!=""){
             echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-1' class='lead'></div></div></div></div>";
         }
         $_SESSION["MSG"]="";

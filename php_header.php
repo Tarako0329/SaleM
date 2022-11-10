@@ -100,6 +100,8 @@ $stmt->bindValue(3, "menu.php", PDO::PARAM_STR);
 $stmt->bindValue(4, "COLOR", PDO::PARAM_STR);//name属性を指定
 $stmt->execute();
 
+$log_time=date("Y/m/d H:i:s");
+
 if($stmt->rowCount()==0){
     $color_No = 0;
     file_put_contents("sql_log/pglog.log", $log_time."php_header.php@Cannot Get skin_color_cd：session_uid=[".(!empty($_SESSION['user_id'])?$_SESSION['user_id']:"NULL")."] /MACHIN_ID=[".MACHIN_ID."]\n", FILE_APPEND);

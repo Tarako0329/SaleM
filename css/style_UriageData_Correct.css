@@ -32,7 +32,7 @@ INPUT{
 }
 @media (orientation: portrait){/*デバイスが縦向きの場合*/
     table{
-        width:100%;
+        width:90%;
         height:auto;
         table-layout:fixed;
     }
@@ -50,18 +50,40 @@ INPUT{
 td,th{
     padding-right:5px;
 }
+
 th{
-    position: sticky;
-    top:0px;
     height:35px;
     z-index: 98;
     text-align:center;
 }
+
 .tr_stiky{
-    position: sticky; /*スマホ古いと動作が変になるのでやめる?*/
-    top:33px;
     background:#C3E5FF;
 }
+.btn-view{
+    padding:4px;
+    width:30%;
+}
+@media screen and (min-width:376px) {
+    th{
+        position: sticky;
+        top:0px;
+    }
+    
+    .tr_stiky{
+        position: sticky; /*スマホ古いと動作が変になるのでやめる*/
+        top:33px;
+    }
+    
+}
+
+@media screen and (max-width:375px) {
+    .btn-view{
+        padding:4px 1px;
+        font-size:10px;
+    }
+}
+
 .common_footer{
     background: var(--footer-color);
     height: 60px;

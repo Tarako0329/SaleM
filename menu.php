@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang='ja'>
 <!--menu.php-->
 <?php
 /*関数メモ
@@ -134,6 +132,8 @@ if($action=="logout"){
 }
 ?>
 
+<!DOCTYPE html>
+<html lang='ja'>
 
 <head>
     <?php 
@@ -219,22 +219,28 @@ if($action=="logout"){
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token,'user']
         ,'会計連携'=>['output_menu.php?csrf_token='.$token,'kaikei']
         ,'紹介者ID'=>['shoukai.php?csrf_token='.$token,'shoukai']
-        //,'ヘルプ'=>['help_menu.php']
+        //,'機能テスト'=>['sample.php']
     ];
     
     //契約・解約関連は各時で実装したファイルを指定する
     /*
-    $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', null));
+    $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', null)); Product
     $dir_path = bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', null));
     */
     $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', "1"));
     $dir_path = bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', "1"));
     
-    if(EXEC_MODE!="Trial"){
+    if(EXEC_MODE=="Product"){
         if($plan==0){
-            $array2 = ["本契約"=>[PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku']];
+            $array2 = ['本契約'=>[PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku']];
         }else{
             $array2 = ['契約解除へ'=>['sub_cancel.php','kaijo']];
+        }
+    }else if(EXEC_MODE=="Test"){
+        if($plan==0){
+            $array2 = ['本契約'=>[PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku'],'機能テスト'=>['sample.php','kinoutest']];
+        }else{
+            $array2 = ['契約解除へ'=>['sub_cancel.php','kaijo'],'機能テスト'=>['sample.php','kinoutest']];
         }
     }else{
         $array2=array();
