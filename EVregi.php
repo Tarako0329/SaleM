@@ -1,7 +1,7 @@
-<!DOCTYPE html>
-<html lang='ja'>
-<!--Evregi.php-->    
 <?php
+{
+//<!--Evregi.php-->    
+//ヘッド処理
 /*関数メモ
 check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
 
@@ -181,8 +181,10 @@ $stmt->bindValue(2, (string)date("Y-m-d"), PDO::PARAM_STR);
 $stmt->execute();
 $UriageList = $stmt->fetchAll();
 
-
+}
 ?>
+<!DOCTYPE html>
+<html lang='ja'>
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
@@ -755,6 +757,7 @@ window.onload = function() {
 <link rel="stylesheet" href="shepherd/shepherd.css?<?php echo $time; ?>"/>
 <?php require "ajax_func_tourFinish.php";?>
 <script>
+    //チュートリアル
     const TourMilestone = '<?php echo $_SESSION["tour"];?>';
 
     const tutorial_5 = new Shepherd.Tour({
@@ -1277,6 +1280,7 @@ window.onload = function() {
 
 </script><!--チュートリアル-->
 <script>
+    //在庫機能のヘルプ
     const shuppin_zaiko_help2 = new Shepherd.Tour({
         useModalOverlay: true,
         defaultStepOptions: {
@@ -1407,6 +1411,7 @@ window.onload = function() {
     }
 </script><!--出品在庫機能help-->
 <script>
+    //天気機能のリリース
     const new_releace_002 = new Shepherd.Tour({
         useModalOverlay: true,
         defaultStepOptions: {
@@ -1529,7 +1534,7 @@ window.onload = function() {
     const gio_exec = document.querySelector('#gio_exec');
     
     let return_jusho = $.cookie('address',unescape);
-    console.log("起動時クッキー：" + return_jusho);
+    //console.log("起動時クッキー：" + return_jusho);
     /*
     * 緯度経度を画面表示
     */
@@ -1561,19 +1566,10 @@ window.onload = function() {
         address_disp.textContent = `${city}${data.lv01Nm}`;
         address_disp.title = `${city}${data.lv01Nm}`;
         address.value = `${city}${data.lv01Nm}`;
-        //alert(`${city}${data.lv01Nm}`);
-        
-        
+
         let jusho = escape(`${city}${data.lv01Nm}`);
         
-        //document.cookie = `address=${jusho};expires=${limit};Secure; `;
         $.cookie('address',jusho,{secure: true,expires :0.5})
-        /*
-        console.log(`${pref} ${city} ${data.lv01Nm}`);
-        
-        //let return_jusho = $.cookie('address',unescape);
-        //alert(return_jusho);
-        */
     };
     /*
     * 位置情報 API の実行(イベントリスナ)
@@ -1625,7 +1621,8 @@ window.onload = function() {
     const script = document.createElement('script');
     script.src = 'https://maps.gsi.go.jp/js/muni.js';
     document.body.insertAdjacentElement('afterEnd', script);    
-
+    
+    //GIO機能のオンオフ説明
     const gio_on = new Shepherd.Tour({
         useModalOverlay: true,
         defaultStepOptions: {
