@@ -579,7 +579,7 @@ window.onload = function() {
         <button type='button' class='btn--chk ' style='border-left:none;border-right:none;' id='order_chk'>確　認</button>
     </div>
 </footer>
-<input type='hidden' name='address' id='address' value='<?php echo (empty($_COOKIE["address"])?"":$_COOKIE["address"]); ?>'>
+<!--<input type='hidden' name='address' id='address' value='<?php //echo (empty($_COOKIE["address"])?"":$_COOKIE["address"]); ?>'>-->
 <input type='hidden' name='lat' id='lat' value='<?php echo (empty($_COOKIE["lat"])?"":$_COOKIE["lat"]); ?>'>
 <input type='hidden' name='lon' id='lon' value='<?php echo (empty($_COOKIE["lon"])?"":$_COOKIE["lon"]); ?>'>
 
@@ -1525,7 +1525,7 @@ window.onload = function() {
     let today = new Date();
     today.setTime(today.getTime() + 10*60*60*1000);
     let limit = today.toGMTString();
-    let address = '';
+    //let address = '';
 
     const latEle = document.querySelector('#lat');
     const lonEle = document.querySelector('#lon');
@@ -1563,13 +1563,15 @@ window.onload = function() {
         const [prefCode, pref, muniCode, city] = muniData.split(',');   
         //${pref}${city}${data.lv01Nm}->県・市区町村・番地
         // 画面に反映
-        address_disp.textContent = `${city}${data.lv01Nm}`;
-        address_disp.title = `${city}${data.lv01Nm}`;
-        address.value = `${city}${data.lv01Nm}`;
-
-        let jusho = escape(`${city}${data.lv01Nm}`);
+        let jusho = `${city}${data.lv01Nm}`;
+        address_disp.textContent = jusho.replace(/\s+/g, "");
+        address_disp.title = jusho.replace(/\s+/g, "");
+        //address.value = `${city}${data.lv01Nm}`;
         
-        $.cookie('address',jusho,{secure: true,expires :0.5})
+        
+        let jusho_es = escape(jusho.replace(/\s+/g, ""));
+        
+        $.cookie('address',jusho_es,{secure: true,expires :0.5})
     };
     /*
     * 位置情報 API の実行(イベントリスナ)
@@ -1598,8 +1600,8 @@ window.onload = function() {
         ?>
     }
 
-    //if(address_disp.textContent==""){
-    if(return_jusho==""){
+    //住所が取得できてない場合はget_gioを実行
+    if(return_jusho == null){
         get_gio();
         address=address_disp.textContent;
     }else{
