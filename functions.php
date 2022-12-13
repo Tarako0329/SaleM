@@ -3,7 +3,8 @@
 // オリジナルログ出力(error_log)
 // =========================================================
 function log_writer($pgname,$msg){
-    file_put_contents("error_log","[".date("Y/m/d H:i:s")."] ORG_LOG from <".$pgname."> output <<".$msg.">>\n",FILE_APPEND);
+    $log = print_r($msg,true);
+    file_put_contents("error_log","[".date("Y/m/d H:i:s")."] ORG_LOG from <".$pgname."> output <<".$log.">>\n",FILE_APPEND);
 }
 
 
@@ -307,7 +308,7 @@ function secho($s) {
 // テスト環境のみ出力
 // =========================================================
 function deb_echo($s){
-    if(EXEC_MODE=="Test"){
+    if(EXEC_MODE=="Test" || EXEC_MODE=="Local"){
         echo $s."<br>";
     }
 }

@@ -43,9 +43,6 @@ INPUT{
 }
 .th1{
     position: sticky;
-    background:#fff;
+    /*background:#fff;*/
 }
-th{
-    position: sticky;
-    background:#fff;
-}
+

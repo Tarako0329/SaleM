@@ -16,12 +16,15 @@ session_start();
 
 require "functions.php";
 
-
-define("ROOT_URL",substr($_SERVER['SCRIPT_URI'],0,mb_strrpos($_SERVER['SCRIPT_URI'],"/")+1));
+if(!empty($_SERVER['SCRIPT_URI'])){
+    define("ROOT_URL",substr($_SERVER['SCRIPT_URI'],0,mb_strrpos($_SERVER['SCRIPT_URI'],"/")+1));
+}else{
+    define("ROOT_URL","http://".MAIN_DOMAIN."/");
+}
 define("EXEC_MODE",$_ENV["EXEC_MODE"]);
 
 
-if(EXEC_MODE=="Test"){
+if(EXEC_MODE=="Test" || EXEC_MODE=="Local"){
     //テスト環境はミリ秒単位
     //$time="8";
     $time=date('Ymd-His');
@@ -112,6 +115,8 @@ if($stmt->rowCount()==0){
     $color_No = $buf["value"];
     //deb_echo("COLOR".$color_No);
 } 
+//log_writer("php_header.php _SERVER values ",$_SERVER);
+//log_writer("php_header.php _SESSION values ",$_SESSION);
 
 ?>
 

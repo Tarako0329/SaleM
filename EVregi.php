@@ -348,7 +348,7 @@ window.onload = function() {
 };//window.onload
 
 </script>
-
+<body>
 <form method = "post" id="form1" action="EVregi_sql.php">
     <input type="hidden" name="csrf_token" value='<?php echo $token;?>'>
     <input type="hidden" name="mode" value='<?php echo $RG_MODE;?>'> <!--レジor個別売上or在庫登録-->
@@ -361,22 +361,24 @@ window.onload = function() {
     </span><input type='date' class='date' style='height:20%' name='KEIJOUBI' required="required" value='<?php if($RG_MODE<>"shuppin_zaiko"){echo (string)date("Y-m-d");} ?>'>
     </span>
     <?php
-    if($RG_MODE=="kobetu"){
-        echo "<input type='text' class='ev' name='KOKYAKU' required='required' placeholder='顧客名'>\n";
-        echo "<input type='hidden' name='EV' value=''>\n";
-    }else{
-        echo "<input type='text' class='ev item_2' name='EV' value='". $event."' required='required' placeholder='イベント名等'>\n";
-        echo "<input type='hidden' name='KOKYAKU' value=''>\n";
-    }
-    
-    $_SESSION["nonadd"]=(!empty($_SESSION["nonadd"])?$_SESSION["nonadd"]:"");
-    if($RG_MODE!=="evrez"){
-        $dispnone="display:none;";
-        $checked="checked";
-    }else{
-        $dispnone="";
-        $checked="";
-        $_SESSION["nonadd"]="";
+    {
+        if($RG_MODE=="kobetu"){
+            echo "<input type='text' class='ev' name='KOKYAKU' required='required' placeholder='顧客名'>\n";
+            echo "<input type='hidden' name='EV' value=''>\n";
+        }else{
+            echo "<input type='text' class='ev item_2' name='EV' value='". $event."' required='required' placeholder='イベント名等'>\n";
+            echo "<input type='hidden' name='KOKYAKU' value=''>\n";
+        }
+        
+        $_SESSION["nonadd"]=(!empty($_SESSION["nonadd"])?$_SESSION["nonadd"]:"");
+        if($RG_MODE!=="evrez"){
+            $dispnone="display:none;";
+            $checked="checked";
+        }else{
+            $dispnone="";
+            $checked="";
+            $_SESSION["nonadd"]="";
+        }
     }
     ?>
     <div class='address_disp' style='<?php echo $dispnone; ?> position:fixed;top:55px;right:5px;color:var(--user-disp-color);max-width:50%;height:15px;'>
@@ -420,9 +422,10 @@ window.onload = function() {
     
     
 </div>
-<body class='common_body'>
+<main class='common_body'>
    
 <?php
+{
     if(isset($emsg)){//
         echo $emsg;
         echo "</body></html>";
@@ -434,6 +437,7 @@ window.onload = function() {
         echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-e' class='lead'></div></div></div></div>";
     }
     //$_SESSION["status"]="";
+}
 ?>
     <div class="container-fluid">
         <div class='item_11 item_12'>
@@ -458,6 +462,7 @@ window.onload = function() {
         <div class='row item_3' id='jump_0'>
 
 <?php
+{
     $i=0;
     $now=1;
     $bunrui="";
@@ -507,6 +512,7 @@ window.onload = function() {
         
         $i = $i+1;
 	}
+}	
 ?> 
         </div>
 
@@ -561,7 +567,7 @@ window.onload = function() {
     
         
     </script>
-</body>
+</main>
 
 <footer class='rezfooter'>
     <div class='kaikei'>
@@ -584,6 +590,7 @@ window.onload = function() {
 <input type='hidden' name='lon' id='lon' value='<?php echo (empty($_COOKIE["lon"])?"":$_COOKIE["lon"]); ?>'>
 
 </form>
+</body>
 <!--モーダル電卓(FcModal)-->
 <div class='modal fade' id='FcModal' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
     <div class='modal-dialog  modal-dialog-centered'>
@@ -1580,6 +1587,7 @@ window.onload = function() {
         console.log('[EXEC Gio]')
         <?php
         if(EXEC_MODE=='Test'){ echo "gio_exec.textContent='[EXEC Gio]';";}
+        if(EXEC_MODE=='Local'){ echo "gio_exec.textContent='[EXEC Gio]';";}
         ?>
         <?php
         if(EXEC_MODE<>'Trial'){

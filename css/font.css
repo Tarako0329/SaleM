@@ -49,9 +49,11 @@ font-family: 'Murecho', sans-serif;
 table{
     font-family:var(--table-font);
 }
+body{
+    font-family:var(--main-font);
+}
 .common_body {
     padding-top: 70px; /* ヘッダーの後ろに要素が隠れないようにするため */
-    font-family:var(--main-font);
     font-size:1.3rem;
 }
 .btn{

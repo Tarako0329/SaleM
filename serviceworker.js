@@ -40,7 +40,7 @@ self.addEventListener('activate', function(e) {
 // サービスワーカーフェッチ
 
 self.addEventListener('fetch', function(event) {
-    console.log('service worker fetch ... ' + event.request.url);
+    //console.log('service worker fetch ... ' + event.request.url);
 });
 
 

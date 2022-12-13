@@ -1,6 +1,5 @@
-<!DOCTYPE html>
-<html lang="ja">
 <?php
+{
 //memo !empty()　は 変数未定義、空白、NULLの場合にfalseを返す
 require "php_header.php";
 
@@ -239,7 +238,10 @@ $joken=$joken.($_SESSION["Event"]=="%"?"":" / ".$_SESSION["Event"]);
 $joken=$joken.($_SESSION["UriNO"]=="%"?"":" / 売上№".$_SESSION["UriNO"]);
 $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
 //deb_echo ("session:".$_SESSION["UriageData_Correct_mode"]);
+}
 ?>
+<!DOCTYPE html>
+<html lang="ja">
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等

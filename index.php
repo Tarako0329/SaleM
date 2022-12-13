@@ -1,16 +1,10 @@
-<!DOCTYPE html>
-<html lang="ja">
-<!--index.php-->
 <?php
-
 require "php_header.php";
 if(EXEC_MODE=="Trial"){
         header("HTTP/1.1 301 Moved Permanently");
         header("Location: menu.php");
         exit();
 }
-
-
 $_SESSION['csrf_token'] = get_token(); // CSRFのトークンを取得する
 //トークンがセットされていたらリダイレクト
 if (isset($_COOKIE['webrez_token'])) {
@@ -29,6 +23,9 @@ if(isset($_SESSION["EMSG"])){
 }
 
 ?>
+<!DOCTYPE html>
+<html lang="ja">
+
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
@@ -93,3 +90,6 @@ window.onload = function() {
 
 </script>
 </html>
+<?php
+log_writer("php_header.php _SESSION values ",$_SESSION);
+?>

@@ -17,6 +17,9 @@ session_regenerate_id(true);
 
 $pass=dirname(__FILE__);
 require "functions.php";
+log_writer("logincheck.php MAIN_DOMAIN ",MAIN_DOMAIN);
+log_writer("logincheck.php _SESSION values ",$_SESSION);
+//exit();
 
 define("DNS","mysql:host=".$_ENV["SV"].";dbname=".$_ENV["DBNAME"].";charset=utf8");
 define("USER_NAME", $_ENV["DBUSER"]);
