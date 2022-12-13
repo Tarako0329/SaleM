@@ -12,24 +12,6 @@
 
     $csrf_create = csrf_create();
 
-    //商品マスタの取得
-    $sql = "select * from ShouhinMS left join ZeiMS on ShouhinMS.zeiKBN=ZeiMS.zeiKBN where uid = ? order by bunrui1 desc,bunrui2,bunrui3,shouhinNM";
-    $stmt = $pdo_h->prepare($sql);
-    $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-    $stmt->execute();
-    
-    foreach($stmt as $row){
-        $category=(!empty($row["bunrui1"])?$row["bunrui1"].">":"");
-        $category=$category.(!empty($row["bunrui2"])?$row["bunrui2"].">":"");
-        $category=$category.(!empty($row["bunrui3"])?$row["bunrui3"]:"");
-        $shouhihMS[] = array(
-            'shouhinCD'     => $row["shouhinCD"]
-            ,'shouhinNM'    => $row["shouhinNM"]
-            ,'category'     => $category
-            //,'post_name'    => ""
-        );
-    }
-    
     $MSG = (!empty($_SESSION["MSG"])?$_SESSION["MSG"]:"");
     $_SESSION["MSG"]="";
 }?>
@@ -58,7 +40,8 @@
         ?>
     </header>
     <main @click='sujest_OFF'>
-        <form method='post' action='shouhinMSCategoryEdit_sql.php' id='form'>
+        <!--<form method='post' action='shouhinMSCategoryEdit_sql.php' id='form'>-->
+				<form method='post' id='form' @submit.prevent='on_submit'>
             <div class='header2'>
                 <div style='display:flex;height:25px;margin:5px;'>
                     <select v-model="cate_lv" @change='get_categorys' class='form-select form-select-lg' id='categry' name='categry' style='width:100px;' required='required'>
@@ -89,9 +72,9 @@
             </div>
             <div class='container-fluid'>
                 <template v-if='MSG!==""'>
-                    <div class='alert alert-success' role='alert'>{{MSG}}</div>
+                    <div v-bind:class='alert_status' role='alert'>{{MSG}}</div>
                 </template>
-                <input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
+								<input type='hidden' name='csrf_token' v-model='csrf'>
                 <table class='table table-striped table-bordered item_1 MSLIST'>
                     <thead class='table-light'>
                         <tr style='height:30px;'>
@@ -121,25 +104,46 @@
     const { createApp, ref, onMounted, computed } = Vue;
     createApp({
         setup(){
+						const cate_lv = ref('cate1')
             const over_cate = ref([])
             const categorys = ref([])
-            const cate_lv = ref('cate1')
             const sujest_list = ref([])
             const set_category = ref('')
             const sujestOnOff = ref(false)
-            const MSG = ref('<?php echo $MSG; ?>')
+            const MSG = ref('')
+						const csrf = ref('<?php echo $csrf_create; ?>')
+						const alert_status = ref(['alert'])
 
             //商品マスタ全件を取得
-            const shouhinMS = ref(<?php echo json_encode($shouhihMS, JSON_UNESCAPED_UNICODE) ?>)
+            const shouhinMS = ref([])
 
             onMounted(() => {
                 console.log('onMounted')
+								get_shouhinMS()
                 get_categorys()
                 
             })
 
+            const get_shouhinMS = () => {
+                console.log("get_shouhinMS start");
+                let params = new URLSearchParams();
+                params.append('user_id', '<?php echo $_SESSION["user_id"];?>');
+                axios
+                .post('ajax_get_ShouhinMS.php',params)
+                .then((response) => (shouhinMS.value = [...response.data]
+                                    ,console.log('get_shouhinMS succsess')
+                                    ))
+                .catch((error) => console.log(`get_shouhinMS ERROR:${error}`));
+            }
             const shouhinMS_filter = computed(() => {
                 let searchWord = over_cate.value.toString().trim();
+
+								shouhinMS.value.sort((a,b) => {
+									return (a.category > b.category?1:-1)
+									return (a.shouhinNM > b.shouhinNM?1:-1)
+									return 0
+								})
+
                 if (searchWord === "%") return shouhinMS.value;
                 return shouhinMS.value.filter((shouhin) => {
                   return (
@@ -183,7 +187,7 @@
                 .post('ajax_get_MSCategory_list.php',params)
                 .then((response) => (sujest_list.value = [...response.data]
                                     ,console.log('get_sujest_list succsess')
-                                    ,console.log(response.data)
+                                    //,console.log(response.data)
                                     ))
                 .catch((error) => console.log(`get_sujest_list ERROR:${error}`));
             }
@@ -215,6 +219,22 @@
                 }
             }
 
+						const on_submit = (e) => {
+							console.log('on_submit start')
+							console.log(e.target)
+							let form_data = new FormData(e.target)
+							let params = new URLSearchParams (form_data)
+							axios
+								.post('ajax_shouhinMSCategoryEdit_sql.php',params)
+								.then((response) => (console.log(`on_submit succsess`)
+																		,console.log(response.data)
+																		,MSG.value = response.data[0].EMSG
+																		,csrf.value = response.data[0].csrf_create
+																		,alert_status[1] = response.data[0].status
+																		//,alert_status.value = ['alert', 'alert-danger']
+																		))
+								.catch((error) => console.log(`on_submit ERROR:${error}`))
+						}
             return{
                 over_cate,
                 cate_lv,
@@ -229,6 +249,9 @@
                 sujest_ON,
                 sujest_OFF,
                 MSG,
+								on_submit,
+								csrf,
+								alert_status,
             }
         }
     }).mount('#page');
@@ -257,8 +280,6 @@
 <?php require "ajax_func_tourFinish.php";?>
 <script>
     const TourMilestone = '<?php echo $_SESSION["tour"];?>';
-    
-
     const helpTour = new Shepherd.Tour({
         useModalOverlay: true,
         defaultStepOptions: {
