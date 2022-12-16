@@ -16,7 +16,7 @@ INPUT.ev{
     position: fixed;    /* ウィンドウを基準に画面に固定 */
     top: 0;             /* 上下の固定位置を上から0pxにする */
     right: 0;           /* 左右の固定位置を左から0pxにする */
-    height:50px;     
+    height:50px;
     width:16rem;
     /*background: #ff838b;*/
     background:transparent;
@@ -35,10 +35,10 @@ INPUT.ev{
 /*レジボタン*/
 .btn--rezi{
     height:70%;
-    width:100%; 
+    width:100%;
     font-size: 2.0rem;
 }
-@media screen and (max-width:400px) { 
+@media screen and (max-width:400px) {
     .btn--rezi{
         font-size: 1.8rem;
     }
@@ -70,7 +70,7 @@ INPUT.date{
     border-left:none;
     border-top:none;
     border-color:#fff;  /*下線・色固定*/
-    
+
     font-size: 1.3rem;
     /*font-weight: 600;*/
     color: #fff;
@@ -86,30 +86,31 @@ INPUT{
 
 .items{
     padding:5px;
-    height:12rem; 
-    line-height:80%; 
+    height:12rem;
+    line-height:80%;
+    position:relative;
 
     background:transparent;
     text-align:center;
     font-size: 0;
 }
-@media screen and (max-width:400px) { 
+@media screen and (max-width:400px) {
     .items{
-        height:10rem; 
-        
+        height:10rem;
+
     }
 }
 .ordered{
     width:100%;
-    margin:0; 
+    margin:0;
     padding:0;
     height:35%; /*itemsの下20％部分。上はメニューボタン*/
-    line-height:21px; 
+    line-height:21px;
     background:transparent;
     text-align:center;
     font-size: 2.0rem;
     font-weight: 700;
-   
+
 }
 INPUT.order{
     border:none;
@@ -135,10 +136,8 @@ INPUT.su{
 }
 
 .kaikei{
-    width:100%;
     height:50px;
     margin:0px 0 auto; /*中央寄せ*/
-    text-align:center;
     font-size: 3.5rem;
     font-weight: 800;
 
@@ -150,28 +149,12 @@ INPUT.su{
     border-bottom:none;
     border-color:var(--rez-border-color);
 }
-.right3{
-    /*クリアボタンエリア*/
-    width:33%;
-    height:60px;
-    text-align:center;
-}
-.right2{
-    /*確認・登録ボタンエリア*/
-    width:34%;
-    height:60px;
-}
-.right1{
-    /*電卓ボタンエリア*/
-    width:33%;
-    height:60px;
-}
 
 .btn--commit{
     /*注文ボタン*/
     color: var(--order-font-color);
     background-color: var(--order-color);
-    height:100%; 
+    height:100%;
     width:100%;
     font-size: 2rem;
     border-radius:0;
@@ -188,19 +171,19 @@ INPUT.su{
     /*確認ボタン*/
     color: var(--chk-font-color);
     background-color: var(--chk-color);
-    height:100%; 
+    height:100%;
     width:100%;
     font-size: 2rem;
     border-radius:0;
     /*border:none;*/
-    
+
     border:solid;
     border-width:thin;
     border-top:var(--rez-border-top);
     border-top-width:thin;
     border-bottom:none;
     border-color:var(--rez-border-color);
-    
+
 }
 
 .btn-updown{
@@ -217,7 +200,7 @@ INPUT.su{
 .btn-changeVal{
     color: var(--wari-font-color);                 /*文字色*/
     background-color: var(--wari-bk-color);      /*背景色*/
-    width:100%; 
+    width:100%;
     font-weight: 600;
 }
 .header-select{
@@ -241,7 +224,7 @@ INPUT.su{
     left: 0; /* 左右の固定位置を左から0pxにする */
     width: 100%;
     z-index: 99;
-    display: inline-block;
+    /*display: inline-block;*/
     background:#fff;
 }
 .common_body {
@@ -256,7 +239,7 @@ INPUT.su{
     bottom: 0;
     Right: 0;
     width: 100%;
-    display: flex;    
+    display: flex;
     flex-wrap:wrap;
     z-index: 99;
 }
@@ -277,7 +260,7 @@ INPUT.su{
     .rezfooter{
         height: 130px; /* 高さを指定 */
     }
-    
+
 }
 
 *,
@@ -291,7 +274,7 @@ INPUT.su{
     height:450px;
     overflow:auto;
 }
-@media screen and (max-height:600px) { 
+@media screen and (max-height:600px) {
 .urilist{
     height:340px;
 }
@@ -304,7 +287,7 @@ INPUT.su{
     overflow: hidden;
     */
 }
-@media screen and (max-width:400px) { 
+@media screen and (max-width:400px) {
 .address_disp{
     font-size:9px;
 }

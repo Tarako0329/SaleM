@@ -12,22 +12,22 @@ font-family: 'Zen Kurenaido', sans-serif;　日本語あり　今使ってる
 	src: url('ZenKurenaido-Regular.ttf');
 }
 :root {
-    --main-font:'Zen Kurenaido', sans-serif;
-    --tour-font:sans-serif;
-    --table-font:sans-serif;
+		--main-font:'Zen Kurenaido', sans-serif;
+		--tour-font:sans-serif;
+		--table-font:sans-serif;
 }
 .form-select{
-    padding:2px;
+		padding:2px;
 }
 table{
-    font-family:var(--table-font);
+		font-family:var(--table-font);
 }
 .result_table{
-    font-size:15px;
+		font-size:15px;
 }
 .result_table th{
-    background:var(--panel-bk-color);
-    color:var(--panel-font-color);
+		background:var(--panel-bk-color);
+		color:var(--panel-font-color);
 }
 /*点滅クラス*/
 .blink {
@@ -38,42 +38,42 @@ table{
 	100% {opacity: 1;}
 }
 body{
-    font-family:var(--main-font);
+		font-family:var(--main-font);
 }
 .common_body {
-    padding-top: 70px; /* ヘッダーの後ろに要素が隠れないようにするため */
-    font-family:var(--main-font);
-    font-size:1.3rem;
+		padding-top: 70px; /* ヘッダーの後ろに要素が隠れないようにするため */
+		font-family:var(--main-font);
+		font-size:1.3rem;
 }
 .btn{
-    /*bootstrap btn*/
-    font-size: 1.5rem;
-    padding-left:20px;
-    padding-right:20px;
+		/*bootstrap btn*/
+		font-size: 1.5rem;
+		padding-left:20px;
+		padding-right:20px;
 }
 .btn--chk{
-    font-weight:600;
+		font-weight:600;
 }
 .form-control{
-    font-size:1.5rem;
-    padding:0 5px;/*上下 左右*/
+		font-size:1.5rem;
+		padding:0 5px;/*上下 左右*/
 }
 
 .line-green{
-    color:#1dcd00;
+		color:#1dcd00;
 }
 .facebook-blue{
-    color:#3B5998;
+		color:#3B5998;
 }
 .twitter-blue{
-    color:#55acee;
+		color:#55acee;
 }
 .user_disp{
-    color:var(--user-disp-color);
-    font-weight: 400;
+		color:var(--user-disp-color);
+		font-weight: 400;
 }
 .header-color{
-    background-image:linear-gradient(to left top, var(--title-from), var(--title-to));
+		background-image:linear-gradient(to left top, var(--title-from), var(--title-to));
 }
 .logoff-color:before{
 	color: var(--user-disp-color);
@@ -83,137 +83,231 @@ body{
 }
 .rainbow-color,
 .rainbow-color:before{
-    /*文字レインボーカラー*/
-    color: #FF8C00;
-    background: -webkit-linear-gradient(0deg, #40E0D0, #FF8C00, #FF0080);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+		/*文字レインボーカラー*/
+		color: #FF8C00;
+		background: -webkit-linear-gradient(0deg, #40E0D0, #FF8C00, #FF0080);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
 }
 
 html {
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    font-size: 62.5%; /*ルートサイズ10px=1rem算出をしやすくするために*/
-    touch-action: manipulation; /*スマフォのダブルタップによるズームを防ぐ*/
+		-webkit-box-sizing: border-box;
+		box-sizing: border-box;
+		font-size: 62.5%; /*ルートサイズ10px=1rem算出をしやすくするために*/
+		touch-action: manipulation; /*スマフォのダブルタップによるズームを防ぐ*/
 }
 .common_header{
-    height: 70px; /* 高さを70pxに指定 */
-    padding: 2px 2px; /* ヘッダーに上下左右それぞれ余白を指定 */
-    box-sizing: border-box; /* padding分を含んで幅を100%にするため */
-    position: fixed;  /*ウィンドウを基準に画面に固定 */
-    top: 0; /* 上下の固定位置を上から0pxにする */
-    left: 0; /* 左右の固定位置を左から0pxにする */
-    width: 100%;
-    z-index: 99;
-    display: flex;
-    font-weight: 700;
+		height: 70px; /* 高さを70pxに指定 */
+		padding: 2px 2px; /* ヘッダーに上下左右それぞれ余白を指定 */
+		box-sizing: border-box; /* padding分を含んで幅を100%にするため */
+		position: fixed;  /*ウィンドウを基準に画面に固定 */
+		top: 0; /* 上下の固定位置を上から0pxにする */
+		left: 0; /* 左右の固定位置を左から0pxにする */
+		width: 100%;
+		z-index: 99;
+		display: flex;
+		font-weight: 700;
 }
 
 .title{
-    font-family: 'Kranky', cursive;
-    color:var(--title-color);
-    font-size: 3.0rem;
-    font-weight: 700;
+		font-family: 'Kranky', cursive;
+		color:var(--title-color);
+		font-size: 3.0rem;
+		font-weight: 700;
 }
 .title > a{
-    color:inherit;
+		color:inherit;
 }
 @media screen and (max-width:389px) { 
 .title{
-    font-size: 2.5rem;
+		font-size: 2.5rem;
 }
-    
+		
 }
 
 /*トップメニューボタン*/
 .btn--topmenu{
-    height:100%;     
-    width:100%; 
-    font-size: 2.2rem;
+		height:100%;     
+		width:100%; 
+		font-size: 2.2rem;
 }
 @media screen and (max-width:400px) {
 .btn--topmenu{
-    font-size: 1.8rem;
+		font-size: 1.8rem;
 }
 }
 /*ボタンの見た目*/
 .btn-view{
-    color: var(--panel-font-color);               /*文字色*/
-    background-color: var(--panel-bk-color);      /*背景色*/
-    border:solid var(--panel-bd-color) 0.5px;     /*枠線*/
+		color: var(--panel-font-color);               /*文字色*/
+		background-color: var(--panel-bk-color);      /*背景色*/
+		border:solid var(--panel-bd-color) 0.5px;     /*枠線*/
 
-    font-weight: 700;
-    line-height: 1.5;
-    position: relative;
-    display: inline-block;
-    padding: 1rem; /*ボタン文字エリアとボタン外枠の間*/
-    cursor: pointer;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    -webkit-transition: all 0.1s;
-    transition: all 0.1s;
-    text-align: center;
-    vertical-align: middle;
-    text-decoration: none;
-    /*letter-spacing: 0.1em; 文字と文字の間隔*/
-    border-radius: 0.5rem;
-    white-space: normal;  
+		font-weight: 700;
+		line-height: 1.5;
+		position: relative;
+		display: inline-block;
+		padding: 1rem; /*ボタン文字エリアとボタン外枠の間*/
+		cursor: pointer;
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+		-webkit-transition: all 0.1s;
+		transition: all 0.1s;
+		text-align: center;
+		vertical-align: middle;
+		text-decoration: none;
+		/*letter-spacing: 0.1em; 文字と文字の間隔*/
+		border-radius: 0.5rem;
+		white-space: normal;  
 }
 .btn-view:active,
 button:active,
 a:active{
-    transform:translateY(3px);
-    -webkit-transform:translateY(3px);
+		transform:translateY(3px);
+		-webkit-transform:translateY(3px);
 }
 .tour_modal{
-    font-family: var(--tour-font);
+		font-family: var(--tour-font);
 }
 
 .tour_discription{
-    font-size:1.5rem;
-    line-height:1.6rem;
+		font-size:1.5rem;
+		line-height:1.6rem;
 }
 .tour_header{
-    font-size:2rem;
-    line-height:2rem;
+		font-size:2rem;
+		line-height:2rem;
 }
 .common_footer{
-    /*商品マスタ系画面のフッターエリア*/
-    background:var(--footer-color);
-    height:65px; 
-    position: fixed; 
-    padding:0;
-    bottom: 0;
-    Right: 0;
-    width: 100%;
-    display: flex;    
-    z-index: 99;
-    border-top:var(--rez-border-top);
-    border-top-width:thin;
-    border-left:none;
-    border-right:none;
-    border-bottom:none;
-    border-color:var(--rez-border-color);
+		/*商品マスタ系画面のフッターエリア*/
+		background:var(--footer-color);
+		height:65px; 
+		position: fixed; 
+		padding:0;
+		bottom: 0;
+		Right: 0;
+		width: 100%;
+		display: flex;    
+		z-index: 99;
+		border-top:var(--rez-border-top);
+		border-top-width:thin;
+		border-left:none;
+		border-right:none;
+		border-bottom:none;
+		border-color:var(--rez-border-color);
 }
 .btn--chk {
-    /*商品マスタ系画面の登録ボタン*/
-    color: var(--chk-font-color);
-    background-color:var(--chk-color);
-    height:100%; 
-    width:80%;
-    margin:auto;
-    font-size: 3rem;
-    font-weight:700;
-    border-top:none;
-    border-right:var(--rez-border-top);
-    border-right-width:thin;
-    border-left:var(--rez-border-top);
-    border-left-width:thin;
-    border-bottom:none;
-    border-color:var(--rez-border-color);
+		/*商品マスタ系画面の登録ボタン*/
+		color: var(--chk-font-color);
+		background-color:var(--chk-color);
+		height:100%; 
+		width:80%;
+		margin:auto;
+		font-size: 3rem;
+		font-weight:700;
+		border-top:none;
+		border-right:var(--rez-border-top);
+		border-right-width:thin;
+		border-left:var(--rez-border-top);
+		border-left-width:thin;
+		border-bottom:none;
+		border-color:var(--rez-border-color);
 }
 
-
+/*ローディングアニメーション*/
+.loader-wrap {
+	position: fixed;
+	top:0%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	background: #fff;
+	opacity: 0.7;
+	z-index: 1000
+}
+.loader {
+		color: #5d53ea;
+		font-size: 90px;
+		text-indent: -9999em;
+		overflow: hidden;
+		width: 1em;
+		height: 1em;
+		border-radius: 50%;
+		margin: 72px auto;
+		position: relative;
+		-webkit-transform: translateZ(0);
+		-ms-transform: translateZ(0);
+		transform: translateZ(0);
+		-webkit-animation: load6 1.7s infinite ease, round 1.7s infinite ease;
+		animation: load6 1.7s infinite ease, round 1.7s infinite ease;
+		opacity: 1;
+	}
+	@-webkit-keyframes load6 {
+		0% {
+			box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+		}
+		5%,
+		95% {
+			box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+		}
+		10%,
+		59% {
+			box-shadow: 0 -0.83em 0 -0.4em, -0.087em -0.825em 0 -0.42em, -0.173em -0.812em 0 -0.44em, -0.256em -0.789em 0 -0.46em, -0.297em -0.775em 0 -0.477em;
+		}
+		20% {
+			box-shadow: 0 -0.83em 0 -0.4em, -0.338em -0.758em 0 -0.42em, -0.555em -0.617em 0 -0.44em, -0.671em -0.488em 0 -0.46em, -0.749em -0.34em 0 -0.477em;
+		}
+		38% {
+			box-shadow: 0 -0.83em 0 -0.4em, -0.377em -0.74em 0 -0.42em, -0.645em -0.522em 0 -0.44em, -0.775em -0.297em 0 -0.46em, -0.82em -0.09em 0 -0.477em;
+		}
+		100% {
+			box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+		}
+	}
+	@keyframes load6 {
+		0% {
+			box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+		}
+		5%,
+		95% {
+			box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+		}
+		10%,
+		59% {
+			box-shadow: 0 -0.83em 0 -0.4em, -0.087em -0.825em 0 -0.42em, -0.173em -0.812em 0 -0.44em, -0.256em -0.789em 0 -0.46em, -0.297em -0.775em 0 -0.477em;
+		}
+		20% {
+			box-shadow: 0 -0.83em 0 -0.4em, -0.338em -0.758em 0 -0.42em, -0.555em -0.617em 0 -0.44em, -0.671em -0.488em 0 -0.46em, -0.749em -0.34em 0 -0.477em;
+		}
+		38% {
+			box-shadow: 0 -0.83em 0 -0.4em, -0.377em -0.74em 0 -0.42em, -0.645em -0.522em 0 -0.44em, -0.775em -0.297em 0 -0.46em, -0.82em -0.09em 0 -0.477em;
+		}
+		100% {
+			box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+		}
+	}
+	@-webkit-keyframes round {
+		0% {
+			-webkit-transform: rotate(0deg);
+			transform: rotate(0deg);
+		}
+		100% {
+			-webkit-transform: rotate(360deg);
+			transform: rotate(360deg);
+		}
+	}
+	@keyframes round {
+		0% {
+			-webkit-transform: rotate(0deg);
+			transform: rotate(0deg);
+		}
+		100% {
+			-webkit-transform: rotate(360deg);
+			transform: rotate(360deg);
+		}
+	}
+	
 

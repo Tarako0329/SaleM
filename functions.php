@@ -175,7 +175,7 @@ function csrf_chk(){
 
     if ($cookie_token != $csrf_token || $csrf_token != $session_token) {
         //不正アクセス
-        deb_echo("NG [".$cookie_token."::".$csrf_token."::".$session_token."] csrf_chk<br>");
+        log_writer("function.php","NG [".$cookie_token."::".$csrf_token."::".$session_token."] csrf_chk");
         return false;
         //return true;
     }else{

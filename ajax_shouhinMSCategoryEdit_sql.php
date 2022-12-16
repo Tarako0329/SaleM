@@ -1,6 +1,6 @@
 <?php
 require "php_header.php";
-log_writer("logincheck.php POST ",$_POST);
+//log_writer("logincheck.php POST ",$_POST);
 
 $msg[0] = array(
     "EMSG" => "更新処理が実行されませんでした。"
@@ -42,7 +42,6 @@ if($_POST["categry"]=="cate1"){
     $col="bunrui3";
 }
 
-
 foreach($array as $row){
     if($row["chk"]!="on"){
         continue;
@@ -67,7 +66,7 @@ if($E_Flg==0){
     $pdo_h->commit();
     $msg[0] = array(
         "EMSG" => "更新されました。"
-        ,"status" => "alert-danger"
+        ,"status" => "alert-success"
         ,"csrf_create" => csrf_create()
     );
 }else{
