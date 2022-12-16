@@ -405,6 +405,7 @@ window.onload = function() {
 <div class='header-plus-minus text-center item_4' style='font-size:1.4rem;font-weight;700'>
     <span style='position:fixed;top:95px;left:10px;' id='gio_exec'></span><!--開発モードでGET_GIO実行時の通知に使用-->
     <i class="fa-regular fa-circle-question fa-lg logoff-color"></i><!--スペーシングのため白アイコンを表示-->
+			
     <div class='btn-group btn-group-toggle' style='padding:0;' data-toggle='buttons'>
         <label class='btn btn-outline-primary active' id='plus_mode'>
             <input type='radio' name='options' value='plus' autocomplete='off' checked>　▲　
@@ -515,27 +516,30 @@ window.onload = function() {
 }	
 ?> 
         </div>
-
-    </div>
-    <script>
-        $('a[href*="#"]').click(function () {//全てのページ内リンクに適用させたい場合はa[href*="#"]のみでもOK
-        	var elmHash = $(this).attr('href'); //ページ内リンクのHTMLタグhrefから、リンクされているエリアidの値を取得
-        	var pos = $(elmHash).offset().top-145;	//idの上部の距離を取得
-        	$('body,html').animate({scrollTop: pos}, 500); //取得した位置にスクロール。500の数値が大きくなるほどゆっくりスクロール
-        	return false;
-        });
-        
-        $(function () {
-          $('select').change(function () {
-            var speed = 400;
-            var href = $(this).val();
-            var target = $(href == "#" || href == "" ? 'html' : href);
-            //var position = target.offset().top-100;
-            var position = target.offset().top-145;
-            $('body,html').animate({scrollTop:position}, speed, 'swing');
-            return false;
-          });
-        });        
+						</div>
+					</template>
+					</div>
+				</div><!--オーダーパネル部分-->
+			</div>
+			<script>
+				$('a[href*="#"]').click(function () {//全てのページ内リンクに適用させたい場合はa[href*="#"]のみでもOK
+					var elmHash = $(this).attr('href'); //ページ内リンクのHTMLタグhrefから、リンクされているエリアidの値を取得
+					var pos = $(elmHash).offset().top-145;	//idの上部の距離を取得
+					$('body,html').animate({scrollTop: pos}, 500); //取得した位置にスクロール。500の数値が大きくなるほどゆっくりスクロール
+					return false;
+				});
+			
+				$(function () {
+					$('select').change(function () {
+					var speed = 400;
+					var href = $(this).val();
+					var target = $(href == "#" || href == "" ? 'html' : href);
+					//var position = target.offset().top-100;
+					var position = target.offset().top-145;
+					$('body,html').animate({scrollTop:position}, speed, 'swing');
+					return false;
+					});
+				});
         //注文ボタン
         function order_cnt(TANKA,TANKA_ZEI,obj_id_SHOUHIN_cnt){
             let plus_minus = document.getElementsByName('options');
@@ -618,39 +622,143 @@ window.onload = function() {
 
                 <p>お預り：￥<span id='azukari'>0</span></p>
                 <p>お会計：￥<span id='seikyuu'>0</span></p>
-                <p>お釣り：￥<span id='oturi'>0</span></p>    
-                </div>
-            <div class='modal-footer'>
-                <button type='button'  class='item_7 btn btn-primary' data-dismiss='modal' style='font-size: 2.0rem;width:100%;'>閉じる</button>
-            </div>
-            <script>
-                function dentaku_btn(btn){
-                    let azukarikin = azukari_val.value;
-                    const seikyu = total_pay;
-                    let oturikin
-                    
-                    if(btn.innerHTML =='C'){
-                        azukari_val.value = 0;
-                        azukari.innerHTML = '0';
-                        azukarikin = '0';
-                    }else if(btn.innerHTML =='ちょうど'){
-                        azukarikin = seikyu;
-                        azukari_val.value = Number(seikyu);
-                        azukari.innerHTML = Number(seikyu).toLocaleString();
-                    }else{
-                        azukarikin = "" + azukarikin + btn.innerHTML;
-                        azukari_val.value = Number(azukarikin);
-                        azukari.innerHTML = Number(azukarikin).toLocaleString();
-                    }
-                    oturikin = azukarikin - seikyu;
-                    
-                    oturi_val.value = oturikin;
-                    oturi.innerHTML = oturikin.toLocaleString();
-                }
-            </script>
-        </div>
-    </div>
-    </div>
+				<p>お釣り：￥<span id='oturi'>0</span></p>
+				</div>
+			<div class='modal-footer'>
+				<button type='button'  class='item_7 btn btn-primary' data-dismiss='modal' style='font-size: 2.0rem;width:100%;'>閉じる</button>
+			</div>
+			<script>
+		const { createApp, ref, onMounted, computed } = Vue;
+		createApp({
+			setup(){
+				const shouhinMS = ref([])			//商品マスタ
+				const get_shouhinMS = () => {//商品マスタ取得ajax
+					console.log("get_shouhinMS start");
+					let params = new URLSearchParams();
+					params.append('user_id', '<?php echo $_SESSION["user_id"];?>');
+					axios
+					.post('ajax_get_ShouhinMS.php',params)
+					.then((response) => (shouhinMS.value = [...response.data]
+															,console.log('get_shouhinMS succsess')
+															))
+					.catch((error) => console.log(`get_shouhinMS ERROR:${error}`));
+				}//商品マスタ取得ajax
+				const shouhinMS_filter = computed(() => {//商品パネルのソート・フィルタ
+					//let searchWord = over_cate.value.toString().trim();
+					shouhinMS.value.sort((a,b) => {
+						return (a.category > b.category?1:-1)
+						return (a.shouhinNM > b.shouhinNM?1:-1)
+						return 0
+					})
+					//return shouhinMS.value;
+					
+					//if (searchWord === "%") return shouhinMS.value;
+					return shouhinMS.value.filter((shouhin) => {
+						return (
+							shouhin.hyoujiKBN1.includes('on') 
+						);
+					});
+					
+				})//商品パネルのソート・フィルタ
+				onMounted(() => {
+					console.log('onMounted')
+					get_shouhinMS()
+				})
+				const pay = ref(0)		//会計税込金額
+				const kaikei_zei = ref(0)		//会計消費税
+				const pm = ref('plus')
+				const ordercounter = (e) => {
+					console.log(e.target.value)
+					console.log(shouhinMS.value[e.target.value])
+					let index = e.target.value
+					
+					if(pm.value==="plus"){
+						shouhinMS.value[index].ordercounter ++
+						pay.value = pay.value + shouhinMS.value[index].tanka + shouhinMS.value[index].tanka_zei
+						kaikei_zei.value = kaikei_zei.value + shouhinMS.value[index].tanka_zei
+					}else if(pm.value==="minus"){
+						if(shouhinMS.value[index].ordercounter - 1 < 0){
+							alert("注文数は０以下にはできません。")
+							return 0
+						}
+						shouhinMS.value[index].ordercounter --
+						pay.value = pay.value - shouhinMS.value[index].tanka - shouhinMS.value[index].tanka_zei
+						kaikei_zei.value = kaikei_zei.value - shouhinMS.value[index].tanka_zei
+					}
+					return 0
+				}
+				return{
+					get_shouhinMS,
+					shouhinMS_filter,
+					ordercounter,
+					pay,
+					kaikei_zei,
+					pm,
+				}
+			}
+		}).mount('#register');
+
+	</script><!--Vue3-->
+	<script>
+		$('a[href*="#"]').click(function () {//全てのページ内リンクに適用させたい場合はa[href*="#"]のみでもOK
+			var elmHash = $(this).attr('href'); //ページ内リンクのHTMLタグhrefから、リンクされているエリアidの値を取得
+			var pos = $(elmHash).offset().top-145;	//idの上部の距離を取得
+			$('body,html').animate({scrollTop:pos}, 500); //取得した位置にスクロール。500の数値が大きくなるほどゆっくりスクロール
+			return false;
+		});
+	
+		$(function () {
+			$('select').change(function () {
+			var speed = 400;
+			var href = $(this).val();
+			var target = $(href == "#" || href == "" ? 'html' : href);
+			//var position = target.offset().top-100;
+			var position = target.offset().top-145;
+			$('body,html').animate({scrollTop:position}, speed, 'swing');
+			return false;
+			});
+		});
+	
+		// Enterキーが押された時にSubmitされるのを抑制する
+		document.getElementById("form1").onkeypress = (e) => {
+			// form1に入力されたキーを取得
+			const key = e.keyCode || e.charCode || 0;
+			// 13はEnterキーのキーコード
+			if (key == 13) {
+				// アクションを行わない
+				//alert('test');
+				e.preventDefault();
+			}
+		}
+	</script><!--js-->
+	<script>
+				function dentaku_btn(btn){
+					let azukarikin = azukari_val.value;
+					const seikyu = total_pay;
+					let oturikin
+
+					if(btn.innerHTML =='C'){
+						azukari_val.value = 0;
+						azukari.innerHTML = '0';
+						azukarikin = '0';
+					}else if(btn.innerHTML =='ちょうど'){
+						azukarikin = seikyu;
+						azukari_val.value = Number(seikyu);
+						azukari.innerHTML = Number(seikyu).toLocaleString();
+					}else{
+						azukarikin = "" + azukarikin + btn.innerHTML;
+						azukari_val.value = Number(azukarikin);
+						azukari.innerHTML = Number(azukarikin).toLocaleString();
+					}
+					oturikin = azukarikin - seikyu;
+
+					oturi_val.value = oturikin;
+					oturi.innerHTML = oturikin.toLocaleString();
+				}
+			</script>
+		</div>
+	</div>
+	</div>
 </div>
 
 <!--分類表示切替のヘルプ(modal_help1)-->
