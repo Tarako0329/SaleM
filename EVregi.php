@@ -443,6 +443,20 @@ window.onload = function() {
 					.catch((error) => console.log(`get_shouhinMS ERROR:${error}`));
 				}//商品マスタ取得ajax
 
+				//売上取得関連
+				const UriageList = ref([])		//商品マスタ
+				const get_UriageList = () => {//商品マスタ取得ajax
+					console.log("get_UriageList start");
+					let params = new URLSearchParams();
+					params.append('user_id', '<?php echo $_SESSION["user_id"];?>');
+					axios
+					.post('ajax_get_Uriage.php',params)
+					.then((response) => (UriageList.value = [...response.data]
+															,console.log('get_UriageList succsess')
+															))
+					.catch((error) => console.log(`get_UriageList ERROR:${error}`));
+				}//商品マスタ取得ajax
+
 				const shouhinMS_filter = computed(() => {//商品パネルのソート・フィルタ
 					let order_panel = ([])
 					if (chk_register_show.value === "chk"){//表示対象のみを返す
