@@ -174,13 +174,14 @@
 	//deb_echo($next_categoly);
 	*/
 	//今日の売上
+	/*
 	$sql = "select * from UriageData where uid = ? and UriDate = ? order by insDatetime desc";
 	$stmt = $pdo_h->prepare($sql);
 	$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 	$stmt->bindValue(2, (string)date("Y-m-d"), PDO::PARAM_STR);
 	$stmt->execute();
 	$UriageList = $stmt->fetchAll();
-
+*/
 }
 ?>
 <!DOCTYPE html>
@@ -315,13 +316,14 @@ window.onload = function() {
 				<div class='row item_3' id=''>
 					<?php
 					{
+						/*
 						$i=0;
 						$now=1;
 						$bunrui="";
 						$disp=""; //ボタンの表示非表示（showを表示。ブランクは非表示）
 						$style="";
 					
-						/*foreach($shouhiMS as $row){
+						foreach($shouhiMS as $row){
 							if($bunrui<>$row["categoly"]){
 								//ジャンルを区切るバーの表示
 								$next=$now+1;
@@ -340,6 +342,20 @@ window.onload = function() {
 					}
 					?>
 					<template v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
+						<template v-if='index===0'>
+							<div class='row' style='background:var(--jumpbar-color);margin-top:5px;' >
+								<div class='col-12' id='jump_".$now."' style='color:var(--categ-font-color);'><a href='#jump_".$befor."' class='btn-updown'><i class='fa-solid fa-angles-up'></i></a>
+									{{list.disp_category}}<a href='#jump_".$next."'  class='btn-updown'><i class='fa-solid fa-angles-down'></i></a>
+								</div>
+							</div>
+						</template>
+						<template v-if='index!==0 && list.disp_category !== shouhinMS_filter[index-1].disp_category'>
+							<div class='row' style='background:var(--jumpbar-color);margin-top:5px;' >
+								<div class='col-12' id='jump_".$now."' style='color:var(--categ-font-color);'><a href='#jump_".$befor."' class='btn-updown'><i class='fa-solid fa-angles-up'></i></a>
+									{{list.disp_category}}<a href='#jump_".$next."'  class='btn-updown'><i class='fa-solid fa-angles-down'></i></a>
+								</div>
+							</div>
+						</template>
 						<div class ='col-md-3 col-sm-6 col-6 items'>
 							<button type='button' @click="ordercounter" class='btn-view btn--rezi' :id="`btn_menu_${list.shouhinCD}`" :value = "index">{{list.shouhinNM}}
 							</button>
@@ -423,14 +439,73 @@ window.onload = function() {
 			</div>
 		</div>
 		</div>
-	</div>	
+	</div>
+	<!--売上リスト-->
+	<div class='modal fade' id='modal_uriagelist' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
+		<div class='modal-dialog  modal-dialog-centered' >
+			<div class='modal-content' style='font-size:1.2rem; font-weight:400;'>
+				<div class='modal-header'>
+					<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;font-weight:600;' class='lead alert-success'>本日の売上</div></div></div></div>
+				</div>
+				<div class='modal-body'>
+					<div class='urilist'>
+					<table class="table table-sm" style='font-family:"Meiryo UI";'>
+						<thead class='header-color' style='color:var(--title-color);'>
+							<tr>
+								<th>No</th>
+								<th>時刻</th>
+								<th>商品</th>
+								<th>数量</th>
+								<th>税込売上</th>
+							</tr>
+						</thead>
+						<tbody >
+							<template v-for='(row,index) in UriageList' :Key='row.UriageNO+row.ShouhinCD'>
+								<template v-if='row.UriageNO===row.lastNo'>
+									<tr class='table-success'>
+										<td>{{row.UriageNO}}</td><td>{{row.insDatetime}}</td><td>{{row.ShouhinNM}}</td><td>{{row.su}}</td><td>{{row.ZeikomiUriage}}</td>
+									</tr>
+								</template>
+								<template v-if='row.UriageNO!==row.lastNo'>
+									<tr>
+										<td>{{row.UriageNO}}</td><td>{{row.insDatetime}}</td><td>{{row.ShouhinNM}}</td><td>{{row.su}}</td><td>{{row.ZeikomiUriage}}</td>
+									</tr>
+								</template>	
+							</template>
+						</tbody>
+					</table>
+					</div>
+				</div>
+				<div class='modal-footer' style='font-size:2.5rem;font-weight:600;'>
+					合計：<?php echo return_num_disp($Goukei); ?> 円
+				</div>
+			</div>
+		</div>
+	</div>
+
 	</div>
 	<script>
 		const { createApp, ref, onMounted, computed } = Vue;
 		createApp({
 			setup(){
+				//売上取得関連
+				const UriageList = ref([])		//売上リスト
+				const get_UriageList = () => {//売上リスト取得ajax
+					console.log("get_UriageList start");
+					let params = new URLSearchParams();
+					params.append('user_id', '<?php echo $_SESSION["user_id"];?>');
+					axios
+					.post('ajax_get_Uriage.php',params)
+					.then((response) => (UriageList.value = [...response.data]
+															,console.log('get_UriageList succsess')
+															))
+					.catch((error) => console.log(`get_UriageList ERROR:${error}`));
+				}//売上リスト取得ajax
+
 				//商品マスタ取得関連
 				const shouhinMS = ref([])			//商品マスタ
+				const disp_category = ref()		//パネルの分類別表示設定変更用
+
 				const get_shouhinMS = () => {//商品マスタ取得ajax
 					console.log("get_shouhinMS start");
 					let params = new URLSearchParams();
@@ -441,20 +516,6 @@ window.onload = function() {
 															,console.log('get_shouhinMS succsess')
 															))
 					.catch((error) => console.log(`get_shouhinMS ERROR:${error}`));
-				}//商品マスタ取得ajax
-
-				//売上取得関連
-				const UriageList = ref([])		//商品マスタ
-				const get_UriageList = () => {//商品マスタ取得ajax
-					console.log("get_UriageList start");
-					let params = new URLSearchParams();
-					params.append('user_id', '<?php echo $_SESSION["user_id"];?>');
-					axios
-					.post('ajax_get_Uriage.php',params)
-					.then((response) => (UriageList.value = [...response.data]
-															,console.log('get_UriageList succsess')
-															))
-					.catch((error) => console.log(`get_UriageList ERROR:${error}`));
 				}//商品マスタ取得ajax
 
 				const shouhinMS_filter = computed(() => {//商品パネルのソート・フィルタ
@@ -468,6 +529,21 @@ window.onload = function() {
 							return (shouhin.hyoujiKBN1.includes('on') && shouhin.ordercounter > 0);
 						});
 					}
+
+					//カテゴリーグループの追加
+					order_panel.forEach((list)=> {
+						if(disp_category.value===1){
+							list['disp_category'] = list.category1
+						}else if(disp_category.value===2){
+							list['disp_category'] = list.category12
+						}else if(disp_category.value===3){
+							list['disp_category'] = list.category123
+						}else {
+							list['disp_category'] = ''
+						}
+						
+					})
+
 					return order_panel.sort((a,b) => {//フィルタ結果をソートして親に返す
 						return (a.category > b.category?1:-1)
 						return (a.shouhinNM > b.shouhinNM?1:-1)
@@ -478,6 +554,7 @@ window.onload = function() {
 				onMounted(() => {
 					console.log('onMounted')
 					get_shouhinMS()
+					get_UriageList()
 				})
 
 				//オーダー処理関連
@@ -525,7 +602,7 @@ window.onload = function() {
 					let form_data = new FormData(e.target)
 					let params = new URLSearchParams (form_data)
 					axios
-						.post('ajax_EVregi_sql.php',params,{timeout: 60000}) //timeout60s
+						.post('ajax_EVregi_sql.php',params,{timeout: 16000}) //php側は15秒でタイムアウト     timeout60s => 60,000
 						.then((response) => (console.log(`on_submit succsess`)
 											,console.log(response.data)
 											,MSG.value = response.data[0].EMSG
@@ -534,6 +611,7 @@ window.onload = function() {
 											,reset_order()
 											,btn_changer('chk')
 											,csrf.value = response.data[0].csrf_create
+											,get_UriageList()
 						))
 						.catch((error) => (console.log(`on_submit ERROR:${error}`)
 											,loader.value = false
@@ -577,6 +655,9 @@ window.onload = function() {
 					MSG,
 					loader,
 					csrf,
+					get_UriageList,
+					UriageList,
+					disp_category,
 				}
 			}
 		}).mount('#register');
@@ -664,61 +745,6 @@ window.onload = function() {
 	</div>
 </div>
 
-<!--売上リスト-->
-<div class='modal fade' id='modal_uriagelist' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
-	<div class='modal-dialog  modal-dialog-centered' >
-		<div class='modal-content' style='font-size:1.2rem; font-weight:400;'>
-			<div class='modal-header'>
-				<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;font-weight:600;' class='lead alert-success'>本日の売上</div></div></div></div>
-			</div>
-			<div class='modal-body'>
-				<div class='urilist'>
-				<table class="table table-sm" style='font-family:"Meiryo UI";'>
-					<thead class='header-color' style='color:var(--title-color);'>
-						<tr>
-							<th>No</th>
-							<th>時刻</th>
-							<th>商品</th>
-							<th>数量</th>
-							<th>税込売上</th>
-						</tr>
-					</thead>
-					<tbody >
-						<?php
-						$No=0;
-						$color="";
-						$Goukei = 0;
-						foreach($UriageList as $row){
-							if($No == 0){
-								$color="class='table-success'";
-								$No=$row["UriageNO"];
-							}elseif($No != $row["UriageNO"]){
-								if(empty($color)){
-									$color="class='table-active'";
-								}else{
-									$color="";
-								}
-								$No=$row["UriageNO"];
-							}
-							$ZeikomiUri=$row["UriageKin"] + $row["zei"];
-							$Goukei = $Goukei + $ZeikomiUri;
-							echo "<tr ".$color."><td>".$row["UriageNO"]."</td>";
-							echo "<td>".substr($row["insDatetime"],11)."</td>";
-							echo "<td>".$row["ShouhinNM"]."</td>";
-							echo "<td>".$row["su"]."</td>";
-							echo "<td>".return_num_disp($ZeikomiUri)."</td></tr>";
-						}
-						?>
-					</tbody>
-				</table>
-				</div>
-			</div>
-			<div class='modal-footer' style='font-size:2.5rem;font-weight:600;'>
-				合計：<?php echo return_num_disp($Goukei); ?> 円
-			</div>
-		</div>
-	</div>
-</div>
 
 <!--シェパードナビ
 <script src="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/js/shepherd.min.js"></script>

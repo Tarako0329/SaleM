@@ -21,10 +21,15 @@ $msg[0] = array(
 */
 
 //cookie:postのチェックのみ
+ini_set("max_execution_time",15);//タイムアウトの設定(15s)
+
 require "php_header.php";
 $time = date("Y/m/d H:i:s");
 $rtn=check_session_userid($pdo_h);
 $logfilename="sid_".$_SESSION['user_id'].".log";
+
+if(EXEC_MODE=="Test")sleep(5);
+if(EXEC_MODE=="Local")sleep(0);
 
 //リファイラーチェック
 if(ROOT_URL."EVregi.php"!==substr($_SERVER['HTTP_REFERER'],0,strlen(ROOT_URL."EvRegi.php"))){
@@ -73,7 +78,7 @@ $msg[0] = array(
 
 //入力画面の前回値を記録
 //if($_POST["EV"]<>""){
-if(filter_input(INPUT_POST,"EV")<>""    ){
+if(filter_input(INPUT_POST,"EV")<>""){
 	//イベント名
 	$_SESSION["EV"] = $_POST["EV"];
 	$stmt = $pdo_h->prepare ( 'call PageDefVal_update(?,?,?,?,?)' );
