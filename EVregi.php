@@ -16,6 +16,9 @@
 	csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
 	*/
 	require "php_header.php";
+	$timeout=15000;//15秒でタイムアウト timeout60s => 60,000
+	if(EXEC_MODE!=="LOCAL"){$timeout=0;}
+
 	$log_time = date("Y/m/d H:i:s");
 	//セッションのIDがクリアされた場合の再取得処理。
 	$rtn=check_session_userid($pdo_h);
@@ -48,7 +51,6 @@
 		}
 	}
 
-
 	//有効期限チェック
 	$sql="select yuukoukigen from Users where uid=?";
 	$stmt = $pdo_h->prepare($sql);
@@ -65,7 +67,6 @@
 		$emsg="お試し期間、もしくは解約後有効期間が終了しました。<br>継続してご利用頂ける場合は<a href='".PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path."'>こちらから本契約をお願い致します </a>";
 	}
 
-
 	$token = csrf_create();
 
 	$alert_msg=(!empty($_SESSION["msg"])?$_SESSION["msg"]:"");
@@ -79,7 +80,6 @@
 
 	//イベント名の取得
 	//セッション -> DB
-
 	$event = (!empty($_SESSION["EV"])?$_SESSION["EV"]:"");
 	if(empty($event)){
 		$sql = "select value,updatetime from PageDefVal where uid=? and machin=? and page=? and item=?";
@@ -89,7 +89,6 @@
 		$stmt->bindValue(3, "EVregi.php", PDO::PARAM_STR);
 		$stmt->bindValue(4, "EV", PDO::PARAM_STR);//name属性を指定
 		$stmt->execute();
-
 
 		if($stmt->rowCount()==0){
 			$event = "";
@@ -112,76 +111,6 @@
 			}
 		}
 	}
-	//メニューカテゴリー粒度(0:なし>1:大>2:中>3:小)
-	//セッション-> DB
-	$categoly=(!empty($_SESSION["CTGL"])?$_SESSION["CTGL"]:"");
-	if(empty($categoly)){
-		$sql = "select value from PageDefVal where uid=? and machin=? and page=? and item=?";
-		$stmt = $pdo_h->prepare($sql);
-		$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-		$stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
-		$stmt->bindValue(3, "EVregi.php", PDO::PARAM_STR);
-		$stmt->bindValue(4, "CTGL", PDO::PARAM_STR);//name属性を指定
-		$stmt->execute();
-
-		if($stmt->rowCount()==0){
-			$categoly = 0;
-			//deb_echo("NULL");
-		}else{
-			$buf = $stmt->fetch();
-			$_SESSION["CTGL"] = $buf["value"];
-			$categoly = $buf["value"];
-			//deb_echo("DB".$event);
-		}
-	}
-	$next_categoly=$categoly+1;
-	//echo $next_categoly;
-	$sqlorder="";
-	if($categoly==0){
-		$sql_order="order by hyoujiNO,shouhinNM";
-		$sql_group="group by categoly";
-		$sql_select="'' as categoly";
-	}else if($categoly==1){
-		$sqlorder="order by bunrui1,hyoujiNO,shouhinNM";
-		$sql_group="group by bunrui1";
-		$sql_select="if(bunrui1<>'',bunrui1,'未分類') as categoly";
-	}else if($categoly==2){
-		$sqlorder="order by bunrui1,bunrui2,hyoujiNO,shouhinNM";
-		$sql_group="group by bunrui1,bunrui2";
-		$sql_select="concat(if(bunrui1<>'',bunrui1,'未分類'),'>',if(bunrui2<>'',bunrui2,'未分類')) as categoly";
-	}else if($categoly==3){
-		$sqlorder="order by bunrui1,bunrui2,bunrui3,hyoujiNO,shouhinNM";
-		$sql_group="group by bunrui1,bunrui2,bunrui3";
-		$sql_select="concat(if(bunrui1<>'',bunrui1,'未分類'),'>',if(bunrui2<>'',bunrui2,'未分類'),'>',if(bunrui3<>'',bunrui3,'未分類')) as categoly";
-		$next_categoly=0;
-	}
-
-	//商品M取得
-	/*
-	$sql = "select *,".$sql_select." from ShouhinMS where uid = ? ".$sqlorder;
-
-	$stmt = $pdo_h->prepare($sql);
-	$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-	$stmt->execute();
-	$shouhiMS = $stmt->fetchAll();
-
-	//商品M分類取得
-	$sql = "select ".$sql_select." from ShouhinMS where hyoujiKBN1='on' and uid = ? ".$sql_group." ".$sqlorder;
-	$stmt = $pdo_h->prepare($sql);
-	$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-	$stmt->execute();
-	$shouhiMS_bunrui = $stmt->fetchAll();
-	//deb_echo($next_categoly);
-	*/
-	//今日の売上
-	/*
-	$sql = "select * from UriageData where uid = ? and UriDate = ? order by insDatetime desc";
-	$stmt = $pdo_h->prepare($sql);
-	$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-	$stmt->bindValue(2, (string)date("Y-m-d"), PDO::PARAM_STR);
-	$stmt->execute();
-	$UriageList = $stmt->fetchAll();
-*/
 }
 ?>
 <!DOCTYPE html>
@@ -270,8 +199,10 @@ window.onload = function() {
 				} ?>
 			</select>
 			<a href="#" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;' data-bs-toggle='modal' data-bs-target='#modal_help1'><i class="fa-regular fa-circle-question fa-lg logoff-color"></i></a>
-			<a class='item_15' href='javascript:void(0)' onClick="postFormRG('EVregi_sql.php','<?php echo $RG_MODE; ?>','<?php echo $next_categoly; ?>')" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'>
-				<i class="fa-solid fa-arrow-rotate-right fa-lg logoff-color"></i>
+			
+			<!--<a class='item_15' href='javascript:void(0)' onClick="postFormRG('EVregi_sql.php','<?php echo $RG_MODE; ?>','<?php echo $next_categoly; ?>')" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'>-->
+			<a class='item_15' href='javascript:void(0)' @Click='panel_changer()' style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'>
+				<i class='fa-solid fa-arrow-rotate-right fa-lg logoff-color'></i>
 			</a>
 		</div>
 		<div class='header-plus-minus d-flex justify-content-center align-items-center item_4' style='font-size:1.4rem;font-weight:700;'>
@@ -314,33 +245,6 @@ window.onload = function() {
 				</div><!--割引処理-->
 				<hr>
 				<div class='row item_3' id=''>
-					<?php
-					{
-						/*
-						$i=0;
-						$now=1;
-						$bunrui="";
-						$disp=""; //ボタンの表示非表示（showを表示。ブランクは非表示）
-						$style="";
-					
-						foreach($shouhiMS as $row){
-							if($bunrui<>$row["categoly"]){
-								//ジャンルを区切るバーの表示
-								$next=$now+1;
-								$befor=$now-1;
-								echo "</div>";
-								echo "<div class='row' style='background:var(--jumpbar-color);margin-top:5px;' >\n"; //height:30px;
-								echo "<div class='col-12' id='jump_".$now."' style='color:var(--categ-font-color);'><a href='#jump_".$befor."' class='btn-updown'><i class='fa-solid fa-angles-up'></i></a>\n";
-								echo $row["categoly"];
-								echo "<a href='#jump_".$next."'  class='btn-updown'><i class='fa-solid fa-angles-down'></i></a>\n";
-								echo "</div></div>\n";
-								echo "<div class='row'>";
-								$bunrui=$row["categoly"];
-								$now=$now+1;
-							}//ジャンルを区切るバーの表示
-						*/
-					}
-					?>
 					<template v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
 						<template v-if='index===0'>
 							<div class='row' style='background:var(--jumpbar-color);margin-top:5px;' >
@@ -504,7 +408,7 @@ window.onload = function() {
 
 				//商品マスタ取得関連
 				const shouhinMS = ref([])			//商品マスタ
-				const disp_category = ref()		//パネルの分類別表示設定変更用
+				const disp_category = ref(4)		//パネルの分類別表示設定変更用
 
 				const get_shouhinMS = () => {//商品マスタ取得ajax
 					console.log("get_shouhinMS start");
@@ -551,6 +455,14 @@ window.onload = function() {
 					})
 				})//商品パネルのソート・フィルタ
 
+				const panel_changer = () => {
+					if(disp_category.value >= 4){
+						disp_category.value=1
+					}else{
+						disp_category.value ++
+					}
+				}
+
 				onMounted(() => {
 					console.log('onMounted')
 					get_shouhinMS()
@@ -595,14 +507,14 @@ window.onload = function() {
 				const MSG = ref('')
 				const loader = ref(false)
 				const csrf = ref('<?php echo $token; ?>')
-				const on_submit = (e) => {
+				const on_submit = (e) => {//登録・submit
 					loader.value = true
 					console.log('on_submit start')
 					//console.log(e.target)
 					let form_data = new FormData(e.target)
 					let params = new URLSearchParams (form_data)
 					axios
-						.post('ajax_EVregi_sql.php',params,{timeout: 16000}) //php側は15秒でタイムアウト     timeout60s => 60,000
+						.post('ajax_EVregi_sql.php',params,{timeout: <?php echo $timeout; ?>}) //php側は15秒でタイムアウト
 						.then((response) => (console.log(`on_submit succsess`)
 											,console.log(response.data)
 											,MSG.value = response.data[0].EMSG
@@ -623,10 +535,10 @@ window.onload = function() {
 				
 				//電卓処理関連
 				const deposit = ref(0)
-				const oturi = computed(() =>{
+				const oturi = computed(() =>{//おつりの計算
 					return deposit.value - pay.value
 				})
-				const keydown = (e) => {
+				const keydown = (e) => {//電卓ボタンの処理
 					console.log(e.target.innerHTML)
 					if(e.target.innerHTML==="C"){
 						deposit.value = 0
@@ -658,6 +570,7 @@ window.onload = function() {
 					get_UriageList,
 					UriageList,
 					disp_category,
+					panel_changer,
 				}
 			}
 		}).mount('#register');
@@ -1490,6 +1403,7 @@ window.onload = function() {
 
 </script><!--天気機能リリースヘルプ（次回機能リリース時は不要となる）-->
 <script>
+	/*
 	function postFormRG(url,mode,CTGL) {
 
 		var form = document.createElement('form');
@@ -1514,6 +1428,7 @@ window.onload = function() {
 		form.submit();
 
 	}
+	*/
 </script>
 <script>
 	/*ジオ・コーディング*/
