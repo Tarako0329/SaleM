@@ -368,7 +368,7 @@ window.onload = function() {
 							<input type='hidden' :name ="`ORDERS[${index}][ZEI]`" :value = "list.tanka_zei">  
 							<input type='hidden' :name ="`ORDERS[${index}][GENKA_TANKA]`" :value = "list.genka_tanka">
 							<div class ='ordered'>
-									￥<input type='number' readonly='readonly' class='order tanka' :value="list.tanka + list.tanka_zei">
+									￥<input type='number' readonly='readonly' class='order tanka' :value="list.zeikomigaku">
 									× <input type='number' v-model='list.ordercounter' readonly='readonly' :name ="`ORDERS[${index}][SU]`" :id="`suryou_${list.shouhinCD}`" class='order su' style='display:inline;'>
 							</div>
 						</div>
@@ -530,7 +530,7 @@ window.onload = function() {
 						});
 					}
 
-					//カテゴリーグループの追加
+					//カテゴリーグループ,税込み額の追加
 					order_panel.forEach((list)=> {
 						if(disp_category.value===1){
 							list['disp_category'] = list.category1
@@ -541,7 +541,7 @@ window.onload = function() {
 						}else {
 							list['disp_category'] = ''
 						}
-						
+						list['zeikomigaku']=list.tanka + list.tanka_zei
 					})
 
 					return order_panel.sort((a,b) => {//フィルタ結果をソートして親に返す

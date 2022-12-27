@@ -21,9 +21,9 @@ $msg[0] = array(
 */
 
 //cookie:postのチェックのみ
-ini_set("max_execution_time",15);//タイムアウトの設定(15s)
-
 require "php_header.php";
+if(EXEC_MODE!=="Local")ini_set("max_execution_time",15);//タイムアウトの設定(15s)
+
 $time = date("Y/m/d H:i:s");
 $rtn=check_session_userid($pdo_h);
 $logfilename="sid_".$_SESSION['user_id'].".log";
