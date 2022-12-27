@@ -198,9 +198,10 @@ window.onload = function() {
 					}
 				} ?>
 			</select>
-			<a href="#" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;' data-bs-toggle='modal' data-bs-target='#modal_help1'><i class="fa-regular fa-circle-question fa-lg logoff-color"></i></a>
+			<a href="#" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;' data-bs-toggle='modal' data-bs-target='#modal_help1'>
+				<i class="fa-regular fa-circle-question fa-lg logoff-color"></i>
+			</a>
 			
-			<!--<a class='item_15' href='javascript:void(0)' onClick="postFormRG('EVregi_sql.php','<?php echo $RG_MODE; ?>','<?php echo $next_categoly; ?>')" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'>-->
 			<a class='item_15' href='javascript:void(0)' @Click='panel_changer()' style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'>
 				<i class='fa-solid fa-arrow-rotate-right fa-lg logoff-color'></i>
 			</a>
@@ -263,7 +264,7 @@ window.onload = function() {
 						<div class ='col-md-3 col-sm-6 col-6 items'>
 							<button type='button' @click="ordercounter" class='btn-view btn--rezi' :id="`btn_menu_${list.shouhinCD}`" :value = "index">{{list.shouhinNM}}
 							</button>
-							<div class='btn-view btn--rezi-minus bg-warning minus_disp' style='display:none;'></div>
+							<div v-if='pm==="minus"' class='btn-view btn--rezi-minus bg-warning minus_disp'></div>
 							<input type='hidden' :name ="`ORDERS[${index}][CD]`" :value = "list.shouhinCD">
 							<input type='hidden' :name ="`ORDERS[${index}][NM]`" :value = "list.shouhinNM">
 							<input type='hidden' :name ="`ORDERS[${index}][UTISU]`" :value = "list.utisu">
