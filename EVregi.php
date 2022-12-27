@@ -445,7 +445,7 @@ window.onload = function() {
 						}else {
 							list['disp_category'] = ''
 						}
-						list['zeikomigaku']=list.tanka + list.tanka_zei
+						list['zeikomigaku']=Number(list.tanka) + Number(list.tanka_zei)
 					})
 
 					return order_panel.sort((a,b) => {//フィルタ結果をソートして親に返す
@@ -484,16 +484,16 @@ window.onload = function() {
 					
 					if(pm.value==="plus"){
 						shouhinMS_filter.value[index].ordercounter ++
-						pay.value = pay.value + shouhinMS_filter.value[index].tanka + shouhinMS_filter.value[index].tanka_zei
-						kaikei_zei.value = kaikei_zei.value + shouhinMS_filter.value[index].tanka_zei
+						pay.value = Number(pay.value) + Number(shouhinMS_filter.value[index].tanka) + Number(shouhinMS_filter.value[index].tanka_zei)
+						kaikei_zei.value = Number(kaikei_zei.value) + Number(shouhinMS_filter.value[index].tanka_zei)
 					}else if(pm.value==="minus"){
 						if(shouhinMS_filter.value[index].ordercounter - 1 < 0){
 							alert("注文数は０以下にはできません。")
 							return 0
 						}
 						shouhinMS_filter.value[index].ordercounter --
-						pay.value = pay.value - shouhinMS_filter.value[index].tanka - shouhinMS_filter.value[index].tanka_zei
-						kaikei_zei.value = kaikei_zei.value - shouhinMS_filter.value[index].tanka_zei
+						pay.value = Number(pay.value) - Number(shouhinMS_filter.value[index].tanka) - Number(shouhinMS_filter.value[index].tanka_zei)
+						kaikei_zei.value = Number(kaikei_zei.value) - Number(shouhinMS_filter.value[index].tanka_zei)
 					}
 					return 0
 				}
@@ -536,7 +536,7 @@ window.onload = function() {
 				//電卓処理関連
 				const deposit = ref(0)
 				const oturi = computed(() =>{//おつりの計算
-					return deposit.value - pay.value
+					return Number(deposit.value) - Number(pay.value)
 				})
 				const keydown = (e) => {//電卓ボタンの処理
 					console.log(e.target.innerHTML)
