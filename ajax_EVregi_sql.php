@@ -178,18 +178,20 @@ try{
 		$i=0;
 		foreach($result as $row){
 			$chouseigaku = $_POST["CHOUSEI_GAKU"] - $row["total"];
+			/*
 			echo "売上合計:".$row["total"]."<br>";
 			echo "調整売上:".$_POST["CHOUSEI_GAKU"]."<br>";
 			
 			echo $chouseigaku."<br>";
+			*/
 			$chousei_hon = bcdiv(bcmul($chouseigaku , bcdiv($row["uriage"] , $row["total"],5),5),$row["zei_per"],0);//調整額×税率割合÷消費税率
 			$chousei_zei = bcsub(bcmul($chouseigaku , bcdiv($row["uriage"] , $row["total"],5),5) ,$chousei_hon,0);
 			
 			$goukei=$goukei+$chousei_hon+$chousei_zei;
-			
+			/*
 			echo $chousei_hon."<br>";
 			echo $chousei_zei."<br>";
-			
+			*/
 			$sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)";
 			$sqllog = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime) ";
 			$sqllog = $sqllog."values('".$_SESSION['user_id']."','".$UriageNO."','".$_POST["KEIJOUBI"]."','".$time."','".$_POST["EV"]."','".$_POST["KOKYAKU"]."','".(9999-$i)."','割引・割増:税率".(($row["zei_per"]-1)*100)."%分',0,0,0,'".$chousei_hon."','".$chousei_zei."','".$row["ZEIKBN"]."',0)";

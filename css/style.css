@@ -11,8 +11,17 @@ font-family: 'Zen Kurenaido', sans-serif;　日本語あり　今使ってる
 	font-family: 'Zen Kurenaido';
 	src: url('ZenKurenaido-Regular.ttf');
 }
+@font-face {
+	font-family: 'BIZUDGothic-Bold';
+	src: url('BIZUDGothic-Bold.ttf');
+}
+@font-face {
+	font-family: 'BIZUDGothic-Regular';
+	src: url('BIZUDGothic-Regular.ttf');
+}
 :root {
-		--main-font:'Zen Kurenaido', sans-serif;
+		/*--main-font:'Zen Kurenaido', sans-serif;*/
+		--main-font: 'BIZUDGothic-Regular',sans-serif;
 		--tour-font:sans-serif;
 		--table-font:sans-serif;
 }

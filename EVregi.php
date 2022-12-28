@@ -119,51 +119,30 @@
 	<?php
 	//共通部分、bootstrap設定、フォントCND、ファビコン等
 	//include "head.html"
-	include "head_bs5.html"
+	include 'head_bs5.html'
 	?>
 	<!--ページ専用CSS-->
-	<link rel="stylesheet" href="css/style_EVregi.css?<?php echo $time; ?>" >
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
-	<TITLE><?php echo $title." レジ";?></TITLE>
+	<link rel='stylesheet' href='css/style_EVregi.css?<?php echo $time; ?>' >
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js'></script>
+	<TITLE><?php echo $title.' レジ';?></TITLE>
 </head>
 
-<script>
-//フッター合計支払金額を保持
-window.onload = function() {
-	//調整額入力エリア
-	var CHOUSEI = document.getElementById("CHOUSEI");
-	var CHOUSEI_GAKU = document.getElementById("CHOUSEI_GAKU");
-
-	CHOUSEI_BTN.onclick = function(){
-		CHOUSEI_BTN.style.display = 'none';
-		CHOUSEI.style.display = 'block';
-		maekin.innerHTML = total_pay_bk.toLocaleString();
-	}
-	CHOUSEI_GAKU.onchange = function(){
-		total_pay = CHOUSEI_GAKU.value;
-		kaikei_disp.innerHTML = Number(total_pay).toLocaleString();
-	}
-
-
-};//window.onload
-
-</script>
 <body>
 	<div  id='register'>
-	<form method = "post" id="form1" @submit.prevent='on_submit'>
-		<input v-model='csrf' type="hidden" name="csrf_token" >
-		<input type="hidden" name="mode" value='<?php echo $RG_MODE;?>'> <!--レジor個別売上or在庫登録-->
+	<form method = 'post' id='form1' @submit.prevent='on_submit'>
+		<input v-model='csrf' type='hidden' name='csrf_token' >
+		<input type='hidden' name='mode' value='<?php echo $RG_MODE;?>'> <!--レジor個別売上or在庫登録-->
 	
-		<header class="header-color common_header" style='display:block'>
-			<div class="title yagou"><a href="menu.php"><?php echo $title;?></a></div>
+		<header class='header-color common_header' style='display:block'>
+			<div class='title yagou'><a href='menu.php'><?php echo $title;?></a></div>
 			<span class='item_1'>
 			<span style='color:var(--user-disp-color);font-weight:400;'>
-			<?php if($RG_MODE=="shuppin_zaiko"){echo "出店日：";}else{echo "売上日：";}?>
-			</span><input type='date' class='date' style='height:20%' name='KEIJOUBI' required="required" value='<?php if($RG_MODE<>"shuppin_zaiko"){echo (string)date("Y-m-d");} ?>'>
+			<?php if($RG_MODE=='shuppin_zaiko'){echo "出店日：";}else{echo "売上日：";}?>
+			</span><input type='date' class='date' style='height:20%' name='KEIJOUBI' required='required' value='<?php if($RG_MODE<>"shuppin_zaiko"){echo (string)date("Y-m-d");} ?>'>
 			</span>
 			<?php
 			{
-				if($RG_MODE=="kobetu"){
+				if($RG_MODE=='kobetu'){
 					echo "<input type='text' class='ev' name='KOKYAKU' required='required' placeholder='顧客名'>\n";
 					echo "<input type='hidden' name='EV' value=''>\n";
 				}else{
@@ -227,21 +206,31 @@ window.onload = function() {
 				<template v-if='MSG!==""'>
 					<div v-bind:class='alert_status' role='alert'>{{MSG}}</div>
 				</template>
-				<div class='item_11 item_12'>
-					<div class="row text-center" style='padding-top:5px;display:none;' id='CHOUSEI_AREA'>
+				<div class='accordion item_11 item_12' id="accordionExample">
+					<div v-if='chk_register_show==="register"' class='row' style='padding-top:5px;'>
 						<hr>
-						<div>
-							<button type='button' class='btn-view btn-changeVal ' style="padding:0.1rem;width:300px;font-size:2.2rem;" id="CHOUSEI_BTN" >割引・割増</button>
+						<div class='accordion-item'>
+							<h2 class='accordion-header' id='headingOne'>
+								<button type='button' class='accordion-button collapsed' style='font-size:2.2rem;' data-bs-toggle='collapse' data-bs-target='#collapseOne' aria-expanded='false' aria-controls='collapseOne'>
+									割引・割増
+								</button>
+							</h2>
+							<div id='collapseOne' class='accordion-collapse collapse' aria-labelledby='headingOne' data-bs-parent='#accordionExample'>
+					      <div class='accordion-body'>
+									<div class='row'>
+										<div class='col-1 col-md-0' ></div>
+										<div class='col-10 col-md-7' >
+											<p>お会計額：￥{{pay}}</p>
+											<label for='CHOUSEI_GAKU' class='form-label'>変更後お会計額</label>
+											<input type='number' class='form-control order tanka' 
+											style='font-size:2.2rem;width:100%;border:solid;border-top:none;border-right:none;border-left:none;' name='CHOUSEI_GAKU' id='CHOUSEI_GAKU'>
+										<br>
+										</div>
+										<div class='col-1' ></div>
+									</div>
+      					</div>
+    					</div>
 						</div>
-					</div>
-					<div class="row" style="display:none" id="CHOUSEI">
-						<div class="col-1 col-md-0" ></div>
-						<div class="col-10 col-md-7" style="font-size:2.2rem;">
-							お会計額：￥<span id="maekin">0</span> ⇒
-							<input type="number" placeholder="変更後の金額を入力。" class='order tanka' style=" width:100%;border:solid;border-top:none;border-right:none;border-left:none;" name="CHOUSEI_GAKU" id="CHOUSEI_GAKU">
-							<br>
-						</div>
-						<div class="col-1" ></div>
 					</div>
 				</div><!--割引処理-->
 				<hr>
@@ -382,7 +371,7 @@ window.onload = function() {
 					</div>
 				</div>
 				<div class='modal-footer' style='font-size:2.5rem;font-weight:600;'>
-					合計：<?php echo return_num_disp($Goukei); ?> 円
+					合計：{{total_uriage}} 円
 				</div>
 			</div>
 		</div>
@@ -422,6 +411,14 @@ window.onload = function() {
 															))
 					.catch((error) => console.log(`get_shouhinMS ERROR:${error}`));
 				}//商品マスタ取得ajax
+
+				const total_uriage = computed(() =>{
+					let sum_uriage = 0
+					UriageList.value.forEach((list) => {
+						sum_uriage += Number(list.ZeikomiUriage)
+					})
+					return sum_uriage
+				})
 
 				const shouhinMS_filter = computed(() => {//商品パネルのソート・フィルタ
 					let order_panel = ([])
@@ -572,31 +569,13 @@ window.onload = function() {
 					UriageList,
 					disp_category,
 					panel_changer,
+					total_uriage,
 				}
 			}
 		}).mount('#register');
 
 	</script><!--Vue3-->
 	<script>
-		$('a[href*="#"]').click(function () {//全てのページ内リンクに適用させたい場合はa[href*="#"]のみでもOK
-			var elmHash = $(this).attr('href'); //ページ内リンクのHTMLタグhrefから、リンクされているエリアidの値を取得
-			var pos = $(elmHash).offset().top-145;	//idの上部の距離を取得
-			$('body,html').animate({scrollTop:pos}, 500); //取得した位置にスクロール。500の数値が大きくなるほどゆっくりスクロール
-			return false;
-		});
-	
-		$(function () {
-			$('select').change(function () {
-			var speed = 400;
-			var href = $(this).val();
-			var target = $(href == "#" || href == "" ? 'html' : href);
-			//var position = target.offset().top-100;
-			var position = target.offset().top-145;
-			$('body,html').animate({scrollTop:position}, speed, 'swing');
-			return false;
-			});
-		});
-	
 		// Enterキーが押された時にSubmitされるのを抑制する
 		document.getElementById("form1").onkeypress = (e) => {
 			// form1に入力されたキーを取得
@@ -667,8 +646,8 @@ window.onload = function() {
 <script src="shepherd/shepherd.min.js?<?php echo $time; ?>"></script>
 <link rel="stylesheet" href="shepherd/shepherd.css?<?php echo $time; ?>"/>
 <?php require "ajax_func_tourFinish.php";?>
-<script>
-	//チュートリアル
+<script>//チュートリアル
+	
 	const TourMilestone = '<?php echo $_SESSION["tour"];?>';
 
 	const tutorial_5 = new Shepherd.Tour({
@@ -1403,34 +1382,6 @@ window.onload = function() {
 	}
 
 </script><!--天気機能リリースヘルプ（次回機能リリース時は不要となる）-->
-<script>
-	/*
-	function postFormRG(url,mode,CTGL) {
-
-		var form = document.createElement('form');
-		var request_mode = document.createElement('input');
-		var request_CTGL = document.createElement('input');
-
-		form.method = 'POST';
-		form.action = url;
-
-		request_mode.type = 'hidden'; //入力フォームが表示されないように
-		request_mode.name = 'mode';
-		request_mode.value = mode;
-
-		request_CTGL.type = 'hidden'; //入力フォームが表示されないように
-		request_CTGL.name = 'CTGL';
-		request_CTGL.value = CTGL;
-
-		form.appendChild(request_mode);
-		form.appendChild(request_CTGL);
-		document.body.appendChild(form);
-
-		form.submit();
-
-	}
-	*/
-</script>
 <script>
 	/*ジオ・コーディング*/
 	/** 変換表を入れる場所 */
