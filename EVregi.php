@@ -124,6 +124,8 @@
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_EVregi.css?<?php echo $time; ?>' >
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js'></script>
+	
+	
 	<TITLE><?php echo $title.' レジ';?></TITLE>
 </head>
 
@@ -163,7 +165,7 @@
 			?>
 			<div class='address_disp' style='<?php echo $dispnone; ?> position:fixed;top:55px;right:5px;color:var(--user-disp-color);max-width:50%;height:15px;'>
 				<input type='checkbox' name='nonadd' id='nonadd' onclick='gio_onoff()' <?php echo $_SESSION["nonadd"].$checked; ?>>
-				<label for='nonadd' id='address_disp' class='item_101' title='' <?php if($_SESSION["nonadd"]=="checked"){echo "style='text-decoration:line-through;'";} ?> ><?php //echo $event_aria; ?></label>
+				<label for='nonadd' id='address_disp' class='item_101' title='' <?php if($_SESSION["nonadd"]=="checked"){echo "style='text-decoration:line-through;'";} ?> >{{vjusho}}</label>
 			</div>
 		</header>
 		<div class='header-select header-color' >
@@ -294,8 +296,8 @@
 				</div>
 			</div>
 		</footer>
-		<input type='hidden' name='lat' id='lat' value='<?php echo (empty($_COOKIE["lat"])?"":$_COOKIE["lat"]); ?>'>
-		<input type='hidden' name='lon' id='lon' value='<?php echo (empty($_COOKIE["lon"])?"":$_COOKIE["lon"]); ?>'>
+		<input type='hidden' name='lat' :value='vlat'>
+		<input type='hidden' name='lon' :value='vlon'>
 	</form>
 	<div class="loader-wrap" v-show='loader'>
 		<div class="loader">Loading...</div>
@@ -465,6 +467,7 @@
 					console.log('onMounted')
 					get_shouhinMS()
 					get_UriageList()
+					v_get_gio()
 				})
 
 				//オーダー処理関連
@@ -530,7 +533,6 @@
 						))
 				}
 
-				
 				//電卓処理関連
 				const deposit = ref(0)
 				const oturi = computed(() =>{//おつりの計算
@@ -545,6 +547,53 @@
 					}else{
 						deposit.value = Number(deposit.value.toString() + e.target.innerHTML.toString())
 					}
+				}
+
+				
+				//Gioコーディング
+				const vlat = ref('')		//緯度
+				const vlon = ref('')		//経度
+				const vjusho = ref('')
+				const v_get_gio = () =>{//緯度経度取得
+					console.log('exec get_gio')
+					let address = []
+					
+					const script = document.createElement('script');
+					script.src = 'https://maps.gsi.go.jp/js/muni.js';
+					document.body.insertAdjacentElement('afterEnd', script);
+
+					navigator.geolocation.getCurrentPosition(
+						geoLoc => {
+							vlat.value = geoLoc.coords.latitude
+							vlon.value = geoLoc.coords.longitude
+
+							axios
+							.get('https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress',{params:{lat:geoLoc.coords.latitude,lon:geoLoc.coords.longitude}})
+							.then((response) => (
+								address = response.data.results
+								,console.log(address)
+								// 変換表から都道府県などを取得
+								,muniData = GSI.MUNI_ARRAY[address.muniCd]
+								
+								// 都道府県コード,都道府県名,市区町村コード,市区町村名 に分割
+								,[prefCode, pref, muniCode, city] = muniData.split(',')
+								//${pref}${city}${data.lv01Nm}->県・市区町村・番地
+								// 画面に反映
+								,vjusho.value = `${city}${address.lv01Nm}`
+								/*
+								,address_disp.textContent = jusho.replace(/\s+/g, "")
+								,address_disp.title = jusho.replace(/\s+/g, "")
+								//address.value = `${city}${data.lv01Nm}`;
+
+
+								,jusho_es = escape(jusho.replace(/\s+/g, ""))								
+								*/
+								))
+							.catch((error) => console.log(`get_gio ERROR:${error}`))
+						},
+						err => console.error({err}),
+					);
+
 				}
 
 				return{
@@ -570,6 +619,10 @@
 					disp_category,
 					panel_changer,
 					total_uriage,
+					vlat,
+					vlon,
+					vjusho,
+					//v_get_gio,
 				}
 			}
 		}).mount('#register');
@@ -589,7 +642,6 @@
 		}
 	</script><!--js-->
 </body>
-
 
 <!--分類表示切替のヘルプ(modal_help1)-->
 <div class='modal fade' id='modal_help1' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
@@ -1391,103 +1443,7 @@
 	let limit = today.toGMTString();
 	//let address = '';
 
-	const latEle = document.querySelector('#lat');
-	const lonEle = document.querySelector('#lon');
-	const addressEle = document.querySelector('#address');
-	const address_disp = document.querySelector('#address_disp');
-	const gio_exec = document.querySelector('#gio_exec');
 
-	let return_jusho = $.cookie('address',unescape);
-	//console.log("起動時クッキー：" + return_jusho);
-	/*
-	* 緯度経度を画面表示
-	*/
-	const setGeoLoc = (coords) => {
-		latEle.value = `${coords.latitude}`;
-		lonEle.value = `${coords.longitude}`;
-		document.cookie = `lat=${coords.latitude};expires=${limit};Secure; `;
-		document.cookie = `lon=${coords.longitude};expires=${limit};Secure; `;
-		//alert(`緯度: ${coords.latitude}` + "/" + `経度: ${coords.longitude}`);
-	}
-	/*
-	* 緯度経度から住所を取得して表示
-	*/
-	const getAddress = async (coords) => {
-		// 逆ジオコーディング API
-		const url = new URL('https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress');
-		url.searchParams.set('lat', coords.latitude);
-		url.searchParams.set('lon', coords.longitude);
-		const res = await fetch(url.toString());
-		const json = await res.json();
-		const data = json.results;
-
-		// 変換表から都道府県などを取得
-		const muniData = GSI.MUNI_ARRAY[json.results.muniCd];
-		// 都道府県コード,都道府県名,市区町村コード,市区町村名 に分割
-		const [prefCode, pref, muniCode, city] = muniData.split(',');
-		//${pref}${city}${data.lv01Nm}->県・市区町村・番地
-		// 画面に反映
-		let jusho = `${city}${data.lv01Nm}`;
-		address_disp.textContent = jusho.replace(/\s+/g, "");
-		address_disp.title = jusho.replace(/\s+/g, "");
-		//address.value = `${city}${data.lv01Nm}`;
-
-
-		let jusho_es = escape(jusho.replace(/\s+/g, ""));
-
-		$.cookie('address',jusho_es,{secure: true,expires :0.5})
-	};
-	/*
-	* 位置情報 API の実行(イベントリスナ)
-	*/
-	let get_gio = function (){
-		console.log('[EXEC Gio]')
-		<?php
-		if(EXEC_MODE=='Test'){ echo "gio_exec.textContent='[EXEC Gio]';";}
-		if(EXEC_MODE=='Local'){ echo "gio_exec.textContent='[EXEC Gio]';";}
-		?>
-		<?php
-		if(EXEC_MODE<>'Trial'){
-		?>
-		navigator.geolocation.getCurrentPosition(
-			geoLoc => {
-				setGeoLoc(geoLoc.coords);
-				getAddress(geoLoc.coords);
-			},
-			err => console.error({err}),
-		);
-		<?php
-		}else{
-			echo "address_disp.textContent = '東京都中央区（仮）';";
-			echo "latEle.value = 34.6816512;";
-			echo "lonEle.value = 135.4792960;";
-		}
-		?>
-	}
-
-	//住所が取得できてない場合はget_gioを実行
-	if(return_jusho == null){
-		get_gio();
-		address=address_disp.textContent;
-	}else{
-		address=return_jusho;
-		address_disp.textContent=return_jusho;
-	}
-
-	let gio_onoff = function(){
-		if(address_disp.style.textDecoration=='line-through'){
-			address_disp.style.textDecoration='';
-			gio_on.start(tourFinish,'','');
-		}else{
-			address_disp.style.textDecoration='line-through';
-			gio_off.start(tourFinish,'','');
-		}
-	}
-
-
-	const script = document.createElement('script');
-	script.src = 'https://maps.gsi.go.jp/js/muni.js';
-	document.body.insertAdjacentElement('afterEnd', script);
 
 	//GIO機能のオンオフ説明
 	const gio_on = new Shepherd.Tour({
