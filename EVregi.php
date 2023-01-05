@@ -124,8 +124,6 @@
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_EVregi.css?<?php echo $time; ?>' >
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js'></script>
-	
-	
 	<TITLE><?php echo $title.' レジ';?></TITLE>
 </head>
 
@@ -278,6 +276,7 @@
 					<div class='col-12 kaikei'>
 						<span style='font-size:1.6rem;'>お会計</span> ￥<span id='kaikei'> {{ pay }} </span>- <span style='font-size:1.6rem;'>内税</span>(<span id='utizei'>{{kaikei_zei}}</span>)
 					</div>
+					<span @click='v_get_gio'>btn</span>
 				</div>
 				<div class='row' style='height:60px;'>
 					<div class='col-4' style='padding:0;'>
@@ -558,9 +557,6 @@
 					console.log('exec get_gio')
 					let address = []
 					
-					const script = document.createElement('script');
-					script.src = 'https://maps.gsi.go.jp/js/muni.js';
-					document.body.insertAdjacentElement('afterEnd', script);
 
 					navigator.geolocation.getCurrentPosition(
 						geoLoc => {
@@ -622,7 +618,7 @@
 					vlat,
 					vlon,
 					vjusho,
-					//v_get_gio,
+					v_get_gio,
 				}
 			}
 		}).mount('#register');
@@ -640,6 +636,11 @@
 				e.preventDefault();
 			}
 		}
+		/*
+		const script = document.createElement('script');
+		script.src = 'https://maps.gsi.go.jp/js/muni.js';
+		document.body.insertAdjacentElement('afterEnd', script);
+		*/
 	</script><!--js-->
 </body>
 
@@ -1501,6 +1502,7 @@
 
 
 </script><!--ジオコーディング-->
+<script src="https://maps.gsi.go.jp/js/muni.js"></script>
 </html>
 <?php
 
