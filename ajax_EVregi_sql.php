@@ -21,6 +21,7 @@ $msg[0] = array(
 */
 
 //cookie:postのチェックのみ
+
 require "php_header.php";
 
 
@@ -29,11 +30,14 @@ function shutdown(){
   // スクリプトの処理が完了する前に
   // ここで何らかの操作をすることができます
 	$lastError = error_get_last();
-	log_writer("ajax_EVregi_sql.php",$lastError);
+	
 	if($lastError!==null){
 		log_writer("ajax_EVregi_sql.php","shutdown");
 		log_writer("ajax_EVregi_sql.php",$lastError);
-		if(empty($msg)){
+		if(empty($GLOBALS["msg"])===true){
+			$emsg = $GLOBALS["emsg"]."/UriNO::".$GLOBALS["UriageNO"]."　uid::".$_SESSION['user_id']." ERROR_MESSAGE::予期せぬエラー".$lastError['message'];
+			send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
+		
 			$token = csrf_create();
 			$msg[0] = array(
 				"EMSG" => "登録が失敗しました。再度実行してもエラーとなる場合は、ご迷惑をおかけしますが復旧までお待ちください。<br>".$lastError['message']
@@ -45,6 +49,7 @@ function shutdown(){
 		}
 	}
 }
+
 register_shutdown_function('shutdown');
 
 
@@ -95,6 +100,7 @@ if(!empty($_POST)){
 }
 
 $token = csrf_create();
+
 $E_Flg=0;
 $emsg="";
 $ins_cnt=0;
@@ -292,7 +298,6 @@ try{
 			}
 		   
 		}
-		//exit();
 	}
 	
 	//位置情報、天気情報の付与（uid,売上No,緯度、経度、住所、天気、気温、体感温度、天気アイコンping,無効FLG,insdate,update）
@@ -344,7 +349,7 @@ try{
 
 		$stmt = null;
 		$pdo_h = null;
-		exit();
+		exit();//success!
 	}else{
 		//1件でも失敗したらロールバック
 		$pdo_h->rollBack();
@@ -363,7 +368,6 @@ try{
 	$E_Flg=1;
 	$stmt = null;
 	$pdo_h = null;
-	//exit();
 }catch(Throwable $t){
 	$pdo_h->rollBack();
 	$emsg = $emsg."/レジ登録でFATAL ERRORをCATHCしました。：".$t->getMessage();
@@ -374,7 +378,6 @@ try{
 }
 
 if($E_Flg==1){
-	//$_SESSION["msg"]= "登録が失敗しました。再度実行してもエラーとなる場合は、ご迷惑をおかけしますが復旧までお待ちください。エラーは管理者へ自動通知されました。";
 	$emsg = $emsg."/UriNO::".$UriageNO."　uid::".$_SESSION['user_id'];
 	send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
 
@@ -389,12 +392,13 @@ if($E_Flg==1){
 	$pdo_h = null;
 	
 	exit();
-	}
+}
 
 $stmt = null;
 $pdo_h = null;
 
 exit();
+
 
 ?>
 

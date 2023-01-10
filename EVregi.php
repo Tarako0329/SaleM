@@ -16,8 +16,10 @@
 	csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
 	*/
 	require "php_header.php";
-	$timeout=15000;//15秒でタイムアウト timeout60s => 60,000
-	if(EXEC_MODE!=="LOCAL"){$timeout=0;}
+	//php更新処理は15秒でタイムアウトする設定のため
+	//axiosの方は余裕を見て20秒でタイムアウトとする timeout60s => 60,000
+	$timeout=20000;
+	if(EXEC_MODE==="Local"){$timeout=0;}
 
 	$log_time = date("Y/m/d H:i:s");
 	//セッションのIDがクリアされた場合の再取得処理。
@@ -123,7 +125,7 @@
 	?>
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_EVregi.css?<?php echo $time; ?>' >
-	<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js'></script>
+	<!--<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js'></script>-->
 	<TITLE><?php echo $title.' レジ';?></TITLE>
 </head>
 
@@ -276,7 +278,6 @@
 					<div class='col-12 kaikei'>
 						<span style='font-size:1.6rem;'>お会計</span> ￥<span id='kaikei'> {{ pay }} </span>- <span style='font-size:1.6rem;'>内税</span>(<span id='utizei'>{{kaikei_zei}}</span>)
 					</div>
-					<span @click='v_get_gio'>btn</span>
 				</div>
 				<div class='row' style='height:60px;'>
 					<div class='col-4' style='padding:0;'>
@@ -380,7 +381,7 @@
 
 	</div>
 	<script>
-		const { createApp, ref, onMounted, computed } = Vue;
+		const { createApp, ref, onMounted, computed, VueCookies } = Vue;
 		createApp({
 			setup(){
 				//売上取得関連
@@ -392,7 +393,7 @@
 					axios
 					.post('ajax_get_Uriage.php',params)
 					.then((response) => (UriageList.value = [...response.data]
-															,console.log('get_UriageList succsess')
+															//,console.log('get_UriageList succsess')
 															))
 					.catch((error) => console.log(`get_UriageList ERROR:${error}`));
 				}//売上リスト取得ajax
@@ -408,7 +409,7 @@
 					axios
 					.post('ajax_get_ShouhinMS.php',params)
 					.then((response) => (shouhinMS.value = [...response.data]
-															,console.log('get_shouhinMS succsess')
+															//,console.log('get_shouhinMS succsess')
 															))
 					.catch((error) => console.log(`get_shouhinMS ERROR:${error}`));
 				}//商品マスタ取得ajax
@@ -507,29 +508,39 @@
 				const MSG = ref('')
 				const loader = ref(false)
 				const csrf = ref('<?php echo $token; ?>')
-				const on_submit = (e) => {//登録・submit
-					loader.value = true
+
+				const on_submit = (e) => {//登録・submit/
 					console.log('on_submit start')
+					loader.value = true
+					v_get_gio()	//住所再取得
 					//console.log(e.target)
 					let form_data = new FormData(e.target)
 					let params = new URLSearchParams (form_data)
+					
 					axios
 						.post('ajax_EVregi_sql.php',params,{timeout: <?php echo $timeout; ?>}) //php側は15秒でタイムアウト
-						.then((response) => (console.log(`on_submit succsess`)
-											,console.log(response.data)
-											,MSG.value = response.data[0].EMSG
-											,alert_status.value[1]=response.data[0].status
-											,loader.value = false
-											,reset_order()
-											,btn_changer('chk')
-											,csrf.value = response.data[0].csrf_create
-											,get_UriageList()
-						))
-						.catch((error) => (console.log(`on_submit ERROR:${error}`)
-											,loader.value = false
-											,MSG.value = error
-											,alert_status.value[1]='alert-danger'
-						))
+						.then((response) => {
+							console.log(`on_submit SUCCESS`)
+							//console.log(response.data)
+							MSG.value = response.data[0].EMSG
+							alert_status.value[1]=response.data[0].status
+							csrf.value = response.data[0].csrf_create
+
+							if(response.data[0].status==='alert-success'){
+								reset_order()
+								btn_changer('chk')
+							}
+						})
+						.catch((error) => {
+							console.log(`on_submit ERROR:${error}`)
+							MSG.value = error.response.data[0].EMSG
+							csrf.value = error.response.data[0].csrf_create
+							alert_status.value[1]='alert-danger'
+						})
+						.finally(()=>{
+							get_UriageList()
+							loader.value = false
+						})
 				}
 
 				//電卓処理関連
@@ -538,7 +549,7 @@
 					return Number(deposit.value) - Number(pay.value)
 				})
 				const keydown = (e) => {//電卓ボタンの処理
-					console.log(e.target.innerHTML)
+					//console.log(e.target.innerHTML)
 					if(e.target.innerHTML==="C"){
 						deposit.value = 0
 					}else if(e.target.innerHTML==="ちょうど"){
@@ -547,16 +558,14 @@
 						deposit.value = Number(deposit.value.toString() + e.target.innerHTML.toString())
 					}
 				}
-
 				
 				//Gioコーディング
 				const vlat = ref('')		//緯度
 				const vlon = ref('')		//経度
 				const vjusho = ref('')
 				const v_get_gio = () =>{//緯度経度取得
-					console.log('exec get_gio')
+					console.log('get_gio start')
 					let address = []
-					
 
 					navigator.geolocation.getCurrentPosition(
 						geoLoc => {
@@ -567,23 +576,17 @@
 							.get('https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress',{params:{lat:geoLoc.coords.latitude,lon:geoLoc.coords.longitude}})
 							.then((response) => (
 								address = response.data.results
-								,console.log(address)
+								//,console.log(address)
 								// 変換表から都道府県などを取得
 								,muniData = GSI.MUNI_ARRAY[address.muniCd]
 								
 								// 都道府県コード,都道府県名,市区町村コード,市区町村名 に分割
 								,[prefCode, pref, muniCode, city] = muniData.split(',')
 								//${pref}${city}${data.lv01Nm}->県・市区町村・番地
-								// 画面に反映
-								,vjusho.value = `${city}${address.lv01Nm}`
-								/*
-								,address_disp.textContent = jusho.replace(/\s+/g, "")
-								,address_disp.title = jusho.replace(/\s+/g, "")
-								//address.value = `${city}${data.lv01Nm}`;
+								,vjusho.value = (`${city}${address.lv01Nm}`).replace(/\s+/g, "")
 
 
-								,jusho_es = escape(jusho.replace(/\s+/g, ""))								
-								*/
+								//,jusho_es = escape(jusho.replace(/\s+/g, ""))								
 								))
 							.catch((error) => console.log(`get_gio ERROR:${error}`))
 						},
@@ -1442,7 +1445,7 @@
 	let today = new Date();
 	today.setTime(today.getTime() + 10*60*60*1000);
 	let limit = today.toGMTString();
-	//let address = '';
+	let address = '';
 
 
 
