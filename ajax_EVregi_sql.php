@@ -22,7 +22,37 @@ $msg[0] = array(
 
 //cookie:postのチェックのみ
 require "php_header.php";
-if(EXEC_MODE!=="Local")ini_set("max_execution_time",15);//タイムアウトの設定(15s)
+
+
+function shutdown(){
+  // これがシャットダウン関数で、
+  // スクリプトの処理が完了する前に
+  // ここで何らかの操作をすることができます
+	$lastError = error_get_last();
+	log_writer("ajax_EVregi_sql.php",$lastError);
+	if($lastError!==null){
+		log_writer("ajax_EVregi_sql.php","shutdown");
+		log_writer("ajax_EVregi_sql.php",$lastError);
+		if(empty($msg)){
+			$token = csrf_create();
+			$msg[0] = array(
+				"EMSG" => "登録が失敗しました。再度実行してもエラーとなる場合は、ご迷惑をおかけしますが復旧までお待ちください。<br>".$lastError['message']
+				,"status" => "alert-danger"
+				,"csrf_create" => $token
+			);
+			header('Content-type: application/json');
+			echo json_encode($msg, JSON_UNESCAPED_UNICODE);
+		}
+	}
+}
+register_shutdown_function('shutdown');
+
+
+//タイムアウトの設定(15s)タイムアウト時もcommit前のSQLは無効
+//メモ：pdoはプログラムが予期せず終了した場合、自動的にロールバック処理を行うようになっている
+if(EXEC_MODE!=="Local")ini_set("max_execution_time",15);
+//ini_set("max_execution_time",1); 
+
 
 $time = date("Y/m/d H:i:s");
 $rtn=check_session_userid($pdo_h);
