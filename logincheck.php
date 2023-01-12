@@ -6,6 +6,7 @@ require "./vendor/autoload.php";
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
+define("EXEC_MODE",$_ENV["EXEC_MODE"]);
 
 $rtn=session_set_cookie_params(24*60*60*24*3,'/','.'.MAIN_DOMAIN,true);
 if($rtn==false){
@@ -13,12 +14,15 @@ if($rtn==false){
     exit();
 }
 session_start();
-session_regenerate_id(true);
+if(EXEC_MODE!=="Local"){
+    session_regenerate_id(true);
+}
 
 $pass=dirname(__FILE__);
 require "functions.php";
-//log_writer("logincheck.php MAIN_DOMAIN ",MAIN_DOMAIN);
-//log_writer("logincheck.php _SESSION values ",$_SESSION);
+log_writer("logincheck.php MAIN_DOMAIN ",MAIN_DOMAIN);
+log_writer("logincheck.php _SESSION values ",$_SESSION);
+log_writer("logincheck.php _POST values ",$_POST);
 //exit();
 
 define("DNS","mysql:host=".$_ENV["SV"].";dbname=".$_ENV["DBNAME"].";charset=utf8");
@@ -35,28 +39,28 @@ $auto = "";
 
 $csrf_token = "";
 $cookie_token="";
-if(!empty($_COOKIE['webrez_token'])){
-    $cookie_token = $_COOKIE['webrez_token'];
-}
 
-if(!empty($_POST)){
+//自動ログイン情報の取得
+//$login_type="";
+$login_type = (!empty($_COOKIE["login_type"])?$_COOKIE["login_type"]:"normal");
+
+if(!empty($_COOKIE['webrez_token']) && $login_type==="auto"){
+    $cookie_token = $_COOKIE['webrez_token'];
+}else if(!empty($_POST)){
     $mail_id = $_POST['LOGIN_EMAIL'];
     $password = $_POST['LOGIN_PASS'];
     $auto = $_POST['AUTOLOGIN'];
     
     $csrf_token = $_POST['csrf_token'];
-}
-if(!empty($_GET)){
-    $mail_id = $_SESSION["MAIL"];
-    $password = $_SESSION["MOTO_PASS"];
-    //$auto = $_GET['AUTOLOGIN'];
-    
-    $csrf_token = $_GET['csrf_token'];
+}else{
+    echo "不正アクセス。処理を中止します。";
+    exit();
 }
 
 //CSRF チェック
-if (empty($cookie_token) && $csrf_token != $_SESSION['csrf_token']) {
-    //クッキートークンがNULLかつPOSTトークン≠セッショントークンの場合、ログイン画面へ
+//if (empty($cookie_token) && $csrf_token != $_SESSION['csrf_token']) {
+if ($login_type==="normal" && $csrf_token != $_SESSION['csrf_token']) {
+    //通常ログインかつPOSTトークン≠セッショントークンの場合、ログイン画面へ
 	$_SESSION = array();
 	session_destroy();
 	session_start();
@@ -73,22 +77,19 @@ try {
 	// DBとの接続
 	$pdo = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
-	//簡易ログイン①②
-	if (empty($cookie_token)) {
-	    //ログイン画面からログインしたらセッション再作成
+	//if (empty($cookie_token)) {
+    if ($login_type==="normal") {
+        //ログイン画面からログインしたらセッション再作成
         $_SESSION['user_id']="";
-
+        setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly
         $id = check_user($mail_id, $password, $pdo, $key);
         if ($id<>false) {
 		    $normal_result = true;
 	        $_SESSION['user_id']=$id;
-    	    //echo "通った:".$id.":".$auto;
-		    //exit;
 		}else{
 		    $_SESSION["EMSG"]="メールアドレス、又はパスワードが無効です。";
-		    //echo "だめだった";
-		    //exit;
 		}
+        
 	}else{
 		if (check_auto_login($cookie_token, $pdo)) {
 		    $auto_result = true;
@@ -96,18 +97,14 @@ try {
 		}
 	}
 
-    
+    $token = get_token();   //トークンの作成
+
     if (($normal_result && $auto == "on") || $auto_result) {
-    //トークン生成処理(通常ログイン画面で自動ONにしてログインした、もしくは自動ログイン機能でログインした場合)
-        
-    	//トークンの作成
-    	$token = get_token();
-        
-    	//トークンの登録
-    	register_token($id, $token, $pdo);
+        //通常ログイン画面で自動ONにしてログインした、もしくは自動ログイン機能でログインした場合
+    	register_token($id, $token, $pdo);  //トークンの登録
     
-    	//自動ログインのトークンを１週間の有効期限でCookieにセット
     	setCookie("webrez_token", $token, time()+60*60*24*7, "/", "", TRUE, TRUE); // secure, httponly
+        setCookie("login_type", "auto", time()+60*60*24*7, "/", "", TRUE, TRUE); // secure, httponly
     
     	if ($auto_result) {
     	 //古いトークンの削除
@@ -118,10 +115,14 @@ try {
     	redirect_to_welcome(get_top($id, $pdo));
     	exit();
     } else if ($normal_result) {
-    	// リダイレクト
+    	//通常ログイン成功（自動ログインなし）
+        //トップ画面へ
+    	//setCookie("webrez_token", $token, time()+60*60*24*7, "/", "", TRUE, TRUE); // secure, httponly
+        setCookie("login_type", "normal", time()+60*60*24*7, "/", "", TRUE, TRUE); // secure, httponly
+        log_writer("logincheck.php _SESSION values ",$_SESSION);
     	redirect_to_welcome(get_top($id, $pdo));
     } else {
-    	// リダイレクト
+    	//ログイン失敗。ログイン画面へ
     	redirect_to_login();
     	exit();
     }
@@ -154,29 +155,10 @@ function check_user($mail_id, $password, $pdo,$key) {
     }
 }
 
-function get_top($id, $pdo){
-    //ログイン後の表示画面を返す
-    $sql = "select uid,loginrez from Users where uid=?;";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(1, $id, PDO::PARAM_STR);
-    $stmt->execute();
-    
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if ($row['loginrez'] == "on") {
-        return "EVregi.php?mode=evrez";
-    }else{
-        return "menu.php";
-    }
-    
-}
-
-
 /*
 * トークンの登録
 */
 function register_token($id, $token, $pdo) {
-    //プレースホルダで SQL 作成
     $sql = "INSERT INTO AUTO_LOGIN ( USER_ID, TOKEN, REGISTRATED_TIME) VALUES (?,?,?);";
     // 現在日時を取得
     $date = date('Y-m-d H:i:s');
@@ -201,6 +183,20 @@ function redirect_to_login() {
 /*
 * Welcome画面へのリダイレクト
 */
+function get_top($id, $pdo){
+    //ログイン後の表示画面を返す
+    $sql = "select uid,loginrez from Users where uid=?;";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(1, $id, PDO::PARAM_STR);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($row['loginrez'] == "on") {
+        return "EVregi.php?mode=evrez";
+    }else{
+        return "menu.php";
+    }
+}
 function redirect_to_welcome($a) {
     $_SESSION["status"]="login_redirect";
     header("HTTP/1.1 301 Moved Permanently");

@@ -5,12 +5,13 @@ if(EXEC_MODE=="Trial"){
         header("Location: menu.php");
         exit();
 }
-$_SESSION['csrf_token'] = get_token(); // CSRFのトークンを取得する
-//トークンがセットされていたらリダイレクト
-if (isset($_COOKIE['webrez_token'])) {
-    //exit();
-    echo $_COOKIE['webrez_token'];
+//$_SESSION['csrf_token'] = get_token(); // CSRFのトークンを取得する
 
+//自動ログイン情報の取得
+$login_type = (!empty($_COOKIE["login_type"])?$_COOKIE["login_type"]:"normal");
+
+//if (isset($_COOKIE['webrez_token'])) {
+if ($login_type==="auto") {
     header("HTTP/1.1 301 Moved Permanently");
     header("Location: logincheck.php");
 }
@@ -62,7 +63,7 @@ if(isset($_SESSION["EMSG"])){
                 </div>
 
                 <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit"  >ロ グ イ ン</button>
-                <input type="hidden" name="csrf_token" value="<?php echo secho($_SESSION['csrf_token']) ?>">
+                <input type="hidden" name="csrf_token" value="<?php echo csrf_create() /*secho($_SESSION['csrf_token'])*/ ?>">
             </form><!-- /form -->
             <a href="forget_pass_sendurl.php" class="forgot-password">
                 ﾊﾟｽﾜｰﾄﾞを忘れたらｸﾘｯｸ

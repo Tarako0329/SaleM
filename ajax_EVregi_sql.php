@@ -24,7 +24,6 @@ $msg[0] = array(
 
 require "php_header.php";
 
-
 function shutdown(){
   // これがシャットダウン関数で、
   // スクリプトの処理が完了する前に
@@ -49,7 +48,6 @@ function shutdown(){
 		}
 	}
 }
-
 register_shutdown_function('shutdown');
 
 
@@ -63,7 +61,7 @@ $time = date("Y/m/d H:i:s");
 $rtn=check_session_userid($pdo_h);
 $logfilename="sid_".$_SESSION['user_id'].".log";
 
-if(EXEC_MODE=="Test")sleep(5);
+if(EXEC_MODE=="Test")sleep(2);
 if(EXEC_MODE=="Local")sleep(0);
 
 //リファイラーチェック
@@ -197,6 +195,7 @@ try{
 	}
 	
 	if($_POST["CHOUSEI_GAKU"]>0 && $E_Flg!=1){
+		$emsg=$emsg."/割引割増処理開始\n";
 		$sqlstr="SELECT ZeiMS.zeiKBN as ZEIKBN ,1+ZeiMS.zeiritu/100 as zei_per ,sum(UriageKin+Zei) as uriage,T.total ";
 		$sqlstr=$sqlstr."FROM UriageData Umei inner join ZeiMS on Umei.zeiKBN = ZeiMS.zeiKBN ";
 		$sqlstr=$sqlstr."inner join (select UriageNO,sum(UriageKin+Zei) as total from UriageData WHERE uid=? and UriageNO=? group by UriageNO) as T on Umei.UriageNO = T.UriageNO ";
@@ -302,6 +301,7 @@ try{
 	
 	//位置情報、天気情報の付与（uid,売上No,緯度、経度、住所、天気、気温、体感温度、天気アイコンping,無効FLG,insdate,update）
 	if(empty($_POST["nonadd"]) && $ins_cnt>0){
+		$emsg=$emsg."/位置情報、天気情報　処理開始\n";
 		$_SESSION["nonadd"]="";
 		$tenki=get_weather("insert",$_POST['lat'],$_POST['lon']);
 		//file_put_contents("sql_log/".$logfilename,$time.",gio/weather :".$_POST['address']."/".$tenki[0]."/".$tenki[1]."/".$tenki[2]."\n",FILE_APPEND);
@@ -379,8 +379,11 @@ try{
 
 if($E_Flg==1){
 	$emsg = $emsg."/UriNO::".$UriageNO."　uid::".$_SESSION['user_id'];
-	send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
-
+	if(EXEC_MODE!=="Local"){
+		send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
+	}else{
+		log_writer2("ajax.EVreg_sql.php",$emsg,"lv3");
+	}
 	$msg[0] = array(
 		"EMSG" => "登録が失敗しました。再度実行してもエラーとなる場合は、ご迷惑をおかけしますが復旧までお待ちください。エラーは管理者へ自動通知されました。"
 		,"status" => "alert-danger"

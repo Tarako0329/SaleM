@@ -57,6 +57,7 @@ if($action=="logout"){
         setCookie(session_name(), '', -1, "/", '.'.MAIN_DOMAIN, TRUE, TRUE); 
     }
     setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); 
+    setCookie("login_type", "normal", time()+60*60*24*7, "/", "", TRUE, TRUE); // secure, httponly
 
     session_destroy();// 最終的に、セッションを破壊する
     $logoff=true;
@@ -144,10 +145,6 @@ if($action=="logout"){
     <link rel='stylesheet' href='css/style_menu.css?<?php echo $time; ?>' >
     <TITLE><?php echo $title;?></TITLE>
 </head>
-
-<script>
-</script>
-
 <header class='common_header header-color' style='display:block'>
     <?php
     if($logoff==false){

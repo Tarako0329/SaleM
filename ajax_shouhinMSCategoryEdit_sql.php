@@ -1,6 +1,5 @@
 <?php
 require "php_header.php";
-//log_writer("logincheck.php POST ",$_POST);
 
 $msg[0] = array(
     "EMSG" => "更新処理が実行されませんでした。"

@@ -21,38 +21,52 @@
 	$timeout=20000;
 	if(EXEC_MODE==="Local"){$timeout=0;}
 
-	$log_time = date("Y/m/d H:i:s");
-	//セッションのIDがクリアされた場合の再取得処理。
-	$rtn=check_session_userid($pdo_h);
-	$logfilename="sid_".$_SESSION['user_id'].".log";
-	//file_put_contents("sql_log/".$logfilename, $log_time.",REFERER:".$_SERVER['HTTP_REFERER']."\n", FILE_APPEND);
+	//log_writer2("EVregi.php _SESSION values ",$_SESSION,"lv3");
+	//log_writer2("EVregi.php _POST values ",$_POST,"lv3");
 
 	$status=(!empty($_SESSION["status"])?$_SESSION["status"]:"");
-	//$event_aria=(empty($_COOKIE["address"])?"":urldecode($_COOKIE["address"]));
-	//$event_aria="住所サンプル";
 	$_SESSION["status"]="";
 	$HTTP_REFERER=(empty($_SERVER['HTTP_REFERER'])?"":$_SERVER['HTTP_REFERER']);
 
+	/*レジ登録処理等、すべてを非同期通信で処理するようにしたため、チェック方法を変更
 	if(EXEC_MODE!=""){
-	//file_put_contents("sql_log/".$logfilename,$log_time.",cookie :".$_COOKIE['csrf_token']."\n",FILE_APPEND);
-	//file_put_contents("sql_log/".$logfilename,$log_time.",post   :".$_POST['csrf_token']."\n",FILE_APPEND);
-	//file_put_contents("sql_log/".$logfilename,$log_time.",session:".$_SESSION['csrf_token']."\n",FILE_APPEND);
-	//if(!empty($_POST)){
 		if(csrf_chk_nonsession()==false){//POST:COOKIEチェック
-			//if(!empty($status) && ROOT_URL."EVregi.php"==substr($_SERVER['HTTP_REFERER'],0,strlen(ROOT_URL."EvRegi.php"))){
 			if(!empty($status) && ROOT_URL."EVregi.php"==substr($HTTP_REFERER,0,strlen(ROOT_URL."EvRegi.php"))){
 				//リファイラが自身でかつstatusがセットされてる場合、問題なし
-			}else if($status=="longin_redirect"){
+				log_writer2("EVregi.php HTTP_REFERER values ",$HTTP_REFERER,"lv3");
+			}else if($status=="login_redirect"){
 				//$_SESSION["status"]="";
+				log_writer("EVregi.php  $status ",$status);
 			}else{
 				$_SESSION["EMSG"]="セッションが正しくありませんでした。".filter_input(INPUT_POST,"csrf_token");
+				log_writer2("EVregi.php","セッションが正しくありませんでした。","lv3");
 				header("HTTP/1.1 301 Moved Permanently");
 				header("Location: index.php");
 				exit();
 			}
+		}else{
+			log_writer2("EVregi.php","csrf_chk_nonsession clear","lv3");
 		}
 	}
+	*/
+	if(csrf_chk_nonsession()===false){//POST:COOKIEチェック
+		if($status=="login_redirect"){
+			//ログイン画面から直通でアクセス
+			log_writer("EVregi.php  $status ",$status);
+		}else{
+			$_SESSION["EMSG"]="セッションが正しくありませんでした。".filter_input(INPUT_POST,"csrf_token");
+			log_writer2("EVregi.php","セッションが正しくありませんでした。","lv3");
+			header("HTTP/1.1 301 Moved Permanently");
+			header("Location: index.php");
+			exit();
+		}
+	}else{
+		log_writer2("EVregi.php","csrf_chk_nonsession clear","lv3");
+	}
 
+	//セッションのuserIDがクリアされた場合の再取得処理。
+	$rtn=check_session_userid($pdo_h);
+	
 	//有効期限チェック
 	$sql="select yuukoukigen from Users where uid=?";
 	$stmt = $pdo_h->prepare($sql);
@@ -65,7 +79,6 @@
 		//お試し期間終了
 		$root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', 1));
 		$dir_path =  bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', 1));
-		//echo row[0]["yuukoukigen"] ;
 		$emsg="お試し期間、もしくは解約後有効期間が終了しました。<br>継続してご利用頂ける場合は<a href='".PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path."'>こちらから本契約をお願い致します </a>";
 	}
 
@@ -74,8 +87,7 @@
 	$alert_msg=(!empty($_SESSION["msg"])?$_SESSION["msg"]:"");
 	$RG_MODE=(!empty($_POST["mode"])?$_POST["mode"]:$_GET["mode"]);
 
-	if($RG_MODE==""){
-		file_put_contents("sql_log/".$logfilename,$log_time.",post   :".var_dump($_POST)."\n",FILE_APPEND);
+	if($RG_MODE===""){
 		echo "error rezi mode nothing!";
 		exit();
 	}
@@ -89,12 +101,11 @@
 		$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 		$stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
 		$stmt->bindValue(3, "EVregi.php", PDO::PARAM_STR);
-		$stmt->bindValue(4, "EV", PDO::PARAM_STR);//name属性を指定
+		$stmt->bindValue(4, "EV", PDO::PARAM_STR);
 		$stmt->execute();
 
 		if($stmt->rowCount()==0){
 			$event = "";
-			//deb_echo("NULL");
 		}else{
 			$buf = $stmt->fetch();
 			$date = new DateTime($buf["updatetime"]);
@@ -104,12 +115,9 @@
 			if($date->format('Y-m-d')!=date("Y-m-d")){
 				//イベントの日付が前日以前の場合はクリア
 				$event = "";
-				//deb_echo($buf["updatetime"]."<br>");
 			}else{
-				//$buf = $stmt->fetch();
 				$_SESSION["EV"] = $buf["value"];
 				$event = $buf["value"];
-				//deb_echo("DB".$event);
 			}
 		}
 	}
@@ -120,12 +128,10 @@
 <head>
 	<?php
 	//共通部分、bootstrap設定、フォントCND、ファビコン等
-	//include "head.html"
 	include 'head_bs5.html'
 	?>
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_EVregi.css?<?php echo $time; ?>' >
-	<!--<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js'></script>-->
 	<TITLE><?php echo $title.' レジ';?></TITLE>
 </head>
 
@@ -133,44 +139,27 @@
 	<div  id='register'>
 	<form method = 'post' id='form1' @submit.prevent='on_submit'>
 		<input v-model='csrf' type='hidden' name='csrf_token' >
-		<input type='hidden' name='mode' value='<?php echo $RG_MODE;?>'> <!--レジor個別売上or在庫登録-->
+		<input v-model='rg_mode' type='hidden' name='mode'> <!--レジor個別売上or在庫登録-->
+		<input type='hidden' :name='labels["EV_input_hidden"]' value=''>
 	
 		<header class='header-color common_header' style='display:block'>
 			<div class='title yagou'><a href='menu.php'><?php echo $title;?></a></div>
 			<span class='item_1'>
 			<span style='color:var(--user-disp-color);font-weight:400;'>
-			<?php if($RG_MODE=='shuppin_zaiko'){echo "出店日：";}else{echo "売上日：";}?>
-			</span><input type='date' class='date' style='height:20%' name='KEIJOUBI' required='required' value='<?php if($RG_MODE<>"shuppin_zaiko"){echo (string)date("Y-m-d");} ?>'>
+				{{labels['date_type']}}
 			</span>
-			<?php
-			{
-				if($RG_MODE=='kobetu'){
-					echo "<input type='text' class='ev' name='KOKYAKU' required='required' placeholder='顧客名'>\n";
-					echo "<input type='hidden' name='EV' value=''>\n";
-				}else{
-					echo "<input type='text' class='ev item_2' name='EV' value='". $event."' required='required' placeholder='イベント名等'>\n";
-					echo "<input type='hidden' name='KOKYAKU' value=''>\n";
-				}
-			
-				$_SESSION["nonadd"]=(!empty($_SESSION["nonadd"])?$_SESSION["nonadd"]:"");
-				if($RG_MODE!=="evrez"){
-					$dispnone="display:none;";
-					$checked="checked";
-				}else{
-					$dispnone="";
-					$checked="";
-					$_SESSION["nonadd"]="";
-				}
-			}
-			?>
-			<div class='address_disp' style='<?php echo $dispnone; ?> position:fixed;top:55px;right:5px;color:var(--user-disp-color);max-width:50%;height:15px;'>
-				<input type='checkbox' name='nonadd' id='nonadd' onclick='gio_onoff()' <?php echo $_SESSION["nonadd"].$checked; ?>>
-				<label for='nonadd' id='address_disp' class='item_101' title='' <?php if($_SESSION["nonadd"]=="checked"){echo "style='text-decoration:line-through;'";} ?> >{{vjusho}}</label>
+			<input type='date' class='date' style='height:20%' name='KEIJOUBI' required='required' v-model='labels["date_ini"]'>
+			</span>
+			<input type='text' class='ev' :name='labels["EV_input_name"]' v-model='labels["EV_input_value"]' required='required' :placeholder='labels["EV_input_placeholder"]'>
+			<div class='address_disp' :style='`${labels["address"]}; position:fixed;top:55px;right:5px;color:var(--user-disp-color);max-width:50%;height:15px;`'>
+				<input type='checkbox' name='nonadd' id='nonadd' v-model='labels_address_check'>
+				<label for='nonadd' id='address_disp' class='item_101' :style='labels_address_style'>{{vjusho}}</label>
 			</div>
 		</header>
 		<div class='header-select header-color' >
-			<select class='form-control item_16' style='font-size:1.2rem;padding:0;'> <!--width:80%;-->
+			<!--<select class='form-control item_16' style='font-size:1.2rem;padding:0;'> 
 				<option>カテゴリートップへ移動できます</option>
+				<option><a href='#jump_0'>TOP</a></option>
 				<?php {
 					$i=1;
 					foreach($shouhiMS_bunrui as $row){
@@ -178,7 +167,8 @@
 						$i++;
 					}
 				} ?>
-			</select>
+			</select>-->
+			<a href='#jump_0'>TOP</a>
 			<a href="#" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;' data-bs-toggle='modal' data-bs-target='#modal_help1'>
 				<i class="fa-regular fa-circle-question fa-lg logoff-color"></i>
 			</a>
@@ -235,7 +225,7 @@
 						</div>
 					</div>
 				</div><!--割引処理-->
-				<hr>
+				<hr id='jump_0'>
 				<div class='row item_3' id=''>
 					<template v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
 						<template v-if='index===0'>
@@ -379,7 +369,7 @@
 		</div>
 	</div>
 
-	</div>
+	</div><!-- <div  id='register'> -->
 	<script>
 		const { createApp, ref, onMounted, computed, VueCookies } = Vue;
 		createApp({
@@ -595,6 +585,46 @@
 
 				}
 
+				//細かな表示設定など
+				const rg_mode = ref('<?php echo $RG_MODE; ?>')	//レジモード
+				const labels_address_check = ref()
+				const labels = computed(() =>{
+					//let labels = []
+					let rtn_labels = {}
+					if(rg_mode.value !== 'shuppin_zaiko'){
+						rtn_labels={date_type:"売上日",date_ini:'<?php echo (string)date("Y-m-d");?>'}
+					}else{
+						rtn_labels={date_type:"出店日",date_ini:''}
+					}
+					if(rg_mode.value === 'kobetu'){
+						rtn_labels.EV_input_name='KOKYAKU'
+						rtn_labels.EV_input_hidden='EV'
+						rtn_labels.EV_input_placeholder='顧客名'
+						rtn_labels.EV_input_value=''
+					}else{
+						rtn_labels.EV_input_name='EV'
+						rtn_labels.EV_input_hidden='KOKYAKU'
+						rtn_labels.EV_input_placeholder='イベント名等'
+						rtn_labels.EV_input_value='<?php echo $event; ?>'
+					}
+					if(rg_mode.value !== 'evrez'){
+						rtn_labels.address='display:none'
+						labels_address_check.value = true
+					}else{
+						rtn_labels.address=''
+						labels_address_check.value = false
+					}
+					return rtn_labels
+				})
+
+				const labels_address_style = computed(() =>{
+					if(labels_address_check.value===true){
+						return 'text-decoration:line-through;'
+					}else{
+						return ''
+					}
+				})
+
 				return{
 					get_shouhinMS,
 					shouhinMS_filter,
@@ -622,6 +652,10 @@
 					vlon,
 					vjusho,
 					v_get_gio,
+					rg_mode,
+					labels,
+					labels_address_style,
+					labels_address_check,
 				}
 			}
 		}).mount('#register');
@@ -639,11 +673,6 @@
 				e.preventDefault();
 			}
 		}
-		/*
-		const script = document.createElement('script');
-		script.src = 'https://maps.gsi.go.jp/js/muni.js';
-		document.body.insertAdjacentElement('afterEnd', script);
-		*/
 	</script><!--js-->
 </body>
 
@@ -1505,7 +1534,7 @@
 
 
 </script><!--ジオコーディング-->
-<script src="https://maps.gsi.go.jp/js/muni.js"></script>
+<script src="https://maps.gsi.go.jp/js/muni.js"></script><!--gio住所逆引リスト-->
 </html>
 <?php
 

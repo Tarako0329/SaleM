@@ -4,9 +4,20 @@
 // =========================================================
 function log_writer($pgname,$msg){
     $log = print_r($msg,true);
-    file_put_contents("error_log","[".date("Y/m/d H:i:s")."] ORG_LOG from <".$pgname."> output <<".$log.">>\n",FILE_APPEND);
+    file_put_contents("error_log","[".date("Y/m/d H:i:s")."] ORG_LOG from [".$_SERVER["PHP_SELF"]." -> ".$pgname."] => ".$log."\n",FILE_APPEND);
 }
-
+function log_writer2($pgname,$msg,$kankyo){
+    //$kankyo:lv1=全環境 lv2=本番以外 lv3=テスト・ローカル環境のみ
+    if($kankyo==="lv1"){
+        log_writer($pgname,$msg);
+    }else if($kankyo==="lv2" && EXEC_MODE!=="Product"){
+        log_writer($pgname,$msg);
+    }else if($kankyo==="lv3" && (EXEC_MODE==="Test" || EXEC_MODE==="Local")){
+        log_writer($pgname,$msg);
+    }else{
+        return;
+    }
+}
 
 // =========================================================
 // 数字を3桁カンマ区切りで返す(整数のみ対応)
@@ -54,7 +65,10 @@ function delete_old_token($token, $pdo) {
 // 自動ログイン処理
 // =========================================================
 function check_auto_login($cookie_token, $pdo) {
-    //プレースホルダで SQL 作成
+    if($_COOKIE["login_type"]==="normal"){
+        //自動ログインしない
+        return "一定の期間、操作が行われなかったため、自動ログオフしました。";
+    }
     $sql = "SELECT * FROM AUTO_LOGIN WHERE TOKEN = ? AND REGISTRATED_TIME >= ?;";
     //2週間前の日付を取得
     $date = new DateTime("- 7 days");
@@ -63,27 +77,20 @@ function check_auto_login($cookie_token, $pdo) {
     $stmt->bindValue(1, $cookie_token, PDO::PARAM_STR);
     $stmt->bindValue(2, $date->format('Y-m-d H:i:s'), PDO::PARAM_STR);
     $stmt->execute();
-    
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     if (count($rows) == 1) {
     	//自動ログイン成功
     	$_SESSION['user_id'] = $rows[0]['USER_ID'];
-    
     	return true;
     } else {
     	//自動ログイン失敗
-    
     	//Cookie のトークンを削除
     	setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly
-    
-    	 //古くなったトークンを削除
-    	delete_old_token($cookie_token, $pdo);
-    
-    	return false;
+    	delete_old_token($cookie_token, $pdo);  //古くなったトークンを削除
+    	return "自動ログインの有効期限が切れてます。";
     }
 }
-
 
 function check_session_userid($pdo_h){
     if(EXEC_MODE=="Trial"){
@@ -116,31 +123,34 @@ function check_session_userid($pdo_h){
         }
         
     }else{
-
+        //log_writer2("function.php[func:check_session_userid] $_SESSION values ",$_SESSION,"lv3");
         if(empty($_SESSION["user_id"])){
             //セッションのIDがクリアされた場合の再取得処理。
             if(empty($_COOKIE['webrez_token'])){
-                //自動ログインが無効の場合、ログイン画面へ
+                log_writer2("function.php[func:check_session_userid]","cookieのwebrez_tokenが存在してない。useridの取得手段がないのでログイン画面へ","lv3");
                 $_SESSION["EMSG"]="セッションが切れてます。";
-                header("HTTP/1.1 301 Moved Permanently");
-                header("Location: index.php");
-                exit();
-            }elseif(check_auto_login($_COOKIE['webrez_token'],$pdo_h)==false){
-                $_SESSION["EMSG"]="自動ログインの有効期限が切れてます";
+                
                 header("HTTP/1.1 301 Moved Permanently");
                 header("Location: index.php");
                 exit();
             }
-            
+            $rtn=check_auto_login($_COOKIE['webrez_token'],$pdo_h);
+            if($rtn!==true){
+                //$_SESSION["EMSG"]="自動ログインの有効期限が切れてます";
+                $_SESSION["EMSG"]=$rtn;
+                header("HTTP/1.1 301 Moved Permanently");
+                header("Location: index.php");
+                exit();
+            }
         }
         if(!($_SESSION["user_id"]<>"")){
             //念のための最終チェック
-            $_SESSION["EMSG"]="ユーザーＩＤの再取得に失敗しました。";
+            $_SESSION["EMSG"]="ユーザーＩＤの再取得に失敗しました。[error:1]";
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: index.php");
             exit();
         }
-        //取得できたIDがDBに存在するか確認
+        //取得できたUIDがDBに存在するか確認
         $sqlstr="select * from Users where uid=?";
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
@@ -149,7 +159,7 @@ function check_session_userid($pdo_h){
     
         if (count($rows) == 0) {
             //IDは取得できたがDB側にデータが無い場合もID再発行
-            $_SESSION["EMSG"]="ユーザーＩＤの再取得に失敗しました。";
+            $_SESSION["EMSG"]="ユーザーＩＤの再取得に失敗しました。[error:2]";
             $_SESSION["user_id"]="";
     	    //Cookie のトークンを削除
     	    setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly
@@ -157,9 +167,7 @@ function check_session_userid($pdo_h){
             header("Location: index.php");
             exit();
         }
-
     }
-    
     return true;
 }
 
@@ -175,11 +183,9 @@ function csrf_chk(){
 
     if ($cookie_token != $csrf_token || $csrf_token != $session_token) {
         //不正アクセス
-        log_writer("function.php","NG [".$cookie_token."::".$csrf_token."::".$session_token."] csrf_chk");
+        log_writer2("func:csrf_chk","NG [".$cookie_token."::".$csrf_token."::".$session_token."]","lv3");
         return false;
-        //return true;
     }else{
-        //echo "通った [".$cookie_token."::".$csrf_token."::".$session_token."] csrf_chk<br>";
         return true;
     }
 }
@@ -188,18 +194,21 @@ function csrf_chk(){
 // =========================================================
 function csrf_chk_nonsession(){
     //長期滞在できるページはセッション切れを許す
-    $csrf_token = (!empty($_POST['csrf_token'])?$_POST['csrf_token']:"");
-    $cookie_token = (!empty($_COOKIE['csrf_token'])?$_COOKIE['csrf_token']:"");
+    $csrf_token = (!empty($_POST['csrf_token'])?$_POST['csrf_token']:"a");
+    $cookie_token = (!empty($_COOKIE['csrf_token'])?$_COOKIE['csrf_token']:"b");
 
     unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
     setCookie("csrf_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
 
-    if ($csrf_token != $cookie_token) {
+    log_writer2("func:csrf_chk_nonsession","csrf_token  =".$csrf_token,"lv3");
+    log_writer2("func:csrf_chk_nonsession","cookie_token=".$cookie_token,"lv3");
+
+    if ($csrf_token !== $cookie_token) {
         //不正アクセス
+        log_writer2("func:csrf_chk_nonsession","failed","lv3");
         return false;
-        //return true;
     }else{
-        //echo "通った [".$cookie_token."::".$csrf_token."] csrf_chk_nonsession<br>";
+        log_writer2("func:csrf_chk_nonsession","success","lv3");
         return true;
     }
 }
@@ -216,7 +225,6 @@ function csrf_chk_nonsession_get($csrf_token){
     if ($csrf_token != $cookie_token) {
         //不正アクセス
         return false;
-        //return true;
     }else{
         //echo "通った [".$cookie_token."::".$csrf_token."] csrf_chk_nonsession_get<br>";
         return true;
@@ -234,7 +242,6 @@ function csrf_chk_redirect($csrf_token){
     if ($csrf_token != $session_token) {
         //不正アクセス
         return false;
-        //return true;
     }else{
         //echo "通った [".$cookie_token."::".$csrf_token."] csrf_chk_nonsession_get<br>";
         return true;
@@ -257,7 +264,6 @@ function csrf_create(){
 // 不可逆暗号化
 // =========================================================
 function passEx($str,$uid,$key){
-//	if(strlen($str)<=8 and !empty($uid)){
 	if(strlen($str)>0 and !empty($uid)){
 		$rtn = crypt($str,$key);
 		for($i = 0; $i < 1000; $i++){
@@ -373,8 +379,7 @@ function send_mail($to,$subject,$body){
 function getGUID(){
     if (function_exists('com_create_guid')){
         return com_create_guid();
-    }
-    else {
+    }else {
         mt_srand((int)microtime()*10000);//optional for php 4.2.0 and up.
         $charid = strtoupper(md5(uniqid(rand(), true)));
         $hyphen = chr(45);// "-"
@@ -655,6 +660,9 @@ function get_getsumatsu($ym){
 // 天気取得
 // =========================================================
 function get_weather( $type = null,$lat,$lon ){
+    if(EXEC_MODE==="Local"){
+        return ["",0,0,0,0];
+    }
     $url = "http://api.openweathermap.org/data/2.5/weather?lat=".$lat."&lon=".$lon."&units=metric&APPID=" .WEATHER_ID;
 
     $json = file_get_contents( $url );

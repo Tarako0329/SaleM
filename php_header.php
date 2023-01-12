@@ -36,13 +36,10 @@ if(EXEC_MODE=="Test" || EXEC_MODE=="Local"){
     error_reporting( E_ALL & ~E_NOTICE );
 }
 
-
 $pass=dirname(__FILE__);
-
 
 //ツアーガイド実行中か否かを判断する
 $_SESSION["tour"]=(empty($_SESSION["tour"])?"":$_SESSION["tour"]);
-//deb_echo($_SESSION["tour"]);
 
 //DB接続関連
 define("DNS","mysql:host=".$_ENV["SV"].";dbname=".$_ENV["DBNAME"].";charset=utf8");
@@ -75,13 +72,11 @@ define("WEATHER_ID", $_ENV["WEATHER_ID"]);
 //サイトタイトルの取得
 $title = $_ENV["TITLE"];
 
-
 //暗号化キー
 $key = $_ENV["KEY"];
 
 // DBとの接続
 $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
-
 
 //端末IDを発行し、10年の有効期限でCookieにセット
 if(!isset($_COOKIE['machin_id'])){
@@ -91,8 +86,6 @@ if(!isset($_COOKIE['machin_id'])){
     $machin_id = $_COOKIE['machin_id'];
 }
 define("MACHIN_ID", $machin_id);
-
-//deb_echo("端末ID：".MACHIN_ID);
 
 //スキンの取得
 $sql = "select value from PageDefVal where uid=? and machin=? and page=? and item=?";
@@ -109,14 +102,12 @@ if($stmt->rowCount()==0){
     $color_No = 0;
     file_put_contents("sql_log/pglog.log", $log_time."php_header.php@Cannot Get skin_color_cd：session_uid=[".(!empty($_SESSION['user_id'])?$_SESSION['user_id']:"NULL")."] /MACHIN_ID=[".MACHIN_ID."]\n", FILE_APPEND);
 
-    //deb_echo("NULL");
 }else{
     $buf = $stmt->fetch();
     $color_No = $buf["value"];
-    //deb_echo("COLOR".$color_No);
 } 
 //log_writer("php_header.php _SERVER values ",$_SERVER);
-//log_writer("php_header.php _SESSION values ",$_SESSION);
+//log_writer("php_header.php end _SESSION values ",$_SESSION);
 
 ?>
 
