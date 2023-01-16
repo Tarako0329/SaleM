@@ -99,7 +99,7 @@ body{
 		-webkit-text-fill-color: transparent;
 }
 
-html {
+html{
 		-webkit-box-sizing: border-box;
 		box-sizing: border-box;
 		font-size: 62.5%; /*ルートサイズ10px=1rem算出をしやすくするために*/

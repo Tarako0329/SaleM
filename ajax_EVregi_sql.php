@@ -25,7 +25,7 @@ $msg[0] = array(
 require "php_header.php";
 
 function shutdown(){
-  // これがシャットダウン関数で、
+  // シャットダウン関数
   // スクリプトの処理が完了する前に
   // ここで何らかの操作をすることができます
 	$lastError = error_get_last();

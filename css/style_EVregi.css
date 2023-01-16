@@ -1,3 +1,6 @@
+html{
+    scroll-behavior:smooth;
+}
 .yagou{
     width: 60%;
     height: 70%;

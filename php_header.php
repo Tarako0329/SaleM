@@ -88,6 +88,7 @@ if(!isset($_COOKIE['machin_id'])){
 define("MACHIN_ID", $machin_id);
 
 //スキンの取得
+/* headerでuidの再取得はできない、かつ、マシンIDはGUIDなのでほぼ一意となるのでuidは使用しないように変更する
 $sql = "select value from PageDefVal where uid=? and machin=? and page=? and item=?";
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, (!empty($_SESSION['user_id'])?$_SESSION['user_id']:NULL), PDO::PARAM_INT);
@@ -95,13 +96,18 @@ $stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
 $stmt->bindValue(3, "menu.php", PDO::PARAM_STR);
 $stmt->bindValue(4, "COLOR", PDO::PARAM_STR);//name属性を指定
 $stmt->execute();
-
+*/
+$sql = "select value from PageDefVal where machin=? and page=? and item=?";
+$stmt = $pdo_h->prepare($sql);
+$stmt->bindValue(1, MACHIN_ID, PDO::PARAM_STR);
+$stmt->bindValue(2, "menu.php", PDO::PARAM_STR);
+$stmt->bindValue(3, "COLOR", PDO::PARAM_STR);//name属性を指定
+$stmt->execute();
 $log_time=date("Y/m/d H:i:s");
 
 if($stmt->rowCount()==0){
     $color_No = 0;
-    file_put_contents("sql_log/pglog.log", $log_time."php_header.php@Cannot Get skin_color_cd：session_uid=[".(!empty($_SESSION['user_id'])?$_SESSION['user_id']:"NULL")."] /MACHIN_ID=[".MACHIN_ID."]\n", FILE_APPEND);
-
+    log_writer2("php_header.php","php_header.php@Cannot Get skin_color_cd：MACHIN_ID=[".MACHIN_ID."]\n","lv3");
 }else{
     $buf = $stmt->fetch();
     $color_No = $buf["value"];

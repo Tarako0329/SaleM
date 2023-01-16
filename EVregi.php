@@ -28,27 +28,6 @@
 	$_SESSION["status"]="";
 	$HTTP_REFERER=(empty($_SERVER['HTTP_REFERER'])?"":$_SERVER['HTTP_REFERER']);
 
-	/*レジ登録処理等、すべてを非同期通信で処理するようにしたため、チェック方法を変更
-	if(EXEC_MODE!=""){
-		if(csrf_chk_nonsession()==false){//POST:COOKIEチェック
-			if(!empty($status) && ROOT_URL."EVregi.php"==substr($HTTP_REFERER,0,strlen(ROOT_URL."EvRegi.php"))){
-				//リファイラが自身でかつstatusがセットされてる場合、問題なし
-				log_writer2("EVregi.php HTTP_REFERER values ",$HTTP_REFERER,"lv3");
-			}else if($status=="login_redirect"){
-				//$_SESSION["status"]="";
-				log_writer("EVregi.php  $status ",$status);
-			}else{
-				$_SESSION["EMSG"]="セッションが正しくありませんでした。".filter_input(INPUT_POST,"csrf_token");
-				log_writer2("EVregi.php","セッションが正しくありませんでした。","lv3");
-				header("HTTP/1.1 301 Moved Permanently");
-				header("Location: index.php");
-				exit();
-			}
-		}else{
-			log_writer2("EVregi.php","csrf_chk_nonsession clear","lv3");
-		}
-	}
-	*/
 	if(csrf_chk_nonsession()===false){//POST:COOKIEチェック
 		if($status=="login_redirect"){
 			//ログイン画面から直通でアクセス
@@ -153,22 +132,26 @@
 			<input type='text' class='ev' :name='labels["EV_input_name"]' v-model='labels["EV_input_value"]' required='required' :placeholder='labels["EV_input_placeholder"]'>
 			<div class='address_disp' :style='`${labels["address"]}; position:fixed;top:55px;right:5px;color:var(--user-disp-color);max-width:50%;height:15px;`'>
 				<input type='checkbox' name='nonadd' id='nonadd' v-model='labels_address_check'>
-				<label for='nonadd' id='address_disp' class='item_101' :style='labels_address_style'>{{vjusho}}</label>
+				<label for='nonadd' id='address_disp' class='item_101' :style='labels_address_style' onclick='gio_onoff()'>{{vjusho}}</label>
 			</div>
 		</header>
 		<div class='header-select header-color' >
-			<!--<select class='form-control item_16' style='font-size:1.2rem;padding:0;'> 
-				<option>カテゴリートップへ移動できます</option>
-				<option><a href='#jump_0'>TOP</a></option>
-				<?php {
-					$i=1;
-					foreach($shouhiMS_bunrui as $row){
-						echo "<option value='#jump_".$i."'>".$row["categoly"]."</option>";
-						$i++;
-					}
-				} ?>
-			</select>-->
-			<a href='#jump_0'>TOP</a>
+			<select v-model='get_scroll_target' @change='scroller(this)' class='form-control item_16' style='font-size:1.2rem;padding:0;'> 
+				<option value='description'>カテゴリートップへ移動できます</option>
+				<option value='#jump_0'>TOP</option>
+				<template v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
+					<template v-if='index===0 && list.disp_category!==""'>
+						<option :value='`#jump_${index}`'>
+							{{list.disp_category}}
+						</option>
+					</template>
+					<template v-if='index!==0 && list.disp_category !== shouhinMS_filter[index-1].disp_category'>
+						<option :value='`#jump_${index}`'>
+							{{list.disp_category}}
+						</option>
+					</template>
+				</template>
+			</select>
 			<a href="#" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;' data-bs-toggle='modal' data-bs-target='#modal_help1'>
 				<i class="fa-regular fa-circle-question fa-lg logoff-color"></i>
 			</a>
@@ -225,19 +208,19 @@
 						</div>
 					</div>
 				</div><!--割引処理-->
-				<hr id='jump_0'>
+				<div id='jump_0'><hr ></div>
 				<div class='row item_3' id=''>
 					<template v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
 						<template v-if='index===0'>
 							<div class='row' style='background:var(--jumpbar-color);margin-top:5px;' >
-								<div class='col-12' id='jump_".$now."' style='color:var(--categ-font-color);'><a href='#jump_".$befor."' class='btn-updown'><i class='fa-solid fa-angles-up'></i></a>
+								<div class='col-12' :id='`jump_${index}`' style='color:var(--categ-font-color);'><a href='#jump_".$befor."' class='btn-updown'><i class='fa-solid fa-angles-up'></i></a>
 									{{list.disp_category}}<a href='#jump_".$next."'  class='btn-updown'><i class='fa-solid fa-angles-down'></i></a>
 								</div>
 							</div>
 						</template>
 						<template v-if='index!==0 && list.disp_category !== shouhinMS_filter[index-1].disp_category'>
 							<div class='row' style='background:var(--jumpbar-color);margin-top:5px;' >
-								<div class='col-12' id='jump_".$now."' style='color:var(--categ-font-color);'><a href='#jump_".$befor."' class='btn-updown'><i class='fa-solid fa-angles-up'></i></a>
+								<div class='col-12' :id='`jump_${index}`' style='color:var(--categ-font-color);'><a href='#jump_".$befor."' class='btn-updown'><i class='fa-solid fa-angles-up'></i></a>
 									{{list.disp_category}}<a href='#jump_".$next."'  class='btn-updown'><i class='fa-solid fa-angles-down'></i></a>
 								</div>
 							</div>
@@ -272,7 +255,7 @@
 				<div class='row' style='height:60px;'>
 					<div class='col-4' style='padding:0;'>
 						<button type='button' class='btn--chk item_5' style='border-left:none;border-right:none;' id='dentaku' data-bs-toggle='modal' data-bs-target='#FcModal'>
-							<?php if($RG_MODE<>"shuppin_zaiko"){echo "釣　銭";} ?>
+							{{labels['btn_name']}}
 						</button>
 					</div>
 					<div class='col-4 item_10' style='padding:0;'>
@@ -368,12 +351,64 @@
 			</div>
 		</div>
 	</div>
+	<!--加算減算モードのヘルプ(modal_help2)-->
+	<div class='modal fade' id='modal_help2' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
+		<div class='modal-dialog  modal-dialog-centered'>
+			<div class='modal-content' style='font-size: 1.5rem; font-weight: 600;'>
+				<div class='modal-header'>
+					<!--<div class='modal-title' id='myModalLabel'>電　卓</div>-->
+				</div>
+				<div class='modal-body'>
+					<input type='radio' class='btn-check' name='options1' value='minus' autocomplete='off' v-model='pm' id='minus_mode' checked>
+					<label class='btn btn-outline-warning' for='minus_mode'>　▼　</label>
+					をタップすると、注文数を減らせるようになります。<br>
+					<input type='radio' class='btn-check' name='options2' value='plus' autocomplete='off' v-model='pm' id='plus_mode' checked>
+					<label class='btn btn-outline-primary' for='plus_mode'>　▲　</label>
+
+					をタップすると元に戻ります。<br>
+				</div>
+				<div class='modal-footer'>
+					<!--<button type='button' class='btn btn-default' data-dismiss='modal'>閉じる</button>-->
+					<button type='button'  data-bs-dismiss='modal'>閉じる</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--分類表示切替のヘルプ(modal_help1)-->
+	<div class='modal fade' id='modal_help1' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
+		<div class='modal-dialog  modal-dialog-centered'>
+			<div class='modal-content' style='font-size: 1.5rem; font-weight: 600;'>
+				<div class='modal-header'>
+					<!--<div class='modal-title' id='myModalLabel'>電　卓</div>-->
+				</div>
+				<div class='modal-body text-center'>
+					<i class="fa-solid fa-arrow-rotate-right fa-lg"></i> をタップすると、商品登録時に設定した分類ごとにパネルが表示されます。<br>
+					タップするごとに（大分類⇒中分類⇒小分類⇒50音順）の順番でループします。<br>
+				</div>
+				<div class='modal-footer'>
+					<button type='button'  data-bs-dismiss='modal'>閉じる</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	</div><!-- <div  id='register'> -->
 	<script>
 		const { createApp, ref, onMounted, computed, VueCookies } = Vue;
 		createApp({
 			setup(){
+				//スクロールスムース
+				const get_scroll_target = ref('description')
+				
+				const scroller = (target_id) => {
+					console.log('scroller start')
+					let itemHeight
+					const target_elem = document.querySelector(get_scroll_target.value)
+					itemHeight = target_elem.getBoundingClientRect().top + window.pageYOffset - 170
+					
+					scrollTo(0, itemHeight);
+				}
+
 				//売上取得関連
 				const UriageList = ref([])		//売上リスト
 				const get_UriageList = () => {//売上リスト取得ajax
@@ -574,8 +609,6 @@
 								,[prefCode, pref, muniCode, city] = muniData.split(',')
 								//${pref}${city}${data.lv01Nm}->県・市区町村・番地
 								,vjusho.value = (`${city}${address.lv01Nm}`).replace(/\s+/g, "")
-
-
 								//,jusho_es = escape(jusho.replace(/\s+/g, ""))								
 								))
 							.catch((error) => console.log(`get_gio ERROR:${error}`))
@@ -592,9 +625,9 @@
 					//let labels = []
 					let rtn_labels = {}
 					if(rg_mode.value !== 'shuppin_zaiko'){
-						rtn_labels={date_type:"売上日",date_ini:'<?php echo (string)date("Y-m-d");?>'}
+						rtn_labels={date_type:"売上日",date_ini:'<?php echo (string)date("Y-m-d");?>',btn_name:'釣　銭'}
 					}else{
-						rtn_labels={date_type:"出店日",date_ini:''}
+						rtn_labels={date_type:"出店日",date_ini:'',btn_name:''}
 					}
 					if(rg_mode.value === 'kobetu'){
 						rtn_labels.EV_input_name='KOKYAKU'
@@ -656,12 +689,15 @@
 					labels,
 					labels_address_style,
 					labels_address_check,
+					scroller,
+					get_scroll_target,
 				}
 			}
 		}).mount('#register');
 
 	</script><!--Vue3-->
 	<script>
+		var GSI = {};
 		// Enterキーが押された時にSubmitされるのを抑制する
 		document.getElementById("form1").onkeypress = (e) => {
 			// form1に入力されたキーを取得
@@ -673,56 +709,9 @@
 				e.preventDefault();
 			}
 		}
+
 	</script><!--js-->
 </body>
-
-<!--分類表示切替のヘルプ(modal_help1)-->
-<div class='modal fade' id='modal_help1' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
-	<div class='modal-dialog  modal-dialog-centered'>
-		<div class='modal-content' style='font-size: 1.5rem; font-weight: 600;'>
-			<div class='modal-header'>
-				<!--<div class='modal-title' id='myModalLabel'>電　卓</div>-->
-			</div>
-			<div class='modal-body text-center'>
-				<i class="fa-solid fa-arrow-rotate-right fa-lg"></i> をタップすると、商品登録時に設定した分類ごとにパネルが表示されます。<br>
-				タップするごとに（大分類⇒中分類⇒小分類⇒50音順）の順番でループします。<br>
-			</div>
-			<div class='modal-footer'>
-				<button type='button'  data-bs-dismiss='modal'>閉じる</button>
-			</div>
-		</div>
-	</div>
-</div>
-
-<!--加算減算モードのヘルプ(modal_help2)-->
-<div class='modal fade' id='modal_help2' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
-	<div class='modal-dialog  modal-dialog-centered'>
-		<div class='modal-content' style='font-size: 1.5rem; font-weight: 600;'>
-			<div class='modal-header'>
-				<!--<div class='modal-title' id='myModalLabel'>電　卓</div>-->
-			</div>
-			<div class='modal-body'>
-				<div class='btn-group btn-group-toggle' data-toggle='buttons'>
-				<label class='btn btn-outline-warning' style='padding:0;'>
-					<input type='radio' autocomplete='off'>　▼　
-				</label>
-				</div>
-				をタップすると、注文数を減らせるようになります。<br>
-				<div class='btn-group btn-group-toggle' data-toggle='buttons'>
-				<label class='btn btn-outline-primary' style='padding:0;' >
-				<input type='radio' autocomplete='off'>　▲　
-				</label>
-				</div>
-				をタップすると元に戻ります。<br>
-			</div>
-			<div class='modal-footer'>
-				<!--<button type='button' class='btn btn-default' data-dismiss='modal'>閉じる</button>-->
-				<button type='button'  data-bs-dismiss='modal'>閉じる</button>
-			</div>
-		</div>
-	</div>
-</div>
-
 
 <!--シェパードナビ
 <script src="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/js/shepherd.min.js"></script>
@@ -822,7 +811,7 @@
 					<input type='radio' autocomplete='off'>　▼　
 				</label>
 				</div>
-				<br><p class='tour_discription'>を選択すると、メニュータップ時にマイナスされるようになります。<br><br>オーダーを多く入れすぎたときに使ってください。</p>`,
+				<br><p class='tour_discription'>を選択すると、メニュータップ時にマイナスされるようになります。</p>`,
 		attachTo: {
 			element: '.item_4',
 			on: 'top'
@@ -1469,14 +1458,6 @@
 </script><!--天気機能リリースヘルプ（次回機能リリース時は不要となる）-->
 <script>
 	/*ジオ・コーディング*/
-	/** 変換表を入れる場所 */
-	var GSI = {};
-	let today = new Date();
-	today.setTime(today.getTime() + 10*60*60*1000);
-	let limit = today.toGMTString();
-	let address = '';
-
-
 
 	//GIO機能のオンオフ説明
 	const gio_on = new Shepherd.Tour({
@@ -1495,8 +1476,6 @@
 		text: `<p class='tour_discription'>位置情報は有効です。
 			<br>
 			<br>現在地が正しくない場合、同じ場所を再度タップして無効にしてください。
-			<br>
-			<br>現在地：${address}
 			<br></p>`,
 		buttons: [
 			{
@@ -1521,8 +1500,6 @@
 		text: `<p class='tour_discription'>位置情報は無効です。
 			<br>
 			<br>現在地に問題が無い場合、同じ場所を再度タップして有効にしてください。
-			<br>
-			<br>現在地：${address}
 			<br></p>`,
 		buttons: [
 			{
@@ -1531,6 +1508,15 @@
 			}
 		]
 	});
+	let gio_onoff = () => {
+    if(address_disp.style.textDecoration=='line-through'){
+      address_disp.style.textDecoration='';
+      gio_on.start(tourFinish,'','');
+    }else{
+      address_disp.style.textDecoration='line-through';
+      gio_off.start(tourFinish,'','');
+    }
+  }
 
 
 </script><!--ジオコーディング-->

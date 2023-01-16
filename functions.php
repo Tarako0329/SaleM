@@ -127,7 +127,7 @@ function check_session_userid($pdo_h){
         if(empty($_SESSION["user_id"])){
             //セッションのIDがクリアされた場合の再取得処理。
             if(empty($_COOKIE['webrez_token'])){
-                log_writer2("function.php[func:check_session_userid]","cookieのwebrez_tokenが存在してない。useridの取得手段がないのでログイン画面へ","lv3");
+                log_writer2("func:check_session_userid","cookieのwebrez_tokenが存在してない。useridの取得手段がないのでログイン画面へ","lv3");
                 $_SESSION["EMSG"]="セッションが切れてます。";
                 
                 header("HTTP/1.1 301 Moved Permanently");
@@ -183,9 +183,10 @@ function csrf_chk(){
 
     if ($cookie_token != $csrf_token || $csrf_token != $session_token) {
         //不正アクセス
-        log_writer2("func:csrf_chk","NG [".$cookie_token."::".$csrf_token."::".$session_token."]","lv3");
+        log_writer2("func:csrf_chk","failed [".$cookie_token."::".$csrf_token."::".$session_token."]","lv3");
         return false;
     }else{
+        log_writer2("func:csrf_chk","success","lv3");
         return true;
     }
 }
@@ -200,12 +201,9 @@ function csrf_chk_nonsession(){
     unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
     setCookie("csrf_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
 
-    log_writer2("func:csrf_chk_nonsession","csrf_token  =".$csrf_token,"lv3");
-    log_writer2("func:csrf_chk_nonsession","cookie_token=".$cookie_token,"lv3");
-
     if ($csrf_token !== $cookie_token) {
         //不正アクセス
-        log_writer2("func:csrf_chk_nonsession","failed","lv3");
+        log_writer2("func:csrf_chk_nonsession","failed [".$cookie_token."::".$csrf_token."]","lv3");
         return false;
     }else{
         log_writer2("func:csrf_chk_nonsession","success","lv3");
@@ -224,9 +222,10 @@ function csrf_chk_nonsession_get($csrf_token){
 
     if ($csrf_token != $cookie_token) {
         //不正アクセス
+        log_writer2("func:csrf_chk_nonsession_get","failed [".$cookie_token."::".$csrf_token."]","lv3");
         return false;
     }else{
-        //echo "通った [".$cookie_token."::".$csrf_token."] csrf_chk_nonsession_get<br>";
+        log_writer2("func:csrf_chk_nonsession_get","success","lv3");
         return true;
     }
 }
@@ -241,9 +240,10 @@ function csrf_chk_redirect($csrf_token){
 
     if ($csrf_token != $session_token) {
         //不正アクセス
+        log_writer2("func:csrf_chk_nonsession_get","failed [".$session_token."::".$csrf_token."]","lv3");
         return false;
     }else{
-        //echo "通った [".$cookie_token."::".$csrf_token."] csrf_chk_nonsession_get<br>";
+        log_writer2("func:csrf_chk_redirect","success","lv3");
         return true;
     }
 }
