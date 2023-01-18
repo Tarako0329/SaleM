@@ -1,11 +1,14 @@
 <?php
 //シェパードツアーガイドの終了記録
 //$tourName="help"の場合はセッション変数をクリア
+/*
 date_default_timezone_set('Asia/Tokyo');
 session_start();
-require "functions.php";
+*/
+require "php_header.php";
+//require "functions.php";
 require "./vendor/autoload.php";
-
+log_writer2("ajax_tour_log.php POST values ",$_POST,"lv3");
 $logfilename="sid_".$_SESSION['user_id'].".log";
 $time=date("Y-m-d H:m:s");
 if($_POST){
@@ -29,7 +32,7 @@ if($status=="save"){
 
 if(!empty($status)){
     $pass=dirname(__FILE__);
-    
+    /*
     //.envの取得
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->load();
@@ -39,7 +42,7 @@ if(!empty($status)){
     define("PASSWORD", $_ENV["PASS"]);
     // DBとの接続
     $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
-    
+    */
     
     //指定のKeyValueが登録済みかを確認
     $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.".$tourName."') as KeyValue FROM Users WHERE uid=?";

@@ -16,120 +16,121 @@ csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェ�
 チュートリアル
 start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステータス(finish;完了,save;保存(次回途中から始まる),'空白：$_SESSION["tour"]にnewで指定しtourNameをセット)'
 */
-
-require "php_header.php";
-$rtn=check_session_userid($pdo_h);
-//deb_echo($_SESSION["user_id"]);
-$token = csrf_create();
-$logoff=false;
-$Max_color_No=2;
-
-$action="";
-$bell_action="";
-$bell_size="fa-lg";
-$bell_msg="";
-
-if(!empty($_GET["action"])){
-    $action = $_GET["action"];
-}
-
-if($action=="color_change"){
-    //配色の変更・保存
-    $color_No = $_GET["color"]+1;
-    if($color_No>$Max_color_No){
-        $color_No=0;
+{
+    require "php_header.php";
+    $rtn=check_session_userid($pdo_h);
+    //deb_echo($_SESSION["user_id"]);
+    $token = csrf_create();
+    $logoff=false;
+    $Max_color_No=2;
+    
+    $action="";
+    $bell_action="";
+    $bell_size="fa-lg";
+    $bell_msg="";
+    
+    if(!empty($_GET["action"])){
+        $action = $_GET["action"];
     }
-    $stmt = $pdo_h->prepare ( 'call PageDefVal_update(?,?,?,?,?)' );
-    $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-    $stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
-    $stmt->bindValue(3, "menu.php", PDO::PARAM_STR);
-    $stmt->bindValue(4, "COLOR", PDO::PARAM_STR);
-    $stmt->bindValue(5, $color_No, PDO::PARAM_STR);
-    $stmt->execute();
-}
-
-if($action=="logout"){
-    $_SESSION = array();// セッション変数を全て解除する
     
-    // セッションを切断するにはセッションクッキーも削除する。
-    // Note: セッション情報だけでなくセッションを破壊する。
-    if (isset($_COOKIE[session_name()])) {
-        setCookie(session_name(), '', -1, "/", '.'.MAIN_DOMAIN, TRUE, TRUE); 
+    if($action=="color_change"){
+        //配色の変更・保存
+        $color_No = $_GET["color"]+1;
+        if($color_No>$Max_color_No){
+            $color_No=0;
+        }
+        $stmt = $pdo_h->prepare ( 'call PageDefVal_update(?,?,?,?,?)' );
+        $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+        $stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
+        $stmt->bindValue(3, "menu.php", PDO::PARAM_STR);
+        $stmt->bindValue(4, "COLOR", PDO::PARAM_STR);
+        $stmt->bindValue(5, $color_No, PDO::PARAM_STR);
+        $stmt->execute();
     }
-    setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); 
-    setCookie("login_type", "normal", time()+60*60*24*7, "/", "", TRUE, TRUE); // secure, httponly
-
-    session_destroy();// 最終的に、セッションを破壊する
-    $logoff=true;
-}else{
-    $_SESSION["PK"]=PKEY;
-    $_SESSION["SK"]=SKEY;
     
-    $_SESSION["URL"]=ROOT_URL."subscription.php";   //支払成功後にアクセスするURL
-    $_SESSION["PLAN_M"]=PLAN_M;
-    $_SESSION["PLAN_Y"]=PLAN_Y;
-    $_SESSION["SUBID"]="";      //strip subscription idをクリア
+    if($action=="logout"){
+        $_SESSION = array();// セッション変数を全て解除する
+        
+        // セッションを切断するにはセッションクッキーも削除する。
+        // Note: セッション情報だけでなくセッションを破壊する。
+        if (isset($_COOKIE[session_name()])) {
+            setCookie(session_name(), '', -1, "/", '.'.MAIN_DOMAIN, TRUE, TRUE); 
+        }
+        setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); 
+        setCookie("login_type", "normal", time()+60*60*24*7, "/", "", TRUE, TRUE); // secure, httponly
     
-    //ユーザ情報の取得
-    $sql="select * from Users where uid=?";
-    $stmt = $pdo_h->prepare($sql);
-    $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
-    $stmt->execute();
-    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $msg="";
-    //強制ログアウト処理
-    if($row[0]["ForcedLogout"]==true){
-        //system更新を有効にするためにログアウトが必要な場合の処理
-        $sql="update Users set ForcedLogout=false where uid=?";
+        session_destroy();// 最終的に、セッションを破壊する
+        $logoff=true;
+    }else{
+        $_SESSION["PK"]=PKEY;
+        $_SESSION["SK"]=SKEY;
+        
+        $_SESSION["URL"]=ROOT_URL."subscription.php";   //支払成功後にアクセスするURL
+        $_SESSION["PLAN_M"]=PLAN_M;
+        $_SESSION["PLAN_Y"]=PLAN_Y;
+        $_SESSION["SUBID"]="";      //strip subscription idをクリア
+        
+        //ユーザ情報の取得
+        $sql="select * from Users where uid=?";
         $stmt = $pdo_h->prepare($sql);
         $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
         $stmt->execute();
-        header("HTTP/1.1 301 Moved Permanently");
-        header("Location: menu.php?action=logout&ForcedLogout=true");
-        exit();
-    }
-    //契約状況の確認
-    if($row[0]["yuukoukigen"]<>""){
-        if(strtotime($row[0]["yuukoukigen"]) < strtotime(date("Y-m-d"))){
-            //有効期限切れ。申込日から即課金
-            $_SESSION["KIGEN"] = strtotime("+3 day");
-            $msg= "有効期限切れ<br>";
-        }else{
-            //試用期間、もしくは支払済み期間の翌日から課金
-            $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
-            $msg= "有効期限付き(".$row[0]["yuukoukigen"]." まで)<br>";
+        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $msg="";
+        //強制ログアウト処理
+        if($row[0]["ForcedLogout"]==true){
+            //system更新を有効にするためにログアウトが必要な場合の処理
+            $sql="update Users set ForcedLogout=false where uid=?";
+            $stmt = $pdo_h->prepare($sql);
+            $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
+            $stmt->execute();
+            header("HTTP/1.1 301 Moved Permanently");
+            header("Location: menu.php?action=logout&ForcedLogout=true");
+            exit();
         }
-        $plan=0;
-    }else{
-        //契約済
-        $plan=1;
-    }
-    //ユーザ名・屋号の取得
-    if($row[0]["yagou"]<>""){
-        $user=$row[0]["yagou"];
-    }elseif($row[0]["name"]<>""){
-        $user=$row[0]["name"];
-    }else{
-        $user=$row[0]["mail"];
-    }
-
+        //契約状況の確認
+        if($row[0]["yuukoukigen"]<>""){
+            if(strtotime($row[0]["yuukoukigen"]) < strtotime(date("Y-m-d"))){
+                //有効期限切れ。申込日から即課金
+                $_SESSION["KIGEN"] = strtotime("+3 day");
+                $msg= "有効期限切れ<br>";
+            }else{
+                //試用期間、もしくは支払済み期間の翌日から課金
+                $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
+                $msg= "有効期限付き(".$row[0]["yuukoukigen"]." まで)<br>";
+            }
+            $plan=0;
+        }else{
+            //契約済
+            $plan=1;
+        }
+        //ユーザ名・屋号の取得
+        if($row[0]["yagou"]<>""){
+            $user=$row[0]["yagou"];
+        }elseif($row[0]["name"]<>""){
+            $user=$row[0]["name"];
+        }else{
+            $user=$row[0]["mail"];
+        }
     
-    //新機能リリース通知
-    $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.new_releace_002') as ToursLog FROM Users WHERE uid=?";
-    $stmt = $pdo_h->prepare($sqlstr);
-    $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
-    $stmt->execute();
-    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    //deb_echo($row[0]["ToursLog"]);
-    if(empty($row[0]["ToursLog"])){
-        //新機能リリース通知 未確認
-        $bell_action="blink";
-        $bell_size="fa-2x";
-        $bell_msg="tap here！";
-    }else{
-        //新機能リリース通知 確認済み
+        
+        //新機能リリース通知
+        $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.new_releace_002') as ToursLog FROM Users WHERE uid=?";
+        $stmt = $pdo_h->prepare($sqlstr);
+        $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
+        $stmt->execute();
+        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        //deb_echo($row[0]["ToursLog"]);
+        if(empty($row[0]["ToursLog"])){
+            //新機能リリース通知 未確認
+            $bell_action="blink";
+            $bell_size="fa-2x";
+            $bell_msg="tap here！";
+        }else{
+            //新機能リリース通知 確認済み
+        }
+    
     }
-
 }
 ?>
 

@@ -446,7 +446,7 @@
 					})
 					return sum_uriage
 				})
-
+ 
 				const shouhinMS_filter = computed(() => {//商品パネルのソート・フィルタ
 					let order_panel = ([])
 					if (chk_register_show.value === "chk"){//表示対象のみを返す
@@ -723,8 +723,8 @@
 <script>//チュートリアル
 	
 	const TourMilestone = '<?php echo $_SESSION["tour"];?>';
-
-	const tutorial_5 = new Shepherd.Tour({
+	
+	const tutorial_7 = new Shepherd.Tour({
 		useModalOverlay: true,
 		defaultStepOptions: {
 			classes: 'tour_modal',
@@ -733,9 +733,9 @@
 				enabled:true
 			}
 		},
-		tourName:'tutorial_5'
+		tourName:'tutorial_7'
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>売上計上日はここで変更します。<br><br>過去の売上を入れ忘れた場合、ここの日付を変更して売上登録をして下さい。</p>`,
 		attachTo: {
@@ -745,11 +745,11 @@
 		buttons: [
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>出店しているイベント名を入力します。<br><br>今回は適当に入れてください。</p>`,
 		attachTo: {
@@ -759,15 +759,15 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>大まかな出店場所を表示してます。<br><br>端末のGPS機能を使用してます。<br>明らかに変な住所が表示されている場合はチェックを入れて無効にしてください。</p>`,
 		attachTo: {
@@ -777,15 +777,15 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>お会計はメニューをタップした数だけカウントされます。<br><br>試しに何回かタップしてみてください。</p>`,
 		attachTo: {
@@ -795,22 +795,19 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `
-				<div class='btn-group btn-group-toggle' data-toggle='buttons'>
-				<label class='btn btn-outline-warning' style='padding:0;' >
-					<input type='radio' autocomplete='off'>　▼　
-				</label>
-				</div>
+				<input type='radio' class='btn-check' name='options' value='minus' autocomplete='off' v-model='pm' id='minus_mode' >
+				<label class='btn btn-outline-warning' for='minus_mode'>　▼　</label>
 				<br><p class='tour_discription'>を選択すると、メニュータップ時にマイナスされるようになります。</p>`,
 		attachTo: {
 			element: '.item_4',
@@ -819,22 +816,19 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `
-				<div class='btn-group btn-group-toggle' data-toggle='buttons'>
-				<label class='btn btn-outline-primary  style='padding:0;'>
-					<input type='radio' name='options' value='plus' autocomplete='off' checked>　▲　
-				</label>
-				</div>
+				<input type='radio' class='btn-check' name='options' value='plus' autocomplete='off' v-model='pm' id='plus_mode' checked>
+				<label class='btn btn-outline-primary' for='plus_mode'>　▲　</label>
 				<br><p class='tour_discription'>を選択すると、元に戻ります。</p>`,
 		attachTo: {
 			element: '.item_4',
@@ -843,15 +837,15 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>お釣り計算機が表示されます。<!--<br><br>釣銭ボタンを押して表示してみてください。--></p>`,
 		attachTo: {
@@ -861,29 +855,29 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>受取金額を入力して「計算」ボタンを押すとお釣りが表示されます。<br><br>ここでは計算するだけで、何も登録されません。</p>`,
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>再度「釣銭」ボタンを押すと計算機が非表示になります。<!--<br><br>釣銭ボタンを何度か押してしてみてください。--></p>`,
 		attachTo: {
@@ -893,15 +887,15 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>「クリア」ボタンを押すと、全ての数量を０にクリアします。</p>`,
 		attachTo: {
@@ -911,29 +905,29 @@
 		buttons: [
 			{
 				text: 'back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>「確認」ボタンを押すと、注文したメニューのみが表示されます。<br><br>この状態で注文結果の最終確認を行います。<br><br>ボタン名が「確認」から「登録」に変更されます。</p>`,
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>「確認」ボタンを押して下さい。</p>`,
 		attachTo: {
@@ -943,15 +937,15 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>注文内容を修正したい場合は「戻る」ボタンを押すと、ひとつ前の状態に戻ります。
 				<br>表示が「クリア」のままの場合、「Back」をタップして「確認」を押してください。
@@ -963,29 +957,29 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>次に、「割引・割増」について説明します。</p>`,
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>「割引・割増」ボタンをタップしてください。
 				<br>
@@ -997,29 +991,29 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>まとめ買いに対する割引や、サービス時間超過に対する追加料金等で<span style='color:red;'>『支払総額』を変更したい場合</span>に使用します。</p>`,
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>割引割増を使用すると、売上げの実績は以下の表に登録されます。
 				<br>
@@ -1027,15 +1021,15 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>「変更後の金額を入力」をタップし、割引後・割増後の総額を入力すると、下のお会計額が変更されます。</p>`,
 		attachTo: {
@@ -1045,15 +1039,15 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.nextAndSave
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>最後に「登録」ボタンを押すと、売上げの登録が完了します。</p>`,
 		attachTo: {
@@ -1063,73 +1057,60 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_5.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>いろいろ操作してみて最後に「登録」をタップしてください。</p>`,
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_5.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_5.next
+				action: tutorial_7.next
 			}
 		]
 	});
-
-
-	const tutorial_6 = new Shepherd.Tour({
-		useModalOverlay: true,
-		defaultStepOptions: {
-			classes: 'tour_modal',
-			scrollTo: false,
-			cancelIcon:{
-				enabled:true
-			}
-		},
-		tourName:'tutorial_6'
-	});
-	tutorial_6.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>売上が登録されると画面上部に緑色のメッセージバーが表示されます。
 				<br>(しばらくすると自動で消えます。)</p>`,
 		buttons: [
 			{
 				text: 'Next',
-				action: tutorial_6.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_6.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>次に、レジ画面のカテゴリー別表示についてです。</p>`,
 		buttons: [
 			{
 				text: 'Next',
-				action: tutorial_6.next
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_6.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>商品登録時にカテゴリーを設定すると、設定したカテゴリーごとに商品を纏めて表示ます。</p>`,
 		buttons: [
 			{
 				text: 'Next',
-				action: tutorial_6.nextAndSave
+				action: tutorial_7.next
 			}
 		]
 	});
-	tutorial_6.addStep({
+	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>ここをタップするとカテゴリー別表示に変更されます。<br>試しにタップしてください。</p>`,
 		attachTo: {
@@ -1139,25 +1120,13 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_6.back
+				action: tutorial_7.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_6.next
+				action: tutorial_7.next
 			}
 		]
-	});
-
-	const tutorial_7 = new Shepherd.Tour({
-		useModalOverlay: true,
-		defaultStepOptions: {
-			classes: 'tour_modal',
-			scrollTo: false,
-			cancelIcon:{
-				enabled:true
-			}
-		},
-		tourName:'tutorial_7'
 	});
 	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
@@ -1232,16 +1201,10 @@
 			}
 		]
 	});
-
 	if(TourMilestone=="tutorial_4"){
-		tutorial_5.start(tourFinish,'tutorial','');
-	}else if(TourMilestone=="tutorial_5"){
-		tutorial_6.start(tourFinish,'tutorial','');
-	}else if(TourMilestone=="tutorial_6"){
-		tutorial_7.start(tourFinish,'tutorial','save');
+		tutorial_7.start(tourFinish,'tutorial','');
 	}
-
-
+	
 </script><!--チュートリアル-->
 <script>
 	//在庫機能のヘルプ
