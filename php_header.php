@@ -70,9 +70,11 @@ define("PAY_CANCEL_URL", $_ENV["PAY_cancel_url"]);
 define("WEATHER_ID", $_ENV["WEATHER_ID"]);
 
 //サイトタイトルの取得
+define("TITLE", $_ENV["TITLE"]);
 $title = $_ENV["TITLE"];
 
 //暗号化キー
+define("KEY", $_ENV["KEY"]);
 $key = $_ENV["KEY"];
 
 // DBとの接続

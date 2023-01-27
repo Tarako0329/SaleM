@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="ja">
 <?php
 /*関数メモ
 check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
@@ -39,6 +37,8 @@ $success_msg = (!empty($_SESSION["MSG"])?$_SESSION["MSG"]:"");
 $_SESSION["MSG"]=null;
 
 ?>
+<!DOCTYPE html>
+<html lang="ja">
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等

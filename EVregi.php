@@ -31,7 +31,7 @@
 	if(csrf_chk_nonsession()===false){//POST:COOKIEチェック
 		if($status=="login_redirect"){
 			//ログイン画面から直通でアクセス
-			log_writer("EVregi.php  $status ",$status);
+			log_writer2("EVregi.php  $status ",$status,"lv3");
 		}else{
 			$_SESSION["EMSG"]="セッションが正しくありませんでした。".filter_input(INPUT_POST,"csrf_token");
 			log_writer2("EVregi.php","セッションが正しくありませんでした。","lv3");
@@ -58,7 +58,7 @@
 		//お試し期間終了
 		$root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', 1));
 		$dir_path =  bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', 1));
-		$emsg="お試し期間、もしくは解約後有効期間が終了しました。<br>継続してご利用頂ける場合は<a href='".PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path."'>こちらから本契約をお願い致します </a>";
+		$emsg="お試し期間、もしくは解約後有効期間が終了しました。<br>継続してご利用頂ける場合は<a href='".PAY_CONTRACT_URL."?system=".TITLE."&sysurl=".$root_url."&dirpath=".$dir_path."'>こちらから本契約をお願い致します </a>";
 	}
 
 	$token = csrf_create();
@@ -100,6 +100,9 @@
 			}
 		}
 	}
+	$stmt = null;
+	$pdo_h = null;
+
 }
 ?>
 <!DOCTYPE html>
@@ -111,7 +114,7 @@
 	?>
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_EVregi.css?<?php echo $time; ?>' >
-	<TITLE><?php echo $title.' レジ';?></TITLE>
+	<TITLE><?php echo TITLE.' レジ';?></TITLE>
 </head>
 
 <body>
@@ -122,14 +125,14 @@
 		<input type='hidden' :name='labels["EV_input_hidden"]' value=''>
 	
 		<header class='header-color common_header' style='display:block'>
-			<div class='title yagou'><a href='menu.php'><?php echo $title;?></a></div>
+			<div class='title yagou'><a href='menu.php'><?php echo TITLE;?></a></div>
 			<span class='item_1'>
-			<span style='color:var(--user-disp-color);font-weight:400;'>
-				{{labels['date_type']}}
+				<span style='color:var(--user-disp-color);font-weight:400;'>
+					{{labels['date_type']}}
+				</span>
+				<input type='date' class='date' style='height:20%' name='KEIJOUBI' required='required' v-model='labels["date_ini"]'>
 			</span>
-			<input type='date' class='date' style='height:20%' name='KEIJOUBI' required='required' v-model='labels["date_ini"]'>
-			</span>
-			<input type='text' class='ev' :name='labels["EV_input_name"]' v-model='labels["EV_input_value"]' required='required' :placeholder='labels["EV_input_placeholder"]'>
+			<input type='text' class='ev item_2' :name='labels["EV_input_name"]' v-model='labels["EV_input_value"]' required='required' :placeholder='labels["EV_input_placeholder"]'>
 			<div class='address_disp' :style='`${labels["address"]}; position:fixed;top:55px;right:5px;color:var(--user-disp-color);max-width:50%;height:15px;`'>
 				<input type='checkbox' name='nonadd' id='nonadd' v-model='labels_address_check'>
 				<label for='nonadd' id='address_disp' class='item_101' :style='labels_address_style' onclick='gio_onoff()'>{{vjusho}}</label>
@@ -401,7 +404,7 @@
 				const get_scroll_target = ref('description')
 				
 				const scroller = (target_id) => {
-					console.log('scroller start')
+					console_log('scroller start','lv3')
 					let itemHeight
 					const target_elem = document.querySelector(get_scroll_target.value)
 					itemHeight = target_elem.getBoundingClientRect().top + window.pageYOffset - 170
@@ -412,15 +415,15 @@
 				//売上取得関連
 				const UriageList = ref([])		//売上リスト
 				const get_UriageList = () => {//売上リスト取得ajax
-					console.log("get_UriageList start");
+					console_log("get_UriageList start",'lv3');
 					let params = new URLSearchParams();
 					params.append('user_id', '<?php echo $_SESSION["user_id"];?>');
 					axios
 					.post('ajax_get_Uriage.php',params)
 					.then((response) => (UriageList.value = [...response.data]
-															//,console.log('get_UriageList succsess')
+															//,console_log('get_UriageList succsess','lv3')
 															))
-					.catch((error) => console.log(`get_UriageList ERROR:${error}`));
+					.catch((error) => console_log(`get_UriageList ERROR:${error}`,'lv3'));
 				}//売上リスト取得ajax
 
 				//商品マスタ取得関連
@@ -428,15 +431,15 @@
 				const disp_category = ref(4)		//パネルの分類別表示設定変更用
 
 				const get_shouhinMS = () => {//商品マスタ取得ajax
-					console.log("get_shouhinMS start");
+					console_log("get_shouhinMS start",'lv3');
 					let params = new URLSearchParams();
 					params.append('user_id', '<?php echo $_SESSION["user_id"];?>');
 					axios
 					.post('ajax_get_ShouhinMS.php',params)
 					.then((response) => (shouhinMS.value = [...response.data]
-															//,console.log('get_shouhinMS succsess')
+															//,console_log('get_shouhinMS succsess','lv3')
 															))
-					.catch((error) => console.log(`get_shouhinMS ERROR:${error}`));
+					.catch((error) => console_log(`get_shouhinMS ERROR:${error}`,'lv3'));
 				}//商品マスタ取得ajax
 
 				const total_uriage = computed(() =>{
@@ -489,7 +492,7 @@
 				}
 
 				onMounted(() => {
-					console.log('onMounted')
+					console_log('onMounted','lv3')
 					get_shouhinMS()
 					get_UriageList()
 					v_get_gio()
@@ -504,8 +507,8 @@
 				}
 				const pm = ref('plus')
 				const ordercounter = (e) => {//注文増減ボタン
-					//console.log(e.target.value)
-					//console.log(shouhinMS_filter.value[e.target.value])
+					//console_log(e.target.value,'lv3')
+					//console_log(shouhinMS_filter.value[e.target.value],'lv3')
 					let index = e.target.value
 					
 					if(pm.value==="plus"){
@@ -535,18 +538,18 @@
 				const csrf = ref('<?php echo $token; ?>')
 
 				const on_submit = (e) => {//登録・submit/
-					console.log('on_submit start')
+					console_log('on_submit start','lv3')
 					loader.value = true
 					v_get_gio()	//住所再取得
-					//console.log(e.target)
+					//console_log(e.target,'lv3')
 					let form_data = new FormData(e.target)
 					let params = new URLSearchParams (form_data)
 					
 					axios
 						.post('ajax_EVregi_sql.php',params,{timeout: <?php echo $timeout; ?>}) //php側は15秒でタイムアウト
 						.then((response) => {
-							console.log(`on_submit SUCCESS`)
-							//console.log(response.data)
+							console_log(`on_submit SUCCESS`,'lv3')
+							//console_log(response.data,'lv3')
 							MSG.value = response.data[0].EMSG
 							alert_status.value[1]=response.data[0].status
 							csrf.value = response.data[0].csrf_create
@@ -557,7 +560,7 @@
 							}
 						})
 						.catch((error) => {
-							console.log(`on_submit ERROR:${error}`)
+							console_log(`on_submit ERROR:${error}`,'lv3')
 							MSG.value = error.response.data[0].EMSG
 							csrf.value = error.response.data[0].csrf_create
 							alert_status.value[1]='alert-danger'
@@ -574,7 +577,7 @@
 					return Number(deposit.value) - Number(pay.value)
 				})
 				const keydown = (e) => {//電卓ボタンの処理
-					//console.log(e.target.innerHTML)
+					//console_log(e.target.innerHTML,'lv3')
 					if(e.target.innerHTML==="C"){
 						deposit.value = 0
 					}else if(e.target.innerHTML==="ちょうど"){
@@ -589,7 +592,7 @@
 				const vlon = ref('')		//経度
 				const vjusho = ref('')
 				const v_get_gio = () =>{//緯度経度取得
-					console.log('get_gio start')
+					console_log('get_gio start','lv3')
 					let address = []
 
 					navigator.geolocation.getCurrentPosition(
@@ -601,7 +604,7 @@
 							.get('https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress',{params:{lat:geoLoc.coords.latitude,lon:geoLoc.coords.longitude}})
 							.then((response) => (
 								address = response.data.results
-								//,console.log(address)
+								//,console_log(address,'lv3')
 								// 変換表から都道府県などを取得
 								,muniData = GSI.MUNI_ARRAY[address.muniCd]
 								
@@ -611,7 +614,7 @@
 								,vjusho.value = (`${city}${address.lv01Nm}`).replace(/\s+/g, "")
 								//,jusho_es = escape(jusho.replace(/\s+/g, ""))								
 								))
-							.catch((error) => console.log(`get_gio ERROR:${error}`))
+							.catch((error) => console_log(`get_gio ERROR:${error}`,'lv3'))
 						},
 						err => console.error({err}),
 					);
@@ -1485,10 +1488,4 @@
 </script><!--ジオコーディング-->
 <script src="https://maps.gsi.go.jp/js/muni.js"></script><!--gio住所逆引リスト-->
 </html>
-<?php
-
-$stmt = null;
-$pdo_h = null;
-?>
-
 

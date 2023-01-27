@@ -22,7 +22,22 @@
     <!--ajaxライブラリ-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
     <script>axios.defaults.baseURL = <?php echo "'".ROOT_URL."'" ?>;</script>
-
+    <!--jsfunction-->
+    <script>
+        var console_log=(log,lv)=>{
+            let kankyo = '<?php echo EXEC_MODE; ?>'
+            //$kankyo:lv1=全環境 lv2=本番以外 lv3=テスト・ローカル環境のみ
+            if(lv==="lv1"){
+                console.log(log)
+            }else if(lv==="lv2" && kankyo!=="Product"){
+                console.log(log)
+            }else if(lv==="lv3" && (kankyo==="Test" || kankyo==="Local")){
+                console.log(log)
+            }else{
+                return 0;
+            }
+        }
+    </script>
 
 
     <link rel='manifest' href='manifest.webmanifest'>
