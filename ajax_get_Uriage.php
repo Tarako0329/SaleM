@@ -26,7 +26,7 @@ if(!empty($_POST)){
 	$pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
 	$sql = "select *,(UriageKin + zei) as ZeikomiUriage,max(UriageNO) OVER() as lastNo from UriageData where uid = ? and UriDate = ? order by insDatetime desc";
-	log_writer("ajax_get_Uriage.php ",$sqlstr);
+	//log_writer("ajax_get_Uriage.php ",$sqlstr);
 	$stmt = $pdo_h->prepare($sql);
 	$stmt->bindValue(1, $_POST['user_id'], PDO::PARAM_INT);
 	$stmt->bindValue(2, (string)date("Y-m-d"), PDO::PARAM_STR);

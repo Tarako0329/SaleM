@@ -195,8 +195,8 @@ function csrf_chk(){
 // =========================================================
 function csrf_chk_nonsession(){
     //長期滞在できるページはセッション切れを許す
-    $csrf_token = (!empty($_POST['csrf_token'])?$_POST['csrf_token']:"a");
-    $cookie_token = (!empty($_COOKIE['csrf_token'])?$_COOKIE['csrf_token']:"b");
+    $csrf_token = (!empty($_POST['csrf_token'])?$_POST['csrf_token']:"no-post-token");
+    $cookie_token = (!empty($_COOKIE['csrf_token'])?$_COOKIE['csrf_token']:"no-cookie-token");
 
     unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
     setCookie("csrf_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止

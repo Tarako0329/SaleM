@@ -504,6 +504,9 @@
 				const chk_register_show = ref('chk')		//確認・登録ボタンの表示
 				const btn_changer = (args) => {
 					chk_register_show.value = args
+					if(args==='register'){
+						let rtn = chk_csrf()	//token紛失のチェック
+					}
 				}
 				const pm = ref('plus')
 				const ordercounter = (e) => {//注文増減ボタン
@@ -537,10 +540,29 @@
 				const loader = ref(false)
 				const csrf = ref('<?php echo $token; ?>')
 
-				const on_submit = (e) => {//登録・submit/
+				const chk_csrf = () =>{
+					console_log(`ajax_getset_token start`,'lv3')
+					if(csrf.value==null || csrf.value==''){
+						axios
+						.get('ajax_getset_token.php')
+						.then((response) => {
+							csrf.value = response.data
+							console_log(response.data,'lv3')
+						})
+						.catch((error)=>{
+							console_log(`ajax_getset_token ERROR:${error}`,'lv3')
+						})
+					}else{
+						console_log(`ajax_getset_token OK:${csrf.value}`,'lv3')
+					}
+					return 0
+				}
+
+				const on_submit = async(e) => {//登録・submit/
 					console_log('on_submit start','lv3')
+					let rtn
 					loader.value = true
-					v_get_gio()	//住所再取得
+					rtn = await v_get_gio()	//住所再取得
 					//console_log(e.target,'lv3')
 					let form_data = new FormData(e.target)
 					let params = new URLSearchParams (form_data)
@@ -618,7 +640,7 @@
 						},
 						err => console.error({err}),
 					);
-
+					return 0
 				}
 
 				//細かな表示設定など
