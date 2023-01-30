@@ -90,6 +90,9 @@ body{
 .awesome-color-panel-border-same:before{
 	color: var(--panel-bd-color);
 }
+.awesome-color-white:before{
+	color: #fff;
+}
 .rainbow-color,
 .rainbow-color:before{
 		/*文字レインボーカラー*/

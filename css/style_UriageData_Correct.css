@@ -1,5 +1,5 @@
 .common_body {
-    padding-top:115px;
+    padding-top:120px;
     padding-bottom:70px; /*フッターーの後ろに要素が隠れないようにするため */
     font-size:1.1rem;
 /*    font-family: 'Kosugi Maru', sans-serif;*/
@@ -61,8 +61,8 @@ th{
     background:#C3E5FF;
 }
 .btn-view{
-    padding:4px;
-    width:30%;
+    padding:10px 5px;
+    /*width:30%;*/
 }
 @media screen and (min-width:376px) {
     th{
@@ -79,7 +79,7 @@ th{
 
 @media screen and (max-width:375px) {
     .btn-view{
-        padding:4px 1px;
+        padding:10px 1px;
         font-size:10px;
     }
 }
