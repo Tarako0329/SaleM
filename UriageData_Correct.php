@@ -396,9 +396,9 @@ $joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
             <div id="swImg" <?php if($mode=="Update"){echo " style='background:gray;'";}?>></div>
         </div>
     </div>
-    <?php
-        echo "<p style='font-size:1.3rem'>".$msg."</p>\n";
-    ?>
+	<?php
+		echo "<p style='font-size:1.3rem'>".$msg."</p>\n";
+	?>
 </div>
 
 <body class='common_body' id='body' >
