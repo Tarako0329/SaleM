@@ -1,5 +1,6 @@
 <?php
 /*
+*本日の売上データを取得
 *params:POST
 *   user_id     ：ログインユーザID
 *   orderby     ：

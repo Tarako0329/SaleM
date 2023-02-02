@@ -198,7 +198,7 @@
 									<div class='row'>
 										<div class='col-1 col-md-0' ></div>
 										<div class='col-10 col-md-7' >
-											<p>お会計額：￥{{pay}}</p>
+											<p>お会計額：￥{{pay.toLocaleString()}}</p>
 											<label for='CHOUSEI_GAKU' class='form-label'>変更後お会計額</label>
 											<input type='number' class='form-control order tanka' 
 											style='font-size:2.2rem;width:100%;border:solid;border-top:none;border-right:none;border-left:none;' name='CHOUSEI_GAKU' id='CHOUSEI_GAKU'>
@@ -214,13 +214,14 @@
 				<div id='jump_0'><hr ></div>
 				<div class='row item_3' id=''>
 					<template v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
-						<template v-if='index===0'>
+						<template v-if='(index===0) || (index!==0 && list.disp_category !== shouhinMS_filter[index-1].disp_category)'>
 							<div class='row' style='background:var(--jumpbar-color);margin-top:5px;' >
 								<div class='col-12' :id='`jump_${index}`' style='color:var(--categ-font-color);'><a href='#jump_".$befor."' class='btn-updown'><i class='fa-solid fa-angles-up'></i></a>
 									{{list.disp_category}}<a href='#jump_".$next."'  class='btn-updown'><i class='fa-solid fa-angles-down'></i></a>
 								</div>
 							</div>
 						</template>
+						<!--
 						<template v-if='index!==0 && list.disp_category !== shouhinMS_filter[index-1].disp_category'>
 							<div class='row' style='background:var(--jumpbar-color);margin-top:5px;' >
 								<div class='col-12' :id='`jump_${index}`' style='color:var(--categ-font-color);'><a href='#jump_".$befor."' class='btn-updown'><i class='fa-solid fa-angles-up'></i></a>
@@ -228,6 +229,7 @@
 								</div>
 							</div>
 						</template>
+						-->
 						<div class ='col-md-3 col-sm-6 col-6 items'>
 							<button type='button' @click="ordercounter" class='btn-view btn--rezi' :id="`btn_menu_${list.shouhinCD}`" :value = "index">{{list.shouhinNM}}
 							</button>
@@ -252,7 +254,7 @@
 			<div class="container-fluid" style='padding:0;text-align:center;'>
 				<div class='row'>
 					<div class='col-12 kaikei'>
-						<span style='font-size:1.6rem;'>お会計</span> ￥<span id='kaikei'> {{ pay }} </span>- <span style='font-size:1.6rem;'>内税</span>(<span id='utizei'>{{kaikei_zei}}</span>)
+						<span style='font-size:1.6rem;'>お会計</span> ￥<span id='kaikei'> {{pay.toLocaleString()}} </span>- <span style='font-size:1.6rem;'>内税</span>(<span id='utizei'>{{kaikei_zei.toLocaleString()}}</span>)
 					</div>
 				</div>
 				<div class='row' style='height:60px;'>

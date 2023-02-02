@@ -4,25 +4,37 @@
     font-size:1.1rem;
 /*    font-family: 'Kosugi Maru', sans-serif;*/
 }
+.common_header{
+    display:block;
+    height: 75px;
+}
 INPUT{
     height:20px;
 }
-
+.link{
+    color:#1a1aff;
+    font-weight: 700;
+    text-decoration: underline;
+}
 .footer_update_area{
     position: fixed; /* ウィンドウを基準に画面に固定 */
-    height: 290px;
+    height: 350px;
     bottom: 0;
     left:0;
     padding-left:10px;
+    padding-top:10px;
     padding-bottom:10px;
     width: 100%;
     /*z-index: 101;*/
     background:#fff;
 }
+.form-check{
+    width:80px;
+}
 .header_menu{
     position: fixed; /* ウィンドウを基準に画面に固定 */
     height: 50px;
-    top: 70px;
+    top: 75px;
     left:0;
     padding-left:10px;
     width: 100%;
@@ -62,7 +74,16 @@ th{
 }
 .btn-view{
     padding:10px 5px;
+    background-color: #fff;
+    border-radius: 0;
     /*width:30%;*/
+}
+.btn-selected{
+    color:#fff;
+    background-color:var(--title-to);
+}
+.nav-tabs .nav-link.active{
+    color:#fff;
 }
 @media screen and (min-width:376px) {
     th{

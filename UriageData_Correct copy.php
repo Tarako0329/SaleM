@@ -2,7 +2,8 @@
 {
 	//memo !empty()　は 変数未定義、空白、NULLの場合にfalseを返す
 	require "php_header.php";
-		
+	
+	
 	if((empty($_GET["mode"])?"":$_GET["mode"])=="Updated"){
 		if(csrf_chk_redirect($_GET["csrf_token"])==false){
 			$_SESSION["EMSG"]="セッションが正しくありませんでした。③";
@@ -41,9 +42,148 @@
 		$_SESSION["wheresql"]="";
 	}
 	
-	$mode="select";
+	{
+		//POST
+		if(!empty($_POST)){
+			$_SESSION["UriFrom"]    =(empty($_POST["UriDateFrom"])?(string)date("Y-m-d"):$_POST["UriDateFrom"]);
+			$_SESSION["UriTo"]      =(empty($_POST["UriDateTo"])?(string)date("Y-m-d"):$_POST["UriDateTo"]);
+			$_SESSION["Event"]      =(empty($_POST["Event"])?"%":$_POST["Event"]);
+			$mode = (empty($_POST["mode"])?"":$_POST["mode"]);
+			$Type = (empty($_POST["Type"])?"":$_POST["Type"]);
+			$display="where";
+			
+			//検索モーダル使用時は絞り込みを解除
+			$_SESSION["Uridate2"]="%";
+			$_SESSION["UriNO"]="%";
+			$_SESSION["shouhinCD"]="%";
+			
+			//更新条件を保存
+			$_SESSION["chk_uridate"]      =(empty($_POST["chk_uridate"])?"":$_POST["chk_uridate"]);
+			$_SESSION["up_uridate"]      =(empty($_POST["up_uridate"])?"":$_POST["up_uridate"]);
+			$upd_msg = $upd_msg.(empty($_POST["up_uridate"])?"":"売上日：".$_POST["up_uridate"]."<br>");
+			$_SESSION["chk_event"]      =(empty($_POST["chk_event"])?"":$_POST["chk_event"]);
+			$_SESSION["up_event"]      =(empty($_POST["up_event"])?"":$_POST["up_event"]);
+			$upd_msg = $upd_msg.(empty($_POST["up_event"])?"":"イベント名：".$_POST["up_event"]."<br>");
+			$_SESSION["chk_kokyaku"]      =(empty($_POST["chk_kokyaku"])?"":$_POST["chk_kokyaku"]);
+			$_SESSION["up_kokyaku"]      =(empty($_POST["up_kokyaku"])?"":$_POST["up_kokyaku"]);
+			$upd_msg = $upd_msg.(empty($_POST["up_kokyaku"])?"":"顧客名：".$_POST["up_kokyaku"]."<br>");
+			$_SESSION["chk_urikin"]      =(empty($_POST["chk_urikin"])?"":$_POST["chk_urikin"]);
+			$_SESSION["up_zeikbn"]      =(empty($_POST["up_zeikbn"])?"":$_POST["up_zeikbn"]);
+			$_SESSION["up_uritanka"]      =(empty($_POST["up_uritanka"])?"":$_POST["up_uritanka"]);
+			$_SESSION["up_zei"]      =(empty($_POST["up_zei"])?"":$_POST["up_zei"]);
+			$upd_msg = $upd_msg.(empty($_POST["chk_urikin"])?"":"商品単価(税込)：".($_POST["up_uritanka"]+$_POST["up_zei"])."(".$_POST["up_uritanka"]." + ".$_POST["up_zei"].")<br>");
+			$_SESSION["chk_genka"]      =(empty($_POST["chk_genka"])?"":$_POST["chk_genka"]);
+			$_SESSION["up_urigenka"]      =(empty($_POST["up_urigenka"])?"":$_POST["up_urigenka"]);
+			$upd_msg = $upd_msg.(empty($_POST["chk_genka"])?"":"原価単価：".$_POST["up_urigenka"]."<br>");
+		}
+		//GET
+		if(!empty($_GET)){
+			//初回アクセスはGETで来るので日付に今日をセット
+			if(!empty($_GET["first"])){
+				$_SESSION["MSG"]="本日の売上";
+				$_SESSION["UriFrom"]=date("Y-m-d");
+				$_SESSION["UriTo"]=date("Y-m-d");
+				$_SESSION["UriageData_Correct_mode"]="false";
+	
+				param_clear();
+			}
+			$mode=(empty($_GET["mode"])?"":$_GET["mode"]);
+			$Type=(empty($_GET["Type"])?"rireki":$_GET["Type"]);
+			
+			if((empty($_GET["display"])?"":$_GET["display"])=="all"){
+				$_SESSION["UriFrom"]="2000-01-01";
+				$_SESSION["UriTo"]="2099-12-31";
+	
+				param_clear();
+			}
+			//日付＞イベント＞商品・売上No
+			if(!empty($_GET["ad1"])){
+				$_SESSION["Uridate2"]=rot13decrypt2($_GET["ad1"]);
+				$_SESSION["Event"]="%";
+				$_SESSION["UriNO"]="%";
+				$_SESSION["shouhinCD"]="%";
+			}
+			if(!empty($_GET["ad2"])){
+				$_SESSION["Event"]=rot13decrypt2($_GET["ad2"]);
+				$_SESSION["UriNO"]="%";
+				$_SESSION["shouhinCD"]="%";
+			}
+			if(!empty($_GET["ad3"])){$_SESSION["UriNO"]=rot13decrypt2($_GET["ad3"]);}
+			if(!empty($_GET["ad4"])){$_SESSION["shouhinCD"]=rot13decrypt2($_GET["ad4"]);}
+			if(!empty($_GET["ad5"])){$_SESSION["shouhinNM"]=rot13decrypt2($_GET["ad5"]);}
+	
+			//deleteモード
+			$_SESSION["urino"]=(empty($_GET["urino"])?"":$_GET["urino"]);
+			$_SESSION["cd"]=(empty($_GET["cd"])?"":$_GET["cd"]);
+		}
+		//SESSION
+		$_SESSION["UriageData_Correct_mode"]=(empty($_SESSION["UriageData_Correct_mode"])?"false":$_SESSION["UriageData_Correct_mode"]);
+	}
+	//var_dump($_SESSION);
 	
 	if($mode=="select"){
+		$wheresql="where uid = :user_id AND UriDate >= :UriDate AND UriDate <= :UriDateTo and concat(Event,TokuisakiNM) like :Event ";  //検索モーダル部
+		$wheresql=$wheresql."AND UriDate like :UriDate2 AND UriageNO like :UriNO AND ShouhinCD like :shouhinCD ";    //絞り込み対応部
+		for($i=0;$i<4;$i++){
+			if($Type=="rireki"){
+				//履歴明細取得
+				$sql = "select U.*,UGW.icon,UGW.temp,UGW.description, max(UGW.temp) OVER (PARTITION BY U.uid,U.UriDate,U.Event) as max_temp, min(UGW.temp) OVER (PARTITION BY U.uid,U.UriDate,U.Event) as min_temp ";
+				$sql = $sql."from (select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData ".$wheresql.") as U ";
+				$sql = $sql."left join UriageData_GioWeather as UGW on U.uid = UGW.uid and U.UriageNO = UGW.UriNo order by U.UriDate desc,U.Event,U.UriageNO";
+				
+				$NextType=$Type;
+			}elseif($Type=="sum_items"){
+				//商品単位で集計
+				$sql="select UriDate,UriageNO,Event,TokuisakiNM, ShouhinCD, ShouhinNM,shuppin_su,uri_su as su,zan_su, tanka,UriageKin,zei,genka,arari,icon,max_temp,min_temp from UriageDataSummary ";
+				$sql = $sql.$wheresql."order by UriDate desc,Event,TokuisakiNM,ShouhinNM ";
+				
+				$NextType=$Type;
+			}elseif($Type=="sum_events"){
+				//イベント単位で集計
+				if($i==3){
+					//指定期間に実績がなかったらオール表示とする
+					$_SESSION["UriFrom"]="2000-01-01";
+					$_SESSION["UriTo"]="2099-12-31";
+				}
+				$_SESSION["MSG"]="";
+				$sql = "select U.UriDate,'-' as UriageNO,U.Event,U.TokuisakiNM,'-' as ShouhinCD,'-' as ShouhinNM,0 as su,0 as tanka,sum(U.UriageKin) as UriageKin,sum(U.zei) as zei,sum(U.su*U.genka_tanka) as genka,sum(U.UriageKin-(U.su*U.genka_tanka)) as arari ";
+				$sql = $sql.",max(UGW.icon) as icon,max(UGW.temp) as max_temp,min(UGW.temp) as min_temp ";
+				$sql = $sql."from (select * from UriageData ".$wheresql.") as U left join UriageData_GioWeather as UGW on U.uid = UGW.uid and U.UriageNO = UGW.UriNo ";
+				$sql = $sql." group by U.UriDate,U.Event,U.TokuisakiNM order by U.UriDate desc,U.Event,U.TokuisakiNM";
+				$NextType="rireki";
+			}
+			
+			//削除した後に表示する履歴のwhere文をセッションに保存
+			$_SESSION["wheresql"]="where uid = :user_id AND UriDate >= '".$_SESSION["UriFrom"]."' AND UriDate <= '".$_SESSION["UriTo"]."' and concat(Event,TokuisakiNM) like '".$_SESSION["Event"]."' ";
+			$_SESSION["wheresql"]=$_SESSION["wheresql"]."AND UriDate like '".$_SESSION["Uridate2"]."' AND UriageNO like '".$_SESSION["UriNO"]."' AND ShouhinCD like '".$_SESSION["shouhinCD"]."' ";
+		
+			$stmt = $pdo_h->prepare( $sql );
+			$stmt->bindValue("UriDate", $_SESSION["UriFrom"], PDO::PARAM_STR);
+			$stmt->bindValue("UriDateTo", $_SESSION["UriTo"], PDO::PARAM_STR);
+			$stmt->bindValue("Event", $_SESSION["Event"], PDO::PARAM_STR);
+		
+			$stmt->bindValue("UriDate2", $_SESSION["Uridate2"], PDO::PARAM_STR);
+			$stmt->bindValue("UriNO", $_SESSION["UriNO"], PDO::PARAM_INT);
+			$stmt->bindValue("shouhinCD", $_SESSION["shouhinCD"], PDO::PARAM_INT);
+			
+			$stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
+			$rtn=$stmt->execute();
+			if($rtn==false){
+				deb_echo("失敗した場合は不正値が渡されたとみなし、wheresqlを破棄<br>");
+				$_SESSION["wheresql"]="";
+			}
+			$result = $stmt->fetchAll();
+			$rowcnt = $stmt->rowCount();
+			if($rowcnt!==0){
+				break;
+			}else{
+				if($Type=="rireki"){
+					$Type="sum_items";
+				}elseif($Type=="sum_items"){
+					$Type="sum_events";
+				}
+			}
+		}
 	}elseif($mode=="del"){
 		//削除モード(確認)
 		$btnm = "削　除";
@@ -87,19 +227,16 @@
 		exit();
 	}
 	
-	//税区分M取得.基本変動しないので残す
+	//税区分M取得
 	$ZEIsql="select * from ZeiMS order by zeiKBN;";
 	$ZEIresult = $pdo_h->query($ZEIsql);
 	
-	
 	//表示条件
-	/*
 	$joken="";
 	$joken="期間：".($_SESSION["Uridate2"]=="%"?$_SESSION["UriFrom"]." ～ ".$_SESSION["UriTo"]:$_SESSION["Uridate2"]);
 	$joken=$joken.($_SESSION["Event"]=="%"?"":" / ".$_SESSION["Event"]);
 	$joken=$joken.($_SESSION["UriNO"]=="%"?"":" / 売上№".$_SESSION["UriNO"]);
 	$joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
-	*/
 	//deb_echo ("session:".$_SESSION["UriageData_Correct_mode"]);
 }
 ?>
@@ -109,18 +246,18 @@
 	<?php 
 	//共通部分、bootstrap設定、フォントCND、ファビコン等
 	//include "head.html";
-	include "head_bs5.html";
+	include "head.html_bs5";
 	?>
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_UriageData_Correct.css?<?php echo $time; ?>' >
-	
+	<!--
 	<script src='script/jquery-3.6.0.min.js'></script>
   <script src='script/popper.min.js'></script>
-	
+	-->
  	<script>
+		/*
 		window.onload = function() {
 			//アラート用
-			/*
 			function alert(msg) {
 			  return $('<div class="alert" role="alert"></div>')
 				.text(msg);
@@ -160,7 +297,6 @@
 			$('#switch1').change(function(){
 				set_session_param('#switch1');
 			});
-			*/
 
 			function getAllData(List,date_from,date_to,get_list_type){
 				//検索用のイベント・顧客・商品リストを取得
@@ -220,27 +356,28 @@
 				getAllData('#Event','#uridate','#uridateto','Event');
 			});
 
+			document.onkeypress = function(e) {
+				if (e.key === 'Enter') {
+					return false;
+				}
+			}
+
 		};//window.onload
 
+		*/
 	</script>    
 	
-	<TITLE><?php echo TITLE." 売上実績";?></TITLE>
+	<TITLE><?php echo $title." 売上実績";?></TITLE>
 </head>
 <body>
-	<div id='app'>
-	<header class='header-color common_header'>
-		<div class='title' style='width: 100%;height:37px;'>
-			<a href='menu.php'><?php echo TITLE;?></a>
-		</div>
-		<div style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>期間：{{UriDateFrom}} ～ {{UriDateTo}}</div>
-		<div v-if='filter_flg[0]' style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>
-			<button type='button' class='btn-view' @click='reset_filter' style='padding:1px 3px;font-size:1rem;background-color: var(--panel-bk-color);'>解除</button><i class="fa-solid fa-filter fa-lg awesome-color-white"></i>：{{filter_flg[1]}}
-		</div>
-		<a href="#" style='position:fixed;color:inherit;right:15px;top:45px;' data-bs-toggle='modal' data-bs-target='#modal_help1'>
+	<header class='header-color common_header' style='flex-wrap:wrap'>
+		<div class='title' style='width: 100%;'><a href='menu.php'><?php echo $title;?></a></div>
+		<div style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'> <?php echo $joken;?></div>
+		<a href="#" style='position:fixed;color:inherit;right:15px;top:45px;' data-toggle='modal' data-target='#modal_help1'>
 				<i class="fa-regular fa-circle-question fa-lg awesome-color-white"></i>
 		</a>
 	</header>
-	<div class='header_menu' style='border-bottom:solid var(--panel-bd-color) 0.5px;padding:0;'>
+	<div class='header_menu' style='border-bottom:solid var(--panel-bd-color) 0.5px;'>
 		<nav class="navbar navbar-expand" style='padding:0;width:90%;'>
 		<div class="container-fluid" >
 			<div class="navbar-brand" style='padding:5px;font-weight:800;'>売上実績<br>メニュー</div>
@@ -251,13 +388,13 @@
 	    <div class="collapse navbar-collapse" id="navbarSupportedContent">
 	      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 	        <li class="nav-item">
-	          <button :class="btn_class[0]" @click='Type_changer("sum_events")'>イベント別集計</button>
+	          <a class="nav-link btn-view" href="UriageData_Correct.php?mode=select&Type=sum_events&display=all&csrf_token=<?php echo $csrf_create; ?>">イベント別集計</a>
 	        </li>
 	        <li class="nav-item">
-	          <button :class="btn_class[1]" @click='Type_changer("sum_items")'>商品別集計</button>
+	          <a class="nav-link btn-view" href="UriageData_Correct.php?mode=select&Type=sum_items&csrf_token=<?php echo $csrf_create; ?>">商品別集計</a>
 	        </li>
 	        <li class="nav-item">
-	          <button :class="btn_class[2]" @click='Type_changer("rireki")'>売上明細</button>
+	          <a class="nav-link active btn-view" href="UriageData_Correct.php?mode=select&Type=rireki&csrf_token=<?php echo $csrf_create; ?>">売上明細</a>
 	        </li>
 	      </ul>
 	    </div>
@@ -279,58 +416,78 @@
 
 	<main class='common_body' id='body' >
 		<div class='container-fluid'>
-			<template v-if='MSG!==""'>
-				<div v-bind:class='alert_status' role='alert'>{{MSG}}</div>
-			</template>
+		<?php
+			//アラート
+			if($_SESSION["MSG"]!=""){
+				echo "<div class='container'><div class='row'><div class='col-12'><div style='padding:0px 40px;text-align:center;font-size:1.5rem;' id='alert-1' class='lead'></div></div></div></div>";
+			}
+			$_SESSION["MSG"]="";
+
+		?>
 		<div style='overflow:auto;' id='uritable'>
-			<table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
-				<thead>
-					<tr>
-						<th scope='col' style='width:20px;'></th>
-						<th scope='col' style='width:130px;'>商品</th>
-						<th v-if='Type==="sum_items"' scope='col' style='width:35px;'>出品数</th>
-						<th scope='col' style='width:30px;'>数</th>
-						<th v-if='Type==="sum_items"' scope='col' style='width:35px;'>残数</th>
-						<th scope='col' style='width:60px;' class='d-none d-sm-table-cell'>単価</th>
-						<th scope='col' style='width:60px;'>売上</th>
-						<th scope='col' style='width:60px;' class='d-none d-sm-table-cell'>税</th>
-						<th scope='col' style='width:50px;'>原価</th>
-						<th scope='col' style='width:60px;'>粗利</th>
-						<th v-if='Type==="rireki"' scope='col' class='d-none d-sm-table-cell'>天候</th>
-						<th v-if='Type==="rireki"' scope='col' style='width:20px;'></th>
-					</tr>
-				</thead>
-				<tbody v-for='(list,index) in UriageList_filter' :key='list.uid + list.UriDate + list.UriageNO + list.ShouhinCD'>
-					<tr v-if='(index===0) || (index!==0 && list.UriDate + list.Event !== UriageList_filter[index-1].UriDate + UriageList_filter[index-1].Event)' class='tr_stiky'>
-						<td :colspan='colspan' class='tr_stiky' style='white-space:nowrap;'>
-						<span role='button' class='link' @click='set_filter("UriDate",list.UriDate,"")'> 売上日：{{list.UriDate}}</span>
-						<span role='button' class='link' @click='set_filter("Event",list.Event,"")'>『{{list.Event}}{{list.TokuisakiNM}}』</span>
-						<img v-if='list.icon.length>=5' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>（<span style='color:red;'>{{list.max_temp}}</span>/<span style='color:blue;'>{{list.min_temp}}</span>）
-						</td>
-					</tr>
-					<tr>
-						<td v-if='list.UriageNO%2===0' role='button' class='text-center' @click='set_filter("UriNO",list.UriageNO,"")'><span class='link'>★</span></td>
-						<td v-if='list.UriageNO%2!==0' role='button' class='text-center' @click='set_filter("UriNO",list.UriageNO,"")'><span class='link'>☆</span></td>
-						<td role='button' class='link' @click='set_filter("ShouhinCD",list.ShouhinCD,list.ShouhinNM)'>{{list.ShouhinNM}}</td>
-						<td v-if='Type==="sum_items"' class='text-right'>{{list.shuppin_su}}</td>
-						<td class='text-right'>{{list.su}}</td>
-						<td v-if='Type==="sum_items"' class='text-right'>{{list.zan_su}}</td>
-						<td class='text-right d-none d-sm-table-cell'>{{list.tanka.toLocaleString()}}</td>
-						<td class='text-right'>{{list.UriageKin.toLocaleString()}}</td>
-						<td class='text-right d-none d-sm-table-cell'>{{list.zei.toLocaleString()}}</td>
-						<td class='text-right'>{{list.genka.toLocaleString()}}</td>
-						<td class='text-right'>{{list.arari.toLocaleString()}}</td>
-						<td v-if='Type==="rireki"' class='d-none d-sm-table-cell'>
-							<img v-if='list.icon.length>=5' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>（<span>{{list.temp}}℃ </span><span>{{list.description}}</span>）
-						</td>
-						<td v-if='Type==="rireki"' >
-							<a href='UriageData_Correct.php?cd=".$row["ShouhinCD"]."&urino=".$row["UriageNO"]."&csrf_token=".$csrf_create."&mode=del'>
-								<i class='fa-regular fa-trash-can'></i>
-							</a>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+		<table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
+			<thead>
+				<tr>
+					<th scope='col' style='width:20px;'></th>
+					<th scope='col' style='width:130px;'>商品</th>
+					<?php if($Type=="sum_items"){echo "<th scope='col' style='width:35px;'>出品数</th>";} ?>
+					<th scope='col' style='width:30px;'>数</th>
+					<?php if($Type=="sum_items"){echo "<th scope='col' style='width:35px;'>残数</th>";} ?>
+					<th scope='col' style='width:60px;' class='d-none d-sm-table-cell'>単価</th>
+					<th scope='col' style='width:60px;'>売上</th>
+					<th scope='col' style='width:60px;' class='d-none d-sm-table-cell'>税</th>
+					<th scope='col' style='width:50px;'>原価</th>
+					<th scope='col' style='width:60px;'>粗利</th>
+					<th scope='col' class='d-none d-sm-table-cell'>天候</th>
+					<th scope='col' style='width:20px;'></th>
+				</tr>
+			</thead>
+	<?php    
+	$Goukei=0;
+	$GoukeiZei=0;
+	$GoukeiZeikomi=0;
+	$uridate="";
+
+	$colspan=($Type=="sum_items"?"12":"10");
+	$mark="";
+	foreach($result as $row){
+		if($uridate!=$row["UriDate"].$row["Event"]){
+			echo "<tr class='tr_stiky'><td colspan='".$colspan."' class='tr_stiky' style='white-space:nowrap;'><a href='UriageData_Correct.php?mode=select&ad1=".rot13encrypt2($row["UriDate"])."&Type=".$NextType."&csrf_token=".$csrf_create."'> 売上日：".$row["UriDate"]."</a> ";
+			echo "<a href='UriageData_Correct.php?mode=select&ad2=".rot13encrypt2($row["Event"].$row["TokuisakiNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>『".$row["Event"].$row["TokuisakiNM"]."』</a>";
+			if(!empty($row["icon"])){
+				echo "<img style='height:20px;' src='https://openweathermap.org/img/wn/".$row["icon"]."'>（<span style='color:red;'>".$row["max_temp"]."</span>/<span style='color:blue;'>".$row["min_temp"]."</span>）";
+			}
+			echo "</td></tr>\n";
+		}
+		if($row["UriageNO"] !=="-"){
+			$mark=($row["UriageNO"]%2?"★":"☆");
+		}
+		echo "<tr><td class='text-center'><a href='UriageData_Correct.php?mode=select&ad3=".rot13encrypt2($row["UriageNO"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".$mark."</a></td>";
+		echo "<td><a href='UriageData_Correct.php?mode=select&ad4=".rot13encrypt2($row["ShouhinCD"])."&ad5=".rot13encrypt2($row["ShouhinNM"])."&Type=".$NextType."&csrf_token=".$csrf_create."'>".($row["ShouhinNM"])."</a></td>";
+		if($Type=="sum_items"){echo "<td class='text-right'>".$row["shuppin_su"]."</td>";}
+		echo "<td class='text-right'>".$row["su"]."</td>";
+		if($Type=="sum_items"){echo "<td class='text-right'>".$row["zan_su"]."</td>";}
+		echo "<td class='text-right d-none d-sm-table-cell'>".return_num_disp($row["tanka"])."</td><td class='text-right'>".return_num_disp($row["UriageKin"])."</td>";
+		echo "<td class='text-right d-none d-sm-table-cell'>".$row["zei"]."</td><td class='text-right'>".return_num_disp($row["genka"])."</td><td class='text-right'>".return_num_disp($row["arari"])."</td>\n";
+		if(($Type=="rireki") && ($mode == "select") || ($mode == "Updated")){
+			//履歴表示の時だけ削除可能
+			if(!empty($row["icon"])){
+				echo "<td class='d-none d-sm-table-cell'><img style='height:20px;' src='https://openweathermap.org/img/wn/".$row["icon"]."'>（<span>".$row["temp"]."℃ </span><span>".$row["description"]."</span>）</td>";
+			}else{
+				echo "<td class='d-none d-sm-table-cell'></td>";
+			}
+			echo "<td><a href='UriageData_Correct.php?cd=".$row["ShouhinCD"]."&urino=".$row["UriageNO"]."&csrf_token=".$csrf_create."&mode=del'><i class='fa-regular fa-trash-can'></i></a></td>";
+		}else{
+			echo "<td class='d-none d-sm-table-cell'></td><td></td>";
+		}
+		echo "</tr>\n";
+		$Goukei = $Goukei + $row["UriageKin"];
+		$GoukeiZei = $GoukeiZei + $row["zei"];
+		$GoukeiZeikomi = $GoukeiZeikomi + $row["UriageKin"] + $row["zei"];
+		$uridate=$row["UriDate"].$row["Event"];
+	}
+	?>
+		</table>
 		</div>
 	<?php
 	if($mode=="Update" || $mode=="del"){
@@ -349,9 +506,10 @@
 	}
 	?>
 		<!--修正エリア-->
-		<!--
 		<form class='form-horizontal update_areas footer_update_area tour_uri2' method='post' action='UriageData_Correct.php' style='display:none;' id='form2' onsubmit='return check_update()'>
 			<hr>
+			<input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
+			<input type='hidden' name='mode' value='Update'>
 			<div >
 				<table class='tour_uri3' style='width:90%;max-width:370px;'>
 				<tr>
@@ -391,6 +549,11 @@
 					<td colspan='1'>
 						<select class='form-control' style='padding-top:0;' id='zeikbn' name='up_zeikbn' onchange='zei_math()' >
 							<option value=''></option>
+							<?php
+							foreach($ZEIresult as $row){
+								echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
+							}
+							?>
 						</select>
 					</td>
 				</tr>
@@ -418,91 +581,7 @@
 					<i class="fa-regular fa-circle-question fa-2x awesome-color-panel-border-same"></i>
 				</a>
 			</div>
-		</form>-->
-		
-		<div class='footer_update_area'>
-			<form class='form-horizontal update_areas tour_uri2' method='post' action='UriageData_Correct.php' style='max-width:370px;' id='form2' onsubmit='return check_update()'>
-							
-				<input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
-				<input type='hidden' name='mode' value='Update'>
-				<input type='hidden' name='up_uritanka' :value='upd_hontai'>
-				<input type='hidden' name='up_zei' :value='upd_zei_kin'>
-				<input type='hidden' name='UpUriZei' :value='upd_hontai+upd_zei_kin'>
-				<div class='row mb-3'>
-					<div class="col-11" style='display:flex;'>
-  		    	<div class="form-check">
-    		    	<input class="form-check-input" type="checkbox" id="chk_uridate" name='chk_uridate' >
-    	  	  	<label class="form-check-label" for="chk_uridate">売上日</label>
-    	  		</div>
-						<input type='date' style='font-size:1.5rem;width:250px;' name='up_uridate' id='up_uridate' maxlength='10'  class='form-control'>
-    			</div>
-				</div><!--売上日-->
-
-				<div class='row mb-3'>
-					<div class="col-11" style='display:flex;'>
-  		    	<div class="form-check">
-    		    	<input class="form-check-input" type="checkbox" id="chk_event" name='chk_event' >
-    	  	  	<label class="form-check-label" for="chk_event">イベント名</label>
-    	  		</div>
-						<input type='text' style='font-size:1.5rem;width:250px;' name='up_event' id='up_event' maxlength='10'  class='form-control'>
-    			</div>
-				</div><!--イベント名-->
-
-				<div class='row mb-3'>
-					<div class="col-11" style='display:flex;'>
-  		    	<div class="form-check">
-    		    	<input class="form-check-input" type="checkbox" id="chk_kokyaku" name='chk_kokyaku' >
-    	  	  	<label class="form-check-label" for="chk_kokyaku">顧客名</label>
-    	  		</div>
-						<input type='text' style='font-size:1.5rem;width:250px;' name='up_kokyaku' id='up_kokyaku' maxlength='10'  class='form-control'>
-    			</div>
-				</div><!--顧客名-->
-
-				<div class='row mb-3'>
-					<div class="col-11" style='display:flex;'>
-  		    	<div class="form-check">
-    		    	<input class="form-check-input" type="checkbox" id="chk_urikin" name='chk_urikin' >
-    	  	  	<label class="form-check-label" for="chk_urikin">売上単価</label>
-    	  		</div>
-						<input v-model='upd_tanka' type='number' style='font-size:1.5rem;width:100px;' name='up_event' maxlength='10'  class='form-control'>
-						<div style='padding:0 5px;'>
-							<input type='radio' class='btn-check' name='options' value='komi' autocomplete='off' v-model='upd_zei_kominuki' id='plus_mode' checked>
-							<label class='btn btn-outline-primary' style='font-size:1.2rem;padding:1px;' for='plus_mode'>税込</label>
-							<input type='radio' class='btn-check' name='options' value='nuki' autocomplete='off' v-model='upd_zei_kominuki' id='minus_mode' >
-							<label class='btn btn-outline-primary' style='font-size:1.2rem;padding:1px;' for='minus_mode'>税抜</label>
-						</div>
-						<select v-model='upd_zei_kbn' class='form-select' style='padding-top:0;height:20px;width:80px;' name='up_zeikbn' onchange='zei_math()' >
-							<option value=''></option>
-							<?php
-							foreach($ZEIresult as $row){
-								echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
-							}
-							?>
-						</select>
-    			</div>
-				</div><!--売上単価-->
-
-				<div class='row mb-3'>
-					<div class="col-11" style='display:flex;'>
-  		    	<div class="form-check">
-							<!--space-->
-    	  		</div>
-						税込単価：{{(upd_hontai+upd_zei_kin).toLocaleString()}}（本体：{{upd_hontai.toLocaleString()}}　消費税：{{upd_zei_kin.toLocaleString()}}-）
-    			</div>
-				</div><!--売上単価計算結果-->
-
-				<div class='row mb-3'>
-					<div class="col-11" style='display:flex;'>
-  		    	<div class="form-check">
-    		    	<input class="form-check-input" type="checkbox" id="chk_genka" name='chk_genka' >
-    	  	  	<label class="form-check-label" for="chk_genka">原価単価</label>
-    	  		</div>
-						<input type='number' style='font-size:1.5rem;width:250px;' name='up_urigenka' id='up_urigenka' maxlength='10'  class='form-control'>
-    			</div>
-				</div><!--原価単価-->
-
-			</form><!--修正エリア-->
-		</div>
+		</form>
 		</div>
 	</main>
 
@@ -512,288 +591,97 @@
 			<span style='font-size:1.3rem;'>内訳(本体+税)：￥<?php echo return_num_disp($Goukei)." + ".return_num_disp($GoukeiZei) ?></span>
 		</div>
 		<div class='right1 item_1'>
-			<button type='button' class='btn--chk' style='border-radius:0;' data-bs-toggle='modal' data-bs-target='#UriModal'>検　索</button>
+			<button type='button' class='btn--chk' style='border-radius:0;' data-toggle='modal' data-target='#UriModal'>検　索</button>
 		</div>
 
 	</footer>
-	<!--売上実績検索条件-->
-	<div class='modal fade' id='UriModal' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
-		<div class='modal-dialog  modal-dialog-centered'>
-			<div class='modal-content' style='font-size:1.5rem; font-weight: 600;background-color:rgba(255,255,255,0.8);'>
-							
-				<form class='form-horizontal' method='post' action='UriageData_Correct.php' id='form3'>
-					<input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
-					<input type='hidden' name='mode' value='select'>
-					<div class='modal-header'>
-						<div class='modal-title' id='myModalLabel'>表示条件変更</div>
-					</div>
-					<div class='modal-body'>
-						<div>
-							<label for='uridate' class='control-label'>売上日～：</label>
-							<input v-model='UriDateFrom' type='date' style='font-size:1.5rem;' name='UriDateFrom' maxlength='10' id='uridate' class='form-control'>
-						</div>
-						<div>
-							<label for='uridateto' class='control-label'>～売上日：</label>
-							<input v-model='UriDateTo' type='date' style='font-size:1.5rem;' name='UriDateTo' maxlength='10' id='uridateto' class='form-control'>
-						</div>
-						<div>
-							<label for='Event' class='control-label'>イベント/顧客名：</label>
-							<select v-model='Event' name='Event' style='font-size:1.5rem;padding-top:0;' id='Event' class='form-control' aria-describedby='EvHelp'>
-								<option value=''></option>
-								<!--//Ajaxで取得に変更-->
-							</select>
-							<small id='EvHelp' class='form-text text-muted'>売上日の期間を変更すると選択肢が更新されます。</small>
-						</div>
-						<div>
-							<label for='Type' class='control-label'>表示：上で指定した期間中の</label>
-							<select v-model='Type' @change='get_UriageList()' name='Type' style='font-size:1.5rem;padding-top:0;' id='Type' class='form-control'>
-								<option value='rireki' >売上履歴</option>
-								<option value='sum_items' >売上を日付＞イベント＞商品単位で集計</option>
-								<option value='sum_events' >売上を日付＞イベント単位で集計</option>
-							</select>
-						</div>
-					</div>
-					<div class='modal-footer'>
-						<button type='button' @click='get_UriageList()' style='font-size:1.5rem;color:#fff' class='btn btn-primary' data-bs-dismiss="modal">決　定</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div><!--売上実績検索条件-->
-	<!--help1-->
-	<div class='modal fade' id='modal_help1' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
-		<div class='modal-dialog  modal-dialog-centered'>
-			<div class='modal-content' style='font-size:1.2rem; font-weight: 600;background-color:rgba(255,255,255,0.8);'>
-				<!--
+</body>
+<!--売上実績検索条件-->
+<div class='modal fade' id='UriModal' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
+	<div class='modal-dialog  modal-dialog-centered'>
+		<div class='modal-content' style='font-size:1.5rem; font-weight: 600;background-color:rgba(255,255,255,0.8);'>
+			
+			<form class='form-horizontal' method='post' action='UriageData_Correct.php' id='form3'>
+				<input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
+				<input type='hidden' name='mode' value='select'>
 				<div class='modal-header'>
-					<div class='modal-title' id='myModalLabel'>help</div>
+					<div class='modal-title' id='myModalLabel'>表示条件変更</div>
 				</div>
-				-->
 				<div class='modal-body'>
-					<h4 style='margin-bottom:0;'>ボタンについて</h4>
-					<div style='border:solid thin var(--panel-bd-color);border-radius:3px;padding:10px;margin-bottom:5px;'>
-						<li class='btn-view' style='font-size:1.2rem;padding:2px'>イベント集計</li>　<p>全期間の売上を『日付＞イベント』単位で集計して表示</p>
-						<li class='btn-view' style='font-size:1.2rem;padding:2px'>商品集計</li>　<p>現在表示されている売上を『日付＞イベント＞商品』単位で集計して表示</p>
-						<li class='btn-view' style='font-size:1.2rem;padding:2px'>会計明細</li>　<p>現在表示している売上のお会計明細を表示</p>
+					<div>
+						<label for='uridate' class='control-label'>売上日～：</label>
+						<input type='date' style='font-size:1.5rem;' name='UriDateFrom' maxlength='10' id='uridate' class='form-control' value='<?php echo $_SESSION["UriFrom"]; ?>'>
 					</div>
-					<h4 style='margin-bottom:0;'>表の操作</h4>
-					<div style='border:solid thin var(--panel-bd-color);border-radius:3px;padding:10px;margin-bottom:5px;'>
-						<p>イベント集計モードで表示している場合、「<span style='color:blue;'>日付</span>」「<span style='color:blue;'>イベント名</span>」をタップすると明細を表示。</p>
-						<p><span style='color:blue;'>青文字</span>をタップすると、タップしたデータと同じ条件で絞り込まれます。</p>
-						<p>例：イベント名をタップすると、同名のイベントの売上のみが表示</p>
-					</div>        
-					<h4 style='margin-bottom:0;'>修正モードについて</h4>
-					<div style='border:solid thin var(--panel-bd-color);border-radius:3px;padding:10px;'>
-						右上の「<span style='color:blue;'>修正モード</span>」をONにすると、誤入力した売上を修正できます。
+					<div>
+						<label for='uridateto' class='control-label'>～売上日：</label>
+						<input type='date' style='font-size:1.5rem;' name='UriDateTo' maxlength='10' id='uridateto' class='form-control' value='<?php echo $_SESSION["UriTo"]; ?>'>
+					</div>
+					<div>
+						<label for='Event' class='control-label'>イベント/顧客名：</label>
+						<select name='Event' style='font-size:1.5rem;padding-top:0;' id='Event' class='form-control' aria-describedby='EvHelp'>
+							<option value=''></option>
+							<?php
+							//Ajaxで取得に変更
+							?>
+						</select>
+						<small id='EvHelp' class='form-text text-muted'>売上日の期間を変更すると選択肢が更新されます。</small>
+					</div>
+					<div>
+						<label for='Type' class='control-label'>表示：上で指定した期間中の</label>
+						<select name='Type' style='font-size:1.5rem;padding-top:0;' id='Type' class='form-control'>
+							<option value='rireki' >売上履歴</option>
+							<option value='sum_items' >売上を日付＞イベント＞商品単位で集計</option>
+							<option value='sum_events' >売上を日付＞イベント単位で集計</option>
+						</select>
 					</div>
 				</div>
 				<div class='modal-footer'>
+					<button type='submit' style='font-size:1.5rem;color:#fff' class='btn btn-primary' >決　定</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<!--help1-->
+<div class='modal fade' id='modal_help1' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
+	<div class='modal-dialog  modal-dialog-centered'>
+		<div class='modal-content' style='font-size:1.2rem; font-weight: 600;background-color:rgba(255,255,255,0.8);'>
+			<!--
+			<div class='modal-header'>
+				<div class='modal-title' id='myModalLabel'>help</div>
+			</div>
+			-->
+			<div class='modal-body'>
+				<h4 style='margin-bottom:0;'>ボタンについて</h4>
+				<div style='border:solid thin var(--panel-bd-color);border-radius:3px;padding:10px;margin-bottom:5px;'>
+					<li class='btn-view' style='font-size:1.2rem;padding:2px'>イベント集計</li>　<p>全期間の売上を『日付＞イベント』単位で集計して表示</p>
+					<li class='btn-view' style='font-size:1.2rem;padding:2px'>商品集計</li>　<p>現在表示されている売上を『日付＞イベント＞商品』単位で集計して表示</p>
+					<li class='btn-view' style='font-size:1.2rem;padding:2px'>会計明細</li>　<p>現在表示している売上のお会計明細を表示</p>
+				</div>
+				<h4 style='margin-bottom:0;'>表の操作</h4>
+				<div style='border:solid thin var(--panel-bd-color);border-radius:3px;padding:10px;margin-bottom:5px;'>
+					<p>イベント集計モードで表示している場合、「<span style='color:blue;'>日付</span>」「<span style='color:blue;'>イベント名</span>」をタップすると明細を表示。</p>
+					<p><span style='color:blue;'>青文字</span>をタップすると、タップしたデータと同じ条件で絞り込まれます。</p>
+					<p>例：イベント名をタップすると、同名のイベントの売上のみが表示</p>
+				</div>        
+				<h4 style='margin-bottom:0;'>修正モードについて</h4>
+				<div style='border:solid thin var(--panel-bd-color);border-radius:3px;padding:10px;'>
+					右上の「<span style='color:blue;'>修正モード</span>」をONにすると、誤入力した売上を修正できます。
 				</div>
 			</div>
+			<div class='modal-footer'>
+			</div>
 		</div>
-	</div><!--help1-->
-	</div><!--app-->
-	
-	<script>
-		const { createApp, ref, onMounted, computed, VueCookies } = Vue;
-		createApp({
-			setup(){
-				const MSG = ref('<?php echo $_SESSION["MSG"]; ?>')
-				const alert_status = ref('alert-success')
-				//売上取得関連
-				const UriageList = ref([])		//売上リスト
-				const UriDateFrom = ref('<?php echo date("Y")."-01-01"; ?>')
-				const UriDateTo = ref('<?php echo date("Y")."-12-31"; ?>')
-				const Event = ref('')
-				const Type = ref('rireki')
-				const btn_class = ref(['btn-view','btn-view','btn-view btn-selected'])
-				const get_UriageList = () => {//売上リスト取得ajax
-					console_log("get_UriageList start",'lv3');
-					let params = new URLSearchParams()
-					params.append('user_id', '<?php echo $_SESSION["user_id"];?>')
-					params.append('UriDateFrom', UriDateFrom.value)
-					params.append('UriDateTo', UriDateTo.value);
-					params.append('Event', Event.value);
-					params.append('Type', Type.value);
-					axios
-					.post('ajax_get_Uriage2.php',params)
-					.then((response) => {UriageList.value = [...response.data]
-															//console_log('get_UriageList succsess','lv3')
-						})
-					.catch((error) => console_log(`get_UriageList ERROR:${error}`,'lv3'));
-				}//売上リスト取得ajax
-				const Type_changer = (Hyou_Type) => {
-					console_log(`Type_changer ${Hyou_Type}`,'lv3')
-					Type.value = Hyou_Type
-
-					btn_class.value[0] = 'btn-view'
-					btn_class.value[1] = 'btn-view'
-					btn_class.value[2] = 'btn-view'
-					if(Hyou_Type==='sum_events'){
-						btn_class.value[0] = 'btn-view btn-selected'
-					}else if(Hyou_Type==='sum_items'){
-						btn_class.value[1] = 'btn-view btn-selected'
-					}else{
-						btn_class.value[2] = 'btn-view btn-selected'
-					}
-					get_UriageList()
-				}
-
-				//フィルター関連
-				const filter_Uridate = ref('-')
-				const filter_Event = ref('-')
-				const filter_Shouhin = ref('-')
-				const filter_UriNo = ref('-')
-				const filter_flg = ref([false,''])
-				const set_filter = (colum,word,word2) =>{
-					console_log(`set_filter start params(${colum} , ${word})`,'lv3')
-					if(colum==='UriDate'){filter_Uridate.value = word}
-					if(colum==='Event'){filter_Event.value = word}
-					if(colum==='ShouhinCD'){
-						filter_Shouhin.value = word
-						word = word2
-					}
-					if(colum==='UriNO'){filter_UriNo.value = word}
-					filter_flg.value[0] = true
-					filter_flg.value[1] = `${filter_flg.value[1]}${word}＞`
-				}
-				const reset_filter = () =>{
-					console_log(`reset_filter start`,'lv3')
-					filter_Uridate.value = '-'
-					filter_Event.value = '-'
-					filter_Shouhin.value = '-'
-					filter_UriNo.value = '-'
-					filter_flg.value[0] = false
-					filter_flg.value[1] = ''
-				}
-				const UriageList_filter = computed(() => {
-					if(filter_flg.value[0]===false){
-						return UriageList.value
-					}
-					return UriageList.value.filter((row) => {
-						let serch_cols = ''
-						let serch_words = ''
-						if(filter_Uridate.value!=='-'){
-							//return(row.UriDate===(filter_Uridate.value))
-							serch_cols = row.UriDate.toString()
-							serch_words = filter_Uridate.value.toString()
-						}
-						if(filter_Event.value!=='-'){
-							//return(row.Event.includes(filter_Event.value) || row.TokuisakiNM.includes(filter_Event.value))
-							serch_cols = serch_cols + row.Event.toString() + row.TokuisakiNM.toString()
-							serch_words = serch_words + filter_Event.value.toString()
-						}
-						if(filter_Shouhin.value!=='-'){
-							//return(row.ShouhinCD===(filter_Shouhin.value))
-							serch_cols = serch_cols + row.ShouhinCD.toString()
-							serch_words = serch_words + filter_Shouhin.value.toString()
-						}
-						if(filter_UriNo.value!=='-'){
-							//return(row.UriageNO===(filter_UriNo.value))
-							serch_cols = serch_cols + row.UriageNO.toString()
-							serch_words = serch_words + filter_UriNo.value.toString()
-						}
-						console_log(`computed UriageList_filter (${serch_cols}:${serch_words})`)
-						return (serch_cols === serch_words)
-					})
-				})
-				const colspan = computed(()=>{//表タイプ毎の日付・イベント行のセル結合数返す
-					if(Type.value==='sum_items'){
-						return 10
-					}else if(Type.value==='sum_events'){
-						return 8
-					}else{
-						return 10
-					}
-				})
-
-				//更新処理関連
-				const upd_tanka = ref('')
-				const upd_zei_kbn = ref('1101')
-				const upd_zei_kominuki = ref('komi')
-				const upd_zei_kin = computed(() => {
-					if(upd_tanka.value!==''){
-						return return_tax(upd_tanka.value,upd_zei_kbn.value,upd_zei_kominuki.value)
-					}
-					return '-'
-				})
-				const upd_hontai = computed(() => {
-					if(upd_zei_kominuki.value==='nuki'){
-						return upd_tanka.value
-					}else{
-						return upd_tanka.value - upd_zei_kin.value
-					}
-				})
-
-
-				const return_tax = (kingaku,zeikbn,kominuki) => {
-					console_log('return_tax','lv3')
-					let zeiritu
-					if(zeikbn==='0'){
-						zeiritu=0
-					}else if(zeikbn==='1001'){
-						zeiritu=8
-					}else if(zeikbn==='1101'){
-						zeiritu=10
-					}else{
-						return 0
-					}
-
-					if(upd_zei_kbn.value===0){
-						return 0
-					}
-					if(kominuki==='komi'){
-						return kingaku - Math.round(kingaku / (1 + zeiritu / 100))
-					}else{
-						return Math.round(kingaku * (zeiritu / 100));
-					}
-				}
-
-				onMounted(() => {
-					console_log('onMounted','lv3')
-					get_UriageList()
-				})
-
-				return{
-					MSG,
-					alert_status,
-					UriageList,
-					get_UriageList,
-					UriDateFrom,
-					UriDateTo,
-					Event,
-					Type,
-					colspan,
-					set_filter,
-					UriageList_filter,
-					filter_Uridate,
-					filter_Event,
-					filter_Shouhin,
-					filter_UriNo,
-					Type_changer,
-					btn_class,
-					filter_flg,
-					reset_filter,
-					upd_zei_kbn,
-					upd_tanka,
-					upd_hontai,
-					upd_zei_kin,
-					upd_zei_kominuki,
-				}
-			}
-		}).mount('#app');
-	</script><!--Vue3.js-->
-	<script>
-		document.onkeypress = function(e) {
-			if (e.key === 'Enter') {
-				return false;
-			}
-		}
-	</script><!--js-->
-</body>
-
-
+	</div>
+</div>
 <script>
+	
+	var select = document.getElementById('zeikbn');
+	var tanka = document.getElementById('UpUriTanka');
+	var UpTanka = document.getElementById('UpTanka');
+	var shouhizei = document.getElementById('UpZei');
+	var zkomitanka = document.getElementById('UpUriZei');
+	var kominuki = document.getElementsByName('options')
 	var zei_math = function(){
 		if(select.value=='0'){
 			zkomitanka.value=tanka.value;
@@ -858,7 +746,7 @@
 			uritable.style.height= normal_vw +'px';
 		}
 	}
-	//chang_mode();
+	chang_mode();
 	
 	//チェックボックスのチェック有無で必須か否かを切り替え
 	document.getElementById('chk_uridate').onclick = function(){
