@@ -25,7 +25,7 @@ if(!empty($_POST)){
 	// DBとの接続
 	$pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 	$sqlstr = "select * from vw_shouhinms where uid = ? order by shouhinNM";
-	log_writer("ajax_get_MSCategory_list.php ",$sqlstr);
+	//log_writer2("ajax_get_MSCategory_list.php ",$sqlstr,"lv3");
 
 	$stmt = $pdo_h->prepare($sqlstr);
 	$stmt->bindValue(1, $_POST['user_id'], PDO::PARAM_INT);

@@ -302,23 +302,31 @@ try{
 	//位置情報、天気情報の付与（uid,売上No,緯度、経度、住所、天気、気温、体感温度、天気アイコンping,無効FLG,insdate,update）
 	if(empty($_POST["nonadd"]) && $ins_cnt>0){
 		$emsg=$emsg."/位置情報、天気情報　処理開始\n";
-		$_SESSION["nonadd"]="";
-		$tenki=get_weather("insert",$_POST['lat'],$_POST['lon']);
+		//$_SESSION["nonadd"]="";
+		//$tenki=get_weather("insert",$_POST['lat'],$_POST['lon']);
 		//file_put_contents("sql_log/".$logfilename,$time.",gio/weather :".$_POST['address']."/".$tenki[0]."/".$tenki[1]."/".$tenki[2]."\n",FILE_APPEND);
 		
 		$sqlstr = "INSERT INTO `UriageData_GioWeather`(`uid`, `UriNo`, `lat`, `lon`, `weather`, `description`, `temp`, `feels_like`, `icon`) VALUES(?,?,?,?,?,?,?,?,?)";
 		$sqllog = "INSERT INTO `UriageData_GioWeather`(`uid`, `UriNo`, `lat`, `lon`, `weather`, `description`, `temp`, `feels_like`, `icon`) ";
-		$sqllog = $sqllog."VALUES('".$_SESSION['user_id']."','".$UriageNO."','".$_POST['lat']."','".$_POST['lon']."','".$tenki[0]."','".$tenki[1]."','".$tenki[2]."','".$tenki[3]."','".$tenki[4]."')";
+		//$sqllog = $sqllog."VALUES('".$_SESSION['user_id']."','".$UriageNO."','".$_POST['lat']."','".$_POST['lon']."','".$tenki[0]."','".$tenki[1]."','".$tenki[2]."','".$tenki[3]."','".$tenki[4]."')";
+		$sqllog = $sqllog."VALUES('".$_SESSION['user_id']."','".$UriageNO."','".$_POST['lat']."','".$_POST['lon']."','".$_POST['weather']."','".$_POST['description']."','".$_POST['temp']."','".$_POST['feels_like']."','".$_POST['icon']."')";
 		$stmt = $pdo_h->prepare($sqlstr);
 		$stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
 		$stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
 		$stmt->bindValue(3,  $_POST['lat'], PDO::PARAM_INT);
 		$stmt->bindValue(4,  $_POST['lon'], PDO::PARAM_INT);
+		/*
 		$stmt->bindValue(5,  $tenki[0], PDO::PARAM_STR);
 		$stmt->bindValue(6,  $tenki[1], PDO::PARAM_INT);
 		$stmt->bindValue(7,  $tenki[2], PDO::PARAM_INT);
 		$stmt->bindValue(8,  $tenki[3], PDO::PARAM_INT);
 		$stmt->bindValue(9,  $tenki[4], PDO::PARAM_STR);
+		*/
+		$stmt->bindValue(5,  $_POST['weather'], PDO::PARAM_STR);
+		$stmt->bindValue(6,  $_POST['description'], PDO::PARAM_INT);
+		$stmt->bindValue(7,  $_POST['temp'], PDO::PARAM_INT);
+		$stmt->bindValue(8,  $_POST['feels_like'], PDO::PARAM_INT);
+		$stmt->bindValue(9,  $_POST['icon'], PDO::PARAM_STR);
 		$flg=$stmt->execute();
 		
 		if($flg){
@@ -331,7 +339,8 @@ try{
 			$E_Flg=1;
 		}
 	}else{
-		$_SESSION["nonadd"]="checked";
+		//$_SESSION["nonadd"]="checked";
+		log_writer2("ajax_EVregi_sql.php","Gio insert skip","lv3");
 	}
 	
 	//

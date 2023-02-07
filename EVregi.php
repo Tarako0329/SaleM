@@ -276,6 +276,11 @@
 		</footer>
 		<input type='hidden' name='lat' :value='vlat'>
 		<input type='hidden' name='lon' :value='vlon'>
+		<input type='hidden' name='weather' :value='weather'>
+		<input type='hidden' name='description' :value='description'>
+		<input type='hidden' name='temp' :value='temp'>
+		<input type='hidden' name='feels_like' :value='feels_like'>
+		<input type='hidden' name='icon' :value='icon'>
 	</form>
 	<div class="loader-wrap" v-show='loader'>
 		<div class="loader">Loading...</div>
@@ -562,14 +567,14 @@
 
 				const on_submit = async(e) => {//登録・submit/
 					console_log('on_submit start','lv3')
-					let rtn
 					loader.value = true
 					rtn = await v_get_gio()	//住所再取得
-					//console_log(e.target,'lv3')
+					console_log('after v_get_gio?','lv3')
+
 					let form_data = new FormData(e.target)
 					let params = new URLSearchParams (form_data)
 					
-					axios
+					await axios
 						.post('ajax_EVregi_sql.php',params,{timeout: <?php echo $timeout; ?>}) //php側は15秒でタイムアウト
 						.then((response) => {
 							console_log(`on_submit SUCCESS`,'lv3')
@@ -614,35 +619,80 @@
 				//Gioコーディング
 				const vlat = ref('')		//緯度
 				const vlon = ref('')		//経度
+				const weather = ref('')
+				const description = ref('')
+				const temp = ref('')
+				const feels_like = ref('')
+				const icon = ref('')
+
 				const vjusho = ref('')
-				const v_get_gio = () =>{//緯度経度取得
-					console_log('get_gio start','lv3')
-					let address = []
+				const v_get_gio = () =>{//緯度経度,天気情報取得
+					return new Promise(resolve => {
+						console_log('v_get_gio start','lv3')
+						if(labels_address_check.value===true){
+							console_log('v_get_gio no_exec','lv3')
+							resolve(false)	//位置情報なし
+						}else{
+							navigator.geolocation.getCurrentPosition(
+								async (geoLoc) => {
+									vlat.value = geoLoc.coords.latitude
+									vlon.value = geoLoc.coords.longitude
+									let rtn_val
 
-					navigator.geolocation.getCurrentPosition(
-						geoLoc => {
-							vlat.value = geoLoc.coords.latitude
-							vlon.value = geoLoc.coords.longitude
+									//GioCodeから住所を取得
+									const res_add = axios.get('https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress',{params:{lat:geoLoc.coords.latitude,lon:geoLoc.coords.longitude}})
+									//GioCodeから天気を取得
+									const res_weat = axios.get('https://api.openweathermap.org/data/2.5/weather',{
+										params:{lat:geoLoc.coords.latitude,lon:geoLoc.coords.longitude,units:'metric',APPID:'<?php echo WEATHER_ID; ?>'}
+										,timeout: 5000
+									})
 
-							axios
-							.get('https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress',{params:{lat:geoLoc.coords.latitude,lon:geoLoc.coords.longitude}})
-							.then((response) => (
-								address = response.data.results
-								//,console_log(address,'lv3')
-								// 変換表から都道府県などを取得
-								,muniData = GSI.MUNI_ARRAY[address.muniCd]
-								
-								// 都道府県コード,都道府県名,市区町村コード,市区町村名 に分割
-								,[prefCode, pref, muniCode, city] = muniData.split(',')
-								//${pref}${city}${data.lv01Nm}->県・市区町村・番地
-								,vjusho.value = (`${city}${address.lv01Nm}`).replace(/\s+/g, "")
-								//,jusho_es = escape(jusho.replace(/\s+/g, ""))								
-								))
-							.catch((error) => console_log(`get_gio ERROR:${error}`,'lv3'))
-						},
-						err => console.error({err}),
-					);
-					return 0
+									await res_add
+									.then((response) => (
+										console_log(response.data,'lv3')
+										,address = response.data.results
+										// 変換表から都道府県などを取得
+										,muniData = GSI.MUNI_ARRAY[address.muniCd]
+										// 都道府県コード,都道府県名,市区町村コード,市区町村名 に分割
+										,[prefCode, pref, muniCode, city] = muniData.split(',')
+										//${pref}${city}${data.lv01Nm}->県・市区町村・番地
+										,vjusho.value = (`${city}${address.lv01Nm}`).replace(/\s+/g, "")
+										//,jusho_es = escape(jusho.replace(/\s+/g, ""))								
+									))
+									.catch((error) => {
+										console_log(`v_get_gio[address] ERROR:${error}`,'lv3')
+										rtn_val = false
+									})
+
+									await res_weat
+									.then((response) => {
+										console_log(response.data,'lv3')
+										weather.value = response.data.weather[0].main
+										description.value = response.data.weather[0].description
+										temp.value = response.data.main.temp
+										feels_like.value = response.data.main.feels_like
+										icon.value = response.data.weather[0].icon + '.png'
+									})
+									.catch((error) => {
+										console_log(`v_get_gio[weather] ERROR:${error}`,'lv3')
+										rtn_val = false
+									})
+
+									console_log('v_get_gio finish','lv3')
+									if(rtn_val===false){
+										resolve(false) //axiosでエラー
+										labels_address_check.value=true //住所対象外のチェックを入れる
+									}else{
+										resolve(true)
+									}
+								},
+								(err) => {
+									console.error({err})
+									resolve(false)	//位置情報なし
+								}
+							)
+						}
+					})
 				}
 
 				//細かな表示設定など
@@ -718,6 +768,11 @@
 					labels_address_check,
 					scroller,
 					get_scroll_target,
+					weather,
+					description,
+					temp,
+					feels_like,
+					icon,
 				}
 			}
 		}).mount('#register');
