@@ -49,6 +49,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     }
     
     if($action=="logout"){
+        /*
         $_SESSION = array();// セッション変数を全て解除する
         
         // セッションを切断するにはセッションクッキーも削除する。
@@ -61,6 +62,9 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     
         session_destroy();// 最終的に、セッションを破壊する
         $logoff=true;
+        */
+        redirect_to_login("ログオフしました");
+        exit();
     }else{
         $_SESSION["PK"]=PKEY;
         $_SESSION["SK"]=SKEY;
@@ -84,8 +88,27 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             $stmt = $pdo_h->prepare($sql);
             $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
             $stmt->execute();
+            /*
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: menu.php?action=logout&ForcedLogout=true");
+            */
+            ?>
+            <!DOCTYPE html>
+            <html lang='ja'>
+            <script>
+            if ('serviceWorker' in navigator) {
+                window.navigator.serviceWorker.getRegistrations()
+                .then(registrations => {
+                    for(let registration of registrations) {
+                        registration.unregister();
+                        console.log('Service Worker is delete');
+                    }
+                });
+            }
+            </script>
+            </html>
+            <?php
+            redirect_to_login("システム更新のため、強制ログオフしました");
             exit();
         }
         //契約状況の確認
@@ -174,7 +197,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
 <?php
     deb_echo(ROOT_URL);
     deb_echo(EXEC_MODE."：uid_".$_SESSION["user_id"]);
-
+    /*
     if($logoff){
         if($_GET["ForcedLogout"]==true){
             echo "システム更新時に追加した機能を有効にするため、強制ログアウトしました。<br>お手数ですが、再度ログインしてご利用ください。<br><br>";
@@ -184,21 +207,25 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         echo "<a href='index.php'>再ログインする</a>";
         echo "</body>\n";
         ?>
+        <!--
         <script>
-            //
-            window.navigator.serviceWorker.getRegistrations()
-            .then(registrations => {
-                for(let registration of registrations) {
-                    registration.unregister();
-                    console.log('Service Worker is delete');
-                }
-            });
-            //window.location.reload(true); 
+            
+            if ('serviceWorker' in navigator) {
+                window.navigator.serviceWorker.getRegistrations()
+                .then(registrations => {
+                    for(let registration of registrations) {
+                        registration.unregister();
+                        console.log('Service Worker is delete');
+                    }
+                });
+            }
         </script>
+        -->
         <?php
         
         exit();
     }
+    */
     echo $msg;
 
     if(EXEC_MODE=="Trial"){

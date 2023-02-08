@@ -33,10 +33,13 @@
 			//ログイン画面から直通でアクセス
 			log_writer2("EVregi.php  $status ",$status,"lv3");
 		}else{
-			$_SESSION["EMSG"]="セッションが正しくありませんでした。".filter_input(INPUT_POST,"csrf_token");
+			//$_SESSION["EMSG"]="セッションが正しくありませんでした。".filter_input(INPUT_POST,"csrf_token");
 			log_writer2("EVregi.php","セッションが正しくありませんでした。","lv3");
+			/*
 			header("HTTP/1.1 301 Moved Permanently");
 			header("Location: index.php");
+			*/
+			redirect_to_login("セッションが正しくありませんでした。".filter_input(INPUT_POST,"csrf_token"));
 			exit();
 		}
 	}else{
@@ -67,7 +70,8 @@
 	$RG_MODE=(!empty($_POST["mode"])?$_POST["mode"]:$_GET["mode"]);
 
 	if($RG_MODE===""){
-		echo "error rezi mode nothing!";
+		//echo "error rezi mode nothing!";
+		redirect_to_login("error rezi mode nothing!");
 		exit();
 	}
 
@@ -221,15 +225,6 @@
 								</div>
 							</div>
 						</template>
-						<!--
-						<template v-if='index!==0 && list.disp_category !== shouhinMS_filter[index-1].disp_category'>
-							<div class='row' style='background:var(--jumpbar-color);margin-top:5px;' >
-								<div class='col-12' :id='`jump_${index}`' style='color:var(--categ-font-color);'><a href='#jump_".$befor."' class='btn-updown'><i class='fa-solid fa-angles-up'></i></a>
-									{{list.disp_category}}<a href='#jump_".$next."'  class='btn-updown'><i class='fa-solid fa-angles-down'></i></a>
-								</div>
-							</div>
-						</template>
-						-->
 						<div class ='col-md-3 col-sm-6 col-6 items'>
 							<button type='button' @click="ordercounter" class='btn-view btn--rezi' :id="`btn_menu_${list.shouhinCD}`" :value = "index">{{list.shouhinNM}}
 							</button>

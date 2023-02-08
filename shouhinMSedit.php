@@ -18,9 +18,12 @@ require "php_header.php";
 if(isset($_GET["csrf_token"]) || empty($_POST)){
     //トップメニューからの遷移チェック。リンクから飛ぶのでPOSTなし
     if(csrf_chk_nonsession_get($_GET["csrf_token"])==false && csrf_chk_redirect($_GET["csrf_token"])==false){
+        /*
         $_SESSION["EMSG"]="セッションが正しくありませんでした。";
         header("HTTP/1.1 301 Moved Permanently");
         header("Location: index.php");
+        */
+        redirect_to_login("セッションが正しくありませんでした。");
         exit();
     }
 }

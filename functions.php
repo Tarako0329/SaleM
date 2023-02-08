@@ -8,7 +8,11 @@ function log_writer($pgname,$msg){
 }
 function log_writer2($pgname,$msg,$kankyo){
     //$kankyo:lv1=全環境 lv2=本番以外 lv3=テスト・ローカル環境のみ
-    if($kankyo==="lv1"){
+    
+    if($kankyo==="lv0"){
+        log_writer($pgname,$msg);
+        send_mail(SYSTEM_NOTICE_MAIL,"【重要】".TITLE."でシステムエラー発生",$msg);
+    }else if($kankyo==="lv1"){
         log_writer($pgname,$msg);
     }else if($kankyo==="lv2" && EXEC_MODE!=="Product"){
         log_writer($pgname,$msg);
@@ -51,13 +55,16 @@ function get_token() {
     return bin2hex($bytes);
 }
 // =========================================================
-// トークンの削除
+// トークンの削除(指定のトークン もしくは　期限切れのトークンを一括削除)
 // =========================================================
 function delete_old_token($token, $pdo) {
     //プレースホルダで SQL 作成
-    $sql = "DELETE FROM AUTO_LOGIN WHERE token = ?";
+    $date = new DateTime("- 7 days");
+    //$sql = "DELETE FROM AUTO_LOGIN WHERE token = ?";
+    $sql = "DELETE FROM AUTO_LOGIN WHERE token = ? or REGISTRATED_TIME < ?;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(1, $token, PDO::PARAM_STR);
+    $stmt->bindValue(2, $date->format('Y-m-d H:i:s'), PDO::PARAM_STR);
     $stmt->execute();
 }
 
@@ -128,26 +135,35 @@ function check_session_userid($pdo_h){
             //セッションのIDがクリアされた場合の再取得処理。
             if(empty($_COOKIE['webrez_token'])){
                 log_writer2("func:check_session_userid","cookieのwebrez_tokenが存在してない。useridの取得手段がないのでログイン画面へ","lv3");
+                /*
                 $_SESSION["EMSG"]="セッションが切れてます。";
                 
                 header("HTTP/1.1 301 Moved Permanently");
                 header("Location: index.php");
+                */
+                redirect_to_login("セッションが切れてます。");
                 exit();
             }
             $rtn=check_auto_login($_COOKIE['webrez_token'],$pdo_h);
             if($rtn!==true){
                 //$_SESSION["EMSG"]="自動ログインの有効期限が切れてます";
+                /*
                 $_SESSION["EMSG"]=$rtn;
                 header("HTTP/1.1 301 Moved Permanently");
                 header("Location: index.php");
+                */
+                redirect_to_login($rtn);
                 exit();
             }
         }
         if(!($_SESSION["user_id"]<>"")){
             //念のための最終チェック
+            /*
             $_SESSION["EMSG"]="ユーザーＩＤの再取得に失敗しました。[error:1]";
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: index.php");
+            */
+            redirect_to_login("ユーザーＩＤの再取得に失敗しました。[error:1]");
             exit();
         }
         //取得できたUIDがDBに存在するか確認
@@ -159,12 +175,15 @@ function check_session_userid($pdo_h){
     
         if (count($rows) == 0) {
             //IDは取得できたがDB側にデータが無い場合もID再発行
+            /*
             $_SESSION["EMSG"]="ユーザーＩＤの再取得に失敗しました。[error:2]";
             $_SESSION["user_id"]="";
     	    //Cookie のトークンを削除
     	    setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: index.php");
+            */
+            redirect_to_login("ユーザーＩＤの再取得に失敗しました。[error:2]");
             exit();
         }
     }
@@ -657,9 +676,10 @@ function get_getsumatsu($ym){
 }
 
 // =========================================================
-// 天気取得
+// 天気取得（無効・jsに移植）
 // =========================================================
 function get_weather( $type = null,$lat,$lon ){
+    /* openweathermap で &amp;が受け付けられなくなったため、廃止
     if(EXEC_MODE==="Local"){
         return ["",0,0,0,0];
     }
@@ -694,6 +714,25 @@ function get_weather( $type = null,$lat,$lon ){
     }
 
     return $out;
+    */
+}
+// =========================================================
+// ログイン画面へ飛ばす
+// =========================================================
+function redirect_to_login($message) {
+	$_SESSION = array();
+	session_destroy();
+	session_start();
+    session_regenerate_id(true);
+    setCookie("login_type", "", -1, "/", "", TRUE, TRUE);
+    setCookie("webrez_token", "", -1, "/", "", TRUE, TRUE);
+    setCookie("csrf_token", "", -1, "/", "", TRUE, TRUE);
+
+    $_SESSION["EMSG"] = $message;
+
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: index.php");
+    exit();
 }
 
 

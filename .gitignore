@@ -1,7 +1,8 @@
 .env
-error_log
+*error_log*
 差分SQL.sql
 qdmail.log
 *.log
 .bk
 backup
+xxx*

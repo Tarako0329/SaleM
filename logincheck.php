@@ -2,6 +2,7 @@
 date_default_timezone_set('Asia/Tokyo');
 require "./vendor/autoload.php";
 
+
 //.envの取得
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
@@ -19,7 +20,7 @@ if(EXEC_MODE!=="Local"){
 }
 
 $pass=dirname(__FILE__);
-require "functions.php";
+require_once "functions.php";
 log_writer("logincheck.php MAIN_DOMAIN ",MAIN_DOMAIN);
 log_writer("logincheck.php _SESSION values ",$_SESSION);
 log_writer("logincheck.php _POST values ",$_POST);
@@ -53,7 +54,8 @@ if(!empty($_COOKIE['webrez_token']) && $login_type==="auto"){
     
     $csrf_token = $_POST['csrf_token'];
 }else{
-    echo "不正アクセス。処理を中止します。";
+    //echo "不正アクセス。処理を中止します。";
+    redirect_to_login("不正アクセス。処理を中止します。");
     exit();
 }
 
@@ -61,11 +63,8 @@ if(!empty($_COOKIE['webrez_token']) && $login_type==="auto"){
 //if (empty($cookie_token) && $csrf_token != $_SESSION['csrf_token']) {
 if ($login_type==="normal" && $csrf_token != $_SESSION['csrf_token']) {
     //通常ログインかつPOSTトークン≠セッショントークンの場合、ログイン画面へ
-	$_SESSION = array();
-	session_destroy();
-	session_start();
 	// リダイレクト
-	redirect_to_login();
+	redirect_to_login("セッションが不正です");
 	exit();
 }
 
@@ -81,7 +80,8 @@ try {
     if ($login_type==="normal") {
         //ログイン画面からログインしたらセッション再作成
         $_SESSION['user_id']="";
-        setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly
+        setCookie("webrez_token", "", -1, "/", "", TRUE, TRUE); // secure, httponly
+        setCookie("login_type", "", -1, "/", "", TRUE, TRUE);
         $id = check_user($mail_id, $password, $pdo, $key);
         if ($id<>false) {
 		    $normal_result = true;
@@ -90,7 +90,7 @@ try {
 		    $_SESSION["EMSG"]="メールアドレス、又はパスワードが無効です。";
 		}
         
-	}else{
+	}else{//$login_type==="auto"
 		if (check_auto_login($cookie_token, $pdo)) {
 		    $auto_result = true;
 		    $id = $_SESSION['user_id']; // 後続の処理のため格納
@@ -123,11 +123,13 @@ try {
     	redirect_to_welcome(get_top($id, $pdo));
     } else {
     	//ログイン失敗。ログイン画面へ
-    	redirect_to_login();
+    	redirect_to_login("ログインできませんでした。");
     	exit();
     }
 } catch (PDOException $e) {
     die($e->getMessage());
+    log_writer2("logincheck.php",$e->getMessage(),"lv0");
+    redirect_to_login("ログインできませんでした。");
 }
 
 
@@ -174,12 +176,19 @@ function register_token($id, $token, $pdo) {
 /*
 * ログイン画面へのリダイレクト
 */
+/* function.phpへ移動
 function redirect_to_login() {
-  header("HTTP/1.1 301 Moved Permanently");
-  header("Location: index.php");
-  exit();
-}
+	$_SESSION = array();
+	session_destroy();
+	session_start();
+    setCookie("login_type", "", -1, "/", "", TRUE, TRUE);
+    setCookie("webrez_token", "", -1, "/", "", TRUE, TRUE);
 
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: index.php");
+    exit();
+}
+*/
 /*
 * Welcome画面へのリダイレクト
 */
@@ -198,6 +207,7 @@ function get_top($id, $pdo){
     }
 }
 function redirect_to_welcome($a) {
+    //topメニュー or レジ画面へ
     $_SESSION["status"]="login_redirect";
     header("HTTP/1.1 301 Moved Permanently");
     header("Location: ".$a);

@@ -25,6 +25,7 @@ if($_GET["acc"]<>""){
     $mail=$_POST["mail"];
 }else{
     echo "不正アクセスです。";
+    redirect_to_login("不正アクセスです。");
     exit();
 }
 
@@ -53,7 +54,7 @@ if(filter_input(INPUT_POST,"answer")){
         echo $_SESSION["user_id"]."<br>";
         header("HTTP/1.1 301 Moved Permanently");
         header("Location: account_create.php?mode=1&csrf_token=".$token);
-        exit();
+        exit(); //アカウント作成処理へjump
     }else{
         $msg="秘密の答えが間違ってます。<br>";
     }

@@ -22,9 +22,12 @@ require "php_header.php";
 
 if(isset($_GET["csrf_token"]) || empty($_POST)){
     if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
+        /*
         $_SESSION["EMSG"]="セッションが正しくありませんでした。①";
         header("HTTP/1.1 301 Moved Permanently");
         header("Location: index.php");
+        */
+        redirect_to_login("セッションが正しくありませんでした。");
         exit();
     }
 }

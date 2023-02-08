@@ -1,9 +1,9 @@
 <?php
 require "php_header.php";
 if(EXEC_MODE=="Trial"){
-        header("HTTP/1.1 301 Moved Permanently");
-        header("Location: menu.php");
-        exit();
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: menu.php");
+    exit();
 }
 //$_SESSION['csrf_token'] = get_token(); // CSRFのトークンを取得する
 
@@ -54,8 +54,8 @@ if(isset($_SESSION["EMSG"])){
             <?php echo $errmsg; ?>
             <form class="form-signin" id="form1" method="post" action="logincheck.php">
                 <span id="reauth-email" class="reauth-email"></span>
-                <input type="email" id="inputEmail" class="form-control" placeholder="Email address" name="LOGIN_EMAIL" required autofocus>
-                <input type="password" id="inputPassword" class="form-control" name="LOGIN_PASS" placeholder="Password" required>
+                <input type="email" id="inputEmail" class="form-control" placeholder="Email address" name="LOGIN_EMAIL" required autofocus value='<?php echo (EXEC_MODE=="Local"?"green.green.midori@green-island.mixh.jp":""); ?>'>
+                <input type="password" id="inputPassword" class="form-control" name="LOGIN_PASS" placeholder="Password" required value='<?php echo (EXEC_MODE=="Local"?"000000":""); ?>'>
                 <div id="remember" class="checkbox">
                     <label>
                         <input type="checkbox" name="AUTOLOGIN" checked> Remember 
