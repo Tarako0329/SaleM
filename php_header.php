@@ -1,20 +1,13 @@
 <?php
 date_default_timezone_set('Asia/Tokyo');
 require "./vendor/autoload.php";
+require_once "functions.php";
+
 //.envの取得
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
-
-$rtn=session_set_cookie_params(24*60*60*24*3,'/','.'.MAIN_DOMAIN,true);
-if($rtn==false){
-    echo "ERROR:session_set_cookie_params";
-    exit();
-}
-session_start();
-
-require "functions.php";
 
 if(!empty($_SERVER['SCRIPT_URI'])){
     define("ROOT_URL",substr($_SERVER['SCRIPT_URI'],0,mb_strrpos($_SERVER['SCRIPT_URI'],"/")+1));
@@ -22,24 +15,6 @@ if(!empty($_SERVER['SCRIPT_URI'])){
     define("ROOT_URL","http://".MAIN_DOMAIN."/");
 }
 define("EXEC_MODE",$_ENV["EXEC_MODE"]);
-
-
-if(EXEC_MODE=="Test" || EXEC_MODE=="Local"){
-    //テスト環境はミリ秒単位
-    //$time="8";
-    $time=date('Ymd-His');
-    error_reporting( E_ALL );
-}else{
-    //本番はリリースした日を指定
-    $time="20221111-01";
-    //$time=date('Ymd');
-    error_reporting( E_ALL & ~E_NOTICE );
-}
-
-$pass=dirname(__FILE__);
-
-//ツアーガイド実行中か否かを判断する
-$_SESSION["tour"]=(empty($_SESSION["tour"])?"":$_SESSION["tour"]);
 
 //DB接続関連
 define("DNS","mysql:host=".$_ENV["SV"].";dbname=".$_ENV["DBNAME"].";charset=utf8");
@@ -77,6 +52,34 @@ $title = $_ENV["TITLE"];
 define("KEY", $_ENV["KEY"]);
 $key = $_ENV["KEY"];
 
+if(EXEC_MODE=="Test" || EXEC_MODE=="Local"){
+    //テスト環境はミリ秒単位
+    //$time="8";
+    $time=date('Ymd-His');
+    error_reporting( E_ALL );
+}else{
+    //本番はリリースした日を指定
+    $time="20221111-01";
+    //$time=date('Ymd');
+    error_reporting( E_ALL & ~E_NOTICE );
+}
+
+$pass=dirname(__FILE__);
+
+$rtn=session_set_cookie_params(24*60*60*24*3,'/','.'.MAIN_DOMAIN,true);
+if($rtn==false){
+    //echo "ERROR:session_set_cookie_params";
+    log_writer2("php_header.php","ERROR:[session_set_cookie_params] が FALSE を返しました。","lv0");
+    echo "システムエラー発生。システム管理者へ通知しました。";
+    //共通ヘッダーでのエラーのため、リダイレクトTOPは実行できない。
+    exit();
+}
+session_start();
+//ツアーガイド実行中か否かを判断する
+$_SESSION["tour"]=(empty($_SESSION["tour"])?"":$_SESSION["tour"]);
+
+
+
 // DBとの接続
 $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
@@ -90,15 +93,6 @@ if(!isset($_COOKIE['machin_id'])){
 define("MACHIN_ID", $machin_id);
 
 //スキンの取得
-/* headerでuidの再取得はできない、かつ、マシンIDはGUIDなのでほぼ一意となるのでuidは使用しないように変更する
-$sql = "select value from PageDefVal where uid=? and machin=? and page=? and item=?";
-$stmt = $pdo_h->prepare($sql);
-$stmt->bindValue(1, (!empty($_SESSION['user_id'])?$_SESSION['user_id']:NULL), PDO::PARAM_INT);
-$stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
-$stmt->bindValue(3, "menu.php", PDO::PARAM_STR);
-$stmt->bindValue(4, "COLOR", PDO::PARAM_STR);//name属性を指定
-$stmt->execute();
-*/
 $sql = "select value from PageDefVal where machin=? and page=? and item=?";
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, MACHIN_ID, PDO::PARAM_STR);
