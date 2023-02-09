@@ -9,15 +9,6 @@
 */
 require "php_header.php";
 
-function param_clear(){
-	$_SESSION["Uridate2"]="%";
-	$_SESSION["Event"]="%";
-	$_SESSION["UriNO"]="%";
-	$_SESSION["shouhinCD"]="%";
-	$_SESSION["shouhinNM"]="%";
-	$_SESSION["wheresql"]="";
-}
-
 log_writer2("ajax_get_Uriage2.php",$_POST,"lv3");
 
 {//パラメータセット
@@ -28,78 +19,12 @@ log_writer2("ajax_get_Uriage2.php",$_POST,"lv3");
 		$_SESSION["Event"]      =(empty($_POST["Event"])?"%":$_POST["Event"]);
 		$Type = (empty($_POST["Type"])?"":$_POST["Type"]);
 		
-		//検索モーダル使用時は絞り込みを解除
-		$_SESSION["Uridate2"]="%";
-		$_SESSION["UriNO"]="%";
-		$_SESSION["shouhinCD"]="%";
-		
-		//更新条件を保存
-		/*
-		$_SESSION["chk_uridate"]      =(empty($_POST["chk_uridate"])?"":$_POST["chk_uridate"]);
-		$_SESSION["up_uridate"]      =(empty($_POST["up_uridate"])?"":$_POST["up_uridate"]);
-		$upd_msg = $upd_msg.(empty($_POST["up_uridate"])?"":"売上日：".$_POST["up_uridate"]."<br>");
-		$_SESSION["chk_event"]      =(empty($_POST["chk_event"])?"":$_POST["chk_event"]);
-		$_SESSION["up_event"]      =(empty($_POST["up_event"])?"":$_POST["up_event"]);
-		$upd_msg = $upd_msg.(empty($_POST["up_event"])?"":"イベント名：".$_POST["up_event"]."<br>");
-		$_SESSION["chk_kokyaku"]      =(empty($_POST["chk_kokyaku"])?"":$_POST["chk_kokyaku"]);
-		$_SESSION["up_kokyaku"]      =(empty($_POST["up_kokyaku"])?"":$_POST["up_kokyaku"]);
-		$upd_msg = $upd_msg.(empty($_POST["up_kokyaku"])?"":"顧客名：".$_POST["up_kokyaku"]."<br>");
-		$_SESSION["chk_urikin"]      =(empty($_POST["chk_urikin"])?"":$_POST["chk_urikin"]);
-		$_SESSION["up_zeikbn"]      =(empty($_POST["up_zeikbn"])?"":$_POST["up_zeikbn"]);
-		$_SESSION["up_uritanka"]      =(empty($_POST["up_uritanka"])?"":$_POST["up_uritanka"]);
-		$_SESSION["up_zei"]      =(empty($_POST["up_zei"])?"":$_POST["up_zei"]);
-		$upd_msg = $upd_msg.(empty($_POST["chk_urikin"])?"":"商品単価(税込)：".($_POST["up_uritanka"]+$_POST["up_zei"])."(".$_POST["up_uritanka"]." + ".$_POST["up_zei"].")<br>");
-		$_SESSION["chk_genka"]      =(empty($_POST["chk_genka"])?"":$_POST["chk_genka"]);
-		$_SESSION["up_urigenka"]      =(empty($_POST["up_urigenka"])?"":$_POST["up_urigenka"]);
-		$upd_msg = $upd_msg.(empty($_POST["chk_genka"])?"":"原価単価：".$_POST["up_urigenka"]."<br>");
-		*/
 	}
 	//GET
-	if(!empty($_GET)){
-		//初回アクセスはGETで来るので日付に今日をセット
-		if(!empty($_GET["first"])){
-			$_SESSION["MSG"]="本日の売上";
-			$_SESSION["UriFrom"]=date("Y-m-d");
-			$_SESSION["UriTo"]=date("Y-m-d");
-			$_SESSION["UriageData_Correct_mode"]="false";
 
-			param_clear();
-		}
-		$Type=(empty($_GET["Type"])?"rireki":$_GET["Type"]);
-		
-		if((empty($_GET["display"])?"":$_GET["display"])=="all"){
-			$_SESSION["UriFrom"]="2000-01-01";
-			$_SESSION["UriTo"]="2099-12-31";
-
-			param_clear();
-		}
-		//日付＞イベント＞商品・売上No
-		if(!empty($_GET["ad1"])){
-			$_SESSION["Uridate2"]=rot13decrypt2($_GET["ad1"]);
-			$_SESSION["Event"]="%";
-			$_SESSION["UriNO"]="%";
-			$_SESSION["shouhinCD"]="%";
-		}
-		if(!empty($_GET["ad2"])){
-			$_SESSION["Event"]=rot13decrypt2($_GET["ad2"]);
-			$_SESSION["UriNO"]="%";
-			$_SESSION["shouhinCD"]="%";
-		}
-		if(!empty($_GET["ad3"])){$_SESSION["UriNO"]=rot13decrypt2($_GET["ad3"]);}
-		if(!empty($_GET["ad4"])){$_SESSION["shouhinCD"]=rot13decrypt2($_GET["ad4"]);}
-		if(!empty($_GET["ad5"])){$_SESSION["shouhinNM"]=rot13decrypt2($_GET["ad5"]);}
-
-		//deleteモード
-		$_SESSION["urino"]=(empty($_GET["urino"])?"":$_GET["urino"]);
-		$_SESSION["cd"]=(empty($_GET["cd"])?"":$_GET["cd"]);
-	}
 	//SESSION
-	$_SESSION["UriageData_Correct_mode"]=(empty($_SESSION["UriageData_Correct_mode"])?"false":$_SESSION["UriageData_Correct_mode"]);
+	//$_SESSION["UriageData_Correct_mode"]=(empty($_SESSION["UriageData_Correct_mode"])?"false":$_SESSION["UriageData_Correct_mode"]);
 }
-//var_dump($_SESSION);
-
-
-
 
 
 $wheresql="where uid = :user_id AND UriDate >= :UriDate AND UriDate <= :UriDateTo and concat(Event,TokuisakiNM) like :Event ";  //検索モーダル部

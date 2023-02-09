@@ -1,6 +1,6 @@
 .common_body {
     padding-top:120px;
-    padding-bottom:70px; /*フッターーの後ろに要素が隠れないようにするため */
+    /*padding-bottom:70px; フッターーの後ろに要素が隠れないようにするため */
     font-size:1.1rem;
 /*    font-family: 'Kosugi Maru', sans-serif;*/
 }
@@ -18,7 +18,7 @@ INPUT{
 }
 .footer_update_area{
     position: fixed; /* ウィンドウを基準に画面に固定 */
-    height: 350px;
+    height: 250px;
     bottom: 0;
     left:0;
     padding-left:10px;
@@ -26,7 +26,7 @@ INPUT{
     padding-bottom:10px;
     width: 100%;
     /*z-index: 101;*/
-    background:#fff;
+    background:#eae8e1;
 }
 .form-check{
     width:80px;
@@ -156,7 +156,7 @@ th{
         height: 80px; /* 高さを70pxに指定 */
     }
     .common_body {
-        padding-bottom:100px; /*フッターーの後ろに要素が隠れないようにするため */
+        padding-bottom:110px; /*フッターーの後ろに要素が隠れないようにするため */
     }
 }
 

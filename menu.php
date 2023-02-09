@@ -49,20 +49,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     }
     
     if($action=="logout"){
-        /*
-        $_SESSION = array();// セッション変数を全て解除する
-        
-        // セッションを切断するにはセッションクッキーも削除する。
-        // Note: セッション情報だけでなくセッションを破壊する。
-        if (isset($_COOKIE[session_name()])) {
-            setCookie(session_name(), '', -1, "/", '.'.MAIN_DOMAIN, TRUE, TRUE); 
-        }
-        setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); 
-        setCookie("login_type", "normal", time()+60*60*24*7, "/", "", TRUE, TRUE); // secure, httponly
-    
-        session_destroy();// 最終的に、セッションを破壊する
-        $logoff=true;
-        */
+        delete_old_token($_COOKIE["webrez_token"],$pdo_h);
         redirect_to_login("ログオフしました");
         exit();
     }else{

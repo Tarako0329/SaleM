@@ -27,80 +27,10 @@
 	$rtn=check_session_userid($pdo_h);
 	$csrf_create = csrf_create();
 	
-	//deb_echo("UID：".$_SESSION["user_id"]);
-	
-	$msg = "";
-	$upd_msg = "";
-	$NextType="";
-	function param_clear(){
-		$_SESSION["Uridate2"]="%";
-		$_SESSION["Event"]="%";
-		$_SESSION["UriNO"]="%";
-		$_SESSION["shouhinCD"]="%";
-		$_SESSION["shouhinNM"]="%";
-		$_SESSION["wheresql"]="";
-	}
-	
-	$mode="select";
-	
-	if($mode=="select"){
-	}elseif($mode=="del"){
-		//削除モード(確認)
-		$btnm = "削　除";
-		$msg ="この売上を削除しますか？<br>";
-		$sql = "select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData where uid = :user_id and UriageNO = :UriNO and ShouhinCD = :ShouhinCD order by UriageNO";
-		$stmt = $pdo_h->prepare( $sql );
-		$stmt->bindValue("UriNO", $_SESSION["urino"], PDO::PARAM_INT);
-		$stmt->bindValue("ShouhinCD", $_SESSION["cd"], PDO::PARAM_INT);
-		//deb_echo($_SESSION["wheresql"]);
-		$stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
-		$rtn=$stmt->execute();
-		if($rtn==false){
-			deb_echo("失敗した場合は不正値が渡されたとみなし、wheresqlを破棄<br>");
-			$_SESSION["wheresql"]="";
-		}
-		$result = $stmt->fetchAll();
-		//$rowcnt = $stmt->rowCount();
-		
-	}elseif($mode=="Updated" || $mode=="Update"){
-		//更新対象・更新結果の表示
-		$btnm = "更　新";
-		$msg="更新対象データを確認してください。";
-		if($mode=="Updated"){
-			//更新後は更新モードオフ
-			$_SESSION["UriageData_Correct_mode"]="false";
-			$msg="";
-		}
-		$sql = "select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData ".$_SESSION["wheresql"]." order by UriageNO";
-		//deb_echo($sql);
-		$stmt = $pdo_h->prepare( $sql );
-		$stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
-		$rtn=$stmt->execute();
-		if($rtn==false){
-			deb_echo("失敗した場合は不正値が渡されたとみなし、wheresqlを破棄<br>");
-			$_SESSION["wheresql"]="";
-		}
-		$result = $stmt->fetchAll();
-		//$rowcnt = $stmt->rowCount();
-	}else{
-		echo "想定外エラー";
-		exit();
-	}
-	
 	//税区分M取得.基本変動しないので残す
 	$ZEIsql="select * from ZeiMS order by zeiKBN;";
 	$ZEIresult = $pdo_h->query($ZEIsql);
 	
-	
-	//表示条件
-	/*
-	$joken="";
-	$joken="期間：".($_SESSION["Uridate2"]=="%"?$_SESSION["UriFrom"]." ～ ".$_SESSION["UriTo"]:$_SESSION["Uridate2"]);
-	$joken=$joken.($_SESSION["Event"]=="%"?"":" / ".$_SESSION["Event"]);
-	$joken=$joken.($_SESSION["UriNO"]=="%"?"":" / 売上№".$_SESSION["UriNO"]);
-	$joken=$joken.($_SESSION["shouhinCD"]=="%"?"":" / ".$_SESSION["shouhinNM"]);
-	*/
-	//deb_echo ("session:".$_SESSION["UriageData_Correct_mode"]);
 }
 ?>
 <!DOCTYPE html>
@@ -113,117 +43,10 @@
 	?>
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_UriageData_Correct.css?<?php echo $time; ?>' >
-	
+	<!--	
 	<script src='script/jquery-3.6.0.min.js'></script>
   <script src='script/popper.min.js'></script>
-	
- 	<script>
-		window.onload = function() {
-			//アラート用
-			/*
-			function alert(msg) {
-			  return $('<div class="alert" role="alert"></div>')
-				.text(msg);
-			}
-			(function($){
-			  const s = alert('<?php echo $_SESSION["MSG"]; ?>').addClass('alert-success');
-			  // アラートを表示する
-			  $('#alert-1').append(s);
-			})(jQuery);
-
-			function set_session_param(param){
-				//検索用のイベント・顧客・商品リストを取得
-				//id名[List]のリストデータを[date_from]～[date_to]に発生した[get_list_type]に更新
-				$.ajax({
-					// 通信先ファイル名
-					type        : 'POST',
-					url         : 'ajax_set_session_param.php',
-					data        :{
-									mode:$(param)[0].checked
-								}
-					},
-				).done(
-					// 通信が成功した時
-					function(data) {
-						console.log("通信成功");
-					}
-				).fail(
-					// 通信が失敗した時
-					function(XMLHttpRequest, textStatus, errorThrown){
-						console.log("通信失敗2");
-						console.log("XMLHttpRequest : " + XMLHttpRequest.status);
-						console.log("textStatus     : " + textStatus);
-						console.log("errorThrown    : " + errorThrown.message);
-					}
-				)};
-
-			$('#switch1').change(function(){
-				set_session_param('#switch1');
-			});
-			*/
-
-			function getAllData(List,date_from,date_to,get_list_type){
-				//検索用のイベント・顧客・商品リストを取得
-				//id名[List]のリストデータを[date_from]～[date_to]に発生した[get_list_type]に更新
-				$.ajax({
-					// 通信先ファイル名
-					type        : 'POST',
-					url         : 'ajax_get_event_list.php',
-					//dataType    : 'application/json',
-					data        :{
-									user_id     :'<?php echo $_SESSION["user_id"];?>',
-									date_from   :$(date_from)[0].value,
-									date_to     :$(date_to)[0].value,
-									list_type   :get_list_type //イベントリスト or 商品リスト
-								}
-					},
-				).done(
-					// 通信が成功した時
-					function(data) {
-						//selectの子要素をすべて削除
-						$(List).children().remove();
-						$(List).append("<option value=''></option>\n");
-						// 取得したレコードをeachで順次取り出す
-						$.each(data, function(key, value){
-							// appendで追記していく
-							if(get_list_type=='Event'){
-								if(value.LIST == '<?php echo $_SESSION["Event"]; ?>'){
-									$(List).append("<option value='" + value.LIST + "' selected>" + value.LIST + "</option>\n");
-								}else{
-									$(List).append("<option value='" + value.LIST + "'>" + value.LIST + "</option>\n");
-								}
-							}else if(get_list_type=='Shouhin'){
-								$(List).append("<option value='" + value.CODE + "'>" + value.CODE+ ":" + value.LIST + "</option>\n");
-							}
-						});
-						//console.log("通信成功");
-						//console.log(data);
-					}
-				).fail(
-					// 通信が失敗した時
-					function(XMLHttpRequest, textStatus, errorThrown){
-						console.log("通信失敗2");
-						console.log("XMLHttpRequest : " + XMLHttpRequest.status);
-						console.log("textStatus     : " + textStatus);
-						console.log("errorThrown    : " + errorThrown.message);
-					}
-				)};
-				
-			//起動時にリストを取得
-			getAllData('#Event','#uridate','#uridateto','Event');
-				
-			//検索モーダルの売上日を変更すると、イベントリストを更新
-			$('#uridate').change(function(){
-				getAllData('#Event','#uridate','#uridateto','Event');
-			});
-			$('#uridateto').change(function(){
-				getAllData('#Event','#uridate','#uridateto','Event');
-			});
-
-		};//window.onload
-
-	</script>    
-	
+-->
 	<TITLE><?php echo TITLE." 売上実績";?></TITLE>
 </head>
 <body>
@@ -234,7 +57,8 @@
 		</div>
 		<div style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>期間：{{UriDateFrom}} ～ {{UriDateTo}}</div>
 		<div v-if='filter_flg[0]' style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>
-			<button type='button' class='btn-view' @click='reset_filter' style='padding:1px 3px;font-size:1rem;background-color: var(--panel-bk-color);'>解除</button><i class="fa-solid fa-filter fa-lg awesome-color-white"></i>：{{filter_flg[1]}}
+			<button type='button' class='btn-view' @click='reset_filter' style='padding:1px 3px;font-size:1rem;background-color: var(--panel-bk-color);'>解除</button>
+			<i class="fa-solid fa-filter fa-lg awesome-color-white"></i>：{{filter_flg[1]}}
 		</div>
 		<a href="#" style='position:fixed;color:inherit;right:15px;top:45px;' data-bs-toggle='modal' data-bs-target='#modal_help1'>
 				<i class="fa-regular fa-circle-question fa-lg awesome-color-white"></i>
@@ -242,42 +66,38 @@
 	</header>
 	<div class='header_menu' style='border-bottom:solid var(--panel-bd-color) 0.5px;padding:0;'>
 		<nav class="navbar navbar-expand" style='padding:0;width:90%;'>
-		<div class="container-fluid" >
-			<div class="navbar-brand" style='padding:5px;font-weight:800;'>売上実績<br>メニュー</div>
-	    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" 
-	    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-	      <span class="navbar-toggler-icon"></span>
-	    </button>
-	    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-	      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-	        <li class="nav-item">
-	          <button :class="btn_class[0]" @click='Type_changer("sum_events")'>イベント別集計</button>
-	        </li>
-	        <li class="nav-item">
-	          <button :class="btn_class[1]" @click='Type_changer("sum_items")'>商品別集計</button>
-	        </li>
-	        <li class="nav-item">
-	          <button :class="btn_class[2]" @click='Type_changer("rireki")'>売上明細</button>
-	        </li>
-	      </ul>
-	    </div>
-	  </div>
+			<div class="container-fluid" >
+				<div class="navbar-brand" style='padding:5px;font-weight:800;'>売上実績<br>メニュー</div>
+	  	  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" 
+	  	  aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+	  	    <span class="navbar-toggler-icon"></span>
+	  	  </button>
+	  	  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+	  	    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+	  	      <li class="nav-item">
+	  	        <button :class="btn_class[0]" @click='Type_changer("sum_events")'>イベント別集計</button>
+	  	      </li>
+	  	      <li class="nav-item">
+	  	        <button :class="btn_class[1]" @click='Type_changer("sum_items")'>商品別集計</button>
+	  	      </li>
+	  	      <li class="nav-item">
+	  	        <button :class="btn_class[2]" @click='Type_changer("rireki")'>売上明細</button>
+	  	      </li>
+	  	    </ul>
+	  	  </div>
+	  	</div>
 		</nav>
-		<div style='width:20%;max-width:60px;text-align:right;' class='item_2'>
+		<div style='width:20%;max-width:60px;text-align:right;' class='item_2'><!--修正モードのトグルボタン-->
 			<span style='margin-bottom:0px'>修正モード</span>
 			<div class="switchArea">
-				<input type="checkbox" id="switch1" onClick='chang_mode()' <?php if($_SESSION["UriageData_Correct_mode"]==="true"){echo "checked";} if($mode=="Update"){echo " readOnly ='readOnly' disabled ";} ?>>
-				<label for="switch1" <?php if($mode=="Update"){echo " style='border-color:gray;'";}?>><span></span></label>
-				<div id="swImg" <?php if($mode=="Update"){echo " style='background:gray;'";}?>></div>
+				<input v-model='UriageData_Correct_mode' type="checkbox" id="switch1">
+				<label for="switch1" ><span></span></label>
+				<div id="swImg" ></div>
 			</div>
-		</div>
-
-		<?php
-			echo "<p style='font-size:1.3rem'>".$msg."</p>\n";
-		?>
+		</div><!--修正モードのトグルボタン-->
 	</div>
 
-	<main class='common_body' id='body' >
+	<main class='common_body' id='body' :style='common_body_style'>
 		<div class='container-fluid'>
 			<template v-if='MSG!==""'>
 				<div v-bind:class='alert_status' role='alert'>{{MSG}}</div>
@@ -332,181 +152,106 @@
 				</tbody>
 			</table>
 		</div>
-	<?php
-	if($mode=="Update" || $mode=="del"){
-	?>
-		<br>
-		<?php 
-		if($mode=="Update"){echo "<p style='font-size:1.3rem'>上に表示されているデータを更新します。<br><br>更新箇所<br>".$upd_msg."<br>よろしければ「更新」ボタンを押してください。</p>\n";} 
-		?>
-		<form method='post' action='UriageData_sql.php' id='form1'>
-			<input type='hidden' name='mode' value='<?php echo $mode;?>'>
+		</div>
+	</main>
+	<!--修正エリア-->
+	<div v-if='UriageData_Correct_mode' class='footer_update_area'>
+		<form class='form-horizontal update_areas tour_uri2' @submit.prevent='on_submit'>
+						
 			<input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
-			<a href='UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where&csrf_token=<?php echo $csrf_create; ?>' class='btn btn-secondary'>キャンセル</a>
-			<button type='submit' style='font-size:1.5rem;color:#fff' class='btn btn-primary' ><?php echo $btnm; ?></button>
-		</form>
-	<?php
-	}
-	?>
-		<!--修正エリア-->
-		<!--
-		<form class='form-horizontal update_areas footer_update_area tour_uri2' method='post' action='UriageData_Correct.php' style='display:none;' id='form2' onsubmit='return check_update()'>
-			<hr>
-			<div >
-				<table class='tour_uri3' style='width:90%;max-width:370px;'>
-				<tr>
-					<td><input type='checkbox' name='chk_uridate' id='chk_uridate'></td>
-					<td>売上日</td>
-					<td colspan='4'><input type='date' style='font-size:1.5rem;' name='up_uridate' id='up_uridate' maxlength='10'  class='form-control'></td>
-				</tr>
-				<tr>
-					<td><input type='checkbox' name='chk_event' id='chk_event'></td>
-					<td>イベント名</td>
-					<td colspan='4'><input type='text' style='font-size:1.5rem;' name='up_event' id='up_event' maxlength='10' class='form-control'></td>
-				</tr>
-				<tr>
-					<td><input type='checkbox' name='chk_kokyaku' id='chk_kokyaku'></td>
-					<td>顧客名</td>
-					<td colspan='4'><input type='text' style='font-size:1.5rem;' name='up_kokyaku' id='up_kokyaku' maxlength='10' class='form-control'></td>
-				</tr>
-				<tr>
-					<td><input type='checkbox' name='chk_urikin' id='chk_urikin'></td>
-					<td>売上単価</td>
-					<td style='width:9rem'>単価変更</td><td></td><td colspan='1' style='width:9.5rem' >税区分</td>
-				</tr>
-				<tr>
-					<td colspan='2'></td>
-					<td colspan='1' ><input type='number' style='font-size:1.5rem;width:90%;' id='UpUriTanka' maxlength='10' class='form-control'  onchange='zei_math()' ></td>
-					<td colspan='1'>
-						<div class='btn-group btn-group-toggle' data-toggle='buttons'>
-							<label class='btn btn-outline-primary active' style='padding:1px;font-size:1.2rem;' onchange='zei_math()' >
-								<input type='radio' name='options' id='option1' value='zeikomi' autocomplete='off' checked> 税込
-							</label>
-							<label class='btn btn-outline-primary' style='padding:1px;font-size:1.2rem;' onchange='zei_math()' >
-								<input type='radio' name='options' id='option2' value='zeinuki' autocomplete='off'> 税抜
-							</label>
+			
+			<input type='hidden' name='up_uritanka' :value='upd_hontai'>
+			<input type='hidden' name='up_zei' :value='upd_zei_kin'>
 
-						</div>
-					</td>
-					<td colspan='1'>
-						<select class='form-control' style='padding-top:0;' id='zeikbn' name='up_zeikbn' onchange='zei_math()' >
-							<option value=''></option>
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<td colspan='2'></td>
-					<td colspan='1' style='width:9rem'>税抜単価</td><td style='width:7rem'>消費税</td><td colspan='1' style='width:9rem'>税込単価</td>
-				</tr>
-				<tr>
-					<td colspan='2'></td>
-					<td colspan='1' ><input type='number' style='font-size:1.5rem;width:90%;' name='up_uritanka' id='UpTanka' maxlength='10' class='form-control' ></td>
-					<td><input type='number' style='font-size:1.5rem;width:90%;' name='up_zei' id='UpZei' maxlength='10' class='form-control' ></td>
-					<td colspan='1' ><input type='number' style='font-size:1.5rem;width:90%;' id='UpUriZei' maxlength='10' class='form-control' ></td>
-				</tr>
-				<tr>
-					<td><input type='checkbox' name='chk_genka' id='chk_genka'></td>
-					<td>原価単価</td>
-					<td colspan='4'><input type='number' style='font-size:1.5rem;' name='up_urigenka' maxlength='10' id='up_urigenka' class='form-control'></td>
-				</tr>
-				<tr >
-					<td colspan='2'></td>
-					<td colspan='4' style='padding-top:5px;'><button type='submit' style='font-size:1.5rem;color:#fff' class='btn btn-primary tour_uri4'>確　認</button></td>
-				</tr>
-				</table>
-				<a href="#" style='color:inherit;position:fixed;bottom:250px;right:5px;' onclick='urihelp()'>
-					<i class="fa-regular fa-circle-question fa-2x awesome-color-panel-border-same"></i>
-				</a>
-			</div>
-		</form>-->
-		
-		<div class='footer_update_area'>
-			<form class='form-horizontal update_areas tour_uri2' method='post' action='UriageData_Correct.php' style='max-width:370px;' id='form2' onsubmit='return check_update()'>
-							
-				<input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
-				<input type='hidden' name='mode' value='Update'>
-				<input type='hidden' name='up_uritanka' :value='upd_hontai'>
-				<input type='hidden' name='up_zei' :value='upd_zei_kin'>
-				<input type='hidden' name='UpUriZei' :value='upd_hontai+upd_zei_kin'>
-				<div class='row mb-3'>
-					<div class="col-11" style='display:flex;'>
-  		    	<div class="form-check">
-    		    	<input class="form-check-input" type="checkbox" id="chk_uridate" name='chk_uridate' >
-    	  	  	<label class="form-check-label" for="chk_uridate">売上日</label>
-    	  		</div>
-						<input type='date' style='font-size:1.5rem;width:250px;' name='up_uridate' id='up_uridate' maxlength='10'  class='form-control'>
-    			</div>
-				</div><!--売上日-->
+			<input type='hidden' name='w_date_from' :value='UriDateFrom'>
+			<input type='hidden' name='w_date_to' :value='UriDateTo'>
+			<input type='hidden' name='w_date' :value='filter_Uridate'>
+			<input type='hidden' name='w_event' :value='filter_Event'>
+			<input type='hidden' name='w_shouhincd' :value='filter_Shouhin'>
+			<input type='hidden' name='w_urino' :value='filter_UriNo'>
 
-				<div class='row mb-3'>
-					<div class="col-11" style='display:flex;'>
-  		    	<div class="form-check">
-    		    	<input class="form-check-input" type="checkbox" id="chk_event" name='chk_event' >
-    	  	  	<label class="form-check-label" for="chk_event">イベント名</label>
-    	  		</div>
-						<input type='text' style='font-size:1.5rem;width:250px;' name='up_event' id='up_event' maxlength='10'  class='form-control'>
-    			</div>
-				</div><!--イベント名-->
-
-				<div class='row mb-3'>
-					<div class="col-11" style='display:flex;'>
-  		    	<div class="form-check">
-    		    	<input class="form-check-input" type="checkbox" id="chk_kokyaku" name='chk_kokyaku' >
-    	  	  	<label class="form-check-label" for="chk_kokyaku">顧客名</label>
-    	  		</div>
-						<input type='text' style='font-size:1.5rem;width:250px;' name='up_kokyaku' id='up_kokyaku' maxlength='10'  class='form-control'>
-    			</div>
-				</div><!--顧客名-->
-
-				<div class='row mb-3'>
-					<div class="col-11" style='display:flex;'>
-  		    	<div class="form-check">
-    		    	<input class="form-check-input" type="checkbox" id="chk_urikin" name='chk_urikin' >
-    	  	  	<label class="form-check-label" for="chk_urikin">売上単価</label>
-    	  		</div>
-						<input v-model='upd_tanka' type='number' style='font-size:1.5rem;width:100px;' name='up_event' maxlength='10'  class='form-control'>
-						<div style='padding:0 5px;'>
-							<input type='radio' class='btn-check' name='options' value='komi' autocomplete='off' v-model='upd_zei_kominuki' id='plus_mode' checked>
-							<label class='btn btn-outline-primary' style='font-size:1.2rem;padding:1px;' for='plus_mode'>税込</label>
-							<input type='radio' class='btn-check' name='options' value='nuki' autocomplete='off' v-model='upd_zei_kominuki' id='minus_mode' >
-							<label class='btn btn-outline-primary' style='font-size:1.2rem;padding:1px;' for='minus_mode'>税抜</label>
-						</div>
-						<select v-model='upd_zei_kbn' class='form-select' style='padding-top:0;height:20px;width:80px;' name='up_zeikbn' onchange='zei_math()' >
-							<option value=''></option>
-							<?php
+			<div class='row mb-3'>
+				<div class="col-11" style='display:flex;'>
+  	    	<div class="form-check">
+    	    	<input class="form-check-input" type="checkbox" id="chk_uridate" name='chk_uridate' >
+      	  	<label class="form-check-label" for="chk_uridate">売上日</label>
+      		</div>
+					<input type='date' style='font-size:1.5rem;width:250px;' name='up_uridate' id='up_uridate' maxlength='10'  class='form-control'>
+    		</div>
+				<div class="col-1">
+					<a href="#" style='color:inherit;' onclick='urihelp()'>
+						<i class="fa-regular fa-circle-question fa-2x awesome-color-panel-border-same"></i>
+					</a>
+				</div>
+			</div><!--売上日/help icon-->
+			<div class='row mb-3'>
+				<div class="col-11" style='display:flex;'>
+  	    	<div class="form-check">
+    	    	<input class="form-check-input" type="checkbox" id="chk_event" name='chk_event' >
+      	  	<label class="form-check-label" for="chk_event">イベント名</label>
+      		</div>
+					<input type='text' style='font-size:1.5rem;width:250px;' name='up_event' id='up_event' maxlength='10'  class='form-control'>
+    		</div>
+			</div><!--イベント名-->
+			<div class='row mb-3'>
+				<div class="col-11" style='display:flex;'>
+  	    	<div class="form-check">
+    	    	<input class="form-check-input" type="checkbox" id="chk_kokyaku" name='chk_kokyaku' >
+      	  	<label class="form-check-label" for="chk_kokyaku">顧客名</label>
+      		</div>
+					<input type='text' style='font-size:1.5rem;width:250px;' name='up_kokyaku' id='up_kokyaku' maxlength='10'  class='form-control'>
+    		</div>
+			</div><!--顧客名-->
+			<div class='row mb-3'>
+				<div class="col-11" style='display:flex;'>
+  	    	<div class="form-check">
+    	    	<input class="form-check-input" type="checkbox" id="chk_urikin" name='chk_urikin' >
+      	  	<label class="form-check-label" for="chk_urikin">売上単価</label>
+      		</div>
+					<input v-model='upd_tanka' type='number' style='font-size:1.5rem;width:100px;' maxlength='10'  class='form-control'>
+					<div style='padding:0 5px;'>
+						<input type='radio' class='btn-check' name='options' value='komi' autocomplete='off' v-model='upd_zei_kominuki' id='plus_mode' checked>
+						<label class='btn btn-outline-primary' style='font-size:1.2rem;padding:1px;' for='plus_mode'>税込</label>
+						<input type='radio' class='btn-check' name='options' value='nuki' autocomplete='off' v-model='upd_zei_kominuki' id='minus_mode' >
+						<label class='btn btn-outline-primary' style='font-size:1.2rem;padding:1px;' for='minus_mode'>税抜</label>
+					</div>
+					<select v-model='upd_zei_kbn' class='form-select' style='padding-top:0;height:20px;width:80px;' name='up_zeikbn'>
+						<option value=''></option>
+						<?php
 							foreach($ZEIresult as $row){
 								echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
 							}
-							?>
-						</select>
-    			</div>
-				</div><!--売上単価-->
+						?>
+					</select>
+    		</div>
+			</div><!--売上単価-->
+			<div class='row mb-3'>
+				<div class="col-11" style='display:flex;'>
+  	    	<div class="form-check">
+						<!--space-->
+      		</div>
+					税込単価：{{(upd_hontai+upd_zei_kin).toLocaleString()}}（本体：{{upd_hontai.toLocaleString()}}　消費税：{{upd_zei_kin.toLocaleString()}}-）
+    		</div>
+			</div><!--売上単価計算結果-->
+			<div class='row mb-4'>
+				<div class="col-11" style='display:flex;'>
+  	    	<div class="form-check">
+    	    	<input class="form-check-input" type="checkbox" id="chk_genka" name='chk_genka' >
+      	  	<label class="form-check-label" for="chk_genka">原価単価</label>
+      		</div>
+					<input type='number' style='font-size:1.5rem;width:250px;' name='up_urigenka' id='up_urigenka' maxlength='10'  class='form-control'>
+    		</div>
+			</div><!--原価単価-->
+			<div class='row mb-3'>
+				<div class="col-12" style='padding-left:80px;' >
+					<button @click='btn_controler()' type='button' class='btn-lg btn-primary' style='padding-left:30px;padding-right:30px;'>{{btn_controle[0]}}</button>
+					<button v-if='btn_controle[1]' type='submit' class='btn-lg btn-warning' style='padding-left:30px;padding-right:30px;margin-left:10px;'>更　新</button>
+    		</div>
+			</div><!--ボタン-->
+		</form><!--修正エリア-->
+	</div><!--修正エリア-->
 
-				<div class='row mb-3'>
-					<div class="col-11" style='display:flex;'>
-  		    	<div class="form-check">
-							<!--space-->
-    	  		</div>
-						税込単価：{{(upd_hontai+upd_zei_kin).toLocaleString()}}（本体：{{upd_hontai.toLocaleString()}}　消費税：{{upd_zei_kin.toLocaleString()}}-）
-    			</div>
-				</div><!--売上単価計算結果-->
-
-				<div class='row mb-3'>
-					<div class="col-11" style='display:flex;'>
-  		    	<div class="form-check">
-    		    	<input class="form-check-input" type="checkbox" id="chk_genka" name='chk_genka' >
-    	  	  	<label class="form-check-label" for="chk_genka">原価単価</label>
-    	  		</div>
-						<input type='number' style='font-size:1.5rem;width:250px;' name='up_urigenka' id='up_urigenka' maxlength='10'  class='form-control'>
-    			</div>
-				</div><!--原価単価-->
-
-			</form><!--修正エリア-->
-		</div>
-		</div>
-	</main>
-
-	<footer class='common_footer'>
+	<footer v-if='UriageData_Correct_mode===false' class='common_footer'>
 		<div class='kaikei'>
 			合計(税込)：￥<?php echo return_num_disp($GoukeiZeikomi) ?>-<br>
 			<span style='font-size:1.3rem;'>内訳(本体+税)：￥<?php echo return_num_disp($Goukei)." + ".return_num_disp($GoukeiZei) ?></span>
@@ -536,14 +281,16 @@
 							<label for='uridateto' class='control-label'>～売上日：</label>
 							<input v-model='UriDateTo' type='date' style='font-size:1.5rem;' name='UriDateTo' maxlength='10' id='uridateto' class='form-control'>
 						</div>
+						<!--
 						<div>
 							<label for='Event' class='control-label'>イベント/顧客名：</label>
 							<select v-model='Event' name='Event' style='font-size:1.5rem;padding-top:0;' id='Event' class='form-control' aria-describedby='EvHelp'>
 								<option value=''></option>
-								<!--//Ajaxで取得に変更-->
+								!--//Ajaxで取得に変更--
 							</select>
 							<small id='EvHelp' class='form-text text-muted'>売上日の期間を変更すると選択肢が更新されます。</small>
 						</div>
+						-->
 						<div>
 							<label for='Type' class='control-label'>表示：上で指定した期間中の</label>
 							<select v-model='Type' @change='get_UriageList()' name='Type' style='font-size:1.5rem;padding-top:0;' id='Type' class='form-control'>
@@ -604,7 +351,7 @@
 				const UriageList = ref([])		//売上リスト
 				const UriDateFrom = ref('<?php echo date("Y")."-01-01"; ?>')
 				const UriDateTo = ref('<?php echo date("Y")."-12-31"; ?>')
-				const Event = ref('')
+				//const Event = ref('')
 				const Type = ref('rireki')
 				const btn_class = ref(['btn-view','btn-view','btn-view btn-selected'])
 				const get_UriageList = () => {//売上リスト取得ajax
@@ -613,7 +360,7 @@
 					params.append('user_id', '<?php echo $_SESSION["user_id"];?>')
 					params.append('UriDateFrom', UriDateFrom.value)
 					params.append('UriDateTo', UriDateTo.value);
-					params.append('Event', Event.value);
+					//params.append('Event', Event.value);
 					params.append('Type', Type.value);
 					axios
 					.post('ajax_get_Uriage2.php',params)
@@ -640,10 +387,10 @@
 				}
 
 				//フィルター関連
-				const filter_Uridate = ref('-')
-				const filter_Event = ref('-')
-				const filter_Shouhin = ref('-')
-				const filter_UriNo = ref('-')
+				const filter_Uridate = ref('%')
+				const filter_Event = ref('%')
+				const filter_Shouhin = ref('%')
+				const filter_UriNo = ref('%')
 				const filter_flg = ref([false,''])
 				const set_filter = (colum,word,word2) =>{
 					console_log(`set_filter start params(${colum} , ${word})`,'lv3')
@@ -659,10 +406,10 @@
 				}
 				const reset_filter = () =>{
 					console_log(`reset_filter start`,'lv3')
-					filter_Uridate.value = '-'
-					filter_Event.value = '-'
-					filter_Shouhin.value = '-'
-					filter_UriNo.value = '-'
+					filter_Uridate.value = '%'
+					filter_Event.value = '%'
+					filter_Shouhin.value = '%'
+					filter_UriNo.value = '%'
 					filter_flg.value[0] = false
 					filter_flg.value[1] = ''
 				}
@@ -673,27 +420,23 @@
 					return UriageList.value.filter((row) => {
 						let serch_cols = ''
 						let serch_words = ''
-						if(filter_Uridate.value!=='-'){
-							//return(row.UriDate===(filter_Uridate.value))
+						if(filter_Uridate.value!=='%'){
 							serch_cols = row.UriDate.toString()
 							serch_words = filter_Uridate.value.toString()
 						}
-						if(filter_Event.value!=='-'){
-							//return(row.Event.includes(filter_Event.value) || row.TokuisakiNM.includes(filter_Event.value))
+						if(filter_Event.value!=='%'){
 							serch_cols = serch_cols + row.Event.toString() + row.TokuisakiNM.toString()
 							serch_words = serch_words + filter_Event.value.toString()
 						}
-						if(filter_Shouhin.value!=='-'){
-							//return(row.ShouhinCD===(filter_Shouhin.value))
+						if(filter_Shouhin.value!=='%'){
 							serch_cols = serch_cols + row.ShouhinCD.toString()
 							serch_words = serch_words + filter_Shouhin.value.toString()
 						}
-						if(filter_UriNo.value!=='-'){
-							//return(row.UriageNO===(filter_UriNo.value))
+						if(filter_UriNo.value!=='%'){
 							serch_cols = serch_cols + row.UriageNO.toString()
 							serch_words = serch_words + filter_UriNo.value.toString()
 						}
-						console_log(`computed UriageList_filter (${serch_cols}:${serch_words})`)
+						//console_log(`computed UriageList_filter (${serch_cols}:${serch_words})`,'lv3')
 						return (serch_cols === serch_words)
 					})
 				})
@@ -711,6 +454,16 @@
 				const upd_tanka = ref('')
 				const upd_zei_kbn = ref('1101')
 				const upd_zei_kominuki = ref('komi')
+				const UriageData_Correct_mode = ref(false)
+				const btn_controle = ref(['確　認',false]) //ボタン名・更新ボタン表示有無
+				const common_body_style = computed(() => {
+					if(UriageData_Correct_mode.value===false){
+						return 'padding-bottom:80px;'
+					}else{
+						return 'padding-bottom:260px;'
+					}
+					
+				})
 				const upd_zei_kin = computed(() => {
 					if(upd_tanka.value!==''){
 						return return_tax(upd_tanka.value,upd_zei_kbn.value,upd_zei_kominuki.value)
@@ -724,8 +477,6 @@
 						return upd_tanka.value - upd_zei_kin.value
 					}
 				})
-
-
 				const return_tax = (kingaku,zeikbn,kominuki) => {
 					console_log('return_tax','lv3')
 					let zeiritu
@@ -748,6 +499,58 @@
 						return Math.round(kingaku * (zeiritu / 100));
 					}
 				}
+				const btn_controler = () =>{
+					if(btn_controle.value[1]){
+						btn_controle.value[0] = '確　認'
+						btn_controle.value[1] = false
+					}else{
+						btn_controle.value[0] = '戻　る'
+						btn_controle.value[1] = true
+					}
+				}
+				const where_sql = computed(() => {
+					return `where `
+				})
+
+				const on_submit = async(e) => {//登録・submit/
+					console_log('on_submit start','lv3')
+					
+					//loader.value = true
+
+					let form_data = new FormData(e.target)
+					let params = new URLSearchParams (form_data)
+					
+					await axios
+						.post('ajax_UriageData_update_sql.php',params) //php側は15秒でタイムアウト,{timeout: <?php //echo $timeout; ?>}
+						.then((response) => {
+							console_log(`on_submit SUCCESS`,'lv3')
+							console_log(response.data,'lv3')
+							MSG.value = response.data
+							/*
+							
+							alert_status.value[1]=response.data[0].status
+							csrf.value = response.data[0].csrf_create
+
+							if(response.data[0].status==='alert-success'){
+								reset_order()
+								btn_changer('chk')
+							}
+							*/
+						})
+						.catch((error) => {
+							console_log(`on_submit ERROR:${error}`,'lv3')
+							/*
+							MSG.value = error.response.data[0].EMSG
+							csrf.value = error.response.data[0].csrf_create
+							alert_status.value[1]='alert-danger'
+							*/
+						})
+						.finally(()=>{
+							get_UriageList()
+							//loader.value = false
+						})
+						
+				}
 
 				onMounted(() => {
 					console_log('onMounted','lv3')
@@ -761,7 +564,7 @@
 					get_UriageList,
 					UriDateFrom,
 					UriDateTo,
-					Event,
+					//Event,
 					Type,
 					colspan,
 					set_filter,
@@ -779,6 +582,11 @@
 					upd_hontai,
 					upd_zei_kin,
 					upd_zei_kominuki,
+					UriageData_Correct_mode,
+					common_body_style,
+					btn_controle,
+					btn_controler,
+					on_submit,
 				}
 			}
 		}).mount('#app');
@@ -794,42 +602,6 @@
 
 
 <script>
-	var zei_math = function(){
-		if(select.value=='0'){
-			zkomitanka.value=tanka.value;
-			shouhizei.value=0;
-			UpTanka.value = tanka.value;
-		}else if(kominuki[0].checked){//税込
-			switch(select.value){
-				case '1001':
-					zkomitanka.value=tanka.value * 1;
-					shouhizei.value=tanka.value - Math.round(tanka.value / (1 + 8 / 100));
-					UpTanka.value = Math.round(tanka.value / (1 + 8 / 100));
-					break;
-				case '1101':
-					zkomitanka.value=tanka.value * 1;
-					shouhizei.value=tanka.value - Math.round(tanka.value / (1 + 10 / 100));
-					UpTanka.value = Math.round(tanka.value / (1 + 10 / 100));
-					break;
-			}
-		}else if(kominuki[1].checked){//税抜
-			switch(select.value){
-				case '1001':
-					zkomitanka.value=Math.round(tanka.value * (1 + 8 / 100));
-					shouhizei.value=Math.round(tanka.value * (8 / 100));
-					UpTanka.value = tanka.value;
-					break;
-				case '1101':
-					zkomitanka.value=Math.round(tanka.value * (1 + 10 / 100));
-					shouhizei.value=Math.round(tanka.value * (10 / 100));
-					UpTanka.value = tanka.value;
-					break;
-			}
-		}else{
-			//
-		}
-	}
-
 	var update_areas=document.getElementsByClassName('update_areas');
 	var common_footer=document.getElementsByClassName('common_footer');
 	var mode_switch=document.getElementById('switch1');
@@ -861,6 +633,7 @@
 	//chang_mode();
 	
 	//チェックボックスのチェック有無で必須か否かを切り替え
+	/*
 	document.getElementById('chk_uridate').onclick = function(){
 		const a = document.getElementById('up_uridate');
 		if(a.required==true){
@@ -904,6 +677,7 @@
 			a.required=true;
 		}
 	}
+	*/
 	
 	//更新対象の有無を確認。無い場合はsubmitしない
 	function check_update(){
@@ -1150,7 +924,7 @@
 
 	if(TourMilestone=="tutorial_8"){
 		tutorial_9.start(tourFinish,'tutorial','');
-	}else if(TourMilestone=="tutorial_9" && 'Updated'=='<?php echo $mode; ?>'){
+	}else if(TourMilestone=="tutorial_9"){
 		tutorial_10.start(tourFinish,'tutorial','save');
 	}
 
