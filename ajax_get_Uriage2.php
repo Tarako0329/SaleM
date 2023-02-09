@@ -14,9 +14,9 @@ log_writer2("ajax_get_Uriage2.php",$_POST,"lv3");
 {//パラメータセット
 	//POST
 	if(!empty($_POST)){
-		$_SESSION["UriFrom"]    =(empty($_POST["UriDateFrom"])?(string)date("Y-m-d"):$_POST["UriDateFrom"]);
-		$_SESSION["UriTo"]      =(empty($_POST["UriDateTo"])?(string)date("Y-m-d"):$_POST["UriDateTo"]);
-		$_SESSION["Event"]      =(empty($_POST["Event"])?"%":$_POST["Event"]);
+		$UriFrom    =(empty($_POST["UriDateFrom"])?(string)date("Y-m-d"):$_POST["UriDateFrom"]);
+		$UriTo      =(empty($_POST["UriDateTo"])?(string)date("Y-m-d"):$_POST["UriDateTo"]);
+		//$_SESSION["Event"]      =(empty($_POST["Event"])?"%":$_POST["Event"]);
 		$Type = (empty($_POST["Type"])?"":$_POST["Type"]);
 		
 	}
@@ -26,9 +26,10 @@ log_writer2("ajax_get_Uriage2.php",$_POST,"lv3");
 	//$_SESSION["UriageData_Correct_mode"]=(empty($_SESSION["UriageData_Correct_mode"])?"false":$_SESSION["UriageData_Correct_mode"]);
 }
 
-
-$wheresql="where uid = :user_id AND UriDate >= :UriDate AND UriDate <= :UriDateTo and concat(Event,TokuisakiNM) like :Event ";  //検索モーダル部
-$wheresql=$wheresql."AND UriDate like :UriDate2 AND UriageNO like :UriNO AND ShouhinCD like :shouhinCD ";    //絞り込み対応部
+//絞り込みをjsで行うため、検索条件を減らす
+//$wheresql="where uid = :user_id AND UriDate >= :UriDate AND UriDate <= :UriDateTo and concat(Event,TokuisakiNM) like :Event ";  //検索モーダル部
+$wheresql="where uid = :user_id AND UriDate >= :UriDate AND UriDate <= :UriDateTo ";  //検索モーダル部
+//$wheresql=$wheresql."AND UriDate like :UriDate2 AND UriageNO like :UriNO AND ShouhinCD like :shouhinCD ";    //絞り込み対応部
 
 if($Type=="rireki"){
 	//履歴明細取得
@@ -50,33 +51,25 @@ if($Type=="rireki"){
 	$sql = $sql." group by U.UriDate,U.Event,U.TokuisakiNM order by U.UriDate desc,U.Event,U.TokuisakiNM";
 }
 
-//削除した後に表示する履歴のwhere文をセッションに保存
-$_SESSION["wheresql"]="where uid = :user_id AND UriDate >= '".$_SESSION["UriFrom"]."' AND UriDate <= '".$_SESSION["UriTo"]."' and concat(Event,TokuisakiNM) like '".$_SESSION["Event"]."' ";
-$_SESSION["wheresql"]=$_SESSION["wheresql"]."AND UriDate like '".$_SESSION["Uridate2"]."' AND UriageNO like '".$_SESSION["UriNO"]."' AND ShouhinCD like '".$_SESSION["shouhinCD"]."' ";
-
 $stmt = $pdo_h->prepare( $sql );
-$stmt->bindValue("UriDate", $_SESSION["UriFrom"], PDO::PARAM_STR);
-$stmt->bindValue("UriDateTo", $_SESSION["UriTo"], PDO::PARAM_STR);
+$stmt->bindValue("UriDate", $UriFrom, PDO::PARAM_STR);
+$stmt->bindValue("UriDateTo", $UriTo, PDO::PARAM_STR);
+/*
 $stmt->bindValue("Event", $_SESSION["Event"], PDO::PARAM_STR);
 $stmt->bindValue("UriDate2", $_SESSION["Uridate2"], PDO::PARAM_STR);
 $stmt->bindValue("UriNO", $_SESSION["UriNO"], PDO::PARAM_INT);
 $stmt->bindValue("shouhinCD", $_SESSION["shouhinCD"], PDO::PARAM_INT);
-
+*/
 $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
 $rtn=$stmt->execute();
 if($rtn==false){
 	deb_echo("失敗した場合は不正値が渡されたとみなし、wheresqlを破棄<br>");
-	$_SESSION["wheresql"]="";
+	//$_SESSION["wheresql"]="";
 }
 $UriageList = $stmt->fetchAll();
 $rowcnt = $stmt->rowCount();
 if($rowcnt!==0){
 }else{
-	if($Type=="rireki"){
-		$Type="sum_items";
-	}elseif($Type=="sum_items"){
-		$Type="sum_events";
-	}
 }
 
 
