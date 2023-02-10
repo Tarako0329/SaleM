@@ -540,7 +540,7 @@
 				const alert_status = ref(['alert'])
 				const MSG = ref('')
 				const loader = ref(false)
-				const csrf = ref('<?php echo $token; ?>')
+				const csrf = ref('<?php echo $token; ?>') 
 
 				const chk_csrf = () =>{
 					console_log(`ajax_getset_token start`,'lv3')
@@ -573,7 +573,7 @@
 						.post('ajax_EVregi_sql.php',params,{timeout: <?php echo $timeout; ?>}) //php側は15秒でタイムアウト
 						.then((response) => {
 							console_log(`on_submit SUCCESS`,'lv3')
-							//console_log(response.data,'lv3')
+							console_log(response.data,'lv3')
 							MSG.value = response.data[0].EMSG
 							alert_status.value[1]=response.data[0].status
 							csrf.value = response.data[0].csrf_create

@@ -16,5 +16,3 @@ header('Content-type: application/json');
 // htmlへ渡す配列$productListをjsonに変換する
 echo json_encode($token, JSON_UNESCAPED_UNICODE);
 ?>
-
-

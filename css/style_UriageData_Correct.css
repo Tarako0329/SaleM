@@ -1,5 +1,5 @@
 .common_body {
-    padding-top:120px;
+    padding-top:135px;
     /*padding-bottom:70px; フッターーの後ろに要素が隠れないようにするため */
     font-size:1.1rem;
 /*    font-family: 'Kosugi Maru', sans-serif;*/
@@ -18,7 +18,7 @@ INPUT{
 }
 .footer_update_area{
     position: fixed; /* ウィンドウを基準に画面に固定 */
-    height: 250px;
+    height: 280px;
     bottom: 0;
     left:0;
     padding-left:10px;
@@ -27,6 +27,9 @@ INPUT{
     width: 100%;
     /*z-index: 101;*/
     background:#eae8e1;
+}
+.form-check-label{
+    font-size:small;
 }
 .form-check{
     width:80px;

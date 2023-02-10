@@ -154,11 +154,20 @@
 		</div>
 		</div>
 	</main>
+	<footer v-if='UriageData_Correct_mode===false' class='common_footer'>
+		<div class='kaikei'>
+			合計(税込)：￥{{(sum_uriage + sum_uriage_zei).toLocaleString()}}-<br>
+			<span style='font-size:1.3rem;'>内訳(本体+税)：￥{{sum_uriage.toLocaleString()}} + {{sum_uriage_zei.toLocaleString()}}</span>
+		</div>
+		<div class='right1 item_1'>
+			<button type='button' class='btn--chk' style='border-radius:0;' data-bs-toggle='modal' data-bs-target='#UriModal'>検　索</button>
+		</div>
+	</footer>
 	<!--修正エリア-->
 	<div v-if='UriageData_Correct_mode' class='footer_update_area'>
 		<form class='form-horizontal update_areas tour_uri2' @submit.prevent='on_submit'>
 						
-			<input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
+			<input type='hidden' name='csrf_token' :value='csrf'>
 			
 			<input type='hidden' name='up_uritanka' :value='upd_hontai'>
 			<input type='hidden' name='up_zei' :value='upd_zei_kin'>
@@ -170,13 +179,17 @@
 			<input type='hidden' name='w_shouhincd' :value='filter_Shouhin'>
 			<input type='hidden' name='w_urino' :value='filter_UriNo'>
 
-			<div class='row mb-3'>
+			<div class='row mb-2'>
+				<p style='color:red;margin-bottom: 2px;font-size: large;'>※上記データが更新対象となります。</p>
+				<p style='color:red;margin-bottom: 2px;font-size: large;'>※<span style='color:blue;'>青字の項目</span>のタップで絞込みできます。</p>
+			</div>
+			<div class='row mb-2'>
 				<div class="col-11" style='display:flex;'>
   	    	<div class="form-check">
-    	    	<input class="form-check-input" type="checkbox" id="chk_uridate" name='chk_uridate' >
+    	    	<input class="form-check-input" type="checkbox" id="chk_uridate" name='chk_uridate' onchange='chk_visible(this,"#up_uridate")' >
       	  	<label class="form-check-label" for="chk_uridate">売上日</label>
       		</div>
-					<input type='date' style='font-size:1.5rem;width:250px;' name='up_uridate' id='up_uridate' maxlength='10'  class='form-control'>
+					<input type='date' style='font-size:1.5rem;width:250px;background-color:#999999;' name='up_uridate' id='up_uridate' maxlength='10'  class='form-control'>
     		</div>
 				<div class="col-1">
 					<a href="#" style='color:inherit;' onclick='urihelp()'>
@@ -184,31 +197,31 @@
 					</a>
 				</div>
 			</div><!--売上日/help icon-->
-			<div class='row mb-3'>
+			<div class='row mb-2'>
 				<div class="col-11" style='display:flex;'>
   	    	<div class="form-check">
-    	    	<input class="form-check-input" type="checkbox" id="chk_event" name='chk_event' >
-      	  	<label class="form-check-label" for="chk_event">イベント名</label>
+    	    	<input class="form-check-input" type="checkbox" id="chk_event" name='chk_event' onchange='chk_visible(this,"#up_event")' >
+      	  	<label class="form-check-label" for="chk_event">ｲﾍﾞﾝﾄ名</label>
       		</div>
-					<input type='text' style='font-size:1.5rem;width:250px;' name='up_event' id='up_event' maxlength='10'  class='form-control'>
+					<input type='text' style='font-size:1.5rem;width:250px;background-color:#999999;' name='up_event' id='up_event' maxlength='10'  class='form-control'>
     		</div>
 			</div><!--イベント名-->
-			<div class='row mb-3'>
+			<div class='row mb-2'>
 				<div class="col-11" style='display:flex;'>
   	    	<div class="form-check">
-    	    	<input class="form-check-input" type="checkbox" id="chk_kokyaku" name='chk_kokyaku' >
+    	    	<input class="form-check-input" type="checkbox" id="chk_kokyaku" name='chk_kokyaku' onchange='chk_visible(this,"#up_kokyaku")' >
       	  	<label class="form-check-label" for="chk_kokyaku">顧客名</label>
       		</div>
-					<input type='text' style='font-size:1.5rem;width:250px;' name='up_kokyaku' id='up_kokyaku' maxlength='10'  class='form-control'>
+					<input type='text' style='font-size:1.5rem;width:250px;background-color:#999999;' name='up_kokyaku' id='up_kokyaku' maxlength='10'  class='form-control'>
     		</div>
 			</div><!--顧客名-->
-			<div class='row mb-3'>
+			<div class='row mb-1'>
 				<div class="col-11" style='display:flex;'>
   	    	<div class="form-check">
-    	    	<input class="form-check-input" type="checkbox" id="chk_urikin" name='chk_urikin' >
+    	    	<input class="form-check-input" type="checkbox" id="chk_urikin" name='chk_urikin' onchange='chk_visible(this,"#up_tanka")' >
       	  	<label class="form-check-label" for="chk_urikin">売上単価</label>
       		</div>
-					<input v-model='upd_tanka' type='number' style='font-size:1.5rem;width:100px;' maxlength='10'  class='form-control'>
+					<input v-model='upd_tanka' type='number' style='font-size:1.5rem;width:100px;background-color:#999999;' maxlength='10' id='up_tanka' class='form-control'>
 					<div style='padding:0 5px;'>
 						<input type='radio' class='btn-check' name='options' value='komi' autocomplete='off' v-model='upd_zei_kominuki' id='plus_mode' checked>
 						<label class='btn btn-outline-primary' style='font-size:1.2rem;padding:1px;' for='plus_mode'>税込</label>
@@ -225,7 +238,7 @@
 					</select>
     		</div>
 			</div><!--売上単価-->
-			<div class='row mb-3'>
+			<div class='row mb-2'>
 				<div class="col-11" style='display:flex;'>
   	    	<div class="form-check">
 						<!--space-->
@@ -233,16 +246,16 @@
 					税込単価：{{(upd_hontai+upd_zei_kin).toLocaleString()}}（本体：{{upd_hontai.toLocaleString()}}　消費税：{{upd_zei_kin.toLocaleString()}}-）
     		</div>
 			</div><!--売上単価計算結果-->
-			<div class='row mb-4'>
+			<div class='row mb-2'>
 				<div class="col-11" style='display:flex;'>
   	    	<div class="form-check">
-    	    	<input class="form-check-input" type="checkbox" id="chk_genka" name='chk_genka' >
+    	    	<input class="form-check-input" type="checkbox" id="chk_genka" name='chk_genka' onchange='chk_visible(this,"#up_urigenka")'>
       	  	<label class="form-check-label" for="chk_genka">原価単価</label>
       		</div>
-					<input type='number' style='font-size:1.5rem;width:250px;' name='up_urigenka' id='up_urigenka' maxlength='10'  class='form-control'>
+					<input type='number' style='font-size:1.5rem;width:250px;background-color:#999999;' name='up_urigenka' id='up_urigenka' maxlength='10'  class='form-control'>
     		</div>
 			</div><!--原価単価-->
-			<div class='row mb-3'>
+			<div class='row mb-2'>
 				<div class="col-12" style='padding-left:80px;' >
 					<button @click='btn_controler()' type='button' class='btn-lg btn-primary' style='padding-left:30px;padding-right:30px;'>{{btn_controle[0]}}</button>
 					<button v-if='btn_controle[1]' type='submit' class='btn-lg btn-warning' style='padding-left:30px;padding-right:30px;margin-left:10px;'>更　新</button>
@@ -251,16 +264,6 @@
 		</form><!--修正エリア-->
 	</div><!--修正エリア-->
 
-	<footer v-if='UriageData_Correct_mode===false' class='common_footer'>
-		<div class='kaikei'>
-			合計(税込)：￥<?php echo return_num_disp($GoukeiZeikomi) ?>-<br>
-			<span style='font-size:1.3rem;'>内訳(本体+税)：￥<?php echo return_num_disp($Goukei)." + ".return_num_disp($GoukeiZei) ?></span>
-		</div>
-		<div class='right1 item_1'>
-			<button type='button' class='btn--chk' style='border-radius:0;' data-bs-toggle='modal' data-bs-target='#UriModal'>検　索</button>
-		</div>
-
-	</footer>
 	<!--売上実績検索条件-->
 	<div class='modal fade' id='UriModal' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
 		<div class='modal-dialog  modal-dialog-centered'>
@@ -345,13 +348,13 @@
 		const { createApp, ref, onMounted, computed, VueCookies } = Vue;
 		createApp({
 			setup(){
-				const MSG = ref('<?php echo $_SESSION["MSG"]; ?>')
-				const alert_status = ref('alert-success')
+				const MSG = ref('')
+				const alert_status = ref(['alert'])
+				const csrf = ref('<?php echo $csrf_create; ?>')
 				//売上取得関連
 				const UriageList = ref([])		//売上リスト
 				const UriDateFrom = ref('<?php echo date("Y")."-01-01"; ?>')
 				const UriDateTo = ref('<?php echo date("Y")."-12-31"; ?>')
-				//const Event = ref('')
 				const Type = ref('rireki')
 				const btn_class = ref(['btn-view','btn-view','btn-view btn-selected'])
 				const get_UriageList = () => {//売上リスト取得ajax
@@ -360,7 +363,6 @@
 					params.append('user_id', '<?php echo $_SESSION["user_id"];?>')
 					params.append('UriDateFrom', UriDateFrom.value)
 					params.append('UriDateTo', UriDateTo.value);
-					//params.append('Event', Event.value);
 					params.append('Type', Type.value);
 					axios
 					.post('ajax_get_Uriage2.php',params)
@@ -436,7 +438,6 @@
 							serch_cols = serch_cols + row.UriageNO.toString()
 							serch_words = serch_words + filter_UriNo.value.toString()
 						}
-						//console_log(`computed UriageList_filter (${serch_cols}:${serch_words})`,'lv3')
 						return (serch_cols === serch_words)
 					})
 				})
@@ -448,6 +449,16 @@
 					}else{
 						return 10
 					}
+				})
+				const sum_uriage = computed(() => {//表示売上データの売上本体合計
+					return UriageList_filter.value.reduce(function(sum, element){
+  					return sum + element.UriageKin;
+					}, 0)
+				})
+				const sum_uriage_zei = computed(() => {//表示売上データの消費税合計
+					return UriageList_filter.value.reduce(function(sum, element){
+  					return sum + element.zei;
+					}, 0)
 				})
 
 				//更新処理関連
@@ -514,6 +525,11 @@
 
 				const on_submit = async(e) => {//登録・submit/
 					console_log('on_submit start','lv3')
+
+					if(confirm('売上データを更新してもよいですか？')===false){
+						alert('処理を中断しました。')
+						return 0
+					}
 					
 					//loader.value = true
 
@@ -525,7 +541,10 @@
 						.then((response) => {
 							console_log(`on_submit SUCCESS`,'lv3')
 							console_log(response.data,'lv3')
-							MSG.value = response.data
+
+							MSG.value = response.data[0].EMSG
+							alert_status.value[1] = response.data[0].status
+							csrf.value = response.data[0].csrf_create
 							/*
 							
 							alert_status.value[1]=response.data[0].status
@@ -560,11 +579,11 @@
 				return{
 					MSG,
 					alert_status,
+					csrf,
 					UriageList,
 					get_UriageList,
 					UriDateFrom,
 					UriDateTo,
-					//Event,
 					Type,
 					colspan,
 					set_filter,
@@ -587,6 +606,8 @@
 					btn_controle,
 					btn_controler,
 					on_submit,
+					sum_uriage,
+					sum_uriage_zei,
 				}
 			}
 		}).mount('#app');
@@ -595,6 +616,17 @@
 		document.onkeypress = function(e) {
 			if (e.key === 'Enter') {
 				return false;
+			}
+		}
+		const chk_visible = (me,you) => {
+			const chkbox = document.querySelector(`#${me.id}`)
+			const inputbox = document.querySelector(you)
+			if(chkbox.checked===true){
+				inputbox.required = true
+				inputbox.style.backgroundColor = '#fff'
+			}else if(chkbox.checked===false){
+				inputbox.required = false
+				inputbox.style.backgroundColor = '#999999'
 			}
 		}
 	</script><!--js-->
