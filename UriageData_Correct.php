@@ -452,12 +452,12 @@
 				})
 				const sum_uriage = computed(() => {//表示売上データの売上本体合計
 					return UriageList_filter.value.reduce(function(sum, element){
-  					return sum + element.UriageKin;
+  					return Number(sum) + Number(element.UriageKin);
 					}, 0)
 				})
 				const sum_uriage_zei = computed(() => {//表示売上データの消費税合計
 					return UriageList_filter.value.reduce(function(sum, element){
-  					return sum + element.zei;
+  					return Number(sum) + Number(element.zei);
 					}, 0)
 				})
 

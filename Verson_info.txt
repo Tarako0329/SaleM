@@ -2,3 +2,4 @@ ver2.99.0-0017:緊急対応・openweatherApiの&ampエラー対応
 ver2.99.0-0018:エラー時は基本、ログイン画面に飛ぶように修正
 ver2.99.0-0019:bs5&Vue3CompApiへ移行_売上修正ajax対応
 ver2.99.0-0020:bs5&Vue3CompApiへ移行_売上修正ajax対応
+ver2.99.0-0021:bs5&Vue3CompApiへ移行_売上修正ajax対応
