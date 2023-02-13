@@ -132,14 +132,14 @@
 						<td v-if='list.UriageNO%2===0' role='button' class='text-center' @click='set_filter("UriNO",list.UriageNO,"")'><span class='link'>★</span></td>
 						<td v-if='list.UriageNO%2!==0' role='button' class='text-center' @click='set_filter("UriNO",list.UriageNO,"")'><span class='link'>☆</span></td>
 						<td role='button' class='link' @click='set_filter("ShouhinCD",list.ShouhinCD,list.ShouhinNM)'>{{list.ShouhinNM}}</td>
-						<td v-if='Type==="sum_items"' class='text-right'>{{list.shuppin_su}}</td>
-						<td class='text-right'>{{list.su}}</td>
-						<td v-if='Type==="sum_items"' class='text-right'>{{list.zan_su}}</td>
-						<td class='text-right d-none d-sm-table-cell'>{{list.tanka.toLocaleString()}}</td>
-						<td class='text-right'>{{list.UriageKin.toLocaleString()}}</td>
-						<td class='text-right d-none d-sm-table-cell'>{{list.zei.toLocaleString()}}</td>
-						<td class='text-right'>{{list.genka.toLocaleString()}}</td>
-						<td class='text-right'>{{list.arari.toLocaleString()}}</td>
+						<td v-if='Type==="sum_items"' class='text-right'>{{Number(list.shuppin_su)}}</td>
+						<td class='text-right'>{{Number(list.su)}}</td>
+						<td v-if='Type==="sum_items"' class='text-right'>{{Number(list.zan_su)}}</td>
+						<td class='text-right d-none d-sm-table-cell'>{{Number(list.tanka).toLocaleString()}}</td>
+						<td class='text-right'>{{Number(list.UriageKin).toLocaleString()}}</td>
+						<td class='text-right d-none d-sm-table-cell'>{{Number(list.zei).toLocaleString()}}</td>
+						<td class='text-right'>{{Number(list.genka).toLocaleString()}}</td>
+						<td class='text-right'>{{Number(list.arari).toLocaleString()}}</td>
 						<td v-if='Type==="rireki"' class='d-none d-sm-table-cell'>
 							<img v-if='list.icon.length>=5' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>（<span>{{list.temp}}℃ </span><span>{{list.description}}</span>）
 						</td>
