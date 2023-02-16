@@ -43,10 +43,6 @@
 	?>
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_UriageData_Correct.css?<?php echo $time; ?>' >
-	<!--	
-	<script src='script/jquery-3.6.0.min.js'></script>
-  <script src='script/popper.min.js'></script>
--->
 	<TITLE><?php echo TITLE." 売上実績";?></TITLE>
 </head>
 <body>
@@ -144,7 +140,7 @@
 							<img v-if='list.icon.length>=5' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>（<span>{{list.temp}}℃ </span><span>{{list.description}}</span>）
 						</td>
 						<td v-if='Type==="rireki"' >
-							<a href='UriageData_Correct.php?cd=".$row["ShouhinCD"]."&urino=".$row["UriageNO"]."&csrf_token=".$csrf_create."&mode=del'>
+							<a @click='delete_Uriage(list.UriageNO, list.ShouhinCD)' href='#'>
 								<i class='fa-regular fa-trash-can'></i>
 							</a>
 						</td>
@@ -263,7 +259,6 @@
 			</div><!--ボタン-->
 		</form><!--修正エリア-->
 	</div><!--修正エリア-->
-
 	<!--売上実績検索条件-->
 	<div class='modal fade' id='UriModal' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
 		<div class='modal-dialog  modal-dialog-centered'>
@@ -541,28 +536,52 @@
 						.then((response) => {
 							console_log(`on_submit SUCCESS`,'lv3')
 							console_log(response.data,'lv3')
-
-							MSG.value = response.data[0].EMSG
-							alert_status.value[1] = response.data[0].status
-							csrf.value = response.data[0].csrf_create
-							/*
-							
-							alert_status.value[1]=response.data[0].status
-							csrf.value = response.data[0].csrf_create
-
-							if(response.data[0].status==='alert-success'){
-								reset_order()
-								btn_changer('chk')
-							}
-							*/
+							MSG.value = response.data.MSG
+							alert_status.value = response.data.status
+							csrf.value = response.data.csrf_create
 						})
 						.catch((error) => {
 							console_log(`on_submit ERROR:${error}`,'lv3')
-							/*
-							MSG.value = error.response.data[0].EMSG
+							//MSG.value = error.response.data[0].EMSG
+							MSG.value = 'axios 通信エラー'
 							csrf.value = error.response.data[0].csrf_create
-							alert_status.value[1]='alert-danger'
-							*/
+							alert_status.value='alert-danger'
+						})
+						.finally(()=>{
+							get_UriageList()
+							//loader.value = false
+						})
+				}
+
+				const delete_Uriage = (UriNO,ShouhinCD) => {//登録・submit/
+					console_log('delete_Uriage start','lv3')
+
+					if(confirm('売上データを削除してもよいですか？')===false){
+						alert('処理を中断しました。')
+						return 0
+					}
+					
+					//loader.value = true
+					let params = new URLSearchParams ()
+					params.append('csrf_token',csrf.value)
+					params.append('UriageNO',UriNO)
+					params.append('ShouhinCD',ShouhinCD)
+					
+					axios
+						.post('ajax_UriageData_delete_sql.php',params) //php側は15秒でタイムアウト,{timeout: <?php //echo $timeout; ?>}
+						.then((response) => {
+							console_log(`delete_Uriage SUCCESS`,'lv3')
+							console_log(response.data,'lv3')
+							MSG.value = response.data.MSG
+							alert_status.value = response.data.status
+							csrf.value = response.data.csrf_create
+						})
+						.catch((error) => {
+							console_log(`delete_Uriage ERROR:${error}`,'lv3')
+							//MSG.value = error.response.data[0].EMSG
+							MSG.value = 'axios 通信エラー'
+							csrf.value = error.response.data[0].csrf_create
+							alert_status.value='alert-danger'
 						})
 						.finally(()=>{
 							get_UriageList()
@@ -608,6 +627,7 @@
 					on_submit,
 					sum_uriage,
 					sum_uriage_zei,
+					delete_Uriage,
 				}
 			}
 		}).mount('#app');

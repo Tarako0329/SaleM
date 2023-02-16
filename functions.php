@@ -100,6 +100,9 @@ function check_auto_login($cookie_token, $pdo) {
     }
 }
 
+// =========================================================
+// $_SESSION[user_id]の存在チェック
+// =========================================================
 function check_session_userid($pdo_h){
     if(EXEC_MODE=="Trial"){
         if(empty($_COOKIE["user_id"]) && empty($_SESSION["user_id"])){
@@ -164,6 +167,48 @@ function check_session_userid($pdo_h){
         }
     }
     return true;
+}
+
+// =========================================================
+// $_SESSION[user_id]の存在チェック for ajax
+// =========================================================
+function check_session_userid_for_ajax($pdo_h){
+    $rtn_val = true;
+    if(empty($_SESSION["user_id"])){
+        //セッションのIDがクリアされた場合の再取得処理。
+        if(empty($_COOKIE['webrez_token'])){
+            log_writer2("func:check_session_userid_for_ajax","cookie[webrez_token]が存在してないため、useridの取得手段がない","lv3");
+            $rtn_val = false;
+        }else{
+            $rtn=check_auto_login($_COOKIE['webrez_token'],$pdo_h);
+            if($rtn!==true){
+                log_writer2("func:check_session_userid_for_ajax",$rtn,"lv3");
+                $rtn_val = false;
+            }else{
+                $rtn_val = true;
+            }
+        }
+        if(!($_SESSION["user_id"]<>"")){
+            //念のための最終チェック
+            log_writer2("func:check_session_userid_for_ajax","ユーザーＩＤの再取得に失敗しました。[error:1]","lv3");
+            $rtn_val = false;
+        }else{
+            //取得できたUIDがDBに存在するか確認
+            $sqlstr="select * from Users where uid=?";
+            $stmt = $pdo_h->prepare($sqlstr);
+            $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+            if (count($rows) === 0) {
+                //IDは取得できたがDB側にデータが無い場合もID再発行
+                log_writer2("func:check_session_userid_for_ajax","ユーザーＩＤの再取得に失敗しました。[error:2]","lv3");
+                $rtn_val = false;
+            }
+        }
+    }
+
+    return $rtn_val;
 }
 
 // =========================================================

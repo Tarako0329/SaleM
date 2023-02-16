@@ -144,25 +144,21 @@ if(is_null($row[0]["UriageNO"])){
 
 try{
 	$pdo_h->beginTransaction();
-	$sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime,genka_tanka) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)";
+	$sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime,genka_tanka)";
+	$sqlstr = $sqlstr." values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)";
 	
 	$KEIJOUBI = filter_input(INPUT_POST,'KEIJOUBI');
 	$EV = filter_input(INPUT_POST,'EV');
 	$KOKYAKU = filter_input(INPUT_POST,'KOKYAKU');
-	
+	$time = date("Y/m/d H:i:s");
+
 	foreach($array as $row){
-		if($row["SU"]==0){
-			//売上数０はスキップ
-			continue;
-		}
+		if($row["SU"]==0){continue;}//売上数０はスキップ
 		
 		$sqllog = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime,genka_tanka) ";
 		$sqllog = $sqllog."values(".$_SESSION['user_id'].",".$UriageNO.",'".$KEIJOUBI."','".$time."','".$EV."','".$KOKYAKU."','".$row["CD"]."','".$row["NM"]."','".$row["SU"]."','".$row["UTISU"]."','".$row["TANKA"]."','".($row["SU"] * $row["TANKA"])."','".($row["SU"] * $row["ZEI"])."','".$row["ZEIKBN"]."',0,'".$row["GENKA_TANKA"]."')";
 		
-		
 		$stmt = $pdo_h->prepare($sqlstr);
-		
-		$time = date("Y/m/d H:i:s");
 		
 		$stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
 		$stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
@@ -232,8 +228,6 @@ try{
 			$sqllog = $sqllog."values('".$_SESSION['user_id']."','".$UriageNO."','".$_POST["KEIJOUBI"]."','".$time."','".$_POST["EV"]."','".$_POST["KOKYAKU"]."','".(9999-$i)."','割引・割増:税率".(($row["zei_per"]-1)*100)."%分',0,0,0,'".$chousei_hon."','".$chousei_zei."','".$row["ZEIKBN"]."',0)";
 			$stmt = $pdo_h->prepare($sqlstr);
 			
-			$time = date("Y/m/d H:i:s");
-	
 			$stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
 			$stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
 			$stmt->bindValue(3,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
@@ -269,11 +263,8 @@ try{
 			$sqllog = $sqllog."values('".$_SESSION['user_id']."','".$UriageNO."','".$_POST["KEIJOUBI"]."','".$time."','".$_POST["EV"]."','".$_POST["KOKYAKU"]."','".(9999-$i)."','割引・割増:端数".(($row["zei_per"]-1)*100)."%分',0,0,0,'".($chouseigaku-$goukei)."',0,0,0)";
 			$stmt = $pdo_h->prepare($sqlstr);
 			
-			$time = date("Y/m/d H:i:s");
-	
 			$stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
 			$stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
-			//$stmt->bindValue(3,  date("Y/m/d"), PDO::PARAM_STR);
 			$stmt->bindValue(3,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
 			$stmt->bindValue(4,  $time, PDO::PARAM_STR);
 			$stmt->bindValue(5,  $_POST["EV"], PDO::PARAM_INT);
@@ -302,26 +293,16 @@ try{
 	//位置情報、天気情報の付与（uid,売上No,緯度、経度、住所、天気、気温、体感温度、天気アイコンping,無効FLG,insdate,update）
 	if(empty($_POST["nonadd"]) && $ins_cnt>0){
 		$emsg=$emsg."/位置情報、天気情報　処理開始\n";
-		//$_SESSION["nonadd"]="";
-		//$tenki=get_weather("insert",$_POST['lat'],$_POST['lon']);
-		//file_put_contents("sql_log/".$logfilename,$time.",gio/weather :".$_POST['address']."/".$tenki[0]."/".$tenki[1]."/".$tenki[2]."\n",FILE_APPEND);
 		
 		$sqlstr = "INSERT INTO `UriageData_GioWeather`(`uid`, `UriNo`, `lat`, `lon`, `weather`, `description`, `temp`, `feels_like`, `icon`) VALUES(?,?,?,?,?,?,?,?,?)";
 		$sqllog = "INSERT INTO `UriageData_GioWeather`(`uid`, `UriNo`, `lat`, `lon`, `weather`, `description`, `temp`, `feels_like`, `icon`) ";
-		//$sqllog = $sqllog."VALUES('".$_SESSION['user_id']."','".$UriageNO."','".$_POST['lat']."','".$_POST['lon']."','".$tenki[0]."','".$tenki[1]."','".$tenki[2]."','".$tenki[3]."','".$tenki[4]."')";
+
 		$sqllog = $sqllog."VALUES('".$_SESSION['user_id']."','".$UriageNO."','".$_POST['lat']."','".$_POST['lon']."','".$_POST['weather']."','".$_POST['description']."','".$_POST['temp']."','".$_POST['feels_like']."','".$_POST['icon']."')";
 		$stmt = $pdo_h->prepare($sqlstr);
 		$stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
 		$stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
 		$stmt->bindValue(3,  $_POST['lat'], PDO::PARAM_INT);
 		$stmt->bindValue(4,  $_POST['lon'], PDO::PARAM_INT);
-		/*
-		$stmt->bindValue(5,  $tenki[0], PDO::PARAM_STR);
-		$stmt->bindValue(6,  $tenki[1], PDO::PARAM_INT);
-		$stmt->bindValue(7,  $tenki[2], PDO::PARAM_INT);
-		$stmt->bindValue(8,  $tenki[3], PDO::PARAM_INT);
-		$stmt->bindValue(9,  $tenki[4], PDO::PARAM_STR);
-		*/
 		$stmt->bindValue(5,  $_POST['weather'], PDO::PARAM_STR);
 		$stmt->bindValue(6,  $_POST['description'], PDO::PARAM_INT);
 		$stmt->bindValue(7,  $_POST['temp'], PDO::PARAM_INT);
@@ -339,7 +320,6 @@ try{
 			$E_Flg=1;
 		}
 	}else{
-		//$_SESSION["nonadd"]="checked";
 		log_writer2("ajax_EVregi_sql.php","Gio insert skip","lv3");
 	}
 	
