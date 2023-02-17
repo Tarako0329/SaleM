@@ -14,8 +14,8 @@ csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェ�
 */
 /*
 sleep(5);
-$msg[0] = array(
-	"EMSG" => "アクセス元が不正です。=> ".$_SERVER['HTTP_REFERER']
+$msg = array(
+	"MSG" => "アクセス元が不正です。=> ".$_SERVER['HTTP_REFERER']
 	,"status" => "alert-danger"
 );
 */
@@ -38,8 +38,8 @@ function shutdown(){
 			send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
 		
 			$token = csrf_create();
-			$msg[0] = array(
-				"EMSG" => "登録が失敗しました。再度実行してもエラーとなる場合は、ご迷惑をおかけしますが復旧までお待ちください。<br>".$lastError['message']
+			$msg = array(
+				"MSG" => "登録が失敗しました。再度実行してもエラーとなる場合は、ご迷惑をおかけしますが復旧までお待ちください。<br>".$lastError['message']
 				,"status" => "alert-danger"
 				,"csrf_create" => $token
 			);
@@ -66,8 +66,8 @@ if(EXEC_MODE=="Local")sleep(0);
 
 //リファイラーチェック
 if(ROOT_URL."EVregi.php"!==substr($_SERVER['HTTP_REFERER'],0,strlen(ROOT_URL."EvRegi.php"))){
-	$msg[0] = array(
-		"EMSG" => "アクセス元が不正です。=> ".$_SERVER['HTTP_REFERER']
+	$msg = array(
+		"MSG" => "アクセス元が不正です。=> ".$_SERVER['HTTP_REFERER']
 		,"status" => "alert-danger"
 	);
 	header('Content-type: application/json');
@@ -79,8 +79,8 @@ $MODE=(!empty($_POST["mode"])?$_POST["mode"]:"");
 
 if(!empty($_POST)){
 	if(csrf_chk_nonsession()==false){//cookie:post
-		$msg[0] = array(
-			"EMSG" => "セッションが正しくありません。"
+		$msg = array(
+			"MSG" => "セッションが正しくありません。"
 			,"status" => "alert-danger"
 		);
 		header('Content-type: application/json');
@@ -88,8 +88,8 @@ if(!empty($_POST)){
 		exit();
 		}
 }else{
-	$msg[0] = array(
-		"EMSG" => "セッションが正しくありません。"
+	$msg = array(
+		"MSG" => "セッションが正しくありません。"
 		,"status" => "alert-danger"
 	);
 	header('Content-type: application/json');
@@ -103,8 +103,8 @@ $E_Flg=0;
 $emsg="";
 $ins_cnt=0;
 
-$msg[0] = array(
-	"EMSG" => "更新処理が実行されませんでした。"
+$msg = array(
+	"MSG" => "更新処理が実行されませんでした。"
 	,"status" => "alert-danger"
 	,"csrf_create" => $token
 );
@@ -136,7 +136,7 @@ $stmt->execute();
 
 $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
 if(is_null($row[0]["UriageNO"])){
-		$UriageNO = 1;  //初回売上時は売上NO[1]をセット
+	$UriageNO = 1;  //初回売上時は売上NO[1]をセット
 }else{
 	$UriageNO = $row[0]["UriageNO"]+1;
 }
@@ -328,8 +328,8 @@ try{
 		$pdo_h->commit();
 		file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,COMMIT,success,売上No".$UriageNO."\n",FILE_APPEND);
 		
-		$msg[0] = array(
-			"EMSG" => "売上が登録されました。（売上№：".$UriageNO."）"
+		$msg = array(
+			"MSG" => "売上が登録されました。（売上№：".$UriageNO."）"
 			,"status" => "alert-success"
 			,"csrf_create" => $token
 		);
@@ -373,8 +373,9 @@ if($E_Flg==1){
 	}else{
 		log_writer2("ajax.EVreg_sql.php",$emsg,"lv3");
 	}
-	$msg[0] = array(
-		"EMSG" => "登録が失敗しました。再度実行してもエラーとなる場合は、ご迷惑をおかけしますが復旧までお待ちください。エラーは管理者へ自動通知されました。"
+
+	$msg = array(
+		"MSG" => "登録が失敗しました。再度実行してもエラーとなる場合は、ご迷惑をおかけしますが復旧までお待ちください。エラーは管理者へ自動通知されました。"
 		,"status" => "alert-danger"
 		,"csrf_create" => $token
 	);

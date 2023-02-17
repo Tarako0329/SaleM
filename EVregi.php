@@ -20,10 +20,7 @@
 	//axiosの方は余裕を見て20秒でタイムアウトとする timeout60s => 60,000
 	$timeout=20000;
 	if(EXEC_MODE==="Local"){$timeout=0;}
-
-	//log_writer2("EVregi.php > \$_SESSION",$_SESSION,"lv3");
-	//log_writer2("EVregi.php > \$_POST",$_POST,"lv3");
-
+	
 	$status=(!empty($_SESSION["status"])?$_SESSION["status"]:"");
 	$_SESSION["status"]="";
 	$HTTP_REFERER=(empty($_SERVER['HTTP_REFERER'])?"":$_SERVER['HTTP_REFERER']);
@@ -33,12 +30,7 @@
 			//ログイン画面から直通でアクセス
 			log_writer2("EVregi.php  $status ",$status,"lv3");
 		}else{
-			//$_SESSION["EMSG"]="セッションが正しくありませんでした。".filter_input(INPUT_POST,"csrf_token");
 			log_writer2("EVregi.php","セッションが正しくありませんでした。","lv3");
-			/*
-			header("HTTP/1.1 301 Moved Permanently");
-			header("Location: index.php");
-			*/
 			redirect_to_login("セッションが正しくありませんでした。".filter_input(INPUT_POST,"csrf_token"));
 			exit();
 		}
@@ -66,13 +58,12 @@
 
 	$token = csrf_create();
 
-	$alert_msg=(!empty($_SESSION["msg"])?$_SESSION["msg"]:"");
-	$RG_MODE=(!empty($_POST["mode"])?$_POST["mode"]:$_GET["mode"]);
+	//$alert_msg=(!empty($_SESSION["msg"])?$_SESSION["msg"]:"");
+	//$RG_MODE=(!empty($_POST["mode"])?$_POST["mode"]:$_GET["mode"]);
+	$RG_MODE=(!empty($_GET["mode"])?$_GET["mode"]:"");
 
 	if($RG_MODE===""){
-		//echo "error rezi mode nothing!";
 		redirect_to_login("error rezi mode nothing!");
-		exit();
 	}
 
 	//イベント名の取得
@@ -186,7 +177,7 @@
 		<main class='common_body'>
 			<div class="container-fluid">
 				<template v-if='MSG!==""'>
-					<div v-bind:class='alert_status' role='alert'>{{MSG}}</div>
+					<div v-bind:class='alert_status' role='alert' style='padding:3px 10px'>{{MSG}}</div>
 				</template>
 				<div class='accordion item_11 item_12' id="accordionExample">
 					<div v-if='chk_register_show==="register"' class='row' style='padding-top:5px;'>
@@ -537,7 +528,7 @@
 					kaikei_zei.value = 0
 				}
 				
-				const alert_status = ref(['alert'])
+				const alert_status = ref('alert')
 				const MSG = ref('')
 				const loader = ref(false)
 				const csrf = ref('<?php echo $token; ?>') 
@@ -558,7 +549,8 @@
 						console_log(`ajax_getset_token OK:${csrf.value}`,'lv3')
 					}
 					return 0
-				}
+				} 
+				const rg_mode = ref('<?php echo $RG_MODE; ?>')	//レジモード
 
 				const on_submit = async(e) => {//登録・submit/
 					console_log('on_submit start','lv3')
@@ -568,26 +560,33 @@
 
 					let form_data = new FormData(e.target)
 					let params = new URLSearchParams (form_data)
+
+					let php_name = ''
+					if(rg_mode.value==='shuppin_zaiko'){
+						php_name = 'ajax_EVregi_zaiko_sql.php'
+					}else{
+						php_name = 'ajax_EVregi_sql.php'
+					}
 					
 					await axios
-						.post('ajax_EVregi_sql.php',params,{timeout: <?php echo $timeout; ?>}) //php側は15秒でタイムアウト
+						.post(php_name,params,{timeout: <?php echo $timeout; ?>}) //php側は15秒でタイムアウト
 						.then((response) => {
 							console_log(`on_submit SUCCESS`,'lv3')
 							console_log(response.data,'lv3')
-							MSG.value = response.data[0].EMSG
-							alert_status.value[1]=response.data[0].status
-							csrf.value = response.data[0].csrf_create
+							MSG.value = response.data.MSG
+							alert_status.value=response.data.status
+							csrf.value = response.data.csrf_create
 
-							if(response.data[0].status==='alert-success'){
+							if(response.data.status==='alert-success'){
 								reset_order()
 								btn_changer('chk')
 							}
 						})
 						.catch((error) => {
 							console_log(`on_submit ERROR:${error}`,'lv3')
-							MSG.value = error.response.data[0].EMSG
-							csrf.value = error.response.data[0].csrf_create
-							alert_status.value[1]='alert-danger'
+							MSG.value = error.response.data.MSG
+							csrf.value = error.response.data.csrf_create
+							alert_status.value='alert-danger'
 						})
 						.finally(()=>{
 							get_UriageList()
@@ -691,7 +690,6 @@
 				}
 
 				//細かな表示設定など
-				const rg_mode = ref('<?php echo $RG_MODE; ?>')	//レジモード
 				const labels_address_check = ref()
 				const labels = computed(() =>{
 					//let labels = []

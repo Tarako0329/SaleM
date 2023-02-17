@@ -231,7 +231,7 @@ INPUT.su{
     background:#fff;
 }
 .common_body {
-    padding-top: 140px; /* ヘッダーの後ろに要素が隠れないようにするため */
+    padding-top: 160px; /* ヘッダーの後ろに要素が隠れないようにするため */
     padding-bottom:145px;  /*フッターーの後ろに要素が隠れないようにするため */
 }
 

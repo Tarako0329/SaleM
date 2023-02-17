@@ -161,7 +161,9 @@ function shutdown(){
         log_writer2("ajax_EVregi_sql.php",$lastError,"lv1");
           
         $emsg = "/UriNO::".$GLOBALS["UriageNO"]."　uid::".$_SESSION['user_id']." ERROR_MESSAGE::予期せぬエラー".$lastError['message'];
-        send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
+        if(EXEC_MODE!=="Local"){
+            send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
+        }
         log_writer2("ajax_UriageData_update_sql.php [Exception \$lastError] =>",$lastError,"lv0");
     
         $token = csrf_create();
@@ -169,6 +171,7 @@ function shutdown(){
             "MSG" => "システムエラーによる更新失敗。管理者へ通知しました。"
             ,"status" => "alert-danger"
             ,"csrf_create" => $token
+            ,"timeout" => false
         );
         header('Content-type: application/json');
         echo json_encode($return_sts, JSON_UNESCAPED_UNICODE);

@@ -12,7 +12,9 @@ function log_writer2($pgname,$msg,$kankyo){
     if($kankyo==="lv0"){
         log_writer($pgname,$msg);
         $log = print_r($msg,true);
-        send_mail(SYSTEM_NOTICE_MAIL,"【重要】".TITLE."でシステムエラー発生",$log);
+        if(EXEC_MODE!=="Local"){
+            send_mail(SYSTEM_NOTICE_MAIL,"【重要】".TITLE."でシステムエラー発生",$log);
+        }
     }else if($kankyo==="lv1"){
         log_writer($pgname,$msg);
     }else if($kankyo==="lv2" && EXEC_MODE!=="Product"){

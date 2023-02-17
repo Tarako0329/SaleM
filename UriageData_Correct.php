@@ -114,6 +114,7 @@
 						</td>
 						<td class='text-right d-none d-md-table-cell'></td>
 						<td class='text-right d-none d-md-table-cell'></td>
+						<td v-if='Type==="rireki"' class='text-right d-none d-md-table-cell'></td>
 					</tr>
 					<tr>
 						<td v-if='list.UriageNO%2===0' role='button' class='text-center' @click='set_filter("UriNO",list.UriageNO,"")'><span class='link'>★</span></td>
@@ -438,7 +439,7 @@
 					}else if(Type.value==='sum_events'){
 						return 6 
 					}else{
-						return 8 
+						return 7
 					}
 				})
 				const sum_uriage = computed(() => {//表示売上データの売上本体合計
