@@ -73,29 +73,26 @@ function delete_old_token($token, $pdo) {
 // 自動ログイン処理
 // =========================================================
 function check_auto_login($cookie_token, $pdo) {
-    if($_COOKIE["login_type"]==="normal"){
-        //自動ログインしない
+    if($_COOKIE["login_type"]==="normal"){//自動ログインしない
         return "一定の期間、操作が行われなかったため、自動ログオフしました。";
     }
     $sql = "SELECT * FROM AUTO_LOGIN WHERE TOKEN = ? AND REGISTRATED_TIME >= ?;";
-    //2週間前の日付を取得
-    $date = new DateTime("- 7 days");
-    
+    $date = new DateTime("- 7 days");   //2週間前の日付を取得
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(1, $cookie_token, PDO::PARAM_STR);
     $stmt->bindValue(2, $date->format('Y-m-d H:i:s'), PDO::PARAM_STR);
     $stmt->execute();
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    if (count($rows) == 1) {
-    	//自動ログイン成功
+    if (count($rows) == 1) {//自動ログイン成功
     	$_SESSION['user_id'] = $rows[0]['USER_ID'];
     	return true;
-    } else {
-    	//自動ログイン失敗
-    	//Cookie のトークンを削除
+        //return "test msg::自動ログインの有効期限が切れてます。";
+    } else {//自動ログイン失敗
     	setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly
+        setCookie("login_type", "normal", time()+999*999*999, "/", "", TRUE, TRUE); // secure, httponly
     	delete_old_token($cookie_token, $pdo);  //古くなったトークンを削除
+        
     	return "自動ログインの有効期限が切れてます。";
     }
 }
@@ -174,36 +171,36 @@ function check_session_userid($pdo_h){
 // =========================================================
 function check_session_userid_for_ajax($pdo_h){
     $rtn_val = true;
-    if(empty($_SESSION["user_id"])){
-        //セッションのIDがクリアされた場合の再取得処理。
+    //$_SESSION["user_id"]=null;
+    if(empty($_SESSION["user_id"])){//セッションのIDがクリアされた場合の再取得処理。
+        
         if(empty($_COOKIE['webrez_token'])){
-            log_writer2("func:check_session_userid_for_ajax","cookie[webrez_token]が存在してないため、useridの取得手段がない","lv3");
+            log_writer2("func:check_session_userid_for_ajax","cookie[webrez_token] is nothing、useridの取得手段なし。[login type:".$_COOKIE["login_type"]."]","lv3");
             $rtn_val = false;
         }else{
             $rtn=check_auto_login($_COOKIE['webrez_token'],$pdo_h);
+            log_writer2("func:check_session_userid_for_ajax [check_auto_login return value]",$rtn,"lv3");
             if($rtn!==true){
-                log_writer2("func:check_session_userid_for_ajax",$rtn,"lv3");
                 $rtn_val = false;
             }else{
-                $rtn_val = true;
-            }
-        }
-        if(!($_SESSION["user_id"]<>"")){
-            //念のための最終チェック
-            log_writer2("func:check_session_userid_for_ajax","ユーザーＩＤの再取得に失敗しました。[error:1]","lv3");
-            $rtn_val = false;
-        }else{
-            //取得できたUIDがDBに存在するか確認
-            $sqlstr="select * from Users where uid=?";
-            $stmt = $pdo_h->prepare($sqlstr);
-            $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
-            $stmt->execute();
-            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-            if (count($rows) === 0) {
-                //IDは取得できたがDB側にデータが無い場合もID再発行
-                log_writer2("func:check_session_userid_for_ajax","ユーザーＩＤの再取得に失敗しました。[error:2]","lv3");
-                $rtn_val = false;
+                if(!($_SESSION["user_id"]<>"")){//念のための最終チェック
+                    log_writer2("func:check_session_userid_for_ajax","ユーザーＩＤの再取得に失敗しました。[error:1]","lv3");
+                    $rtn_val = false;
+                }else{//取得できたUIDがDBに存在するか確認
+                    $sqlstr="select * from Users where uid=?";
+                    $stmt = $pdo_h->prepare($sqlstr);
+                    $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
+                    $stmt->execute();
+                    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+                    if (count($rows) === 0) {
+                        //IDは取得できたがDB側にデータが無い場合もID再発行
+                        log_writer2("func:check_session_userid_for_ajax","ユーザーＩＤの再取得に失敗しました。[error:2]","lv3");
+                        $rtn_val = false;
+                    }else{
+                        $rtn_val = true;
+                    }
+                }
             }
         }
     }
@@ -294,7 +291,6 @@ function csrf_create(){
     $_SESSION['csrf_token'] = $token;
 
 	//自動ログインのトークンを１週間の有効期限でCookieにセット
-    //setCookie("webrez_token", $token, time()+60*60*24*7, "/", null, TRUE, TRUE); // secure, httponly
     setCookie("csrf_token", $token, time()+60*60*24*2, "/", "", TRUE, TRUE);
     
     return $token;
@@ -744,12 +740,15 @@ function redirect_to_login($message) {
 	$_SESSION = array();
 	session_destroy();
 	session_start();
-    session_regenerate_id(true);
+    if(EXEC_MODE!=="Local"){
+        session_regenerate_id(true);
+    }
     setCookie("login_type", "", -1, "/", "", TRUE, TRUE);
     setCookie("webrez_token", "", -1, "/", "", TRUE, TRUE);
     setCookie("csrf_token", "", -1, "/", "", TRUE, TRUE);
 
     $_SESSION["EMSG"] = $message;
+    log_writer2("function.php[func:redirect_to_login] $_SESSION values ",$_SESSION,"lv3");
 
     header("HTTP/1.1 301 Moved Permanently");
     header("Location: index.php");

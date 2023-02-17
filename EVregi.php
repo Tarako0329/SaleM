@@ -21,8 +21,8 @@
 	$timeout=20000;
 	if(EXEC_MODE==="Local"){$timeout=0;}
 
-	//log_writer2("EVregi.php _SESSION values ",$_SESSION,"lv3");
-	//log_writer2("EVregi.php _POST values ",$_POST,"lv3");
+	//log_writer2("EVregi.php > \$_SESSION",$_SESSION,"lv3");
+	//log_writer2("EVregi.php > \$_POST",$_POST,"lv3");
 
 	$status=(!empty($_SESSION["status"])?$_SESSION["status"]:"");
 	$_SESSION["status"]="";

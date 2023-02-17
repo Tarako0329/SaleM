@@ -8,7 +8,6 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
-
 if(!empty($_SERVER['SCRIPT_URI'])){
     define("ROOT_URL",substr($_SERVER['SCRIPT_URI'],0,mb_strrpos($_SERVER['SCRIPT_URI'],"/")+1));
 }else{
@@ -78,8 +77,6 @@ session_start();
 //ツアーガイド実行中か否かを判断する
 $_SESSION["tour"]=(empty($_SESSION["tour"])?"":$_SESSION["tour"]);
 
-
-
 // DBとの接続
 $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
@@ -109,7 +106,7 @@ if($stmt->rowCount()==0){
     $color_No = $buf["value"];
 } 
 //log_writer("php_header.php _SERVER values ",$_SERVER);
-//log_writer("php_header.php end _SESSION values ",$_SESSION);
+//log_writer("php_header.php end > \$_SESSION values ",$_SESSION);
 
 ?>
 

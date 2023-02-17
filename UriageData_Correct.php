@@ -3,25 +3,14 @@
 	//memo !empty()　は 変数未定義、空白、NULLの場合にfalseを返す
 	require "php_header.php";
 		
-	if((empty($_GET["mode"])?"":$_GET["mode"])=="Updated"){
-		if(csrf_chk_redirect($_GET["csrf_token"])==false){
-			$_SESSION["EMSG"]="セッションが正しくありませんでした。③";
-			header("HTTP/1.1 301 Moved Permanently");
-			header("Location: index.php");
-			exit();
+	if(isset($_GET["csrf_token"])){
+		if(csrf_chk_nonsession_get($_GET["csrf_token"])===false){
+			$message="セッションが正しくありませんでした。";
+			redirect_to_login($message);
 		}
-	}elseif(isset($_GET["csrf_token"]) || empty($_POST)){
-		if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
-			$_SESSION["EMSG"]="セッションが正しくありませんでした。①";
-			header("HTTP/1.1 301 Moved Permanently");
-			header("Location: index.php");
-			exit();
-		}
-	}elseif(csrf_chk()==false){
-		$_SESSION["EMSG"]="セッションが正しくありませんでした②";
-		header("HTTP/1.1 301 Moved Permanently");
-		header("Location: index.php");
-		exit();
+	}else{//GETなしは不正
+		$message="セッションが正しくありませんでした。";
+		redirect_to_login($message);
 	}
 	
 	$rtn=check_session_userid($pdo_h);
@@ -96,7 +85,7 @@
 	<main class='common_body' id='body' :style='common_body_style'>
 		<div class='container-fluid'>
 			<template v-if='MSG!==""'>
-				<div v-bind:class='alert_status' role='alert'>{{MSG}}</div>
+				<div v-bind:class='alert_status' role='alert' style='padding:3px 10px'>{{MSG}}</div>
 			</template>
 		<div style='overflow:auto;' id='uritable'>
 			<table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
@@ -107,12 +96,12 @@
 						<th v-if='Type==="sum_items"' scope='col' style='width:35px;'>出品数</th>
 						<th scope='col' style='width:30px;'>数</th>
 						<th v-if='Type==="sum_items"' scope='col' style='width:35px;'>残数</th>
-						<th scope='col' style='width:60px;' class='d-none d-sm-table-cell'>単価</th>
+						<th scope='col' style='width:60px;' class='d-none d-md-table-cell'>単価</th>
 						<th scope='col' style='width:60px;'>売上</th>
-						<th scope='col' style='width:60px;' class='d-none d-sm-table-cell'>税</th>
+						<th scope='col' style='width:60px;' class='d-none d-md-table-cell'>税</th>
 						<th scope='col' style='width:50px;'>原価</th>
 						<th scope='col' style='width:60px;'>粗利</th>
-						<th v-if='Type==="rireki"' scope='col' class='d-none d-sm-table-cell'>天候</th>
+						<th v-if='Type==="rireki"' scope='col' class='d-none d-md-table-cell'>天候</th>
 						<th v-if='Type==="rireki"' scope='col' style='width:20px;'></th>
 					</tr>
 				</thead>
@@ -123,6 +112,8 @@
 						<span role='button' class='link' @click='set_filter("Event",list.Event,"")'>『{{list.Event}}{{list.TokuisakiNM}}』</span>
 						<img v-if='list.icon.length>=5' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>（<span style='color:red;'>{{list.max_temp}}</span>/<span style='color:blue;'>{{list.min_temp}}</span>）
 						</td>
+						<td class='text-right d-none d-md-table-cell'></td>
+						<td class='text-right d-none d-md-table-cell'></td>
 					</tr>
 					<tr>
 						<td v-if='list.UriageNO%2===0' role='button' class='text-center' @click='set_filter("UriNO",list.UriageNO,"")'><span class='link'>★</span></td>
@@ -131,12 +122,12 @@
 						<td v-if='Type==="sum_items"' class='text-right'>{{Number(list.shuppin_su)}}</td>
 						<td class='text-right'>{{Number(list.su)}}</td>
 						<td v-if='Type==="sum_items"' class='text-right'>{{Number(list.zan_su)}}</td>
-						<td class='text-right d-none d-sm-table-cell'>{{Number(list.tanka).toLocaleString()}}</td>
+						<td class='text-right d-none d-md-table-cell'>{{Number(list.tanka).toLocaleString()}}</td>
 						<td class='text-right'>{{Number(list.UriageKin).toLocaleString()}}</td>
-						<td class='text-right d-none d-sm-table-cell'>{{Number(list.zei).toLocaleString()}}</td>
+						<td class='text-right d-none d-md-table-cell'>{{Number(list.zei).toLocaleString()}}</td>
 						<td class='text-right'>{{Number(list.genka).toLocaleString()}}</td>
 						<td class='text-right'>{{Number(list.arari).toLocaleString()}}</td>
-						<td v-if='Type==="rireki"' class='d-none d-sm-table-cell'>
+						<td v-if='Type==="rireki"' class='d-none d-md-table-cell'>
 							<img v-if='list.icon.length>=5' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>（<span>{{list.temp}}℃ </span><span>{{list.description}}</span>）
 						</td>
 						<td v-if='Type==="rireki"' >
@@ -159,9 +150,13 @@
 			<button type='button' class='btn--chk' style='border-radius:0;' data-bs-toggle='modal' data-bs-target='#UriModal'>検　索</button>
 		</div>
 	</footer>
+	<div class="loader-wrap" v-show='loader'>
+		<div class="loader">Loading...</div>
+	</div>
+
 	<!--修正エリア-->
 	<div v-if='UriageData_Correct_mode' class='footer_update_area'>
-		<form class='form-horizontal update_areas tour_uri2' @submit.prevent='on_submit'>
+		<form class='form-horizontal update_areas tour_uri2' @submit.prevent='on_submit_Uriage_Update'>
 						
 			<input type='hidden' name='csrf_token' :value='csrf'>
 			
@@ -422,7 +417,8 @@
 							serch_words = filter_Uridate.value.toString()
 						}
 						if(filter_Event.value!=='%'){
-							serch_cols = serch_cols + row.Event.toString() + row.TokuisakiNM.toString()
+							//serch_cols = serch_cols + row.Event.toString() + row.TokuisakiNM.toString()
+							serch_cols = serch_cols + (row.Event + row.TokuisakiNM).toString()
 							serch_words = serch_words + filter_Event.value.toString()
 						}
 						if(filter_Shouhin.value!=='%'){
@@ -438,11 +434,11 @@
 				})
 				const colspan = computed(()=>{//表タイプ毎の日付・イベント行のセル結合数返す
 					if(Type.value==='sum_items'){
-						return 10
+						return 8 
 					}else if(Type.value==='sum_events'){
-						return 8
+						return 6 
 					}else{
-						return 10
+						return 8 
 					}
 				})
 				const sum_uriage = computed(() => {//表示売上データの売上本体合計
@@ -457,6 +453,7 @@
 				})
 
 				//更新処理関連
+				const loader = ref(false)
 				const upd_tanka = ref('')
 				const upd_zei_kbn = ref('1101')
 				const upd_zei_kominuki = ref('komi')
@@ -518,30 +515,34 @@
 					return `where `
 				})
 
-				const on_submit = async(e) => {//登録・submit/
-					console_log('on_submit start','lv3')
+				const on_submit_Uriage_Update = async(e) => {//登録・submit/
+					console_log('on_submit_Uriage_Update start','lv3')
 
 					if(confirm('売上データを更新してもよいですか？')===false){
 						alert('処理を中断しました。')
 						return 0
 					}
-					
-					//loader.value = true
-
+					loader.value = true
 					let form_data = new FormData(e.target)
 					let params = new URLSearchParams (form_data)
 					
 					await axios
 						.post('ajax_UriageData_update_sql.php',params) //php側は15秒でタイムアウト,{timeout: <?php //echo $timeout; ?>}
-						.then((response) => {
-							console_log(`on_submit SUCCESS`,'lv3')
+						.then(async(response) => {
+							console_log(`on_submit_Uriage_Update SUCCESS`,'lv3')
 							console_log(response.data,'lv3')
+							if(response.data.timeout===true){
+								await alert(response.data.MSG)
+								if(confirm('ログイン画面に戻りますか？')===true){
+									window.location.href = 'index.php';
+								}
+							}
 							MSG.value = response.data.MSG
 							alert_status.value = response.data.status
 							csrf.value = response.data.csrf_create
 						})
 						.catch((error) => {
-							console_log(`on_submit ERROR:${error}`,'lv3')
+							console_log(`on_submit_Uriage_Update ERROR:${error}`,'lv3')
 							//MSG.value = error.response.data[0].EMSG
 							MSG.value = 'axios 通信エラー'
 							csrf.value = error.response.data[0].csrf_create
@@ -549,7 +550,7 @@
 						})
 						.finally(()=>{
 							get_UriageList()
-							//loader.value = false
+							loader.value = false
 						})
 				}
 
@@ -561,7 +562,7 @@
 						return 0
 					}
 					
-					//loader.value = true
+					loader.value = true
 					let params = new URLSearchParams ()
 					params.append('csrf_token',csrf.value)
 					params.append('UriageNO',UriNO)
@@ -569,9 +570,15 @@
 					
 					axios
 						.post('ajax_UriageData_delete_sql.php',params) //php側は15秒でタイムアウト,{timeout: <?php //echo $timeout; ?>}
-						.then((response) => {
+						.then(async(response) => {
 							console_log(`delete_Uriage SUCCESS`,'lv3')
 							console_log(response.data,'lv3')
+							if(response.data.timeout===true){
+								await alert(response.data.MSG)
+								if(confirm('ログイン画面に戻りますか？')===true){
+									window.location.href = 'index.php';
+								}
+							}
 							MSG.value = response.data.MSG
 							alert_status.value = response.data.status
 							csrf.value = response.data.csrf_create
@@ -585,7 +592,7 @@
 						})
 						.finally(()=>{
 							get_UriageList()
-							//loader.value = false
+							loader.value = false
 						})
 						
 				}
@@ -624,10 +631,11 @@
 					common_body_style,
 					btn_controle,
 					btn_controler,
-					on_submit,
+					on_submit_Uriage_Update,
 					sum_uriage,
 					sum_uriage_zei,
 					delete_Uriage,
+					loader,
 				}
 			}
 		}).mount('#app');
