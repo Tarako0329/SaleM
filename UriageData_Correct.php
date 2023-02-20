@@ -87,9 +87,10 @@
 			<template v-if='MSG!==""'>
 				<div v-bind:class='alert_status' role='alert' style='padding:3px 10px'>{{MSG}}</div>
 			</template>
-		<div style='overflow:auto;' id='uritable'>
-			<table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
-				<thead>
+			<!--<div style='overflow:auto;' id='uritable'>-->
+			<div  id='uritable'>
+				<table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
+					<thead>
 					<tr>
 						<th scope='col' style='width:20px;'></th>
 						<th scope='col' style='width:130px;'>商品</th>
@@ -104,42 +105,42 @@
 						<th v-if='Type==="rireki"' scope='col' class='d-none d-md-table-cell'>天候</th>
 						<th v-if='Type==="rireki"' scope='col' style='width:20px;'></th>
 					</tr>
-				</thead>
-				<tbody v-for='(list,index) in UriageList_filter' :key='list.uid + list.UriDate + list.UriageNO + list.ShouhinCD'>
-					<tr v-if='(index===0) || (index!==0 && list.UriDate + list.Event !== UriageList_filter[index-1].UriDate + UriageList_filter[index-1].Event)' class='tr_stiky'>
-						<td :colspan='colspan' class='tr_stiky' style='white-space:nowrap;'>
-						<span role='button' class='link' @click='set_filter("UriDate",list.UriDate,"")'> 売上日：{{list.UriDate}}</span>
-						<span role='button' class='link' @click='set_filter("Event",list.Event,"")'>『{{list.Event}}{{list.TokuisakiNM}}』</span>
-						<img v-if='list.icon.length>=5' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>（<span style='color:red;'>{{list.max_temp}}</span>/<span style='color:blue;'>{{list.min_temp}}</span>）
-						</td>
-						<td class='text-right d-none d-md-table-cell'></td>
-						<td class='text-right d-none d-md-table-cell'></td>
-						<td v-if='Type==="rireki"' class='text-right d-none d-md-table-cell'></td>
-					</tr>
-					<tr>
-						<td v-if='list.UriageNO%2===0' role='button' class='text-center' @click='set_filter("UriNO",list.UriageNO,"")'><span class='link'>★</span></td>
-						<td v-if='list.UriageNO%2!==0' role='button' class='text-center' @click='set_filter("UriNO",list.UriageNO,"")'><span class='link'>☆</span></td>
-						<td role='button' class='link' @click='set_filter("ShouhinCD",list.ShouhinCD,list.ShouhinNM)'>{{list.ShouhinNM}}</td>
-						<td v-if='Type==="sum_items"' class='text-right'>{{Number(list.shuppin_su)}}</td>
-						<td class='text-right'>{{Number(list.su)}}</td>
-						<td v-if='Type==="sum_items"' class='text-right'>{{Number(list.zan_su)}}</td>
-						<td class='text-right d-none d-md-table-cell'>{{Number(list.tanka).toLocaleString()}}</td>
-						<td class='text-right'>{{Number(list.UriageKin).toLocaleString()}}</td>
-						<td class='text-right d-none d-md-table-cell'>{{Number(list.zei).toLocaleString()}}</td>
-						<td class='text-right'>{{Number(list.genka).toLocaleString()}}</td>
-						<td class='text-right'>{{Number(list.arari).toLocaleString()}}</td>
-						<td v-if='Type==="rireki"' class='d-none d-md-table-cell'>
-							<img v-if='list.icon.length>=5' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>（<span>{{list.temp}}℃ </span><span>{{list.description}}</span>）
-						</td>
-						<td v-if='Type==="rireki"' >
-							<a @click='delete_Uriage(list.UriageNO, list.ShouhinCD)' href='#'>
-								<i class='fa-regular fa-trash-can'></i>
-							</a>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+					</thead>
+					<tbody v-for='(list,index) in UriageList_filter' :key='list.uid + list.UriDate + list.UriageNO + list.ShouhinCD'>
+						<tr v-if='(index===0) || (index!==0 && list.UriDate + list.Event !== UriageList_filter[index-1].UriDate + UriageList_filter[index-1].Event)' class='tr_stiky'>
+							<td :colspan='colspan' class='tr_stiky' style='white-space:nowrap;'>
+							<span role='button' class='link' @click='set_filter("UriDate",list.UriDate,"")'> 売上日：{{list.UriDate}}</span>
+							<span role='button' class='link' @click='set_filter("Event",list.Event,"")'>『{{list.Event}}{{list.TokuisakiNM}}』</span>
+							<img v-if='list.icon.length>=5' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>（<span style='color:red;'>{{list.max_temp}}</span>/<span style='color:blue;'>{{list.min_temp}}</span>）
+							</td>
+							<td class='text-right d-none d-md-table-cell'></td>
+							<td class='text-right d-none d-md-table-cell'></td>
+							<td v-if='Type==="rireki"' class='text-right d-none d-md-table-cell'></td>
+						</tr>
+						<tr>
+							<td v-if='list.UriageNO%2===0' role='button' class='text-center' @click='set_filter("UriNO",list.UriageNO,"")'><span class='link'>★</span></td>
+							<td v-if='list.UriageNO%2!==0' role='button' class='text-center' @click='set_filter("UriNO",list.UriageNO,"")'><span class='link'>☆</span></td>
+							<td role='button' class='link' @click='set_filter("ShouhinCD",list.ShouhinCD,list.ShouhinNM)'>{{list.ShouhinNM}}</td>
+							<td v-if='Type==="sum_items"' class='text-right'>{{Number(list.shuppin_su)}}</td>
+							<td class='text-right'>{{Number(list.su)}}</td>
+							<td v-if='Type==="sum_items"' class='text-right'>{{Number(list.zan_su)}}</td>
+							<td class='text-right d-none d-md-table-cell'>{{Number(list.tanka).toLocaleString()}}</td>
+							<td class='text-right'>{{Number(list.UriageKin).toLocaleString()}}</td>
+							<td class='text-right d-none d-md-table-cell'>{{Number(list.zei).toLocaleString()}}</td>
+							<td class='text-right'>{{Number(list.genka).toLocaleString()}}</td>
+							<td class='text-right'>{{Number(list.arari).toLocaleString()}}</td>
+							<td v-if='Type==="rireki"' class='d-none d-md-table-cell'>
+								<img v-if='list.icon.length>=5' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>（<span>{{list.temp}}℃ </span><span>{{list.description}}</span>）
+							</td>
+							<td v-if='Type==="rireki"' >
+								<a @click='delete_Uriage(list.UriageNO, list.ShouhinCD)' href='#'>
+									<i class='fa-regular fa-trash-can'></i>
+								</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</main>
 	<footer v-if='UriageData_Correct_mode===false' class='common_footer'>
@@ -464,7 +465,7 @@
 					if(UriageData_Correct_mode.value===false){
 						return 'padding-bottom:80px;'
 					}else{
-						return 'padding-bottom:260px;'
+						return 'padding-bottom:280px;'
 					}
 					
 				})

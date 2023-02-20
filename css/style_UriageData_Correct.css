@@ -91,12 +91,12 @@ th{
 @media screen and (min-width:376px) {
     th{
         position: sticky;
-        top:0px;
+        top:123px;
     }
     
     .tr_stiky{
         position: sticky; /*スマホ古いと動作が変になるのでやめる*/
-        top:33px;
+        top:156px;
     }
     
 }
