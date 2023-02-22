@@ -1,4 +1,5 @@
 <?php
+//POST ONLY
 require "php_header.php";
 
 if(csrf_chk()==false){
@@ -7,7 +8,7 @@ if(csrf_chk()==false){
 $_SESSION["MSG"]= "更新対象がありませんでした。";
 $_SESSION["alert"] = "alert-warning";
 
-log_writer2("shouhinMSList_sql.php > \$_POST",$_POST,"lv3");
+//log_writer2("shouhinMSList_sql.php > \$_POST",$_POST,"lv3");
 $array = $_POST["ORDERS"];
 $sqlstr = "";
 

@@ -31,43 +31,41 @@
 	<TITLE><?php echo $title." 取扱商品 確認・編集";?></TITLE>
 </head>
 <BODY>
-	<header class='header-color common_header' style='flex-wrap:wrap'>
-		<div class='title' style='width: 100%;'><a href='menu.php'><?php echo $title;?></a></div>
-		<p style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>  取扱商品 確認・編集 画面</p>
-		<?php if(empty($_SESSION["tour"])){?>
-		<a href="#" style='color:inherit;position:fixed;top:42px;right:5px;' onclick='help()'><i class="fa-regular fa-circle-question fa-lg logoff-color"></i></a>
-		<?php }?>
-	</header>
-	
 	<form method='post' action='shouhinMSList_sql.php' id='form1'>
-		
+		<header class='header-color common_header' style='flex-wrap:wrap'>
+			<div class='title' style='width: 100%;'><a href='menu.php'><?php echo $title;?></a></div>
+			<p style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>  取扱商品 確認・編集 画面</p>
+			<?php if(empty($_SESSION["tour"])){?>
+			<a href="#" style='color:inherit;position:fixed;top:42px;right:5px;' onclick='help()'><i class="fa-regular fa-circle-question fa-lg logoff-color"></i></a>
+			<?php }?>
+		</header>
 		<div class='header2'>
-		<div class='container-fluid'>
-			<div style='padding:0 5px;'>
-				<input type='radio' class='btn-check' name='options' value='komi' autocomplete='off' v-model='upd_zei_kominuki' id='plus_mode'>
-				<label class='btn btn-outline-primary' style='font-size:1.2rem;' for='plus_mode'>税込入力</label>
-				<input type='radio' class='btn-check' name='options' value='nuki' autocomplete='off' v-model='upd_zei_kominuki' id='minus_mode'>
-				<label class='btn btn-outline-primary' style='font-size:1.2rem;' for='minus_mode'>税抜入力</label>
-			</div>
-			<div style='position:fixed;right:10px;width:100px;display:block;'>
-				<div>
-					<select v-model='chk_register_show' class='form-select form-select-lg item_0'>
-						<option value='all'>全て表示</option>
-						<option value='on'>レジON</option>
-						<option value='off'>レジOFF</option>
-					</select>
+			<div class='container-fluid'>
+				<div style='padding:0 5px;'>
+					<input type='radio' class='btn-check' name='options' value='komi' autocomplete='off' v-model='upd_zei_kominuki' id='plus_mode'>
+					<label class='btn btn-outline-primary' style='font-size:1.2rem;' for='plus_mode'>税込入力</label>
+					<input type='radio' class='btn-check' name='options' value='nuki' autocomplete='off' v-model='upd_zei_kominuki' id='minus_mode'>
+					<label class='btn btn-outline-primary' style='font-size:1.2rem;' for='minus_mode'>税抜入力</label>
 				</div>
-				<div style='display:flex;'>
-					<select v-model='order_by[0]' class='form-select form-select-lg' style='margin-bottom:5px;'>
-						<option value='seq'>登録順</option>
-						<option value='name'>名称順</option>
-					</select>
-					<button @click='up_or_down' class='btn btn-primary' style='height:25px;padding:0px 10px;font-size:1.2rem;margin-top:0px;margin-left:5px;' type='button'>
-						{{order_by[1]}}
-					</button>
+				<div style='position:fixed;right:10px;top:75px;width:120px;display:block;'>
+					<div>
+						<select v-model='chk_register_show' class='form-select form-select-lg item_0'>
+							<option value='all'>全て表示</option>
+							<option value='on'>レジON</option>
+							<option value='off'>レジOFF</option>
+						</select>
+					</div>
+					<div style='display:flex;'>
+						<select v-model='order_by[0]' class='form-select form-select-lg' style='margin-bottom:5px;'>
+							<option value='seq'>登録順</option>
+							<option value='name'>名称順</option>
+						</select>
+						<button @click='up_or_down' class='btn btn-primary' style='height:25px;padding:0px 10px;font-size:1.2rem;margin-top:0px;margin-left:5px;' type='button'>
+							{{order_by[1]}}
+						</button>
+					</div>
 				</div>
 			</div>
-		</div>
 		</div>
 	
 		<main class='common_body'>
@@ -76,47 +74,53 @@
 					<div :class='alert_status' role='alert'>{{MSG}}</div>
 				</template>
 				<input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
-				<table class='table result_table item_1' style='max-width:630px;'>
+				<table class='table result_table item_1' style='width:100%;max-width:630px;table-layout: fixed;'>
 					<thead>
 					<tr style='height:30px;'>
-						<th class='th1' scope='col' colspan='12' style='width:auto;padding:0px 5px 0px 0px;'>ID:商品名</th>
+						<th class='th1' scope='col' colspan='3' style='width:auto;padding:0px 5px 0px 0px;'>ID:商品名</th>
+						<th scope='col'>レジ</th>
 					</tr>
 					<tr style='height:30px;'>
-						<th scope='col'>単価変更</th>
-						<th scope='col' style='color:red;'>単価<br>(税抜)</th>
+						<th scope='col' >単価変更</th>
+						<th scope='col' style='color:red;'>本体額</th>
 						<th scope='col' >税区分</th>
 						<th scope='col' style='color:red;'>消費税</th>
+					</tr>
+					<tr>
 						<th scope='col'>原価</th>
-						<th scope='col' class='d-none d-sm-table-cell'>内容量</th>
-						<th scope='col' class='d-none d-sm-table-cell'>単位</th>
-						<th scope='col'>レジ</th>
-						<th class='d-none d-sm-table-cell' style='width:4rem;'></th>
+						<th scope='col' class=''>内容量</th><!--d-none d-sm-table-cell-->
+						<th scope='col' class=''>単位</th>
+						<th scope='col'>削除</th>
+						<!--<th scope='col' class='' style='width:4rem;'></th>-->
 					</tr>
 					</thead>
 					<tbody v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
 						<tr>
-							<td style='font-size:1.7rem;font-weight:700;' colspan='12'>{{list.shouhinCD}}：{{list.shouhinNM}}</td><!--商品名-->
+							<td style='font-size:1.7rem;font-weight:700;' colspan='3'>{{list.shouhinCD}}：{{list.shouhinNM}}</td><!--商品名-->
+							<td ><input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' class='form-check-input' style='transform: scale(1.4);' v-model='list.disp_rezi'></td>
 						</tr>
 						<tr>
-							<td><input @blur='set_new_value(index,`#new_val_${index}`)' :id='`new_val_${index}`' type='number' style='width:8rem;' placeholder='新価格' ></td>   <!--単価修正欄-->
-							<td><input type='number' readonly='readonly' :name ='`ORDERS[${index}][tanka]`' style='width:7rem;background-color:#a3a3a3;' :value='list.tanka'></td><!--登録単価-->
+							<td><input @blur='set_new_value(index,`#new_val_${index}`)' :id='`new_val_${index}`' type='number' class='form-contral' style='width:7rem;' placeholder='新価格' ></td>   <!--単価修正欄 -->
+							<td><input type='number' readonly='readonly' :name ='`ORDERS[${index}][tanka]`' class='form-contral' style='font-size:1.7rem;width:7rem;background-color:#fff;border:0;' :value='list.tanka'></td><!--登録単価-->
 							<td>
-								<select v-model='list.zeiKBN' @change='set_new_value(index,`#new_val_${index}`)' :name ='`ORDERS[${index}][zeikbn]`' class='form-select form-select-lg' style='width:8rem;height:30px;'><!--税区分 -->
-								<?php
-								foreach($ZEIresult as $row){
-									echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
-								}
-								?>
+								<select v-model='list.zeiKBN' @change='set_new_value(index,`#new_val_${index}`)' :name ='`ORDERS[${index}][zeikbn]`' class='form-select form-select-lg' style='font-size:1.7rem;width:7rem;height:30px;'><!--税区分 -->
+									<?php
+									foreach($ZEIresult as $row){
+										echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
+									}
+									?>
 								</select>
 							</td>
-							<td><input type='number' readonly='readonly' :name ='`ORDERS[${index}][shouhizei]`' style='width:6rem;background-color:#a3a3a3;' :value='list.tanka_zei'></td><!--list.tanka_zei-->
-							<td><input type='number' :name ='`ORDERS[${index}][genka]`' style='width:6rem;' :value='list.genka_tanka'></td>
-							<td class='d-none d-sm-table-cell'><input type='number' :name ='`ORDERS[${index}][utisu]`' style='width:6rem;' :value='list.utisu'></td>
-							<td class='d-none d-sm-table-cell'><input type='text'   :name ='`ORDERS[${index}][tani]`' style='width:3rem;' :value='list.tani'></td>
-							<td><input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' style='width:4rem;margin-top:5px;' v-model='list.disp_rezi'></td>
-							<td class='d-none d-sm-table-cell' style='text-align:center;'>
-								<a href='shouhinDEL.php?cd=".$row["shouhinCD"]."&csrf_token=".$csrf_create."'>
-									<i class='fa-regular fa-trash-can'></i>
+							<td><input type='number' readonly='readonly' :name ='`ORDERS[${index}][shouhizei]`' class='form-contral' style='font-size:1.7rem;width:7rem;background-color:#fff;border:0' :value='list.tanka_zei'></td><!--list.tanka_zei-->
+						</tr>
+						<tr>
+							<td><input type='number' :name ='`ORDERS[${index}][genka]`' class='form-contral' style='width:7rem;' :value='list.genka_tanka'></td>
+							<td class=''><input type='number' :name ='`ORDERS[${index}][utisu]`' class='form-contral' style='width:7rem;' :value='list.utisu'></td>
+							<td class=''><input type='text'   :name ='`ORDERS[${index}][tani]`' class='form-contral' style='width:7rem;' :value='list.tani'></td>
+							<!--<td><input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' style='width:4rem;margin-top:5px;' v-model='list.disp_rezi'></td>-->
+							<td class=''>
+								<a :href='`shouhinDEL.php?cd=${list.shouhinCD}&csrf_token=<?php echo $csrf_create; ?>`'>
+									<i class='fa-regular fa-trash-can fa-2x'></i>
 								</a>
 							</td><!--削除アイコン-->
 							<input type='hidden' :name ='`ORDERS[${index}][shouhinCD]`' :value='list.shouhinCD'>

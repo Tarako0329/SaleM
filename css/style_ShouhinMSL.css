@@ -2,7 +2,6 @@
     padding-top:130px;
     padding-bottom:90px; /*フッターーの後ろに要素が隠れないようにするため */
     font-size:1.5rem;
-    /*padding-top:130px;*/
 }
 .yagou{
     width: 100%;
@@ -10,6 +9,7 @@
 }
 INPUT{
     height:30px;
+    margin-left:2px;
 }
 
 .header2{
@@ -34,13 +34,8 @@ th{
     top:159px;
     background:#fff;
 }
-/*
-.hyouji{
-    position:fixed;
-    top:95px;
-    right:0;
-}
-*/
 td{
     border:1 0;
+    padding:2px;
+    width:auto;
 }

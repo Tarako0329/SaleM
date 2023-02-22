@@ -1,8 +1,6 @@
-<!DOCTYPE html>
-<html lang="ja">
 <?php
 require "php_header.php";
-
+log_writer2("shouhinMSList_sql.php > \$_GET",$_GET,"lv3");
 if(isset($_GET["csrf_token"]) || empty($_POST)){
     if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
         $_SESSION["EMSG"]="セッションが正しくありませんでした。";
@@ -20,6 +18,8 @@ if(!($_SESSION['user_id']<>"")){
         header("Location: index.php");
     }
 }
+
+$csrf_token = csrf_create();
 
 //実績有無の確認
 $sqlstr="select count(*) as cnt from UriageData where ShouhinCD=? and uid=?";
@@ -56,6 +56,10 @@ if($_POST["btn"] == "削除"){
     }
 
     //echo $_POST["hyoujiKBN1"];
+}else if($_POST["btn"] == "戻る"){
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: shouhinMSList.php?csrf_token=".$csrf_token);
+    exit();
 }else{
     //削除対象の取得
     $sqlstr="select * from ShouhinMS where shouhinCD=? and uid=?";
@@ -71,13 +75,16 @@ if($_POST["btn"] == "削除"){
 //税区分MSリスト取得
 $sqlstr="select * from ZeiMS order by zeiKBN;";
 $stmt = $pdo_h->query($sqlstr);
-$csrf_token = csrf_create();
+
 
 ?>
+<!DOCTYPE html>
+<html lang="ja">
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
-    include "head.html" 
+    //include "head.html" 
+    include "head_bs5.html" 
     ?>
     <!--ページ専用CSS-->
     <link rel="stylesheet" href="css/style_ShouhinMSedit.css?<?php echo $time; ?>" >
@@ -98,12 +105,15 @@ $csrf_token = csrf_create();
     } ?>
     <p>以下の商品を削除しますか？</p>
     <form method="post" class="form" id="form1" action="shouhinDEL.php">
-        <div class="form-group form-inline">
+        <!--<div class="form-group form-inline">
             <label for="shouhinNM" class="col-2 col-md-1 control-label">商品名</label>
             <div class="col-10">
-                <input type="text" class="form-control" style="width:80%" id="shouhinNM" name="shouhinNM" required="required" placeholder="必須" value="<?php echo rot13decrypt($row[0]["shouhinNM"]);?>">
+                <input type="text" class="form-control" style="width:80%" id="shouhinNM" name="shouhinNM" required="required" placeholder="必須" value="<?php echo ($row[0]["shouhinNM"]);?>">
             </div>
         </div>
+        -->
+        <label for="shouhinNM" class="form-label">商品名</label>
+        <input type="text" class="form-control" style="width:80%" id="shouhinNM" name="shouhinNM" required="required" placeholder="必須" value="<?php echo ($row[0]["shouhinNM"]);?>">
         <div class="form-group form-inline">
             <label for="tanka" class="col-2 col-md-1 control-label">単価(税抜)</label>
             <div class=" col-10">
@@ -114,12 +124,10 @@ $csrf_token = csrf_create();
         <div class="form-group form-inline">
             <label for="zeikbn" class="col-2 col-md-1 control-label">税区分</label>
             <div class=" col-10">
-                <!--<input type="text" class="form-control" id="zeikbn" name="zeikbn">-->
                 <select class="form-control" style="width:80%;padding-top:0;" id="zeikbn" name="zeikbn" required="required" placeholder="必須">
                     <option value=""></option>
                     <?php
                     foreach($stmt as $row2){
-                        //echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
                         if($row[0]["zeiKBN"]==$row2["zeiKBN"]){
                             echo "<option value='".$row2["zeiKBN"]."' selected>".$row2["hyoujimei"]."</option>\n";
                         }else{
@@ -185,19 +193,20 @@ $csrf_token = csrf_create();
                 <input type="text" class="form-control" id="hyoujiKBN3" name="hyoujiKBN3">
             </div>
         </div>
-        -->
         <div class="form-group form-inline">
             <label for="hyoujiNO" class="col-2 col-md-1 control-label">表示順</label>
             <div class=" col-10">
                 <input type="text" class="form-control" style="width:50%" id="hyoujiNO" name="hyoujiNO" placeholder="レジ表示順。未指定の場合は「カテゴリー大>中>小>商品名」の五十音順" value=0>
             </div>
         </div>
+        -->
         
         <input type="hidden" name="cd" value="<?php echo $_GET["cd"]; ?>">
         <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
         <br>
-        <div class="col-2 col-md-1" style=" padding:0; margin-top:10px;">
-            <button type="submit" class="btn btn-primary" style="width:100%;" name="btn" value="削除">削  除</button>
+        <div class="col-2 col-md-1" style="display:flex;">
+            <button type="submit" class="btn btn-primary" name="btn" value="削除">削  除</button>
+            <button type="submit" class="btn btn-info" name="btn" value="戻る">戻　る</button>
         </div>
     </form>
     </div>
