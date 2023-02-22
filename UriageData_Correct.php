@@ -85,7 +85,7 @@
 	<main class='common_body' id='body' :style='common_body_style'>
 		<div class='container-fluid'>
 			<template v-if='MSG!==""'>
-				<div v-bind:class='alert_status' role='alert' style='padding:3px 10px'>{{MSG}}</div>
+				<div v-bind:class='alert_status' role='alert'>{{MSG}}</div>
 			</template>
 			<!--<div style='overflow:auto;' id='uritable'>-->
 			<div  id='uritable'>
@@ -540,7 +540,7 @@
 								}
 							}
 							MSG.value = response.data.MSG
-							alert_status.value = response.data.status
+							alert_status.value[1] = response.data.status
 							csrf.value = response.data.csrf_create
 						})
 						.catch((error) => {
@@ -548,7 +548,7 @@
 							//MSG.value = error.response.data[0].EMSG
 							MSG.value = 'axios 通信エラー'
 							csrf.value = error.response.data[0].csrf_create
-							alert_status.value='alert-danger'
+							alert_status.value[1]='alert-danger'
 						})
 						.finally(()=>{
 							get_UriageList()
@@ -582,7 +582,7 @@
 								}
 							}
 							MSG.value = response.data.MSG
-							alert_status.value = response.data.status
+							alert_status.value[1] = response.data.status
 							csrf.value = response.data.csrf_create
 						})
 						.catch((error) => {
@@ -590,7 +590,7 @@
 							//MSG.value = error.response.data[0].EMSG
 							MSG.value = 'axios 通信エラー'
 							csrf.value = error.response.data[0].csrf_create
-							alert_status.value='alert-danger'
+							alert_status.value[1]='alert-danger'
 						})
 						.finally(()=>{
 							get_UriageList()

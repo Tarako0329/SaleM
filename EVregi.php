@@ -447,7 +447,7 @@
 					let order_panel = ([])
 					if (chk_register_show.value === "chk"){//表示対象のみを返す
 						order_panel = shouhinMS.value.filter((shouhin) => {
-							return (shouhin.hyoujiKBN1.includes('on') );
+							return (shouhin.hyoujiKBN1 && shouhin.hyoujiKBN1.includes('on') );
 						});
 					}else if(chk_register_show.value === "register"){//表示対象かつ注文数１以上を返す
 						order_panel = shouhinMS.value.filter((shouhin) => {

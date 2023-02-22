@@ -7,3 +7,22 @@ ver2.99.0-0022:bs5&Vue3CompApiへ移行_売上修正ajax対応
 ver2.99.0-0023:to[bs5&Vue3CompApi]売上実績画面対応完了
 ver2.99.0-0024:to[bs5&Vue3CompApi]在庫登録画面対応
 ver2.99.0-0025:to[bs5&Vue3CompApi]売上実績:軽微な修正
+ver2.99.0-0025:to[bs5&Vue3CompApi]商品一覧画面対応-a1
+
+
+
+
+ローカルからテスト環境へ
+cd /home/ifduktdo/public_html/SaleM/TEST
+git fetch --all
+git reset --hard origin/master
+
+
+
+cd /home/ifduktdo/public_html/SaleM/WebRez
+git fetch --all
+git reset --hard origin/master
+
+cd /home/ifduktdo/public_html/SaleM/WebRez_Trial
+git fetch --all
+git reset --hard origin/master
