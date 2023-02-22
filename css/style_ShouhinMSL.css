@@ -34,6 +34,11 @@ th{
     top:159px;
     background:#fff;
 }
+.th2{
+    position: sticky;
+    top:188px;
+    background:#fff;
+}
 td{
     border:1 0;
     padding:2px;

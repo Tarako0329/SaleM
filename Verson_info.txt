@@ -9,7 +9,7 @@ ver2.99.0-0024:to[bs5&Vue3CompApi]在庫登録画面対応
 ver2.99.0-0025:to[bs5&Vue3CompApi]売上実績:軽微な修正
 ver2.99.0-0025:to[bs5&Vue3CompApi]商品一覧画面対応-a1
 ver2.99.0-0026:to[bs5&Vue3CompApi]商品一覧画面対応-a1
-
+ver2.99.0-0027:to[bs5&Vue3CompApi]商品一覧画面対応-a1
 
 
 

@@ -76,28 +76,28 @@
 				<input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
 				<table class='table result_table item_1' style='width:100%;max-width:630px;table-layout: fixed;'>
 					<thead>
-					<tr style='height:30px;'>
-						<th class='th1' scope='col' colspan='3' style='width:auto;padding:0px 5px 0px 0px;'>ID:商品名</th>
-						<th scope='col'>レジ</th>
-					</tr>
-					<tr style='height:30px;'>
-						<th scope='col' >単価変更</th>
-						<th scope='col' style='color:red;'>本体額</th>
-						<th scope='col' >税区分</th>
-						<th scope='col' style='color:red;'>消費税</th>
-					</tr>
-					<tr>
-						<th scope='col'>原価</th>
-						<th scope='col' class=''>内容量</th><!--d-none d-sm-table-cell-->
-						<th scope='col' class=''>単位</th>
-						<th scope='col'>削除</th>
-						<!--<th scope='col' class='' style='width:4rem;'></th>-->
-					</tr>
+						<tr style='height:30px;'>
+							<th class='th1' scope='col' colspan='3' style='width:auto;padding:0px 5px 0px 0px;'>ID:商品名</th>
+							<th class='th1' scope='col'>レジ</th>
+						</tr>
+						<tr style='height:30px;'>
+							<th scope='col' >単価変更</th>
+							<th scope='col' style='color:red;'>本体額</th>
+							<th scope='col' >税区分</th>
+							<th scope='col' style='color:red;'>消費税</th>
+						</tr>
+						<tr>
+							<th class='th2' scope='col'>原価</th>
+							<th class='th2' scope='col' class=''>内容量</th><!--d-none d-sm-table-cell-->
+							<th class='th2' scope='col' class=''>単位</th>
+							<th class='th2' scope='col'>削除</th>
+							<!--<th scope='col' class='' style='width:4rem;'></th>-->
+						</tr>
 					</thead>
 					<tbody v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
 						<tr>
 							<td style='font-size:1.7rem;font-weight:700;' colspan='3'>{{list.shouhinCD}}：{{list.shouhinNM}}</td><!--商品名-->
-							<td ><input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' class='form-check-input' style='transform: scale(1.4);' v-model='list.disp_rezi'></td>
+							<td ><input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' class='form-check-input' style='transform:scale(1.4);' v-model='list.disp_rezi'></td>
 						</tr>
 						<tr>
 							<td><input @blur='set_new_value(index,`#new_val_${index}`)' :id='`new_val_${index}`' type='number' class='form-contral' style='width:7rem;' placeholder='新価格' ></td>   <!--単価修正欄 -->
@@ -117,9 +117,8 @@
 							<td><input type='number' :name ='`ORDERS[${index}][genka]`' class='form-contral' style='width:7rem;' :value='list.genka_tanka'></td>
 							<td class=''><input type='number' :name ='`ORDERS[${index}][utisu]`' class='form-contral' style='width:7rem;' :value='list.utisu'></td>
 							<td class=''><input type='text'   :name ='`ORDERS[${index}][tani]`' class='form-contral' style='width:7rem;' :value='list.tani'></td>
-							<!--<td><input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' style='width:4rem;margin-top:5px;' v-model='list.disp_rezi'></td>-->
 							<td class=''>
-								<a :href='`shouhinDEL.php?cd=${list.shouhinCD}&csrf_token=<?php echo $csrf_create; ?>`'>
+								<a @click='delete_item(list.shouhinNM,`shouhinDEL_sql.php?cd=${list.shouhinCD}&nm=${list.shouhinNM}&csrf_token=<?php echo $csrf_create; ?>`)'>
 									<i class='fa-regular fa-trash-can fa-2x'></i>
 								</a>
 							</td><!--削除アイコン-->
@@ -131,7 +130,7 @@
 		</main>
 		<footer class='common_footer'>
 			<button type='button' @click='chk_onoff()' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >{{btn_name}}</button>
-			<button v-if='chk==="on"' type='button' @click='chk_onoff()' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >登　録</button>
+			<button v-if='chk==="on"' type='submit' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >登　録</button>
 		</footer>
 	</form>
 	<script>
@@ -183,6 +182,7 @@
 					if(chk.value==='off'){
 						chk.value='on'
 						btn_name.value='戻　る'
+						//alert('表示されてる内容でよろしければ「登録」してください。')
 					}else{
 						chk.value='off'
 						btn_name.value='確　認'
@@ -317,9 +317,16 @@
 						set_new_value(index,`#new_val_${index}`)
 					})
 				})
+				const delete_item = (item,link) =>{
+					console_log(item,'lv3')
+					console_log(link,'lv3')
+					if(confirm(`${item} を削除します。よろしいですか？`)===true){
+						window.location.href = link
+					}
+					
+				}
 
 				const MSG = ref('<?php echo $_SESSION["MSG"]; ?>')
-				//const alert_status = ref({class:'alert',status:'<?php echo $_SESSION["alert"]; ?>'})
 				const alert_status = ref(['alert','<?php echo $_SESSION["alert"]; ?>'])
 				onMounted(() => {
 					console_log('onMounted','lv3')
@@ -341,6 +348,8 @@
 					alert_status,
 					btn_name,
 					btn_type,
+					delete_item,
+					chk,
 				}
 			}
 		}).mount('#form1');
