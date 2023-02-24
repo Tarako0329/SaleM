@@ -6,26 +6,12 @@ check_session_userid：セッションのユーザIDが消えた場合、自動�
 csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容を返す。(POSTorGETで遷移先に渡す)
 　　　　　　　 headerでリダイレクトされた場合、COOKIEにセットされないので注意。
 
-遷移先のチェック
-csrf_chk()                              ：COOKIE・SESSION・POSTのトークンチェック。
-csrf_chk_nonsession()                   ：COOKIE・POSTのトークンチェック。
-csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェック。
-csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
 */
-
 require "php_header.php";
 
-if(isset($_GET["csrf_token"]) || empty($_POST)){
-    //トップメニューからの遷移チェック。リンクから飛ぶのでPOSTなし
-    if(csrf_chk_nonsession_get($_GET["csrf_token"])==false && csrf_chk_redirect($_GET["csrf_token"])==false){
-        /*
-        $_SESSION["EMSG"]="セッションが正しくありませんでした。";
-        header("HTTP/1.1 301 Moved Permanently");
-        header("Location: index.php");
-        */
-        redirect_to_login("セッションが正しくありませんでした。");
-        exit();
-    }
+$rtn = csrf_checker(["menu.php","shouhinMSedit.php"],["G","C","S"]);
+if($rtn !== true){
+    redirect_to_login($rtn);
 }
 
 //セッションのIDがクリアされた場合の再取得処理。

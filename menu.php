@@ -7,12 +7,6 @@ check_session_userid：セッションのユーザIDが消えた場合、自動�
 csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容を返す。(POSTorGETで遷移先に渡す)
 　　　　　　　 headerでリダイレクトされた場合、COOKIEにセットされないので注意。
 
-遷移先のチェック
-csrf_chk()                              ：COOKIE・SESSION・POSTのトークンチェック。
-csrf_chk_nonsession()                   ：COOKIE・POSTのトークンチェック。
-csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェック。
-csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
-
 チュートリアル
 start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステータス(finish;完了,save;保存(次回途中から始まる),'空白：$_SESSION["tour"]にnewで指定しtourNameをセット)'
 */
@@ -220,12 +214,12 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     }
 
     $array = [
-        'レジ'=>['EVregi.php?mode=evrez','rez']
-        ,'個別売上'=>['EVregi.php?mode=kobetu','k_rez']
+        'レジ'=>['EVregi.php?mode=evrez&csrf_token='.$token,'rez']
+        ,'個別売上'=>['EVregi.php?mode=kobetu&csrf_token='.$token,'k_rez']
         ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token,'s_tou']
         ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token,'s_itiran']
         ,'商品ｶﾃｺﾞﾘｰ'=>['shouhinMSCategoryEdit.php?csrf_token='.$token,'s_itiran']
-        ,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko','z_rez']
+        ,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko&csrf_token='.$token,'z_rez']
         ,'売上実績'=>['UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where&csrf_token='.$token,'uri']
         ,'売上分析'=>['analysis_menu.php?csrf_token='.$token,'bunseki']
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token,'user']

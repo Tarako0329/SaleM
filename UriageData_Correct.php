@@ -2,17 +2,12 @@
 {
 	//memo !empty()　は 変数未定義、空白、NULLの場合にfalseを返す
 	require "php_header.php";
-		
-	if(isset($_GET["csrf_token"])){
-		if(csrf_chk_nonsession_get($_GET["csrf_token"])===false){
-			$message="セッションが正しくありませんでした。";
-			redirect_to_login($message);
-		}
-	}else{//GETなしは不正
-		$message="セッションが正しくありませんでした。";
-		redirect_to_login($message);
+
+	$rtn = csrf_checker(["menu.php"],["G","C","S"]);
+	if($rtn !== true){
+  	  redirect_to_login($rtn);
 	}
-	
+
 	$rtn=check_session_userid($pdo_h);
 	$csrf_create = csrf_create();
 	
@@ -87,7 +82,7 @@
 			<template v-if='MSG!==""'>
 				<div v-bind:class='alert_status' role='alert'>{{MSG}}</div>
 			</template>
-			<!--<div style='overflow:auto;' id='uritable'>-->
+			
 			<div  id='uritable'>
 				<table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
 					<thead>

@@ -1,15 +1,19 @@
 <?php
 	require "php_header.php";
-
+/*
 	if(isset($_GET["csrf_token"]) || empty($_POST)){
 		if(csrf_chk_redirect($_GET["csrf_token"])==false){
-			$_SESSION["EMSG"]="セッションが正しくありませんでした。";
-			header("HTTP/1.1 301 Moved Permanently");
-			header("Location: index.php");
-			exit();
+			redirect_to_login("セッションが正しくありませんでした。");
 		}
+	}else{
+    redirect_to_login("セッションが正しくありませんでした。(アクセスルート不正)");
 	}
-
+*/
+	$rtn = csrf_checker(["shouhinMSList.php","shouhinMSList_sql.php","shouhinDEL_sql.php","menu.php"],["G","C","S"]);
+	if($rtn !== true){
+			redirect_to_login($rtn);
+	}
+	
 	$csrf_create = csrf_create();
 	$MSG = (empty($_SESSION["MSG"])?"":$_SESSION["MSG"]);
 
@@ -118,7 +122,7 @@
 							<td class=''><input type='number' :name ='`ORDERS[${index}][utisu]`' class='form-contral' style='width:7rem;' :value='list.utisu'></td>
 							<td class=''><input type='text'   :name ='`ORDERS[${index}][tani]`' class='form-contral' style='width:7rem;' :value='list.tani'></td>
 							<td class=''>
-								<a @click='delete_item(list.shouhinNM,`shouhinDEL_sql.php?cd=${list.shouhinCD}&nm=${list.shouhinNM}&csrf_token=<?php echo $csrf_create; ?>`)'>
+								<a href='#' @click='delete_item(list.shouhinNM,`shouhinDEL_sql.php?cd=${list.shouhinCD}&nm=${list.shouhinNM}&csrf_token=<?php echo $csrf_create; ?>`)'>
 									<i class='fa-regular fa-trash-can fa-2x'></i>
 								</a>
 							</td><!--削除アイコン-->

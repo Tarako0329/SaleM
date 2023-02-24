@@ -9,10 +9,6 @@ csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容
 　　　　　　　 headerでリダイレクトされた場合、COOKIEにセットされないので注意。
 
 遷移先のチェック
-csrf_chk()                              ：COOKIE・SESSION・POSTのトークンチェック。
-csrf_chk_nonsession()                   ：COOKIE・POSTのトークンチェック。
-csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェック。
-csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
 */
 
 require "php_header.php";

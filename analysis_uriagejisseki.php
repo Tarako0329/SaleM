@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="ja">
 <?php
 /*関数メモ
 check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
@@ -9,10 +7,6 @@ csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容
 　　　　　　　 headerでリダイレクトされた場合、COOKIEにセットされないので注意。
 
 遷移先のチェック
-csrf_chk()                              ：COOKIE・SESSION・POSTのトークンチェック。
-csrf_chk_nonsession()                   ：COOKIE・POSTのトークンチェック。
-csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェック。
-csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
 */
 
 require "php_header.php";
@@ -20,15 +14,11 @@ require "php_header.php";
 //var_dump($_GET);
 //var_dump($_POST);
 
-if(isset($_GET["csrf_token"]) || empty($_POST)){
-    if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
-        /*
-        $_SESSION["EMSG"]="セッションが正しくありませんでした。①";
-        header("HTTP/1.1 301 Moved Permanently");
-        header("Location: index.php");
-        */
-        redirect_to_login("セッションが正しくありませんでした。");
-        exit();
+$rtn = csrf_checker(["analysis_menu.php","analysis_uriagejisseki.php","analysis_abc.php"],["G","C","S"]);
+if($rtn !== true){
+    $rtn = csrf_checker(["analysis_menu.php","analysis_uriagejisseki.php","analysis_abc.php"],["P","C","S"]);
+    if($rtn !== true){
+        redirect_to_login($rtn);
     }
 }
 
@@ -205,6 +195,8 @@ $SLVresult = $stmt->fetchAll();
 $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
 
 ?>
+<!DOCTYPE html>
+<html lang="ja">
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
@@ -515,6 +507,7 @@ $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
     <div class='col-md-3' style='padding:5px;background:white'>
         
         <form id='form1' class='form' method='post' action='analysis_uriagejisseki.php' style='font-size:1.5rem'>
+            <input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
             集計期間:
             <div class='btn-group btn-group-toggle' data-toggle='buttons'>
                 <label class='btn btn-outline-primary <?php if($options=="ym"){echo "active";}?>' style='font-size:1.2rem;padding:1px 5px;height:25px;'>

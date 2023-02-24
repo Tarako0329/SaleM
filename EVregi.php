@@ -8,12 +8,6 @@
 	【想定して無いページからの遷移チェック】
 	csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容を返す。(POSTorGETで遷移先に渡す)
 	　　　　　　　 headerでリダイレクトされた場合、COOKIEにセットされないので注意。
-
-	遷移先のチェック
-	csrf_chk()                              ：COOKIE・SESSION・POSTのトークンチェック。
-	csrf_chk_nonsession()                   ：COOKIE・POSTのトークンチェック。
-	csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェック。
-	csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
 	*/
 	require "php_header.php";
 	//php更新処理は15秒でタイムアウトする設定のため
@@ -23,19 +17,15 @@
 	
 	$status=(!empty($_SESSION["status"])?$_SESSION["status"]:"");
 	$_SESSION["status"]="";
-	$HTTP_REFERER=(empty($_SERVER['HTTP_REFERER'])?"":$_SERVER['HTTP_REFERER']);
 
-	if(csrf_chk_nonsession()===false){//POST:COOKIEチェック
-		if($status=="login_redirect"){
-			//ログイン画面から直通でアクセス
-			log_writer2("EVregi.php  $status ",$status,"lv3");
-		}else{
-			log_writer2("EVregi.php","セッションが正しくありませんでした。","lv3");
-			redirect_to_login("セッションが正しくありませんでした。".filter_input(INPUT_POST,"csrf_token"));
-			exit();
-		}
+	if($status==="login_redirect"){
+		//ログイン画面から直通でアクセス
+		log_writer2("EVregi.php  $status ",$status,"lv3");
 	}else{
-		log_writer2("EVregi.php","csrf_chk_nonsession clear","lv3");
+		$rtn = csrf_checker(["menu.php"],["G","C"]);
+		if($rtn !== true){
+				redirect_to_login($rtn);
+		}
 	}
 
 	//セッションのuserIDがクリアされた場合の再取得処理。
@@ -177,7 +167,7 @@
 		<main class='common_body'>
 			<div class="container-fluid">
 				<template v-if='MSG!==""'>
-					<div v-bind:class='alert_status' role='alert' style='padding:3px 10px'>{{MSG}}</div>
+					<div v-bind:class='alert_status' role='alert' >{{MSG}}</div>
 				</template>
 				<div class='accordion item_11 item_12' id="accordionExample">
 					<div v-if='chk_register_show==="register"' class='row' style='padding-top:5px;'>
@@ -528,7 +518,7 @@
 					kaikei_zei.value = 0
 				}
 				
-				const alert_status = ref('alert')
+				const alert_status = ref(['alert'])
 				const MSG = ref('')
 				const loader = ref(false)
 				const csrf = ref('<?php echo $token; ?>') 
@@ -574,7 +564,7 @@
 							console_log(`on_submit SUCCESS`,'lv3')
 							console_log(response.data,'lv3')
 							MSG.value = response.data.MSG
-							alert_status.value=response.data.status
+							alert_status.value[1]=response.data.status
 							csrf.value = response.data.csrf_create
 
 							if(response.data.status==='alert-success'){
@@ -586,7 +576,7 @@
 							console_log(`on_submit ERROR:${error}`,'lv3')
 							MSG.value = error.response.data.MSG
 							csrf.value = error.response.data.csrf_create
-							alert_status.value='alert-danger'
+							alert_status.value[1]='alert-danger'
 						})
 						.finally(()=>{
 							get_UriageList()

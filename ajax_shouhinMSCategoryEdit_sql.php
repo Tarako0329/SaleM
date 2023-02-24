@@ -5,28 +5,17 @@ $msg[0] = array(
     "EMSG" => "更新処理が実行されませんでした。"
     ,"status" => "alert-danger"
 );
-
-if(isset($_GET["csrf_token"]) || empty($_POST)){
-    if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
-        $msg[0] = array(
-            "EMSG" => "セッションが正しくありませんでした。csrf_chk_nonsession_get"
-            ,"status" => "alert-danger"
-        );
-        header('Content-type: application/json');
-        echo json_encode($msg, JSON_UNESCAPED_UNICODE);
-        exit();
-    }
-}
-
-if(csrf_chk()==false){
+$rtn = csrf_checker(["shouhinMSCategoryEdit.php"],["P","C","S"]);
+if($rtn !== true){
     $msg[0] = array(
-        "EMSG" => "セッションが正しくありませんでした。csrf_chk()"
+        "EMSG" => $rtn
         ,"status" => "alert-danger"
     );
     header('Content-type: application/json');
     echo json_encode($msg, JSON_UNESCAPED_UNICODE);
     exit();
 }
+
 $array = $_POST["ORDERS"];
 $sqlstr = "";
 

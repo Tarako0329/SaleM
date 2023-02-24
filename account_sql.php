@@ -21,7 +21,6 @@ if($_POST["BTN"] == "登　録"){
     //$kigen=date('Y-m-d', strtotime('last day of next month' . date("Y-m-d")));
     $kigen=date('Y-m-d', strtotime(date("Y-m-d") . "+2 month"));
     
-    //$sqlstr="insert into Users values(0,?,?,?,?,?,?,?,?,?,?,?,null,null,null,null,null,null,null,null,null,null,?,?,null)";
     $sqlstr="insert into Users(uid,mail,password,question,answer,loginrez,insdate,yuukoukigen,introducer_id) values(0,?,?,?,?,?,?,?,?)";
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $_SESSION["MAIL"], PDO::PARAM_STR);
@@ -47,22 +46,7 @@ if($_POST["BTN"] == "登　録"){
         $mode=6;
     }
 }elseif($_POST["BTN"] == "更　新"){
-    /*
-    $sqlstr="update Users set mail=?,password=?,question=?,answer=?,loginrez=?,name=?,yagou=?,yubin=?,address1=?,address2=?,address3=? where uid=?";
-    $stmt = $pdo_h->prepare($sqlstr);
-    $stmt->bindValue(1, $_SESSION["MAIL"], PDO::PARAM_STR);
-    $stmt->bindValue(2, $_SESSION["PASS"], PDO::PARAM_STR);
-    $stmt->bindValue(3, $_SESSION["QUESTION"], PDO::PARAM_STR);
-    $stmt->bindValue(4, $_SESSION["ANSWER"], PDO::PARAM_STR);
-    $stmt->bindValue(5, $_SESSION["LOGINREZ"], PDO::PARAM_STR);
-    $stmt->bindValue(6, $_SESSION["NAME"], PDO::PARAM_STR);
-    $stmt->bindValue(7, $_SESSION["YAGOU"], PDO::PARAM_STR);
-    $stmt->bindValue(8, $_SESSION["zip11"], PDO::PARAM_STR);
-    $stmt->bindValue(9, $_SESSION["addr11"], PDO::PARAM_STR);
-    $stmt->bindValue(10, $_SESSION["ADD2"], PDO::PARAM_STR);
-    $stmt->bindValue(11, $_SESSION["ADD3"], PDO::PARAM_STR);
-    $stmt->bindValue(12, $_SESSION["user_id"], PDO::PARAM_INT);
-    */
+
     if($_SESSION["chk_pass"]=="on"){
         $sqlstr="update Users set mail=:mail,password=:password,question=:question,answer=:answer,loginrez=:loginrez,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3 where uid=:uid";
         $stmt = $pdo_h->prepare($sqlstr);
@@ -70,7 +54,6 @@ if($_POST["BTN"] == "登　録"){
     }else{
         $sqlstr="update Users set mail=:mail,question=:question,answer=:answer,loginrez=:loginrez,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3 where uid=:uid";
         $stmt = $pdo_h->prepare($sqlstr);
-        //$stmt->bindValue("password", $_SESSION["PASS"], PDO::PARAM_STR);
     }
     $stmt->bindValue("mail", $_SESSION["MAIL"], PDO::PARAM_STR);
     $stmt->bindValue("question", $_SESSION["QUESTION"], PDO::PARAM_STR);

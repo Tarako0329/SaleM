@@ -2,9 +2,12 @@
 //POST ONLY
 require "php_header.php";
 
-if(csrf_chk()==false){
-    redirect_to_login("セッションが正しくありませんでした");
+$rtn = csrf_checker(["shouhinMSList.php"],["P","C","S"]);
+if($rtn !== true){
+    redirect_to_login($rtn);
 }
+
+check_session_userid($pdo_h);
 $_SESSION["MSG"]= "更新対象がありませんでした。";
 $_SESSION["alert"] = "alert-warning";
 
@@ -22,7 +25,6 @@ foreach($array as $row){
     $stmt->execute();
     $row3 = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    //$sqlstr = "update ShouhinMS set tanka=?,tanka_zei=?,zeiritu=?,zeikbn=?,tani=?,bunrui1=?,bunrui2=?,bunrui3=?,hyoujiKBN1=?,hyoujiNO=?,genka_tanka=? where shouhinCD=? and uid=?";
     $sqlstr = "update ShouhinMS set tanka=?,tanka_zei=?,zeiritu=?,zeikbn=?,tani=?,hyoujiKBN1=?,hyoujiNO=?,genka_tanka=? where shouhinCD=? and uid=?";
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $row["tanka"], PDO::PARAM_INT);
@@ -30,9 +32,6 @@ foreach($array as $row){
     $stmt->bindValue(3, $row3[0]["zeiritu"], PDO::PARAM_INT);
     $stmt->bindValue(4, $row["zeikbn"], PDO::PARAM_STR);
     $stmt->bindValue(5, $row["tani"], PDO::PARAM_STR);
-    //$stmt->bindValue(6, $row["bunrui1"], PDO::PARAM_STR);
-    //$stmt->bindValue(7, $row["bunrui2"], PDO::PARAM_STR);
-    //$stmt->bindValue(8, $row["bunrui3"], PDO::PARAM_STR);
     $stmt->bindValue(6, (empty($row["hyoujiKBN1"])?"":$row["hyoujiKBN1"]), PDO::PARAM_STR);
     $stmt->bindValue(7,0, PDO::PARAM_INT);
     $stmt->bindValue(8,$row["genka"], PDO::PARAM_INT);
@@ -66,7 +65,7 @@ $csrf_create = csrf_create();
 
 $stmt  = null;
 $pdo_h = null;
-log_writer2("shouhinMSList_sql.php > \$_SESSION",$_SESSION,"lv3");
+//log_writer2("shouhinMSList_sql.php > \$_SESSION",$_SESSION,"lv3");
 header("HTTP/1.1 301 Moved Permanently");
 header("Location: shouhinMSList.php?csrf_token=".$csrf_create);
 

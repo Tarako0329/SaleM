@@ -9,22 +9,13 @@ csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容
 　　　　　　　 headerでリダイレクトされた場合、COOKIEにセットされないので注意。
 
 遷移先のチェック
-csrf_chk()                              ：COOKIE・SESSION・POSTのトークンチェック。
-csrf_chk_nonsession()                   ：COOKIE・POSTのトークンチェック。
-csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェック。
-csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
 */
 require "php_header.php";
-if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
-    /*
-    $_SESSION["EMSG"]="セッションが正しくありませんでした。①";
-    header("HTTP/1.1 301 Moved Permanently");
-    header("Location: index.php");
-    */
-    redirect_to_login("セッションが正しくありませんでした。");
-    exit();
-}
 
+$rtn = csrf_checker(["menu.php","analysis_uriagejisseki.php","analysis_abc.php"],["G","C","S"]);
+if($rtn !== true){
+    redirect_to_login($rtn);
+}
 
 
 $rtn=check_session_userid($pdo_h);

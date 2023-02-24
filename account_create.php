@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="ja">
 <?php
 //ユーザ登録、登録情報の修正画面
 //$mode 0:新規　1:更新　3:確認(新規) 4:確認(更新) 5:登録完了（更新・新規共通）6:登録失敗
@@ -141,6 +139,8 @@ if($mode==0 || $mode==1){
     exit();
 }
 ?>
+<!DOCTYPE html>
+<html lang="ja">
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
@@ -221,12 +221,6 @@ if($mode==0 || $mode==1){
             <small id='answer' class='form-text text-muted'>ひらがな・半角英数・スペース不使用を推奨</small>
         </div>
         <br>
-        <!--
-        <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input" id="loginrez" name="LOGINREZ" <?php if($mode>=1){if($_SESSION["LOGINREZ"]=="on"){echo "checked";};} ?>>
-            <label class="form-check-label" for="loginrez" style="padding-left:5px;padding-top:3px">ログイン後レジ画面表示</label>
-        </div>
-        -->
         <div class='form-group'>
         <label for='loginrez' >
         	<input type='checkbox'  id='loginrez' name='LOGINREZ' <?php if($mode>=1){if($_SESSION["LOGINREZ"]=="on"){echo "checked";};} ?>>ログイン後レジ画面表示
@@ -276,7 +270,6 @@ if($mode==0 || $mode==1){
     </div>
 </body>
 <script language='JavaScript' type='text/javascript'>
-<!--
     function Checkpass(input){
         //IE対応の為変更
         
@@ -322,7 +315,6 @@ if($mode==0 || $mode==1){
         }
     }
     
-// -->
 </script>
 </html>
 <?php

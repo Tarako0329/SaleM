@@ -5,12 +5,6 @@ check_session_userid：セッションのユーザIDが消えた場合、自動�
 【想定して無いページからの遷移チェック】
 csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容を返す。(POSTorGETで遷移先に渡す)
 　　　　　　　 headerでリダイレクトされた場合、COOKIEにセットされないので注意。
-
-遷移先のチェック
-csrf_chk()                              ：COOKIE・SESSION・POSTのトークンチェック。
-csrf_chk_nonsession()                   ：COOKIE・POSTのトークンチェック。
-csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェック。
-csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
 */
 /*
 sleep(5);
@@ -64,39 +58,19 @@ $logfilename="sid_".$_SESSION['user_id'].".log";
 if(EXEC_MODE=="Test")sleep(2);
 if(EXEC_MODE=="Local")sleep(0);
 
-//リファイラーチェック
-if(ROOT_URL."EVregi.php"!==substr($_SERVER['HTTP_REFERER'],0,strlen(ROOT_URL."EvRegi.php"))){
+$rtn = csrf_checker(["EVregi.php"],["P","C"]);
+if($rtn !== true){
 	$msg = array(
-		"MSG" => "アクセス元が不正です。=> ".$_SERVER['HTTP_REFERER']
+		"MSG" => $rtn
 		,"status" => "alert-danger"
 	);
 	header('Content-type: application/json');
 	echo json_encode($msg, JSON_UNESCAPED_UNICODE);
 	exit();
 }
+
 
 $MODE=(!empty($_POST["mode"])?$_POST["mode"]:"");
-
-if(!empty($_POST)){
-	if(csrf_chk_nonsession()==false){//cookie:post
-		$msg = array(
-			"MSG" => "セッションが正しくありません。"
-			,"status" => "alert-danger"
-		);
-		header('Content-type: application/json');
-		echo json_encode($msg, JSON_UNESCAPED_UNICODE);
-		exit();
-		}
-}else{
-	$msg = array(
-		"MSG" => "セッションが正しくありません。"
-		,"status" => "alert-danger"
-	);
-	header('Content-type: application/json');
-	echo json_encode($msg, JSON_UNESCAPED_UNICODE);
-	exit();
-}
-
 $token = csrf_create();
 
 $E_Flg=0;

@@ -8,58 +8,53 @@ $alert_status = "alert-warning";    //bootstrap alert class
 $reseve_status=false;               //処理結果セット済みフラグ。
 $timeout=false;                     //セッション切れ。ログイン画面に飛ばすフラグ
 
-$rtn = csrf_checker(["xxx.php","xxx.php"],["P","C","S"]);
+//$rtn = csrf_checker(["xxx.php","xxx.php"],["P","C","S"]);
+$rtn=true;
 if($rtn !== true){
+    /*
     $msg=$rtn;
     $alert_status = "alert-warning";
     $reseve_status = true;
+    */
 }else{
-    $rtn=check_session_userid_for_ajax($pdo_h);
     if($rtn===false){
+        /*
         $reseve_status = true;
         $msg="長時間操作されていないため、自動ﾛｸﾞｱｳﾄしました。再度ログインし、もう一度xxxxxxして下さい。";
         $_SESSION["EMSG"]="長時間操作されていないため、自動ﾛｸﾞｱｳﾄしました。再度ログインし、もう一度xxxxxxして下さい。";
         $timeout=true;
+        */
     }else{
-        $logfilename="sid_".$_SESSION['user_id'].".log";
-
-        //更新モード(実行)
-        $sql = "update UriageData set tanka = :tanka,updDatetime=now() where UriDate = :w_date_from ";
-        $up_sqllog = "update UriageData set tanka = '".$_POST["up_uritanka"]."' , updDatetime=now() where UriDate = '".$_POST["w_date_from"]."'";
-
+        $sqlstr="select count(*) as cnt from Users where mail=?";
         try{
-            $pdo_h->beginTransaction();
-            $stmt = $pdo_h->prepare( $sql );
-            //bind処理
-            $stmt->bindValue("tanka", $_POST["tanka"], PDO::PARAM_INT);
-            $stmt->bindValue("w_date_to", $_POST["w_date_to"], PDO::PARAM_STR);
-
+            $stmt = $pdo_h->prepare($sqlstr);
+            $stmt->bindValue(1, $_GET["MAIL"], PDO::PARAM_STR);
             $status = $stmt->execute();
             $count = $stmt->rowCount();
-
-            if($status && $count<>0){
-                $pdo_h->commit();
-                $msg = "更新成功。";
-                $alert_status = "alert-success";
-                file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,succsess,".$up_sqllog."\n",FILE_APPEND);
+            $row = $stmt->fetchAll();
+            
+            if($status===true){
+                if($row[0]["cnt"]>=1){
+                    $msg = "メールアドレスは登録済みになります。";
+                    $alert_status = "alert-warning";
+                }else{
+                    $msg = "メールアドレスは登録可能です。";
+                    $alert_status = "alert-success";
+                }
             }else{
-                $pdo_h->rollBack();
-                $msg = "更新失敗。";
+                $msg = "メールアドレスチェック処理失敗。";
                 $alert_status = "alert-danger";
-                file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,failed,".$up_sqllog."\n",FILE_APPEND);
             }
             $reseve_status=true;
         }catch(Exception $e){
-            $pdo_h->rollBack();
-            $msg = "システムエラーによる更新失敗。管理者へ通知しました。";
+            $msg = "システムエラー。管理者へ通知しました。";
             $alert_status = "alert-danger";
-            log_writer2("ajax_UriageData_update_sql.php [Exception \$e] =>",$e,"lv0");
+            log_writer2("ajax_chk_email.php [Exception \$e] =>",$e,"lv0");
             $reseve_status=true;
         }
     }
 }
 
-$token = csrf_create();
 
 $return_sts = array(
     "MSG" => $msg

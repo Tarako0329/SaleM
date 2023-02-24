@@ -1,22 +1,13 @@
 <?php {
 	require "php_header.php";
 
-	if(isset($_GET["csrf_token"]) || empty($_POST)){
-		if(csrf_chk_redirect($_GET["csrf_token"])==false){
-			/*
-			$_SESSION["EMSG"]="セッションが正しくありませんでした。";
-			header("HTTP/1.1 301 Moved Permanently");
-			header("Location: index.php");
-			*/
-			redirect_to_login("セッションが正しくありませんでした。");
-			exit();
-		}
+	$rtn = csrf_checker(["menu.php"],["G","C","S"]);
+	if($rtn !== true){
+			redirect_to_login($rtn);
 	}
-
+	
 	$csrf_create = csrf_create();
 
-	$MSG = (!empty($_SESSION["MSG"])?$_SESSION["MSG"]:"");
-	$_SESSION["MSG"]="";
 }?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -234,6 +225,9 @@
 										,alert_status.value[1]=response.data[0].status
 										))
 					.catch((error) => console.log(`on_submit ERROR:${error}`))
+					.finally(()=>{
+						get_shouhinMS()
+					})
 			}
 			return{
 				over_cate,

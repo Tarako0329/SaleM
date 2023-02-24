@@ -12,9 +12,8 @@ function log_writer2($pgname,$msg,$kankyo){
     if($kankyo==="lv0"){
         log_writer($pgname,$msg);
         $log = print_r($msg,true);
-        if(EXEC_MODE!=="Local"){
-            send_mail(SYSTEM_NOTICE_MAIL,"【重要】".TITLE."でシステムエラー発生",$log);
-        }
+        
+        send_mail(SYSTEM_NOTICE_MAIL,"【重要】".TITLE."でシステムエラー発生",$log);
     }else if($kankyo==="lv1"){
         log_writer($pgname,$msg);
     }else if($kankyo==="lv2" && EXEC_MODE!=="Product"){
@@ -103,7 +102,7 @@ function check_auto_login($cookie_token, $pdo) {
 // $_SESSION[user_id]の存在チェック
 // =========================================================
 function check_session_userid($pdo_h){
-    if(EXEC_MODE=="Trial"){
+    if(EXEC_MODE==="Trial"){
         if(empty($_COOKIE["user_id"]) && empty($_SESSION["user_id"])){
             //セッション・クッキーのどちらにもIDが無い場合、ID発行を行う
             header("HTTP/1.1 301 Moved Permanently");
@@ -212,12 +211,74 @@ function check_session_userid_for_ajax($pdo_h){
 
 // =========================================================
 // データ更新時のセキュリティ対応（セッション・クッキー・ポストのチェック）
+//　一元化 (リファイラ[xxx.php,xxx.php],[S,C,G,P])
+// =========================================================
+function csrf_checker($from,$chkpoint){
+    //リファイラーチェック
+    $chkflg=false;
+    foreach($from as $row){
+        if(false !== strpos($_SERVER['HTTP_REFERER'],ROOT_URL.$row)){
+            $chkflg=true;
+            log_writer2("func:csrf_checker","HTTP_REFERER success \$_SERVER[".$_SERVER['HTTP_REFERER']."]","lv3");
+            log_writer2("func:csrf_checker","HTTP_REFERER success ParamUrl[".ROOT_URL.$row."]","lv3");
+            break;
+        }
+    }
+    if($chkflg===true){
+        $i=0;
+        $csrf="";
+        $checked="";
+        foreach($chkpoint as $row){
+            if($row==="S"){
+                $csrf_ck = (!empty($_SESSION["csrf_token"])?$_SESSION["csrf_token"]:"\$_SESSION empty");
+                $checked=$checked."S";
+                unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
+            }else if($row==="C"){
+                $csrf_ck = (!empty($_COOKIE["csrf_token"])?$_COOKIE["csrf_token"]:"\$_COOKIE empty");
+                $checked=$checked."C";
+                setCookie("csrf_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
+            }if($row==="G"){
+                $csrf_ck = (!empty($_GET["csrf_token"])?$_GET["csrf_token"]:"\$_GET empty");
+                $checked=$checked."G";
+            }if($row==="P"){
+                $csrf_ck = (!empty($_POST["csrf_token"])?$_POST["csrf_token"]:"\$_POST empty");
+                $checked=$checked."P";
+            }
+            if($i!==0){
+                if($csrf !== $csrf_ck){
+                    $chkflg=false;
+                    log_writer2("func:csrf_checker","CSRF failed [".$checked."]","lv3");
+                    log_writer2("func:csrf_checker","CSRF failed [".$csrf."]","lv3");
+                    log_writer2("func:csrf_checker","CSRF failed [".$csrf_ck."]","lv3");
+                    $chkflg = "セッションが正しくありません";
+                    break;
+                }else{
+                    log_writer2("func:csrf_checker","CSRF success [".$checked."]","lv3");
+                    log_writer2("func:csrf_checker","CSRF success [".$csrf."]","lv3");
+                    log_writer2("func:csrf_checker","CSRF success [".$csrf_ck."]","lv3");
+                }
+            }
+            $csrf=$csrf_ck;
+            $i++;
+        }
+    }else{
+        log_writer2("func:csrf_checker","HTTP_REFERER failed \$_SERVER[".$_SERVER['HTTP_REFERER']."]","lv3");
+        log_writer2("func:csrf_checker","HTTP_REFERER failed ParamUrl[".ROOT_URL.$row."]","lv3");
+        $chkflg = "アクセス元が不正です";
+    }
+    
+    return $chkflg;
+}
+
+
+// =========================================================
+// データ更新時のセキュリティ対応（セッション・クッキー・ポストのチェック）
 // =========================================================
 function csrf_chk(){
     $csrf_token = $_POST['csrf_token'];
     $cookie_token = $_COOKIE['csrf_token'];
     $session_token = $_SESSION['csrf_token'];
-    
+    log_writer2("func:csrf_chk",$_SERVER['HTTP_REFERER'],"lv3");
     unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
 
     if ($cookie_token != $csrf_token || $csrf_token != $session_token) {
@@ -375,6 +436,10 @@ function send_mail($to,$subject,$body){
 	//$body		: 本文
 
 	//SMTP送信
+    if(EXEC_MODE==="Local"){
+        return true;
+    }
+
     require_once('qdmail.php');
     require_once('qdsmtp.php');
 

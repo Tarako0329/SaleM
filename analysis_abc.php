@@ -8,31 +8,20 @@ check_session_userid：セッションのユーザIDが消えた場合、自動�
 csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容を返す。(POSTorGETで遷移先に渡す)
 　　　　　　　 headerでリダイレクトされた場合、COOKIEにセットされないので注意。
 
-遷移先のチェック
-csrf_chk()                              ：COOKIE・SESSION・POSTのトークンチェック。
-csrf_chk_nonsession()                   ：COOKIE・POSTのトークンチェック。
-csrf_chk_nonsession_get($_GET[token])   ：COOKIE・GETのトークンチェック。
-csrf_chk_redirect($_GET[token])         ：SESSSION・GETのトークンチェック
 */
 
 require "php_header.php";
 
-if(isset($_GET["csrf_token"]) || empty($_POST)){
-    if(csrf_chk_nonsession_get($_GET["csrf_token"])==false){
-        /*
-        $_SESSION["EMSG"]="セッションが正しくありませんでした。";
-        header("HTTP/1.1 301 Moved Permanently");
-        header("Location: index.php");
-        */
-        redirect_to_login("セッションが正しくありませんでした。");
-        exit();
+$rtn = csrf_checker(["analysis_menu.php","analysis_uriagejisseki.php","analysis_abc.php"],["G","C","S"]);
+if($rtn !== true){
+    $rtn = csrf_checker(["analysis_menu.php","analysis_uriagejisseki.php","analysis_abc.php"],["P","C","S"]);
+    if($rtn !== true){
+        redirect_to_login($rtn);
     }
 }
 
 $rtn=check_session_userid($pdo_h);
 $csrf_create = csrf_create();
-
-//deb_echo("UID：".$_SESSION["user_id"]);
 
 if(!empty($_POST)){
     $ymfrom = $_POST["ymfrom"];
@@ -78,29 +67,11 @@ if($rtn==false){
 }
 $result=$stmt->fetchAll();
 
-/*
-
-//売上実績商品リスト（修正モーダル用）
-$SHsql = "select ShouhinCD,ShouhinNM from UriageData where uid =? group by ShouhinCD,ShouhinNM order by ShouhinCD,ShouhinNM";
-$stmt = $pdo_h->prepare($SHsql);
-$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-$stmt->execute();
-$SHresult = $stmt->fetchAll();
-*/
 //検索年月リスト
 $SLVsql = "select * from SerchValMS where type='yyyymm' order by Value";
 $stmt = $pdo_h->prepare($SLVsql);
 $stmt->execute();
 $SLVresult = $stmt->fetchAll();
-/*
-$EVsql = "select Event as LIST from UriageData where uid =? and Event <> '' group by Event ";
-$EVsql = $EVsql."union select TokuisakiNM as LIST from UriageData where uid =? and TokuisakiNM<>'' group by TokuisakiNM ";
-$stmt = $pdo_h->prepare($EVsql);
-$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-$stmt->bindValue(2, $_SESSION['user_id'], PDO::PARAM_INT);
-$stmt->execute();
-$EVresult = $stmt->fetchAll();
-*/
 
 ?>
 <head>
@@ -112,12 +83,6 @@ $EVresult = $stmt->fetchAll();
     <link rel="stylesheet" href="css/style_analysis.css?<?php echo $time; ?>" >
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    
-    
-    <script>
-
-    </script>
-
-    
     <TITLE><?php echo $title." 売上分析";?></TITLE>
 </head>
 <script>
@@ -187,6 +152,7 @@ $EVresult = $stmt->fetchAll();
     <div class="row">
     <div class="col-md-3" style='padding:5px;background:white'>
         <form class="form" method="post" action="analysis_abc.php" style='font-size:1.5rem' id='form1'>
+            <input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
             集計期間:
             <select name='ymfrom' class="form-control" style="padding:0;width:11rem;display:inline-block;margin:5px" onchange='send()' id='uridate'>
             <?php
@@ -215,22 +181,7 @@ $EVresult = $stmt->fetchAll();
                 <option value='2' <?php if($analysis_type==2){echo "selected";} ?>>イベント・店舗/商品別ABC分析</option>
             </select>
             <select name='list' class="form-control" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px" onchange='send()' id='Event' >
-            <!--
-            <option value='%'>場所・顧客</option>
-            <option value='%'>全て</option>
-            <?php
-            /*
-            foreach($EVresult as $row){
-                if($list==$row["LIST"]){
-                    echo "<option value='".$row["LIST"]."' selected>".$row["LIST"]."</option>\n";
-                }
-                echo "<option value='".$row["LIST"]."'>".$row["LIST"]."</option>\n";
-            }
-            */
-            ?>
-            -->
             </select>
-            <!--<button type='submit' class='btn btn-primary' style='padding:0;hight:55px;width:100px;margin:2px;'>検　索</button>-->
         </form>
     </div>
     <div class="col-md-9" style='padding:5px'>
@@ -241,10 +192,6 @@ $EVresult = $stmt->fetchAll();
     </div><!--row-->
     </div>
 </body>
-<!--
-<footer>
-</footer>
--->
 <script>
     function send(){
         const form1 = document.getElementById('form1');
