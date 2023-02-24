@@ -3,22 +3,8 @@
 //$mode 0:新規　1:更新　3:確認(新規) 4:確認(更新) 5:登録完了（更新・新規共通）6:登録失敗
 require "php_header.php";
 
-//GET or POST からモード値を取得。無い場合は不正アクセス
-if($_GET["mode"]<>""){
-    $mode=$_GET["mode"];
-}elseif($_POST["MODE"]<>""){
-    $mode=$_POST["MODE"];
-}else{
-    //必ずモード値が渡される
-    echo "不正アクセス";
-    exit();
-}
-$shoukai="";
-if(!empty($_GET["shoukai"])){
-    $shoukai=$_GET["shoukai"];
-}elseif(!empty($_POST["shoukai"])){
-    $shoukai=$_POST["shoukai"];
-}
+$shoukai=(!empty($_GET["shoukai"])?$_GET["shoukai"]:$_POST["shoukai"]);
+$mode=(!empty($_GET["MODE"])?$_GET["MODE"]:$_POST["MODE"]);
 
 //GETのセッションチェック
 if($mode==5 || $mode==6){
