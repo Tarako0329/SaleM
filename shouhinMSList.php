@@ -959,10 +959,12 @@
 
 </script>
 <script>
+	/*
 	function send(){
 		const form2 = document.getElementById('form2');
 		form2.submit();
 	}
+	*/
 </script>
 </html>
 <?php

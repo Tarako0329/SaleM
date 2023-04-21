@@ -689,7 +689,7 @@ function output_csv($data,$kikan){
     }
 
     foreach ($data as $key => $line) {
-        echo implode($line, ",") . "\r\n";
+        echo implode(",", $line ) . "\r\n";
     }
     exit;
 }

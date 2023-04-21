@@ -1,18 +1,7 @@
 <?php
-date_default_timezone_set('Asia/Tokyo');
-session_start();
-require "functions.php";
-require "./vendor/autoload.php";
+require "php_header.php";
 
-$pass=dirname(__FILE__);
-
-//.envの取得
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-
-define("DNS","mysql:host=".$_ENV["SV"].";dbname=".$_ENV["DBNAME"].";charset=utf8");
-define("USER_NAME", $_ENV["DBUSER"]);
-define("PASSWORD", $_ENV["PASS"]);
+log_writer2("ajax_get_event_list.php",$_POST,"lv3");
 
 $ymfrom=(strlen($_POST['date_from'])==6?substr($_POST['date_from'],0,4)."-".substr($_POST['date_from'],4,2)."-01":$_POST['date_from']);
 $ymto=get_getsumatsu($_POST['date_to']);

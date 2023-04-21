@@ -7,6 +7,7 @@ $msg = "";                          //ユーザー向け処理結果メッセー
 $alert_status = "alert-warning";    //bootstrap alert class
 $reseve_status=false;               //処理結果セット済みフラグ。
 $timeout=false;                     //セッション切れ。ログイン画面に飛ばすフラグ
+$myname = "filename.php";           //ログファイルに出力する自身のファイル名
 
 $rtn = csrf_checker(["xxx.php","xxx.php"],["P","C","S"]);
 if($rtn !== true){
@@ -53,7 +54,7 @@ if($rtn !== true){
             $pdo_h->rollBack();
             $msg = "システムエラーによる更新失敗。管理者へ通知しました。";
             $alert_status = "alert-danger";
-            log_writer2("ajax_UriageData_update_sql.php [Exception \$e] =>",$e,"lv0");
+            log_writer2($myname." [Exception \$e] =>",$e,"lv0");
             $reseve_status=true;
         }
     }
@@ -82,14 +83,14 @@ function shutdown(){
       
       //直前でエラーあり、かつ、catch処理出来ていない場合に実行
       if($lastError!==null && $GLOBALS["reseve_status"] === false){
-        log_writer2("ajax_EVregi_sql.php","shutdown","lv3");
-        log_writer2("ajax_EVregi_sql.php",$lastError,"lv1");
+        log_writer2($GLOBALS["myname"],"shutdown","lv3");
+        log_writer2($GLOBALS["myname"],$lastError,"lv1");
           
         $emsg = "/UriNO::".$GLOBALS["UriageNO"]."　uid::".$_SESSION['user_id']." ERROR_MESSAGE::予期せぬエラー".$lastError['message'];
         if(EXEC_MODE!=="Local"){
             send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
         }
-        log_writer2("ajax_UriageData_update_sql.php [Exception \$lastError] =>",$lastError,"lv0");
+        log_writer2($GLOBALS["myname"]." [Exception \$lastError] =>",$lastError,"lv0");
     
         $token = csrf_create();
         $return_sts = array(
