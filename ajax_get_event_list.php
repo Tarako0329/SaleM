@@ -11,8 +11,8 @@ $ymto=get_getsumatsu($_POST['date_to']);
 $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
 if($_POST["list_type"]=="Event"){
-    $sqlstr = "select '' as CODE, LIST from (select Event as LIST,UriDate from UriageData where uid =? and Event <> '' group by UriDate,Event ";
-    $sqlstr = $sqlstr."union select TokuisakiNM as LIST,UriDate from UriageData where uid =? and TokuisakiNM<>'' group by UriDate,TokuisakiNM) as tmp ";
+    $sqlstr = "select CODE , LIST from (select Event as CODE,CONCAT('Ev:',Event) as LIST,UriDate from UriageData where uid =? and Event <> '' group by UriDate,Event ";
+    $sqlstr = $sqlstr."union select TokuisakiNM as CODE,CONCAT('得意先:',TokuisakiNM) as LIST,UriDate from UriageData where uid =? and TokuisakiNM<>'' group by UriDate,TokuisakiNM) as tmp ";
     $sqlstr = $sqlstr."where tmp.UriDate >= ? and tmp.UriDate <= ? group by LIST order by LIST";
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $_POST['user_id'], PDO::PARAM_INT);

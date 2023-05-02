@@ -2,9 +2,10 @@
 //ユーザ登録、登録情報の修正画面
 //$mode 0:新規　1:更新　3:確認(新規) 4:確認(更新) 5:登録完了（更新・新規共通）6:登録失敗
 require "php_header.php";
-
+$myname = "account_create.php";           //ログファイルに出力する自身のファイル名
+//log_writer2($myname." \$row[NAME] =>",$row["NAME"],"lv3");
 $shoukai=(!empty($_GET["shoukai"])?$_GET["shoukai"]:$_POST["shoukai"]);
-$mode=(!empty($_GET["MODE"])?$_GET["MODE"]:$_POST["MODE"]);
+$mode=(!empty($_GET["mode"])?$_GET["mode"]:$_POST["mode"]);
 
 //GETのセッションチェック
 if($mode==5 || $mode==6){
@@ -26,8 +27,10 @@ if($mode==5 || $mode==6){
 if($mode==1 || $mode==4){
     //更新モードの場合、session[usr_id]のチェック
     $rtn=check_session_userid($pdo_h);
+    
 }
-
+log_writer2($myname." \$session[id] =>",$_SESSION["user_id"],"lv3");
+log_writer2($myname." \$session[id] =>",$_SESSION["user_id"],"lv3");
 
 if($mode==0){
     //同一端末の前回ログイン情報をクリアする
@@ -167,7 +170,7 @@ if($mode==0 || $mode==1){
         <form method='post' id='form1' action='account_sql.php' style='font-size:1.5rem'>
     <?php   } ?>
         <input type='hidden' name='csrf_token' value='<?php echo $token; ?>'>
-        <input type='hidden' name='MODE' value=<?php echo $next_mode; ?>>
+        <input type='hidden' name='mode' value=<?php echo $next_mode; ?>>
         <input type='hidden' name='shoukai' value=<?php echo $shoukai; ?>>
         <div class='form-group'>
             <label for='mail' >メールアドレス</label>

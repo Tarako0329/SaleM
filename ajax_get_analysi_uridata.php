@@ -23,12 +23,20 @@ $reseve_status=false;               //処理結果セット済みフラグ。
 $timeout=false;                     //セッション切れ。ログイン画面に飛ばすフラグ
 $myname = "ajax_get_analysi_uridata.php";           //ログファイルに出力する自身のファイル名
 
+$top15="";
+$aryColumn = [];
+$result=[];
+$labels=[];
+$data=[];
+$chart_type="";
+
 $rtn = csrf_checker(["analysis_uriagejisseki.php"],["P","C","S"]);
 if($rtn !== true){
     $msg=$rtn;
     $alert_status = "alert-warning";
     $reseve_status = true;
 }else{
+    $tokui = $_POST["tokui"];
     $rtn=check_session_userid_for_ajax($pdo_h);
     if($rtn===false){
         $reseve_status = true;
@@ -86,16 +94,16 @@ if($rtn !== true){
             $chart_type="bar";
             $top15="on";
         }elseif($analysis_type==8){//イベント・店舗別来客数推移
-            $sqlstr = "select UriDate,sum(来客カウント) as 来客数,Event from ";
+            $sqlstr = "select UriDate as Labels,Event,sum(来客カウント) as datasets from ";
             $sqlstr = $sqlstr." (select uid, UriDate, Event, TokuisakiNM, UriageNO,0 as ShouhinCD, 1 as 来客カウント from UriageData where Event <>'' ";
             $sqlstr = $sqlstr." group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriageData ";
             $gp_sqlstr = "group by UriDate,Event order by UriDate";
-            $aryColumn = ["計上日","来客数","Event/店舗"];
+            $aryColumn = ["計上日","Event/店舗","来客数"];
             $chart_type="bar";
             
             $tokui="xxxx";//来客数の場合は個別売りを除く
         }elseif($analysis_type==9){//イベント・店舗別来客数ランキング
-            $sqlstr = "select Event,ROUND(avg(来客数)) as 平均来客数 from (select UriDate,sum(来客カウント) as 来客数,Event from ";
+            $sqlstr = "select Event as Labels,ROUND(avg(来客数)) as datasets from (select UriDate,sum(来客カウント) as 来客数,Event from ";
             $sqlstr = $sqlstr." (select uid, UriDate, Event, TokuisakiNM, UriageNO,0 as ShouhinCD, 1 as 来客カウント from UriageData where Event <>'' ";
             $sqlstr = $sqlstr." group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriageData ";
             $gp_sqlstr = "group by UriDate,Event) as Urisum2 group by Event order by ROUND(avg(来客数)) desc";
@@ -151,7 +159,7 @@ if($rtn !== true){
             $stmt->bindValue("ymto", $_POST["date_to"], PDO::PARAM_INT);
             $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
             $stmt->bindValue("event", "%".$_POST["event"]."%", PDO::PARAM_STR);
-            $stmt->bindValue("tokui", "%".$_POST["tokui"]."%", PDO::PARAM_STR);
+            $stmt->bindValue("tokui", "%".$tokui."%", PDO::PARAM_STR);
 
             $status=$stmt->execute();
             $result = $stmt->fetchall(PDO::FETCH_ASSOC);

@@ -105,7 +105,7 @@
 						<tr v-if='(index===0) || (index!==0 && list.UriDate + list.Event !== UriageList_filter[index-1].UriDate + UriageList_filter[index-1].Event)' class='tr_stiky'>
 							<td :colspan='colspan' class='tr_stiky' style='white-space:nowrap;'>
 							<span role='button' class='link' @click='set_filter("UriDate",list.UriDate,"")'> 売上日：{{list.UriDate}}</span>
-							<span role='button' class='link' @click='set_filter("Event",list.Event,"")'>『{{list.Event}}{{list.TokuisakiNM}}』</span>
+							<span role='button' class='link' @click='set_filter("Event",list.Event+list.TokuisakiNM,"")'>『{{list.Event}}{{list.TokuisakiNM}}』</span>
 							<img v-if='list.icon.length>=5' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>（<span style='color:red;'>{{list.max_temp}}</span>/<span style='color:blue;'>{{list.min_temp}}</span>）
 							</td>
 							<td class='text-right d-none d-md-table-cell'></td>

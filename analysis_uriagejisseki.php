@@ -25,178 +25,13 @@ log_writer2("test",$SLVresult,"lv3");
     $rtn=check_session_userid($pdo_h);
     $csrf_create = csrf_create();
 
-    //deb_echo("UID：".$_SESSION["user_id"]);
-/*
-    if(!empty($_POST)){
-        $list = (empty($_POST["list"])?"%":$_POST["list"]);
-        $analysis_type=$_POST["sum_tani"];
-        $options=$_POST["options"];
-        if($options=="ym"){
-            $ymfrom = $_POST["ymfrom"];
-            $ymto = $_POST["ymto"];
-            //$ajax_func="getAllData('#Event','#ymfrom1','#ymto1','Event');";
-        }else{
-            //ymd指定
-            $ymfrom = $_POST["ymfrom2"];
-            $ymto = $_POST["ymto2"];
-            //$ajax_func="getAllData('#Event','#ymfrom2','#ymto2','Event');";
-        }
-        $category=(!empty($_POST["category"])?$_POST["category"]:"")."%";
-        $category_lv=(!empty($_POST["category_lv"])?$_POST["category_lv"]:"0");
-    }else{
-        //初期はGETから
-        $ymfrom = (int)((string)date('Y')."01");
-        $ymto = (string)date('Y')."12";
-        $list = "%";
-        $analysis_type=$_GET["sum_tani"];
-        $options="ym";
-        //$ajax_func="getAllData('#Event','#ymfrom1','#ymto1','Event');";
-        $category="%";
-        $category_lv="0";
-    }
-    $tokui=$list;
-*/
-
-    $ymfrom = (int)((string)date('Y')."01");
-    $ymto = (string)date('Y')."12";
     $list = "%";
     $analysis_type=$_GET["sum_tani"];
-    $options="ym";
     
     $category="%";
     $category_lv="0";
 
-    $chart_type="";
-    $top15="off";
-    //deb_echo($list);
-/*    
-    if($analysis_type==1){//日ごと
-        $sqlstr = "select UriDate as 計上年月 ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
-        $gp_sqlstr = "group by UriDate order by UriDate";
-        $aryColumn = ["計上日","税抜売上","消費税","税込売上"];
-        $chart_type="bar";
-    }elseif($analysis_type==2){//月毎
-        $sqlstr = "select DATE_FORMAT(UriDate, '%Y/%m') as 計上年月 ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
-        $gp_sqlstr = "group by DATE_FORMAT(UriDate, '%Y%m') order by DATE_FORMAT(UriDate, '%Y%m')";
-        $aryColumn = ["計上年月","税抜売上","消費税","税込売上"];
-        $chart_type="bar";
-    }elseif($analysis_type==3){//年ごと
-        $sqlstr = "select DATE_FORMAT(UriDate, '%Y') as 計上年月 ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
-        $gp_sqlstr = "group by DATE_FORMAT(UriDate, '%Y') order by DATE_FORMAT(UriDate, '%Y')";
-        $aryColumn = ["計上年度","税抜売上","消費税","税込売上"];
-        $chart_type="bar";
-    }elseif($analysis_type==4){//製品名ごと売上金額ランキング
-        $sqlstr = "select ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上,sum(zei) as 税,sum(UriageKin+zei) as 税込売上 from UriageData ";
-        $gp_sqlstr = "group by ShouhinNM order by sum(UriageKin) desc";
-        $aryColumn = ["商品名","税抜売上","消費税","税込売上"];
-        $chart_type="bar";
-        $top15="on";
-    }elseif($analysis_type==5){//製品名ごと売上数量ランキング
-        $sqlstr = "select ShouhinNM as ShouhinNM ,sum(Su) as 売上数 from UriageData ";
-        $gp_sqlstr = "group by ShouhinNM order by sum(Su) desc";
-        $aryColumn = ["商品名","売上数"];
-        $chart_type="bar";
-        $top15="on";
-    }elseif($analysis_type==6){//客単価推移
-        //客単価一覧
-        $sqlstr = "select 計上日,ROUND(avg(税抜売上)) as 客単価,Event from ";
-        $sqlstr = $sqlstr." (select UriDate as 計上日 ,concat(Event,TokuisakiNM) as Event ,UriageNO ,sum(UriageKin) as 税抜売上 from UriageData ";
-        $gp_sqlstr = "group by UriDate,UriageNO ) as UriageData group by 計上日 order by 計上日";
-        $aryColumn = ["計上日","客単価","Event/店舗"];
-        $chart_type="bar";
-    }elseif($analysis_type==7){//イベント・店舗別客単価ランキング
-        $sqlstr = "select KYAKU,ROUND(avg(客単価)) as 平均客単価 from ";
-        $sqlstr = $sqlstr." (select UriDate as 計上日 ,concat(Event,TokuisakiNM) as KYAKU ,UriageNO ,sum(UriageKin) as 客単価 from UriageData ";
-        $gp_sqlstr = "group by UriDate,concat(Event,TokuisakiNM),UriageNO ) as UriageData group by KYAKU order by avg(客単価) desc";
-        $aryColumn = ["Event/店舗","客単価"];
-        $chart_type="bar";
-        $top15="on";
-    }elseif($analysis_type==8){//イベント・店舗別来客数推移
-        $sqlstr = "select UriDate,sum(来客カウント) as 来客数,Event from ";
-        $sqlstr = $sqlstr." (select uid, UriDate, Event, TokuisakiNM, UriageNO,0 as ShouhinCD, 1 as 来客カウント from UriageData where Event <>'' ";
-        $sqlstr = $sqlstr." group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriageData ";
-        $gp_sqlstr = "group by UriDate,Event order by UriDate";
-        $aryColumn = ["計上日","来客数","Event/店舗"];
-        $chart_type="bar";
 
-        $tokui="xxxx";//来客数の場合は個別売りを除く
-    }elseif($analysis_type==9){//イベント・店舗別来客数ランキング
-        $sqlstr = "select Event,ROUND(avg(来客数)) as 平均来客数 from (select UriDate,sum(来客カウント) as 来客数,Event from ";
-        $sqlstr = $sqlstr." (select uid, UriDate, Event, TokuisakiNM, UriageNO,0 as ShouhinCD, 1 as 来客カウント from UriageData where Event <>'' ";
-        $sqlstr = $sqlstr." group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriageData ";
-        $gp_sqlstr = "group by UriDate,Event) as Urisum2 group by Event order by ROUND(avg(来客数)) desc";
-        $aryColumn = ["Event/店舗","平均来客数"];
-        $chart_type="bar";
-
-        $tokui="xxxx";//来客数の場合は個別売りを除く
-        $top15="on";
-    }elseif($analysis_type==10){//商品の売れる勢い
-        $sqlstr = "select ShouhinNM as NAME,concat(time_format(insDatetime,'%H'), '時') as Hour,sum(su) as COUNT from UriageData ";
-        $gp_sqlstr = "group by ShouhinNM,time_format(insDatetime,'%H') order by ShouhinNM,time_format(insDatetime,'%H')";
-        $aryColumn = ["商品名","時","個数"];
-        $chart_type="line";
-
-        $tokui="xxxx";//時間別推移の場合は個別売りを除く
-    }elseif($analysis_type==11){//来客数推移
-        $sqlstr = "select tmp.Event as NAME ,tmp.Hour as Hour,count(*) as COUNT from (select Event,concat(time_format(insDatetime,'%H'), '時') as Hour,UriageNO from UriageData ";
-        $gp_sqlstr = "group by Event,concat(time_format(insDatetime,'%H'), '時'),UriageNO) as tmp group by tmp.Event,tmp.Hour order by tmp.Event,tmp.Hour";
-        $aryColumn = ["イベント名","時","人数"];
-        $chart_type="line";
-
-        $tokui="xxxx";//時間別推移の場合は個別売りを除く
-    }elseif($analysis_type==12){//ジャンル別実績
-        if($category_lv==="0"){
-            $sql_category = "if(bunrui1<>'',bunrui1,'未分類')";
-            $category="%";
-        }elseif($category_lv==="1"){
-    //        $sql_category = "if(bunrui2<>'',bunrui2,'未分類')";
-            $sql_category = "concat(if(bunrui1<>'',bunrui1,'未分類'),'>',if(bunrui2<>'',bunrui2,'未分類'))";
-
-        }elseif($category_lv==="2"){
-    //        $sql_category = "if(bunrui3<>'',bunrui3,'未分類')";
-            $sql_category = "concat(if(bunrui1<>'',bunrui1,'未分類'),'>',if(bunrui2<>'',bunrui2,'未分類'),'>',if(bunrui3<>'',bunrui3,'未分類'))";
-            $category_lv=-1;
-        }else{
-            $sql_category = "";
-            $sql_category_where="";
-        }
-        $sql_category_where = " AND ".$sql_category." LIKE '".$category."'";
-        $sqlstr = "select ".$sql_category.",sum(UriageKin) as Uriage from UriageData inner join ShouhinMS on UriageData.uid=ShouhinMS.uid and UriageData.shouhinCD=ShouhinMS.shouhinCD ";
-        $gp_sqlstr = "group by ".$sql_category." order by sum(UriageKin) desc";
-        $aryColumn = ["カテゴリー","売上"];
-        $chart_type="doughnut";
-        //memo
-        //$sql_select="if(bunrui1<>'',bunrui1,'未分類') as categoly";
-        //$sql_select="concat(if(bunrui1<>'',bunrui1,'未分類'),'>',if(bunrui2<>'',bunrui2,'未分類')) as categoly";
-        //$sql_select="concat(if(bunrui1<>'',bunrui1,'未分類'),'>',if(bunrui2<>'',bunrui2,'未分類'),'>',if(bunrui3<>'',bunrui3,'未分類')) as categoly";
-    
-
-    }
-
-    if($options=="ym"){
-        $sqlstr = $sqlstr." where UriageData.ShouhinCD<9900 and DATE_FORMAT(UriDate, '%Y%m') between :ymfrom and :ymto AND UriageData.uid = :user_id ";
-    }else{
-        $sqlstr = $sqlstr." where UriageData.ShouhinCD<9900 and UriDate between :ymfrom and :ymto AND UriageData.uid = :user_id ";
-    }
-    $sqlstr = $sqlstr." AND ((TokuisakiNM ='' and Event like :event) OR (Event = '' and TokuisakiNM like :tokui ))";
-    $sqlstr = $sqlstr.(!empty($sql_category_where)?$sql_category_where:"");
-
-    $sqlstr = $sqlstr." ".$gp_sqlstr;
-
-    //deb_echo($sqlstr);
-
-    $stmt = $pdo_h->prepare( $sqlstr );
-    $stmt->bindValue("ymfrom", $ymfrom, PDO::PARAM_INT);
-    $stmt->bindValue("ymto", $ymto, PDO::PARAM_INT);
-    $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
-    $stmt->bindValue("event", $list, PDO::PARAM_STR);
-    $stmt->bindValue("tokui", $tokui, PDO::PARAM_STR);
-    $rtn=$stmt->execute();
-    if($rtn==false){
-        deb_echo("失敗<br>");
-    }
-    $result=$stmt->fetchAll();
-*/
     //検索年月リスト ユーザの最初の売上年月～今年12月までのリストを作成する
     $SLVsql = "select DATE_FORMAT(min(UriDate), '%Y-%m') as min_uridate from UriageData where uid = :user_id";
     $stmt = $pdo_h->prepare($SLVsql);
@@ -231,7 +66,7 @@ log_writer2("test",$SLVresult,"lv3");
     ?>
     <!--ページ専用CSS-->
     <link rel="stylesheet" href="css/style_analysis.css?<?php echo $time; ?>" >
-    <script src='script/jquery-3.6.0.min.js'></script>
+    <!--<script src='script/jquery-3.6.0.min.js'></script>-->
 
     <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js' integrity='sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==' crossorigin='anonymous' referrerpolicy='no-referrer'></script>    
     
@@ -249,7 +84,6 @@ log_writer2("test",$SLVresult,"lv3");
                     
             <form id='form1' class='form' method='post' action='analysis_uriagejisseki.php' style='font-size:1.5rem'>
                 <input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
-                
                 <div>
                     集計期間:    
                     <input type='radio' class='btn-check' name='options' autocomplete='off' id='ym' checked>
@@ -291,7 +125,7 @@ log_writer2("test",$SLVresult,"lv3");
                 </select>
                 <select v-model='ev_selected' name='list' class='form-select form-select-lg' style='padding:0;width:auto;max-width:100%;display:inline-block;margin:5px'>
                     <template v-for='(list,index) in ev_list' :key='list.LIST'>
-                        <option :value='list.LIST'>{{list.LIST}}</option>
+                        <option :value='list.CODE'>{{list.LIST}}</option>
                     </template>
                 </select>
             </form>
@@ -411,30 +245,9 @@ log_writer2("test",$SLVresult,"lv3");
                                 pointHoverRadius:8,
                                 data: chart_datasets.value[i]
                             }
-
                         }
-                        /*
-                            params.data.datasets[0] = {
-                                borderColor: 'rgba('+(~~(256 * Math.random()))+','+(~~(256 * Math.random()))+','+ (~~(256 * Math.random()))+', 0.8)',
-                                label:'商品名1',
-                                tension: 0.2,
-                                pointRadius:5,
-                                hitRadius:15,
-                                pointHoverRadius:8,
-                                data: [10,20,15,30]
-                            }
-                            params.data.datasets[1] = {
-                                borderColor: 'rgba('+(~~(256 * Math.random()))+','+(~~(256 * Math.random()))+','+ (~~(256 * Math.random()))+', 0.8)',
-                                label:'商品名2',
-                                tension: 0.2,
-                                pointRadius:5,
-                                hitRadius:15,
-                                pointHoverRadius:8,
-                                data: [15,25,5,10]
-                            }
-                        */
                     }
-                    console.log(params)
+                    
                     myChart = new Chart(ctx, params);
                 }
                 const serch_ym = ref(true)
@@ -519,13 +332,17 @@ log_writer2("test",$SLVresult,"lv3");
 					.catch((error) => {
 						console_log(`get_analysis_data ERROR:${error}`,'lv3')
 					})
-                    .finally(()=>{console_log(myChart,'lv3')})
+                    .finally(()=>{
+                        //console_log(myChart,'lv3')
+                    })
 					return 0;
 				};//売上分析データ取得ajax
-
-
+                
                 watch([date_from,date_to,analysis_type,ev_selected],() => {
                     get_analysis_data()
+                })
+                watch([date_from,date_to],() => {
+                    get_event()
                 })
 
                 const ym_list = ref([
@@ -565,65 +382,6 @@ log_writer2("test",$SLVresult,"lv3");
                 }
             }
         }).mount('#app');
-
-        
-
-        /*
-        function getAllData(List,date_from,date_to,get_list_type){
-            //検索用のイベント・顧客・商品リストを取得
-            //id名[List]のリストデータを[date_from]～[date_to]に発生した[get_list_type]に更新
-            $.ajax({
-                // 通信先ファイル名
-                type        : 'POST',
-                url         : 'ajax_get_event_list.php',
-                //dataType    : 'application/json',
-                data        :{
-                                user_id     :'<?php echo $_SESSION["user_id"];?>',
-                                date_from   :$(date_from)[0].value,
-                                date_to     :$(date_to)[0].value,
-                                list_type   :get_list_type //イベントリスト or 商品リスト
-                            }
-                },
-            ).done(
-                // 通信が成功した時
-                function(data) {
-                    //selectの子要素をすべて削除
-                    $(List).children().remove();
-                    $(List).append("<option value='%'>イベント名選択</option>\n");
-                    $(List).append("<option value='%'>全て</option>\n");
-                    // 取得したレコードをeachで順次取り出す
-                    $.each(data, function(key, value){
-                        // appendで追記していく
-                        if(get_list_type=='Event'){
-                            if(value.LIST == '<?php echo $_SESSION["Event"]; ?>'){
-                                $(List).append("<option value='" + value.LIST + "' selected>" + value.LIST + "</option>\n");
-                            }else{
-                                $(List).append("<option value='" + value.LIST + "'>" + value.LIST + "</option>\n");
-                            }
-                        }else if(get_list_type=='Shouhin'){
-                            $(List).append("<option value='" + value.CODE + "'>" + value.CODE+ ":" + value.LIST + "</option>\n");
-                        }
-                    });
-                    console.log("通信成功");
-                    console.log(data);
-                }
-            ).fail(
-                // 通信が失敗した時
-                function(XMLHttpRequest, textStatus, errorThrown){
-                    console.log("通信失敗2");
-                    console.log("XMLHttpRequest : " + XMLHttpRequest.status);
-                    console.log("textStatus     : " + textStatus);
-                    console.log("errorThrown    : " + errorThrown.message);
-                }
-            )};
-            */
-        //起動時にリストを取得
-        //getAllData('#Event','#ymfrom1','#ymto1','Event');
-                
-            <?php
-            //echo $ajax_func."\n";   //  "getAllData()
-            ?>
-
     </script><!--chart.js-->
 </BODY>
 </html>

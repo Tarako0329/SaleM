@@ -12,6 +12,7 @@ ver2.99.0-0026:to[bs5&Vue3CompApi]商品一覧画面対応-a1
 ver2.99.0-0027:to[bs5&Vue3CompApi]商品一覧画面対応-a1
 ver2.99.0-028:to[bs5&Vue3CompApi]SessionCheckerの改良
 ver2.99.0-029:to[bs5&Vue3CompApi]売上分析画面の対応-v1
+ver2.99.0-030:to[bs5&Vue3CompApi]売上分析画面の対応-v2
 
 
 ローカルからテスト環境へ
