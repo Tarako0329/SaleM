@@ -80,14 +80,16 @@
 				<input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
 				<table class='table result_table item_1' style='width:100%;max-width:630px;table-layout: fixed;'>
 					<thead>
+					
 						<tr style='height:30px;'>
-							<th class='th1' scope='col' colspan='3' style='width:auto;padding:0px 5px 0px 0px;'>ID:商品名</th>
+							<th class='th1' scope='col' colspan='2' style='width:auto;padding:0px 5px 0px 0px;'>ID:商品名</th>
+							<th class='th1' scope='col'>元税込価格</th>
 							<th class='th1' scope='col'>レジ</th>
 						</tr>
 						<tr style='height:30px;'>
 							<th scope='col' >単価変更</th>
 							<th scope='col' style='color:red;'>本体額</th>
-							<th scope='col' >税区分</th>
+							<th scope='col' >税率(%)</th>
 							<th scope='col' style='color:red;'>消費税</th>
 						</tr>
 						<tr>
@@ -97,17 +99,30 @@
 							<th class='th2' scope='col'>削除</th>
 							<!--<th scope='col' class='' style='width:4rem;'></th>-->
 						</tr>
+					
 					</thead>
 					<tbody v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
 						<tr>
-							<td style='font-size:1.7rem;font-weight:700;' colspan='3'>{{list.shouhinCD}}：{{list.shouhinNM}}</td><!--商品名-->
-							<td ><input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' class='form-check-input' style='transform:scale(1.4);' v-model='list.disp_rezi'></td>
+							<td style='font-size:1.7rem;font-weight:700;' colspan='2'>{{list.shouhinCD}}:{{list.shouhinNM}}</td><!--商品名-->
+							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' align='right'><!--変更前価格-->
+								￥{{Number(list.moto_kin).toLocaleString()}}
+							</td>
+							<td>
+								<!--<input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' class='form-check-input' style='transform:scale(1.4);' v-model='list.disp_rezi'>-->
+								<!--<div class="form-check form-switch"><input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' class='form-check-input' v-model='list.disp_rezi'></div>-->
+								<input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' class='btn-check' :id="`${list.shouhinCD}btn-check-outlined`" v-model='list.disp_rezi'  autocomplete="off">
+								<label class="btn btn-outline-primary" :for="`${list.shouhinCD}btn-check-outlined`">表示</label>
+							</td>
 						</tr>
 						<tr>
-							<td><input @blur='set_new_value(index,`#new_val_${index}`)' :id='`new_val_${index}`' type='number' class='form-contral' style='width:7rem;' placeholder='新価格' ></td>   <!--単価修正欄 -->
-							<td><input type='number' readonly='readonly' :name ='`ORDERS[${index}][tanka]`' class='form-contral' style='font-size:1.7rem;width:7rem;background-color:#fff;border:0;' :value='list.tanka'></td><!--登録単価-->
+							<td><input @blur='set_new_value(index,`#new_val_${index}`)' :id='`new_val_${index}`' type='number' class='form-contral' style='width:100%;text-align:center' placeholder='新価格' ></td>   <!--単価修正欄 -->
+							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' align='right'>
+								<!--<input type='hidden' readonly='readonly' :name ='`ORDERS[${index}][tanka]`' class='form-contral' style='font-size:1.7rem;width:7rem;background-color:#fff;border:0;' :value='list.tanka'>-->
+								￥{{Number(list.tanka).toLocaleString()}}
+							</td><!--登録単価-->
 							<td>
-								<select v-model='list.zeiKBN' @change='set_new_value(index,`#new_val_${index}`)' :name ='`ORDERS[${index}][zeikbn]`' class='form-select form-select-lg' style='font-size:1.7rem;width:7rem;height:30px;'><!--税区分 -->
+								<select v-model='list.zeiKBN' @change='set_new_value(index,`#new_val_${index}`)' :name ='`ORDERS[${index}][zeikbn]`' class='form-select form-select-lg' 
+								style='font-size:1.7rem;width:100%;height:30px;'><!--税区分 -->
 									<?php
 									foreach($ZEIresult as $row){
 										echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
@@ -115,18 +130,23 @@
 									?>
 								</select>
 							</td>
-							<td><input type='number' readonly='readonly' :name ='`ORDERS[${index}][shouhizei]`' class='form-contral' style='font-size:1.7rem;width:7rem;background-color:#fff;border:0' :value='list.tanka_zei'></td><!--list.tanka_zei-->
+							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' align='right'><!--list.tanka_zei-->
+								<!--<input type='number' readonly='readonly' :name ='`ORDERS[${index}][shouhizei]`' class='form-contral' style='font-size:1.7rem;width:7rem;background-color:#fff;border:0' :value='list.tanka_zei'>-->
+								￥{{Number(list.tanka_zei).toLocaleString()}}
+							</td>
 						</tr>
 						<tr>
-							<td><input type='number' :name ='`ORDERS[${index}][genka]`' class='form-contral' style='width:7rem;' :value='list.genka_tanka'></td>
-							<td class=''><input type='number' :name ='`ORDERS[${index}][utisu]`' class='form-contral' style='width:7rem;' :value='list.utisu'></td>
-							<td class=''><input type='text'   :name ='`ORDERS[${index}][tani]`' class='form-contral' style='width:7rem;' :value='list.tani'></td>
+							<td><input type='number' :name ='`ORDERS[${index}][genka]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.genka_tanka'></td>
+							<td class=''><input type='number' :name ='`ORDERS[${index}][utisu]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.utisu'></td>
+							<td class=''><input type='text'   :name ='`ORDERS[${index}][tani]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.tani'></td>
 							<td class=''>
 								<a href='#' @click='delete_item(list.shouhinNM,`shouhinDEL_sql.php?cd=${list.shouhinCD}&nm=${list.shouhinNM}&csrf_token=<?php echo $csrf_create; ?>`)'>
 									<i class='fa-regular fa-trash-can fa-2x'></i>
 								</a>
 							</td><!--削除アイコン-->
 							<input type='hidden' :name ='`ORDERS[${index}][shouhinCD]`' :value='list.shouhinCD'>
+							<input type='hidden' :name ='`ORDERS[${index}][tanka]`' :value='list.tanka'>
+							<input type='hidden' :name ='`ORDERS[${index}][shouhizei]`' :value='list.tanka_zei'>
 						</tr>
 					</tbody>
 				</table>
@@ -134,7 +154,7 @@
 		</main>
 		<footer class='common_footer'>
 			<button type='button' @click='chk_onoff()' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >{{btn_name}}</button>
-			<button v-if='chk==="on"' type='submit' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >登　録</button>
+			<button v-if='chk==="on"' type='submit' class='btn--chk item_3' style='border-radius:0;border-left: thick double #32a1ce;' name='commit_btn' >登　録</button>
 		</footer>
 	</form>
 	<script>

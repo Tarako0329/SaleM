@@ -33,12 +33,20 @@ define("POP_PASS", $_ENV["POP_PASS"]);
 define("SYSTEM_NOTICE_MAIL",$_ENV["SYSTEM_NOTICE_MAIL"]);
 
 //契約・支払関連のキー情報
+/*暗号化
 define("SKEY", $_ENV["SKey"]);
 define("PKEY", $_ENV["PKey"]);
 define("PLAN_M", $_ENV["PLAN_M"]);
 define("PLAN_Y", $_ENV["PLAN_Y"]);
 define("PAY_CONTRACT_URL", $_ENV["PAY_contract_url"]);
 define("PAY_CANCEL_URL", $_ENV["PAY_cancel_url"]);
+*/
+define("SKEY", rot13encrypt2($_ENV["SKey"]));
+define("PKEY", rot13encrypt2($_ENV["PKey"]));
+define("PLAN_M", rot13encrypt2($_ENV["PLAN_M"]));
+define("PLAN_Y", rot13encrypt2($_ENV["PLAN_Y"]));
+define("PAY_CONTRACT_URL", rot13encrypt2($_ENV["PAY_contract_url"]));
+define("PAY_CANCEL_URL", rot13encrypt2($_ENV["PAY_cancel_url"]));
 
 //WEATHER_ID
 define("WEATHER_ID", $_ENV["WEATHER_ID"]);

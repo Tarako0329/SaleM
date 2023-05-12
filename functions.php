@@ -211,7 +211,7 @@ function check_session_userid_for_ajax($pdo_h){
 
 // =========================================================
 // データ更新時のセキュリティ対応（セッション・クッキー・ポストのチェック）
-//　一元化 (リファイラ[xxx.php,xxx.php],[S,C,G,P])
+//　一元化 (リファイラ[xxx.php,xxx.php],[S:session,C:cookie,G:get,P:post])
 // =========================================================
 function csrf_checker($from,$chkpoint){
     //リファイラーチェック
