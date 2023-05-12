@@ -153,9 +153,9 @@
 			<i class="fa-regular fa-circle-question fa-lg logoff-color"></i><!--スペーシングのため白アイコンを表示-->
 			<div style='padding:0;'>
 				<input type='radio' class='btn-check' name='options' value='plus' autocomplete='off' v-model='pm' id='plus_mode' checked>
-				<label class='btn btn-outline-primary' for='plus_mode'>　▲　</label>
+				<label class='btn btn-outline-primary' for='plus_mode' style='border-radius:0;'>　▲　</label>
 				<input type='radio' class='btn-check' name='options' value='minus' autocomplete='off' v-model='pm' id='minus_mode' >
-				<label class='btn btn-outline-warning' for='minus_mode'>　▼　</label>
+				<label class='btn btn-outline-warning' for='minus_mode' style='border-radius:0;'>　▼　</label>
 			</div>
 			<a href="#" style='color:inherit;margin-left:5px;' data-bs-toggle='modal' data-bs-target='#modal_help2'>
 				<i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i>
@@ -185,7 +185,7 @@
 										<div class='col-10 col-md-7' >
 											<p>お会計額：￥{{pay.toLocaleString()}}</p>
 											<label for='CHOUSEI_GAKU' class='form-label'>変更後お会計額</label>
-											<input type='number' class='form-control order tanka' 
+											<input type='number' v-model='Revised_pay' class='form-control order tanka' 
 											style='font-size:2.2rem;width:100%;border:solid;border-top:none;border-right:none;border-left:none;' name='CHOUSEI_GAKU' id='CHOUSEI_GAKU'>
 										<br>
 										</div>
@@ -217,9 +217,12 @@
 							<input type='hidden' :name ="`ORDERS[${index}][TANKA]`" :value = "list.tanka">
 							<input type='hidden' :name ="`ORDERS[${index}][ZEI]`" :value = "list.tanka_zei">  
 							<input type='hidden' :name ="`ORDERS[${index}][GENKA_TANKA]`" :value = "list.genka_tanka">
-							<div class ='ordered'>
-									￥<input type='number' readonly='readonly' class='order tanka' :value="list.zeikomigaku">
-									× <input type='number' v-model='list.ordercounter' readonly='readonly' :name ="`ORDERS[${index}][SU]`" :id="`suryou_${list.shouhinCD}`" class='order su' style='display:inline;'>
+							<input type='hidden' v-model='list.ordercounter' :name ="`ORDERS[${index}][SU]`" :id="`suryou_${list.shouhinCD}`">
+							<div class ='ordered' style='font-size:2.5rem;padding-top:5px;'>
+									<!--￥<input type='number' readonly='readonly' class='order tanka' :value="list.zeikomigaku">
+									× <input type='number' v-model='list.ordercounter' readonly='readonly' :name ="`ORDERS[${index}][SU]`" :id="`suryou_${list.shouhinCD}`" class='order su' style='display:inline;'>-->
+									￥{{list.zeikomigaku.toLocaleString()}}
+									× {{list.ordercounter.toLocaleString()}}
 							</div>
 						</div>
 					</template>
@@ -285,7 +288,8 @@
 					<input type='hidden' id='oturi_val'>
 
 					<p>お預り：￥<span id='azukari'>{{deposit}}</span></p>
-					<p>お会計：￥<span id='seikyuu'>{{ pay }}</span></p>
+					<template v-if='Revised_pay===""'><p>お会計：￥<span id='seikyuu'>{{ pay }}</span></p></template>
+					<template v-if='Revised_pay!==""'><p>お会計：￥<span id='seikyuu'>{{ Revised_pay }}</span></p></template>
 					<p>お釣り：￥<span id='oturi'>{{oturi}}</span></p>
 					</div>
 				<div class='modal-footer'>
@@ -483,6 +487,7 @@
 
 				//オーダー処理関連
 				const pay = ref(0)		//会計税込金額
+				const Revised_pay = ref('')
 				const kaikei_zei = ref(0)		//会計消費税
 				const chk_register_show = ref('chk')		//確認・登録ボタンの表示
 				const btn_changer = (args) => {
@@ -587,7 +592,12 @@
 				//電卓処理関連
 				const deposit = ref(0)
 				const oturi = computed(() =>{//おつりの計算
-					return Number(deposit.value) - Number(pay.value)
+					if(Revised_pay.value!==""){
+						return Number(deposit.value) - Number(Revised_pay.value)
+					}else{
+						return Number(deposit.value) - Number(pay.value)
+					}
+					
 				})
 				const keydown = (e) => {//電卓ボタンの処理
 					//console_log(e.target.innerHTML,'lv3')
@@ -756,6 +766,7 @@
 					temp,
 					feels_like,
 					icon,
+					Revised_pay,
 				}
 			}
 		}).mount('#register');
