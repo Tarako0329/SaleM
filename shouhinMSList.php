@@ -1,14 +1,6 @@
 <?php
 	require "php_header.php";
-/*
-	if(isset($_GET["csrf_token"]) || empty($_POST)){
-		if(csrf_chk_redirect($_GET["csrf_token"])==false){
-			redirect_to_login("セッションが正しくありませんでした。");
-		}
-	}else{
-    redirect_to_login("セッションが正しくありませんでした。(アクセスルート不正)");
-	}
-*/
+
 	$rtn = csrf_checker(["shouhinMSList.php","shouhinMSList_sql.php","shouhinDEL_sql.php","menu.php"],["G","C","S"]);
 	if($rtn !== true){
 			redirect_to_login($rtn);
@@ -47,9 +39,9 @@
 			<div class='container-fluid'>
 				<div style='padding:0 5px;'>
 					<input type='radio' class='btn-check' name='options' value='komi' autocomplete='off' v-model='upd_zei_kominuki' id='plus_mode'>
-					<label class='btn btn-outline-primary' style='font-size:1.2rem;' for='plus_mode'>税込入力</label>
+					<label class='btn btn-outline-primary' style='font-size:1.2rem;border-radius:0;' for='plus_mode'>税込入力</label>
 					<input type='radio' class='btn-check' name='options' value='nuki' autocomplete='off' v-model='upd_zei_kominuki' id='minus_mode'>
-					<label class='btn btn-outline-primary' style='font-size:1.2rem;' for='minus_mode'>税抜入力</label>
+					<label class='btn btn-outline-primary' style='font-size:1.2rem;border-radius:0;' for='minus_mode'>税抜入力</label>
 				</div>
 				<div style='position:fixed;right:10px;top:75px;width:120px;display:block;'>
 					<div>
@@ -97,7 +89,6 @@
 							<th class='th2' scope='col' class=''>内容量</th><!--d-none d-sm-table-cell-->
 							<th class='th2' scope='col' class=''>単位</th>
 							<th class='th2' scope='col'>削除</th>
-							<!--<th scope='col' class='' style='width:4rem;'></th>-->
 						</tr>
 					
 					</thead>
@@ -107,11 +98,13 @@
 							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' align='right'><!--変更前価格-->
 								￥{{Number(list.moto_kin).toLocaleString()}}
 							</td>
-							<td>
+							<td style='padding:10px 10px;'>
 								<!--<input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' class='form-check-input' style='transform:scale(1.4);' v-model='list.disp_rezi'>-->
-								<!--<div class="form-check form-switch"><input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' class='form-check-input' v-model='list.disp_rezi'></div>-->
-								<input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' class='btn-check' :id="`${list.shouhinCD}btn-check-outlined`" v-model='list.disp_rezi'  autocomplete="off">
-								<label class="btn btn-outline-primary" :for="`${list.shouhinCD}btn-check-outlined`">表示</label>
+								<div class="form-check form-switch">
+									<input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' class='form-check-input' v-model='list.disp_rezi' :id='`${list.shouhinCD}`'>
+									<label v-if='list.disp_rezi!==true' class='form-check-label' :for='`${list.shouhinCD}`'>非表示</label>
+									<label v-if='list.disp_rezi===true' class='form-check-label' :for='`${list.shouhinCD}`'>表示</label>
+								</div>
 							</td>
 						</tr>
 						<tr>
@@ -151,6 +144,9 @@
 					</tbody>
 				</table>
 			</div>
+			<template v-for='(list,index) in shouhinMS_BK_filter' :key='list.shouhinCD'>
+			</template><!--比較用の変更前商品マスタも呼び出ししないとソートされないため、ダミーで呼び出し-->
+
 		</main>
 		<footer class='common_footer'>
 			<button type='button' @click='chk_onoff()' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >{{btn_name}}</button>
@@ -225,8 +221,11 @@
 						let j=0 
 						for (let i = 0; i < shouhinMS.value.length; ++i) {
 							if(JSON.stringify(shouhinMS.value[i]) !== JSON.stringify(shouhinMS_BK.value[i])){
+								console_log(`chk on ${i} UNmatch`,"lv3")
 								order_panel[j] = shouhinMS.value[i]
 								j++
+							}else{
+								console_log(`chk on ${i} match`,"lv3")
 							}
 						}
 						return order_panel
