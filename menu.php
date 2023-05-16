@@ -209,7 +209,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     */
     echo $msg;
 
-    if(EXEC_MODE=="Trial"){
+    if(EXEC_MODE==="Trial"){
         echo "有効期限を過ぎると初期状態に戻りますので、ご自由に操作して下さい。<br>";
     }
 

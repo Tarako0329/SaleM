@@ -1,7 +1,9 @@
 <?php
 require "php_header.php";
 //log_writer2("index.php > \$_SESSION",$_SESSION,"lv3");
-if(EXEC_MODE=="Trial"){
+if(EXEC_MODE==="Trial"){
+    $emsg = print_r($_SERVER,true);
+    send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-INFO】トライアルユーザーが来たよ！",$emsg);
     header("HTTP/1.1 301 Moved Permanently");
     header("Location: menu.php");
     exit();

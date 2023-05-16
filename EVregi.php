@@ -604,7 +604,12 @@
 					if(e.target.innerHTML==="C"){
 						deposit.value = 0
 					}else if(e.target.innerHTML==="ちょうど"){
-						deposit.value = pay.value
+						if(Revised_pay.value!==""){
+							deposit.value = Revised_pay.value
+						}else{
+							deposit.value = pay.value
+						}
+						
 					}else{
 						deposit.value = Number(deposit.value.toString() + e.target.innerHTML.toString())
 					}
