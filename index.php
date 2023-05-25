@@ -23,11 +23,16 @@ if(isset($_SESSION["EMSG"])){
     //一度エラーを表示したらクリアする
     $_SESSION["EMSG"]="";
 }
+$mail="";
+if(!empty($_SESSION["MAIL"])){
+    $mail=$_SESSION["MAIL"];
+}elseif(EXEC_MODE==="Local"){
+    $mail="green.green.midori@green-island.mixh.jp";
+}
 
 ?>
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
@@ -38,12 +43,10 @@ if(isset($_SESSION["EMSG"])){
     <script src="script/index.js"></script>
     <TITLE><?php echo secho($title)." ようこそ";?></TITLE>
 </head>
- 
 <header  class="header-color common_header" style="flex-wrap:wrap">
     <div class="title" style="width: 100%;"><a href="index.php" ><?php echo secho($title);?></a></div>
     <div style="font-size:1rem;"> ようこそWEBREZへ</div>
 </header>
-
 <body class='common_body'>
     <div class="container">
         <div class="card card-container">
@@ -55,8 +58,8 @@ if(isset($_SESSION["EMSG"])){
             <?php echo $errmsg; ?>
             <form class="form-signin" id="form1" method="post" action="logincheck.php">
                 <span id="reauth-email" class="reauth-email"></span>
-                <input type="email" id="inputEmail" class="form-control" placeholder="Email address" name="LOGIN_EMAIL" required autofocus value='<?php echo (EXEC_MODE=="Local"?"green.green.midori@green-island.mixh.jp":""); ?>'>
-                <input type="password" id="inputPassword" class="form-control" name="LOGIN_PASS" placeholder="Password" required value='<?php echo (EXEC_MODE=="Local"?"000000":""); ?>'>
+                <input type="email" id="inputEmail" class="form-control" placeholder="Email address" name="LOGIN_EMAIL" required autofocus value='<?php echo $mail;// echo (EXEC_MODE=="Local"?"green.green.midori@green-island.mixh.jp":""); ?>'>
+                <input type="password" id="inputPassword" class="form-control" name="LOGIN_PASS" placeholder="Password" required value='<?php echo (EXEC_MODE=="Local"?"123456":""); ?>'>
                 <div id="remember" class="checkbox">
                     <label>
                         <input type="checkbox" name="AUTOLOGIN" checked> AUTOLOGIN 

@@ -7,13 +7,18 @@ require_once "functions.php";
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
+define("EXEC_MODE",$_ENV["EXEC_MODE"]);
+if(EXEC_MODE==="Local"){
+    ini_set('error_log', 'C:\xampp\htdocs\SaleM\php_error.log');
+}
+
+
 define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
 if(!empty($_SERVER['SCRIPT_URI'])){
     define("ROOT_URL",substr($_SERVER['SCRIPT_URI'],0,mb_strrpos($_SERVER['SCRIPT_URI'],"/")+1));
 }else{
     define("ROOT_URL","http://".MAIN_DOMAIN."/");
 }
-define("EXEC_MODE",$_ENV["EXEC_MODE"]);
 
 //DB接続関連
 define("DNS","mysql:host=".$_ENV["SV"].";dbname=".$_ENV["DBNAME"].";charset=utf8");
