@@ -8,3 +8,4 @@ backup
 xxx*
 *copy.php
 .ini
+/vendor/

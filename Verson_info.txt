@@ -17,19 +17,9 @@ ver2.99.0-031:to[bs5&Vue3CompApi]商品一覧BubFix-01
 ver2.99.0-032:to[bs5&Vue3CompApi]レジ画面BubFix・・・電卓の金額に割引を適用、無駄なInputタグをhiddenに
 ver2.99.0-033:to[bs5&Vue3CompApi]レジ画面BubFix・・・電卓の[ちょうど]ボタンに割引を適用
 ver2.99.0-034:to[bs5&Vue3CompApi]ｱｶｳﾝﾄ登録画面の対応・・・インボイスとリファクタリング
-ALTER TABLE `users` ADD `invoice_no` VARCHAR(20) NULL DEFAULT NULL COMMENT '課税事業者登録番号' AFTER `introducer_id`;
+	ALTER TABLE `users` ADD `invoice_no` VARCHAR(20) NULL DEFAULT NULL COMMENT '課税事業者登録番号' AFTER `introducer_id`;
+ver2.99.0-035:to[bs5&Vue3CompApi]インボイス対応・・・請求書作成中
 
-	$_SESSION["MAIL"] = $row[0]["mail"];
-	$_SESSION["moto_MAIL"] = $row[0]["mail"]; //メールアドレスを変更したかどうか比較するための元ｱﾄﾞﾚｽ
-	$_SESSION["QUESTION"] = $row[0]["question"];
-	$_SESSION["ANSWER"] = $row[0]["answer"];
-	$_SESSION["LOGINREZ"] = $row[0]["loginrez"];
-	$_SESSION["NAME"] = $row[0]["name"];
-	$_SESSION["YAGOU"] = $row[0]["yagou"];
-	$_SESSION["zip11"] = $row[0]["yubin"];
-	$_SESSION["addr11"] = $row[0]["address1"];
-	$_SESSION["ADD2"] = $row[0]["address2"];
-	$_SESSION["ADD3"] = $row[0]["address3"];
 
 
 ローカルからテスト環境へ
