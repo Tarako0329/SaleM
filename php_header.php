@@ -10,9 +10,9 @@ $dotenv->load();
 define("EXEC_MODE",$_ENV["EXEC_MODE"]);
 if(EXEC_MODE==="Local"){
     ini_set('error_log', 'C:\xampp\htdocs\SaleM\php_error.log');
-    define("HTTP","http://");
+    //define("HTTP","http://");
 }else{
-    define("HTTP","https://");
+    //define("HTTP","https://");
 }
 
 
