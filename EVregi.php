@@ -741,7 +741,7 @@
 				//領収書
 				const keishou = ref('様')
 				const oaite = ref('上')
-				const http = ref('<?php echo HTTP;?>')
+				
 				const QRout = () =>{
   				// 入力された文字列を取得
   				let userInput = rtURL.value + '&tp=1&k=' + keishou.value + '&s=' + oaite.value
