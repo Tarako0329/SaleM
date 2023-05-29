@@ -18,7 +18,8 @@ ver2.99.0-032:to[bs5&Vue3CompApi]レジ画面BubFix・・・電卓の金額に�
 ver2.99.0-033:to[bs5&Vue3CompApi]レジ画面BubFix・・・電卓の[ちょうど]ボタンに割引を適用
 ver2.99.0-034:to[bs5&Vue3CompApi]ｱｶｳﾝﾄ登録画面の対応・・・インボイスとリファクタリング
 	ALTER TABLE `users` ADD `invoice_no` VARCHAR(20) NULL DEFAULT NULL COMMENT '課税事業者登録番号' AFTER `introducer_id`;
-ver2.99.0-035:to[bs5&Vue3CompApi]インボイス対応・・・請求書作成中
+ver2.99.0-035:to[bs5&Vue3CompApi]インボイス対応・・・領収書作成中
+ver2.99.0-036:to[bs5&Vue3CompApi]インボイス対応・・・領収書作成
 
 
 

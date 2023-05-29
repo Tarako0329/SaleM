@@ -99,7 +99,17 @@
 	?>
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_EVregi.css?<?php echo $time; ?>' >
+	<!--QR生成API-->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.js"></script>
 	<TITLE><?php echo TITLE.' レジ';?></TITLE>
+	<style>
+		#qrOutput {
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-around;
+    padding: 20px;
+		}
+	</style>
 </head>
 
 <body>
@@ -167,7 +177,12 @@
 		<main class='common_body'>
 			<div class="container-fluid">
 				<template v-if='MSG!==""'>
-					<div v-bind:class='alert_status' role='alert' >{{MSG}}</div>
+					<div v-bind:class='alert_status' role='alert' >
+						{{MSG}}
+						<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#ryoushuu'>
+							領収書
+						</button>
+					</div>
 				</template>
 				<div class='accordion item_11 item_12' id="accordionExample">
 					<div v-if='chk_register_show==="register"' class='row' style='padding-top:5px;'>
@@ -381,6 +396,34 @@
 			</div>
 		</div>
 	</div>
+	<!--領収書-->
+	<div class='modal fade' id='ryoushuu' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
+		<div class='modal-dialog  modal-dialog-centered'>
+			<div class='modal-content' style='font-size: 2rem; font-weight: 600;'>
+				<div class='modal-header'>
+					<div class='modal-title' id='myModalLabel' style='text-align:center;width:100%;'>領収書発行</div>
+				</div>
+				<div class='modal-body text-center'>
+					<label for='oaite' class='form-label'>宛名：</label>
+					<input type='text' class='form-control' id='oaite' v-model='oaite' style='font-size: 2rem;'>
+					
+					<div style='padding:0;margin-top:10px;'>
+						<input type='radio' class='btn-check' name='keishou' value='御中' autocomplete='off' v-model='keishou' id='onchu'>
+						<label class='btn btn-outline-primary' for='onchu' style='border-radius:0;font-size: 2rem;'>御中</label>
+						<input type='radio' class='btn-check' name='keishou' value='様' autocomplete='off' v-model='keishou' id='sama' >
+						<label class='btn btn-outline-warning' for='sama' style='border-radius:0;font-size: 2rem;'>様</label>
+					</div>
+					<div id="qrOutput">
+					  <canvas id="qr"></canvas>
+					</div>
+				</div>
+				<div class='modal-footer'>
+					<button type='button' style='font-size: 2rem;' class='btn btn-primary' @click='QRout()'>QR表示</button>
+					<button type='button' style='font-size: 2rem;' class='btn btn-primary' >プレビュー</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	</div><!-- <div  id='register'> -->
 	<script>
@@ -527,6 +570,7 @@
 				const MSG = ref('')
 				const loader = ref(false)
 				const csrf = ref('<?php echo $token; ?>') 
+				const rtURL = ref('')
 
 				const chk_csrf = () =>{
 					console_log(`ajax_getset_token start`,'lv3')
@@ -571,7 +615,7 @@
 							MSG.value = response.data.MSG
 							alert_status.value[1]=response.data.status
 							csrf.value = response.data.csrf_create
-
+							rtURL.value = response.data.RyoushuURL
 							if(response.data.status==='alert-success'){
 								reset_order()
 								btn_changer('chk')
@@ -694,6 +738,34 @@
 					})
 				}
 
+				//領収書
+				const keishou = ref('様')
+				const oaite = ref('上')
+				const QRout = () =>{
+  				// 入力された文字列を取得
+  				let userInput = rtURL.value + '&tp=1&k=' + keishou.value + '&s=' + oaite.value
+					console.log(userInput)
+  				var query = userInput.split(' ').join('+');
+  				// QRコードの生成
+  				(function() {
+  				  var qr = new QRious({
+  				    element: document.getElementById('qr'),
+  				    // 入力した文字列でQRコード生成
+  				    value: query
+  					});
+  					qr.background = '#FFF'; //背景色
+  					qr.backgroundAlpha = 1; // 背景の透過率
+  					qr.foreground = '#1c1c1c'; //QRコード自体の色
+  					qr.foregroundAlpha = 1.0; //QRコード自体の透過率
+  					qr.level = 'L'; // QRコードの誤り訂正レベル
+  					qr.size = 240; // QRコードのサイズ
+    				// QRコードをflexboxで表示
+    				document.getElementById('qrOutput').style.display = 'flex';
+  				})();
+					// png出力用コード
+					var cvs = document.getElementById("qr");
+
+				}
 				//細かな表示設定など
 				const labels_address_check = ref()
 				const labels = computed(() =>{
@@ -772,6 +844,9 @@
 					feels_like,
 					icon,
 					Revised_pay,
+					keishou,
+					QRout,
+					oaite,
 				}
 			}
 		}).mount('#register');
@@ -790,7 +865,6 @@
 				e.preventDefault();
 			}
 		}
-
 	</script><!--js-->
 </body>
 

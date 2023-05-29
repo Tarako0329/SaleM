@@ -78,7 +78,7 @@ $result = $stmt->fetchAll();
 $ZeiGoukei = 0;
 foreach($result as $row){
 	$zeigaku = round($row["売上金額"] * $row["zeiritu"] / 100);
-	$ZeiKei .= "<tr><td>".$row["税率"]."対象</td><td style='text-align:right;'>￥".number_format($row["売上金額"])."-</td><td>消費税</td><td style='text-align:right;'>￥".number_format($zeigaku)."-</td></tr>\n";
+	$ZeiKei .= "<tr><td style='width:30%;'>".$row["税率"]."対象</td><td style='text-align:right;width:30%;'>￥".number_format($row["売上金額"])."-</td><td style='width:20%;'>消費税</td><td style='text-align:right;width:20%;'>￥".number_format($zeigaku)."-</td></tr>\n";
 	$ZeiGoukei += $zeigaku;
 }
 $ZeiGoukei = number_format($ZeiGoukei);
@@ -90,39 +90,51 @@ $html = <<< EOM
 	<head>
 		<meta charset="utf-8">
 		<style>
-		html{
-			font-family:ipagp;
-		}
-		div{
-			border:0;
-			width:100%;
-			text-align: center;
-			padding:5px auto;
-		}
-		p{
-			margin-top:5px;
-			margin-bottom:0px;
-		}
-		table{
-			margin: 0 auto;
-			border:solid;
-			border-collapse: collapse;
-		}
-		th,td{
-			border:solid;
-			border-collapse: collapse;
-			padding:auto 5px;
-		}
-		.meisaival{
-			width:50px;
-			min-width:50px;
-			text-align: right;
-			padding:auto 5px;
-		}
-		.title{
-			font-size:30px;
-			font-weight: bolder;
-		}
+			html{
+				font-family:ipagp;
+			}
+			div{
+				border:0;
+				width:100%;
+				text-align: center;
+				padding:5px auto;
+			}
+			p{
+				margin-top:5px;
+				margin-bottom:0px;
+			}
+			table{
+				margin: 0 auto;
+				border:solid;
+				border-collapse: collapse;
+			}
+			th{
+				border-bottom:solid;
+				border-right:solid 0.5px;
+				border-collapse: collapse;
+				padding:auto 5px;
+			}
+			td{
+				border:solid 0.5px;
+				border-collapse: collapse;
+				padding:auto 5px;
+			}
+			.meisaival{
+				width:50px;
+				min-width:50px;
+				text-align: right;
+				padding:auto 5px;
+			}
+			.title{
+				font-size:30px;
+				font-weight: bolder;
+				border-top: 4px solid;
+				border-bottom: 4px solid;
+			}
+			.Seikyu{
+				font-size:25px;
+				font-weight: bolder;
+			}
 		</style>
 	</head>
 	<body>
@@ -130,28 +142,32 @@ $html = <<< EOM
 			powered by <span style='font-family:Kranky;font-weight: bolder;'>$sysname</span>
 		</div>
 		<div style='height:70px;'>
-			<p class='title'>＜＜領 収 書＞＞</p>
+			<span class='title'> - 領 収 書 - </span>
+		</div>
+		<div style='text-align:left;font-size:25px;'>
+			<span style='border-bottom:solid;'>お客様　御中 or 様</span>
 		</div>
 		<div style='text-align:right;'>
 			<p style='font-size:25px;'>$from</p>
 			<p>$invoice</p>
 			<p>$add</p>
 			<p>取引日時[$insDT]</p>
+			<p>伝票番号[$UriNo]</p>
 		</div>
-		<div style='display:flex;'>
+		<div class='Seikyu' style='display:flex;'>
 			<table style='width:100%;'>
 				<tr>
-				<td>税込合計金額</td><td style='text-align:right;'>￥$Goukei-</td>
-				<td>内消費税</td><td style='text-align:right;'>￥$ZeiGoukei-</td>
+				<td style='width:30%;'>税込合計金額</td><td style='text-align:right;width:30%;'>￥$Goukei-</td>
+				<td style='width:20%;'>内消費税</td><td style='text-align:right;width:20%;'>￥$ZeiGoukei-</td>
 				</tr>
 			</table>
 		</div>
 			<table style='width:100%;'>
 				$ZeiKei
 			</table>
-		<div>
-			内　訳
-			<table>
+		<div style='margin-top:15px;'>
+			<span style='font-size:20px;'>【 内　訳 】</span>
+			<table style='width:100%;'>
 				<thead>
 					<tr>
 					<th>商品名</th>
@@ -165,8 +181,8 @@ $html = <<< EOM
 				</tbody>
 			</table>
 		</div>
-		<div>
-			※は軽減税率８％対象
+		<div style='text-align:left;'>
+			※：軽減税率８％対象
 		</div>
 		
 	</body>

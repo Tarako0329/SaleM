@@ -244,7 +244,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         }
     }else if(EXEC_MODE=="Test" || EXEC_MODE=="Local"){
         if($plan==0){
-            $array2 = ['本契約'=>[PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku'],'機能テスト'=>['sample.php','kinoutest']];
+            $array2 = ['本契約'=>[PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku'],'機能テスト'=>['sample.php?a=a','kinoutest']];
         }else{
             $array2 = ['契約解除へ'=>['sub_cancel.php','kaijo'],'機能テスト'=>['sample.php','kinoutest']];
         }
