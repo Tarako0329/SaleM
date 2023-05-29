@@ -741,9 +741,10 @@
 				//領収書
 				const keishou = ref('様')
 				const oaite = ref('上')
+				const http = ref('<?php echo HTTP;?>')
 				const QRout = () =>{
   				// 入力された文字列を取得
-  				let userInput = rtURL.value + '&tp=1&k=' + keishou.value + '&s=' + oaite.value
+  				let userInput = http.value + rtURL.value + '&tp=1&k=' + keishou.value + '&s=' + oaite.value
 					console.log(userInput)
   				var query = userInput.split(' ').join('+');
   				// QRコードの生成
@@ -766,7 +767,8 @@
 					var cvs = document.getElementById("qr");
 				}
 				const prv = () =>{
-					location.href = rtURL.value + '&tp=1&k=' + keishou.value + '&s=' + oaite.value
+					//location.href = 'https://' + rtURL.value + '&tp=1&k=' + keishou.value + '&s=' + oaite.value
+					window.open(http.value + rtURL.value + '&tp=1&k=' + keishou.value + '&s=' + oaite.value, '_blank')
 				}
 				//細かな表示設定など
 				const labels_address_check = ref()

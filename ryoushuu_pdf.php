@@ -31,6 +31,7 @@ $id=rot13decrypt2($_GET["i"]);
 $UriNo=rot13decrypt2($_GET["u"]);
 $Atena = (!empty($_GET["s"])?$_GET["s"] . " " . $_GET["k"]:"");
 $type = ($_GET["tp"]==="1"?"領　収　書":"請　求　書");
+$filename = ($_GET["tp"]==="1"?"Ryoushusho":"Seikyusho");
 
 //$id=2;
 //$UriNo="206";
@@ -200,5 +201,5 @@ $options->set(array('isRemoteEnabled' => false));
 $dompdf->setOptions($options);
 $dompdf->setPaper('A4', 'portrait');
 $dompdf->render();
-$dompdf->stream(".pdf", array("Attachment" => 0));
+$dompdf->stream($filename, array('Attachment' => 0));
 ?>
