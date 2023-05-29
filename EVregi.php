@@ -419,7 +419,7 @@
 				</div>
 				<div class='modal-footer'>
 					<button type='button' style='font-size: 2rem;' class='btn btn-primary' @click='QRout()'>QR表示</button>
-					<button type='button' style='font-size: 2rem;' class='btn btn-primary' >プレビュー</button>
+					<button type='button' style='font-size: 2rem;' class='btn btn-primary' @click='prv()'>プレビュー</button>
 				</div>
 			</div>
 		</div>
@@ -764,7 +764,9 @@
   				})();
 					// png出力用コード
 					var cvs = document.getElementById("qr");
-
+				}
+				const prv = () =>{
+					location.href = rtURL.value + '&tp=1&k=' + keishou.value + '&s=' + oaite.value
 				}
 				//細かな表示設定など
 				const labels_address_check = ref()
@@ -847,6 +849,7 @@
 					keishou,
 					QRout,
 					oaite,
+					prv,
 				}
 			}
 		}).mount('#register');
