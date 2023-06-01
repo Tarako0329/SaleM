@@ -29,7 +29,7 @@ if(empty($_GET)){
 }
 $id=rot13decrypt2($_GET["i"]);
 $UriNo=rot13decrypt2($_GET["u"]);
-$Atena = (!empty($_GET["s"])?$_GET["s"] . " " . $_GET["k"]:"");
+$Atena = (!empty($_GET["s"])?$_GET["s"] . "　　" . $_GET["k"]:"");
 $type = ($_GET["tp"]==="1"?"領　収　書":"請　求　書");
 $filename = ($_GET["tp"]==="1"?"Ryoushusho":"Seikyusho");
 
@@ -48,7 +48,7 @@ $invoice = $userinfo["invoice_no"];
 $add = $userinfo["address1"].$userinfo["address2"].$userinfo["address3"];
 
 //売上明細の取得
-$sql="select *,ZeiMS.hyoujimei as 税率desp,ZeiMS.zeiritu as 税率 from UriageData Uri inner join ZeiMS on Uri.zeiKBN = ZeiMS.zeiKBN where uid = ? and UriageNO like ?";
+$sql="select *,ZeiMS.hyoujimei as 税率desp,ZeiMS.zeiritu as 税率 from UriageData Uri inner join ZeiMS on Uri.zeiKBN = ZeiMS.zeiKBN where uid = ? and UriageNO like ? and zei = 0 order by Uri.zeiKBN,Uri.ShouhinCD";
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $id, PDO::PARAM_INT);
 $stmt->bindValue(2, $UriNo, PDO::PARAM_STR);
@@ -72,7 +72,7 @@ foreach($result as $row){
 
 
 //税率ごとの合計
-$sql="select ZeiMS.hyoujimei as 税率,ZeiMS.zeiritu, sum(UriageKin) as 売上金額 from UriageData Uri inner join ZeiMS on Uri.zeiKBN = ZeiMS.zeiKBN where uid = ? and UriageNO like ? group by ZeiMS.hyoujimei,ZeiMS.zeiritu order by ZeiMS.zeiritu desc";
+$sql="select ZeiMS.hyoujimei as 税率,ZeiMS.zeiKBN, sum(UriageKin) as 売上金額, sum(zei) as 消費税額 from UriageData Uri inner join ZeiMS on Uri.zeiKBN = ZeiMS.zeiKBN where uid = ? and UriageNO like ? group by ZeiMS.hyoujimei,ZeiMS.zeiKBN order by ZeiMS.zeiKBN";
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $id, PDO::PARAM_INT);
 $stmt->bindValue(2, $UriNo, PDO::PARAM_STR);
@@ -80,7 +80,7 @@ $stmt->execute();
 $result = $stmt->fetchAll();
 $ZeiGoukei = 0;
 foreach($result as $row){
-	$zeigaku = round($row["売上金額"] * $row["zeiritu"] / 100);
+	$zeigaku = $row["消費税額"] ;
 	$ZeiKei .= "<tr><td style='width:30%;'>".$row["税率"]."対象</td><td style='text-align:right;width:30%;'>￥".number_format($row["売上金額"])."-</td><td style='width:20%;'>消費税</td><td style='text-align:right;width:20%;'>￥".number_format($zeigaku)."-</td></tr>\n";
 	$ZeiGoukei += $zeigaku;
 }

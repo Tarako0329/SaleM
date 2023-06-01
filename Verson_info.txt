@@ -20,6 +20,10 @@ ver2.99.0-034:to[bs5&Vue3CompApi]ｱｶｳﾝﾄ登録画面の対応・・・�
 	ALTER TABLE `users` ADD `invoice_no` VARCHAR(20) NULL DEFAULT NULL COMMENT '課税事業者登録番号' AFTER `introducer_id`;
 ver2.99.0-035:to[bs5&Vue3CompApi]インボイス対応・・・領収書作成中
 ver2.99.0-036:to[bs5&Vue3CompApi]インボイス対応・・・領収書作成
+ver2.99.0-037:to[bs5&Vue3CompApi]インボイス対応・・・レジ画面などの端数調整
+	ALTER TABLE `uriagedata` CHANGE `su` `su` INT(11) NOT NULL DEFAULT '0' COMMENT '数量';
+	ALTER TABLE `uriagedata` CHANGE `tanka` `tanka` INT(11) NOT NULL DEFAULT '0' COMMENT '単価', CHANGE `UriageKin` `UriageKin` INT(11) NOT NULL DEFAULT '0' COMMENT '売上金額', CHANGE `zei` `zei` INT(11) NOT NULL DEFAULT '0' COMMENT '消費税';
+	ALTER TABLE `uriagedata` CHANGE `ShouhinCD` `ShouhinCD` VARCHAR(7) NOT NULL COMMENT '商品CD';
 
 
 

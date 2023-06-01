@@ -202,7 +202,8 @@
 											<label for='CHOUSEI_GAKU' class='form-label'>変更後お会計額</label>
 											<input type='number' v-model='Revised_pay' class='form-control order tanka' 
 											style='font-size:2.2rem;width:100%;border:solid;border-top:none;border-right:none;border-left:none;' name='CHOUSEI_GAKU' id='CHOUSEI_GAKU'>
-										<br>
+											<br>
+											<button type='button' @click='Revised()'>決　定</button>
 										</div>
 										<div class='col-1' ></div>
 									</div>
@@ -234,8 +235,6 @@
 							<input type='hidden' :name ="`ORDERS[${index}][GENKA_TANKA]`" :value = "list.genka_tanka">
 							<input type='hidden' v-model='list.ordercounter' :name ="`ORDERS[${index}][SU]`" :id="`suryou_${list.shouhinCD}`">
 							<div class ='ordered' style='font-size:2.5rem;padding-top:5px;'>
-									<!--￥<input type='number' readonly='readonly' class='order tanka' :value="list.zeikomigaku">
-									× <input type='number' v-model='list.ordercounter' readonly='readonly' :name ="`ORDERS[${index}][SU]`" :id="`suryou_${list.shouhinCD}`" class='order su' style='display:inline;'>-->
 									￥{{list.zeikomigaku.toLocaleString()}}
 									× {{list.ordercounter.toLocaleString()}}
 							</div>
@@ -275,6 +274,14 @@
 		<input type='hidden' name='temp' :value='temp'>
 		<input type='hidden' name='feels_like' :value='feels_like'>
 		<input type='hidden' name='icon' :value='icon'>
+		<template v-for='(list,index) in hontai' :key='list.税率'>
+		<input type='hidden' :name ="`ZeiKbnSummary[${index}][ZEIKBN]`" :value = "list.税区分">
+		<input type='hidden' :name ="`ZeiKbnSummary[${index}][ZEIKBNMEI]`" :value = "list.税区分名">
+		<input type='hidden' :name ="`ZeiKbnSummary[${index}][ZEIRITU]`" :value = "list.税率">
+			<input type='hidden' :name ="`ZeiKbnSummary[${index}][CHOUSEIGAKU]`" :value = "list.調整額">
+			<input type='hidden' :name ="`ZeiKbnSummary[${index}][HONTAIGAKU]`" :value = "list.本体額">
+			<input type='hidden' :name ="`ZeiKbnSummary[${index}][SHOUHIZEI]`" :value = "list.消費税">
+		</template>
 	</form>
 	<div class="loader-wrap" v-show='loader'>
 		<div class="loader">Loading...</div>
@@ -427,7 +434,7 @@
 
 	</div><!-- <div  id='register'> -->
 	<script>
-		const { createApp, ref, onMounted, computed, VueCookies } = Vue;
+		const { createApp, ref, onMounted, computed, VueCookies, watch } = Vue;
 		createApp({
 			setup(){
 				//スクロールスムース
@@ -530,6 +537,7 @@
 
 				//オーダー処理関連
 				const pay = ref(0)		//会計税込金額
+				const hontai = ref([])
 				const Revised_pay = ref('')
 				const kaikei_zei = ref(0)		//会計消費税
 				const chk_register_show = ref('chk')		//確認・登録ボタンの表示
@@ -541,29 +549,90 @@
 				}
 				const pm = ref('plus')
 				const ordercounter = (e) => {//注文増減ボタン
-					//console_log(e.target.value,'lv3')
+					//console_log(e.target.disabled,'lv3')
 					//console_log(shouhinMS_filter.value[e.target.value],'lv3')
+					e.target.disabled = true	//ボタン連打対応：処理が終わるまでボタンを無効にする
 					let index = e.target.value
-					
 					if(pm.value==="plus"){
 						shouhinMS_filter.value[index].ordercounter ++
-						pay.value = Number(pay.value) + Number(shouhinMS_filter.value[index].tanka) + Number(shouhinMS_filter.value[index].tanka_zei)
-						kaikei_zei.value = Number(kaikei_zei.value) + Number(shouhinMS_filter.value[index].tanka_zei)
+						//税率ごとに本体額を計上
+						if(pay.value===0){
+							hontai.value.push({'税区分':Number(shouhinMS_filter.value[index].zeiKBN) ,'税区分名':shouhinMS_filter.value[index].hyoujimei ,'税率':Number(shouhinMS_filter.value[index].zeiritu) ,'本体額':Number(shouhinMS_filter.value[index].tanka),'調整額':0,'消費税':0})
+						}else{
+							let counted=false
+							for(const row of hontai.value){
+								if(row['税区分']===Number(shouhinMS_filter.value[index].zeiKBN)){
+									row['本体額'] = row['本体額'] + Number(shouhinMS_filter.value[index].tanka)
+									counted = true
+									break
+								}
+							}
+							if(counted===false){
+								hontai.value.push({'税区分':Number(shouhinMS_filter.value[index].zeiKBN) ,'税区分名':shouhinMS_filter.value[index].hyoujimei ,'税率':Number(shouhinMS_filter.value[index].zeiritu) ,'本体額':Number(shouhinMS_filter.value[index].tanka),'調整額':0,'消費税':0})
+							}
+						}
 					}else if(pm.value==="minus"){
 						if(shouhinMS_filter.value[index].ordercounter - 1 < 0){
 							alert("注文数は０以下にはできません。")
+							e.target.disabled = false	//ボタン連打対応：処理が終わったらボタンを有効に戻す
 							return 0
+						}else{
+							shouhinMS_filter.value[index].ordercounter --
+							for(const row of hontai.value){
+								if(row['税区分']===Number(shouhinMS_filter.value[index].zeiKBN)){
+									row['本体額'] = row['本体額'] - Number(shouhinMS_filter.value[index].tanka)
+									break
+								}
+							}
 						}
-						shouhinMS_filter.value[index].ordercounter --
-						pay.value = Number(pay.value) - Number(shouhinMS_filter.value[index].tanka) - Number(shouhinMS_filter.value[index].tanka_zei)
-						kaikei_zei.value = Number(kaikei_zei.value) - Number(shouhinMS_filter.value[index].tanka_zei)
 					}
+					
+					calculation()
+					e.target.disabled = false	//ボタン連打対応：処理が終わったらボタンを有効に戻す
 					return 0
 				}
+				const calculation = () =>{
+					//税率ごとの本体額総合計から消費税を計算する(インボイス対応)
+					pay.value=0
+					kaikei_zei.value=0
+					for(const row of hontai.value){
+						row["消費税"] = Math.round((Number(row['本体額']) + Number(row['調整額'])) * (Number(row['税率']))/100)	
+						pay.value = pay.value + Number(row['本体額']) + Number(row['調整額']) + Number(row['消費税'])		//税込額
+						kaikei_zei.value = kaikei_zei.value + Number(row['消費税']) 	//内消費税
+					}
+				}
+				const Revised = () => {
+					if(Revised_pay.value!==""){//Revised_pay.value:修正後税込金額
+						//let sagaku = Revised_pay.value - pay.value 
+						let sagaku_zan = Revised_pay.value
+						let wariai = 0
+						let Rev_hontai = 0
+						for(const row of hontai.value){
+							//税区分ごとに請求額の割合を算出し、調整額に掛ける
+							wariai = (row['本体額']+row['消費税']) / (pay.value)
+							/*
+							console.log(`wariai:${wariai}`)
+							console.log(`目標額:${Math.round(Revised_pay.value * wariai)}`)
+							console.log(`現在額:${Math.round(pay.value * wariai)}`)
+							*/
+							Rev_hontai = Math.round((Revised_pay.value * wariai / ((100+row['税率'])/100))-(row['本体額']))	//割引税抜本体
+							row["調整額"] = Rev_hontai
+							sagaku_zan = sagaku_zan - Math.round((Number(row['本体額']) + Number(row['調整額'])) * (Number(100)+Number(row['税率']))/100)
+						}
+						if(sagaku_zan !== 0){
+							console.log(sagaku_zan)
+							//hontai.value[0]["調整額"] += sagaku_zan
+						}
+						calculation()
+					}
+          
+        }
+				
 				const reset_order = () => {//オーダーリセット
 					shouhinMS_filter.value.forEach((list)=>list.ordercounter=0)
 					pay.value = 0
 					kaikei_zei.value = 0
+					hontai.value = []
 				}
 				
 				const alert_status = ref(['alert'])
@@ -852,6 +921,8 @@
 					QRout,
 					oaite,
 					prv,
+					hontai,
+					Revised,
 				}
 			}
 		}).mount('#register');

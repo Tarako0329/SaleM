@@ -17,31 +17,6 @@ $msg = array(
 //cookie:postのチェックのみ
 
 require "php_header.php";
-
-function shutdown(){
-  // シャットダウン関数
-  // スクリプトの処理が完了する前に
-  // ここで何らかの操作をすることができます
-	$lastError = error_get_last();
-	
-	if($lastError!==null){
-		log_writer("ajax_EVregi_sql.php","shutdown");
-		log_writer("ajax_EVregi_sql.php",$lastError);
-		if(empty($GLOBALS["msg"])===true){
-			$emsg = $GLOBALS["emsg"]."/UriNO::".$GLOBALS["UriageNO"]."　uid::".$_SESSION['user_id']." ERROR_MESSAGE::予期せぬエラー".$lastError['message'];
-			send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
-		
-			$token = csrf_create();
-			$msg = array(
-				"MSG" => "登録が失敗しました。再度実行してもエラーとなる場合は、ご迷惑をおかけしますが復旧までお待ちください。<br>".$lastError['message']
-				,"status" => "alert-danger"
-				,"csrf_create" => $token
-			);
-			header('Content-type: application/json');
-			echo json_encode($msg, JSON_UNESCAPED_UNICODE);
-		}
-	}
-}
 register_shutdown_function('shutdown');
 
 
@@ -101,6 +76,7 @@ if(filter_input(INPUT_POST,"EV")<>""){
 //売上登録
 //$logfilename="sid_".$_SESSION['user_id'].".log";
 $array = $_POST["ORDERS"];
+$ZeiKbnSummary = $_POST["ZeiKbnSummary"];
 $sqlstr = "";
 //売上番号の取得
 $sqlstr = "select max(UriageNO) as UriageNO from UriageData where uid=?";
@@ -140,13 +116,14 @@ try{
 		$stmt->bindValue(4,  $time, PDO::PARAM_STR);
 		$stmt->bindValue(5,  $EV, PDO::PARAM_INT);
 		$stmt->bindValue(6,  $KOKYAKU, PDO::PARAM_STR);
-		$stmt->bindValue(7,  $row["CD"], PDO::PARAM_INT);                       //商品CD
+		$stmt->bindValue(7,  $row["CD"], PDO::PARAM_STR);                       //商品CD
 		$stmt->bindValue(8,  $row["NM"], PDO::PARAM_STR);                       //商品名
 		$stmt->bindValue(9,  $row["SU"], PDO::PARAM_INT);                       //数量
 		$stmt->bindValue(10, $row["UTISU"], PDO::PARAM_INT);                    //内数
 		$stmt->bindValue(11, $row["TANKA"], PDO::PARAM_INT);                    //単価
 		$stmt->bindValue(12, ($row["SU"] * $row["TANKA"]), PDO::PARAM_INT);     //数量×単価
-		$stmt->bindValue(13, ($row["SU"] * $row["ZEI"]), PDO::PARAM_INT);       //数量×単価税
+		//$stmt->bindValue(13, ($row["SU"] * $row["ZEI"]), PDO::PARAM_INT);     //数量×単価税
+		$stmt->bindValue(13, 0, PDO::PARAM_INT);       													//インボイス対応・消費税は合計から算出
 		$stmt->bindValue(14, $row["ZEIKBN"], PDO::PARAM_INT);                   //税区分
 		$stmt->bindValue(15, $row["GENKA_TANKA"], PDO::PARAM_INT);              //原価単価
 		
@@ -163,7 +140,69 @@ try{
 			break;
 		}
 	}
+
+	//インボイス対応（消費税レコードと調整レコードの追加）
+	$sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,UriageKin,zei,zeiKBN)";
+	$sqlstr_val = " values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:UriageKin,:zei,:zeiKBN)";
+
+	foreach($ZeiKbnSummary as $row){
+		$sqllog = $sqlstr." values(".$_SESSION['user_id'].",".$UriageNO.",'".$KEIJOUBI."','".$time."','".$EV."','".$KOKYAKU."','Z".substr("000000".$row["ZEIKBN"],-6)."','".$row["ZEIKBNMEI"]."','0','".$row["SHOUHIZEI"]."','".$row["ZEIKBN"]."')";
+		$stmt = $pdo_h->prepare($sqlstr.$sqlstr_val);
+		
+		$stmt->bindValue("uid",  $_SESSION['user_id'], PDO::PARAM_INT);
+		$stmt->bindValue("UriageNO",  $UriageNO, PDO::PARAM_INT);
+		$stmt->bindValue("UriDate",  $KEIJOUBI, PDO::PARAM_STR);
+		$stmt->bindValue("insDatetime",  $time, PDO::PARAM_STR);
+		$stmt->bindValue("Event",  $EV, PDO::PARAM_INT);
+		$stmt->bindValue("TokuisakiNM",  $KOKYAKU, PDO::PARAM_STR);
+		$stmt->bindValue("ShouhinCD",  "Z".substr("000000".$row["ZEIKBN"],-6), PDO::PARAM_STR);	//商品CD["Z" + 0埋 + 税区分] Z=税
+		$stmt->bindValue("ShouhinNM",  $row["ZEIKBNMEI"], PDO::PARAM_STR);                      //商品名
+		$stmt->bindValue("UriageKin",  0, PDO::PARAM_INT);                      								//売上０固定
+		$stmt->bindValue("zei", $row["SHOUHIZEI"], PDO::PARAM_INT);       											//消費税
+		$stmt->bindValue("zeiKBN", $row["ZEIKBN"], PDO::PARAM_INT);                   					//税区分
+		$flg=$stmt->execute();
+		
+		if($flg){
+			$ins_cnt++;
+			$emsg="売上消費税のINSERTは正常終了\n";
+			file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,success,".$sqllog."\n",FILE_APPEND);
+		}else{
+			$emsg="売上消費税のINSERTでエラー";
+			file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,failed,".$sqllog."\n",FILE_APPEND);
+			$E_Flg=1;
+			break;
+		}
+		if($row["CHOUSEIGAKU"]!=0){
+			$sqllog = $sqlstr." values(".$_SESSION['user_id'].",".$UriageNO.",'".$KEIJOUBI."','".$time."','".$EV."','".$KOKYAKU."','C".substr("000000".$row["ZEIKBN"],-6)."','".$row["ZEIKBNMEI"]."本体調整額','".$row["CHOUSEIGAKU"]."','0','".$row["ZEIKBN"]."')";
+			$stmt = $pdo_h->prepare($sqlstr.$sqlstr_val);
+			
+			$stmt->bindValue("uid",  $_SESSION['user_id'], PDO::PARAM_INT);
+			$stmt->bindValue("UriageNO",  $UriageNO, PDO::PARAM_INT);
+			$stmt->bindValue("UriDate",  $KEIJOUBI, PDO::PARAM_STR);
+			$stmt->bindValue("insDatetime",  $time, PDO::PARAM_STR);
+			$stmt->bindValue("Event",  $EV, PDO::PARAM_INT);
+			$stmt->bindValue("TokuisakiNM",  $KOKYAKU, PDO::PARAM_STR);
+			$stmt->bindValue("ShouhinCD",  "C".substr("000000".$row["ZEIKBN"],-6), PDO::PARAM_STR);	//商品CD["C" + 0埋 + 税区分] C=調整
+			$stmt->bindValue("ShouhinNM",  $row["ZEIKBNMEI"]."本体調整額", PDO::PARAM_STR);          //商品名
+			$stmt->bindValue("UriageKin",  $row["CHOUSEIGAKU"], PDO::PARAM_INT);                    //売上本体調整額
+			$stmt->bindValue("zei", 0, PDO::PARAM_INT);       																			//消費税
+			$stmt->bindValue("zeiKBN", $row["ZEIKBN"], PDO::PARAM_INT);                   					//税区分
+			$flg=$stmt->execute();
+			
+			if($flg){
+				$ins_cnt++;
+				$emsg="調整額のINSERTは正常終了\n";
+				file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,success,".$sqllog."\n",FILE_APPEND);
+			}else{
+				$emsg="調整額のINSERTでエラー";
+				file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,failed,".$sqllog."\n",FILE_APPEND);
+				$E_Flg=1;
+				break;
+			}
 	
+		}
+	}
+	/*インボイス対応でクライアント側で調整額を算出するよう変更
 	if($_POST["CHOUSEI_GAKU"]>0 && $E_Flg!=1){
 		$emsg=$emsg."/割引割増処理開始\n";
 		$sqlstr="SELECT ZeiMS.zeiKBN as ZEIKBN ,1+ZeiMS.zeiritu/100 as zei_per ,sum(UriageKin+Zei) as uriage,T.total ";
@@ -183,20 +222,10 @@ try{
 		$i=0;
 		foreach($result as $row){
 			$chouseigaku = $_POST["CHOUSEI_GAKU"] - $row["total"];
-			/*
-			echo "売上合計:".$row["total"]."<br>";
-			echo "調整売上:".$_POST["CHOUSEI_GAKU"]."<br>";
-			
-			echo $chouseigaku."<br>";
-			*/
 			$chousei_hon = bcdiv(bcmul($chouseigaku , bcdiv($row["uriage"] , $row["total"],5),5),$row["zei_per"],0);//調整額×税率割合÷消費税率
 			$chousei_zei = bcsub(bcmul($chouseigaku , bcdiv($row["uriage"] , $row["total"],5),5) ,$chousei_hon,0);
 			
 			$goukei=$goukei+$chousei_hon+$chousei_zei;
-			/*
-			echo $chousei_hon."<br>";
-			echo $chousei_zei."<br>";
-			*/
 			$sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)";
 			$sqllog = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime) ";
 			$sqllog = $sqllog."values('".$_SESSION['user_id']."','".$UriageNO."','".$_POST["KEIJOUBI"]."','".$time."','".$_POST["EV"]."','".$_POST["KOKYAKU"]."','".(9999-$i)."','割引・割増:税率".(($row["zei_per"]-1)*100)."%分',0,0,0,'".$chousei_hon."','".$chousei_zei."','".$row["ZEIKBN"]."',0)";
@@ -263,7 +292,7 @@ try{
 		   
 		}
 	}
-	
+	*/
 	//位置情報、天気情報の付与（uid,売上No,緯度、経度、住所、天気、気温、体感温度、天気アイコンping,無効FLG,insdate,update）
 	if(empty($_POST["nonadd"]) && $ins_cnt>0){
 		$emsg=$emsg."/位置情報、天気情報　処理開始\n";
@@ -368,6 +397,30 @@ $pdo_h = null;
 exit();
 
 
+function shutdown(){
+  // シャットダウン関数
+  // スクリプトの処理が完了する前に
+  // ここで何らかの操作をすることができます
+	$lastError = error_get_last();
+	
+	if($lastError!==null){
+		log_writer("ajax_EVregi_sql.php","shutdown");
+		log_writer("ajax_EVregi_sql.php",$lastError);
+		if(empty($GLOBALS["msg"])===true){
+			$emsg = $GLOBALS["emsg"]."/UriNO::".$GLOBALS["UriageNO"]."　uid::".$_SESSION['user_id']." ERROR_MESSAGE::予期せぬエラー".$lastError['message'];
+			send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
+		
+			$token = csrf_create();
+			$msg = array(
+				"MSG" => "登録が失敗しました。再度実行してもエラーとなる場合は、ご迷惑をおかけしますが復旧までお待ちください。<br>".$lastError['message']
+				,"status" => "alert-danger"
+				,"csrf_create" => $token
+			);
+			header('Content-type: application/json');
+			echo json_encode($msg, JSON_UNESCAPED_UNICODE);
+		}
+	}
+}
 ?>
 
 
