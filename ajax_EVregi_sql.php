@@ -156,7 +156,7 @@ try{
 		$stmt->bindValue("Event",  $EV, PDO::PARAM_INT);
 		$stmt->bindValue("TokuisakiNM",  $KOKYAKU, PDO::PARAM_STR);
 		$stmt->bindValue("ShouhinCD",  "Z".substr("000000".$row["ZEIKBN"],-6), PDO::PARAM_STR);	//商品CD["Z" + 0埋 + 税区分] Z=税
-		$stmt->bindValue("ShouhinNM",  $row["ZEIKBNMEI"], PDO::PARAM_STR);                      //商品名
+		$stmt->bindValue("ShouhinNM",  ($row["ZEIRITU"]<>0?$row["ZEIKBNMEI"]." 消費税額":$row["ZEIKBNMEI"]), PDO::PARAM_STR);                      //商品名
 		$stmt->bindValue("UriageKin",  0, PDO::PARAM_INT);                      								//売上０固定
 		$stmt->bindValue("zei", $row["SHOUHIZEI"], PDO::PARAM_INT);       											//消費税
 		$stmt->bindValue("zeiKBN", $row["ZEIKBN"], PDO::PARAM_INT);                   					//税区分

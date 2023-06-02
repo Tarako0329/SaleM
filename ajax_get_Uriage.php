@@ -7,11 +7,13 @@
 *   list_type   ：
 *   serch_word  ：
 */
+require "php_header.php";
+/*
 date_default_timezone_set('Asia/Tokyo');
 session_start();
 require "functions.php";
 require "./vendor/autoload.php";
-
+*/
 $pass=dirname(__FILE__);
 
 //.envの取得
@@ -33,6 +35,12 @@ if(!empty($_POST)){
 	$stmt->bindValue(2, (string)date("Y-m-d"), PDO::PARAM_STR);
 	$stmt->execute();
 	$UriageList = $stmt->fetchAll();
+	
+	$i=0;
+	foreach($UriageList as $row){
+		$UriageList[$i]["URL"] = ROOT_URL."ryoushuu_pdf.php?u=".rot13encrypt2($row["UriageNO"])."&i=".rot13encrypt2($_POST["user_id"]);
+		$i++;
+	}
 }else{
 	echo "不正アクセス";
 	exit;

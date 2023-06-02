@@ -179,7 +179,7 @@
 				<template v-if='MSG!==""'>
 					<div v-bind:class='alert_status' role='alert' >
 						{{MSG}}
-						<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#ryoushuu'>
+						<button type='button' class='btn btn-primary' @click='open_R()'> <!-- data-bs-toggle='modal' data-bs-target='#ryoushuu'-->
 							領収書
 						</button>
 					</div>
@@ -267,21 +267,23 @@
 				</div>
 			</div>
 		</footer>
-		<input type='hidden' name='lat' :value='vlat'>
-		<input type='hidden' name='lon' :value='vlon'>
-		<input type='hidden' name='weather' :value='weather'>
-		<input type='hidden' name='description' :value='description'>
-		<input type='hidden' name='temp' :value='temp'>
-		<input type='hidden' name='feels_like' :value='feels_like'>
-		<input type='hidden' name='icon' :value='icon'>
-		<template v-for='(list,index) in hontai' :key='list.税率'>
-		<input type='hidden' :name ="`ZeiKbnSummary[${index}][ZEIKBN]`" :value = "list.税区分">
-		<input type='hidden' :name ="`ZeiKbnSummary[${index}][ZEIKBNMEI]`" :value = "list.税区分名">
-		<input type='hidden' :name ="`ZeiKbnSummary[${index}][ZEIRITU]`" :value = "list.税率">
-			<input type='hidden' :name ="`ZeiKbnSummary[${index}][CHOUSEIGAKU]`" :value = "list.調整額">
-			<input type='hidden' :name ="`ZeiKbnSummary[${index}][HONTAIGAKU]`" :value = "list.本体額">
-			<input type='hidden' :name ="`ZeiKbnSummary[${index}][SHOUHIZEI]`" :value = "list.消費税">
-		</template>
+		<div><!--hidden block-->
+			<input type='hidden' name='lat' :value='vlat'>
+			<input type='hidden' name='lon' :value='vlon'>
+			<input type='hidden' name='weather' :value='weather'>
+			<input type='hidden' name='description' :value='description'>
+			<input type='hidden' name='temp' :value='temp'>
+			<input type='hidden' name='feels_like' :value='feels_like'>
+			<input type='hidden' name='icon' :value='icon'>
+			<template v-for='(list,index) in hontai' :key='list.税率'>
+			<input type='hidden' :name ="`ZeiKbnSummary[${index}][ZEIKBN]`" :value = "list.税区分">
+			<input type='hidden' :name ="`ZeiKbnSummary[${index}][ZEIKBNMEI]`" :value = "list.税区分名">
+			<input type='hidden' :name ="`ZeiKbnSummary[${index}][ZEIRITU]`" :value = "list.税率">
+				<input type='hidden' :name ="`ZeiKbnSummary[${index}][CHOUSEIGAKU]`" :value = "list.調整額">
+				<input type='hidden' :name ="`ZeiKbnSummary[${index}][HONTAIGAKU]`" :value = "list.本体額">
+				<input type='hidden' :name ="`ZeiKbnSummary[${index}][SHOUHIZEI]`" :value = "list.消費税">
+			</template>
+		</div>
 	</form>
 	<div class="loader-wrap" v-show='loader'>
 		<div class="loader">Loading...</div>
@@ -344,12 +346,12 @@
 							<template v-for='(row,index) in UriageList' :Key='row.UriageNO+row.ShouhinCD'>
 								<template v-if='row.UriageNO===row.lastNo'>
 									<tr class='table-success'>
-										<td>{{row.UriageNO}}</td><td>{{row.insDatetime}}</td><td>{{row.ShouhinNM}}</td><td>{{row.su}}</td><td>{{row.ZeikomiUriage}}</td>
+										<td><a href="#" style='color:inherit;' @click='open_R(row.URL)'>{{row.UriageNO}}</a></td><td>{{row.insDatetime.slice(-8)}}</td><td>{{row.ShouhinNM}}</td><td>{{row.su}}</td><td>{{row.ZeikomiUriage}}</td>
 									</tr>
 								</template>
 								<template v-if='row.UriageNO!==row.lastNo'>
 									<tr>
-										<td>{{row.UriageNO}}</td><td>{{row.insDatetime}}</td><td>{{row.ShouhinNM}}</td><td>{{row.su}}</td><td>{{row.ZeikomiUriage}}</td>
+										<td><a href="#" style='color:inherit;' @click='open_R(row.URL)'>{{row.UriageNO}}</a></td><td>{{row.insDatetime.slice(-8)}}</td><td>{{row.ShouhinNM}}</td><td>{{row.su}}</td><td>{{row.ZeikomiUriage}}</td>
 									</tr>
 								</template>	
 							</template>
@@ -606,7 +608,6 @@
 						//let sagaku = Revised_pay.value - pay.value 
 						let sagaku_zan = Revised_pay.value
 						let wariai = 0
-						let Rev_hontai = 0
 						for(const row of hontai.value){
 							//税区分ごとに請求額の割合を算出し、調整額に掛ける
 							wariai = (row['本体額']+row['消費税']) / (pay.value)
@@ -615,8 +616,8 @@
 							console.log(`目標額:${Math.round(Revised_pay.value * wariai)}`)
 							console.log(`現在額:${Math.round(pay.value * wariai)}`)
 							*/
-							Rev_hontai = Math.round((Revised_pay.value * wariai / ((100+row['税率'])/100))-(row['本体額']))	//割引税抜本体
-							row["調整額"] = Rev_hontai
+							//調整額＝変更後税込額/税率-変更前本体額
+							row["調整額"] = Math.round((Revised_pay.value * wariai / ((100+row['税率'])/100))-(row['本体額']))	//割引税抜本体
 							sagaku_zan = sagaku_zan - Math.round((Number(row['本体額']) + Number(row['調整額'])) * (Number(100)+Number(row['税率']))/100)
 						}
 						if(sagaku_zan !== 0){
@@ -810,10 +811,11 @@
 				//領収書
 				const keishou = ref('様')
 				const oaite = ref('上')
+				const URL = ref('')
 				
 				const QRout = () =>{
   				// 入力された文字列を取得
-  				let userInput = rtURL.value + '&tp=1&k=' + keishou.value + '&s=' + oaite.value
+  				let userInput = URL.value + '&tp=1&k=' + keishou.value + '&s=' + oaite.value
 					console.log(userInput)
   				var query = userInput.split(' ').join('+');
   				// QRコードの生成
@@ -836,9 +838,25 @@
 					var cvs = document.getElementById("qr");
 				}
 				const prv = () =>{
-					//location.href = 'https://' + rtURL.value + '&tp=1&k=' + keishou.value + '&s=' + oaite.value
-					window.open(rtURL.value + '&tp=1&k=' + keishou.value + '&s=' + oaite.value, '_blank')
+					window.open(URL.value + '&tp=1&k=' + keishou.value + '&s=' + oaite.value, '_blank')
 				}
+				const open_R = (setURL) =>{
+					if(setURL!==undefined){
+						URL.value = setURL
+					}else{
+						URL.value = rtURL.value
+					}
+					console.log(URL.value)
+					const myModal = new bootstrap.Modal(document.getElementById('ryoushuu'), {})
+					myModal.show()
+					/*
+					const btn = document.querySelector('#test')
+ 			    btn.addEventListener('click', () => {
+        		myModal.show()
+      		})
+					*/
+				}
+
 				//細かな表示設定など
 				const labels_address_check = ref()
 				const labels = computed(() =>{
@@ -923,6 +941,7 @@
 					prv,
 					hontai,
 					Revised,
+					open_R,
 				}
 			}
 		}).mount('#register');

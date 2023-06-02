@@ -21,10 +21,10 @@ ver2.99.0-034:to[bs5&Vue3CompApi]ｱｶｳﾝﾄ登録画面の対応・・・�
 ver2.99.0-035:to[bs5&Vue3CompApi]インボイス対応・・・領収書作成中
 ver2.99.0-036:to[bs5&Vue3CompApi]インボイス対応・・・領収書作成
 ver2.99.0-037:to[bs5&Vue3CompApi]インボイス対応・・・レジ画面などの端数調整
-	ALTER TABLE `uriagedata` CHANGE `su` `su` INT(11) NOT NULL DEFAULT '0' COMMENT '数量';
-	ALTER TABLE `uriagedata` CHANGE `tanka` `tanka` INT(11) NOT NULL DEFAULT '0' COMMENT '単価', CHANGE `UriageKin` `UriageKin` INT(11) NOT NULL DEFAULT '0' COMMENT '売上金額', CHANGE `zei` `zei` INT(11) NOT NULL DEFAULT '0' COMMENT '消費税';
-	ALTER TABLE `uriagedata` CHANGE `ShouhinCD` `ShouhinCD` VARCHAR(7) NOT NULL COMMENT '商品CD';
-
+	ALTER TABLE `UriageData` CHANGE `su` `su` INT(11) NOT NULL DEFAULT '0' COMMENT '数量';
+	ALTER TABLE `UriageData` CHANGE `tanka` `tanka` INT(11) NOT NULL DEFAULT '0' COMMENT '単価', CHANGE `UriageKin` `UriageKin` INT(11) NOT NULL DEFAULT '0' COMMENT '売上金額', CHANGE `zei` `zei` INT(11) NOT NULL DEFAULT '0' COMMENT '消費税';
+	ALTER TABLE `UriageData` CHANGE `ShouhinCD` `ShouhinCD` VARCHAR(7) NOT NULL COMMENT '商品CD';
+ver2.99.0-038:to[bs5&Vue3CompApi]インボイス対応・・・履歴からの領収書出力
 
 
 ローカルからテスト環境へ
