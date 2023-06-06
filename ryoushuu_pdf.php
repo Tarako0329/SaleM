@@ -1,40 +1,61 @@
 <?php
-date_default_timezone_set('Asia/Tokyo');
-require "./vendor/autoload.php";
-require_once "functions.php";
+//QRからアクセスされた場合は領収書発行済みとして処理する。
+//プレビューの場合、発行済みとするチェックの有無で判断する。
+{
+	date_default_timezone_set('Asia/Tokyo');
+	require "./vendor/autoload.php";
+	require_once "functions.php";
 
-//.envの取得
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
+	//.envの取得
+	$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+	$dotenv->load();
 
-define("EXEC_MODE",$_ENV["EXEC_MODE"]);
-if(EXEC_MODE==="Local"){
-		ini_set('error_log', 'C:\xampp\htdocs\SaleM\php_error.log');
+	define("EXEC_MODE",$_ENV["EXEC_MODE"]);
+	if(EXEC_MODE==="Local"){
+			ini_set('error_log', 'C:\xampp\htdocs\SaleM\php_error.log');
+	}
+
+	define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
+	//DB接続関連
+	define("DNS","mysql:host=".$_ENV["SV"].";dbname=".$_ENV["DBNAME"].";charset=utf8");
+	define("USER_NAME", $_ENV["DBUSER"]);
+	define("PASSWORD", $_ENV["PASS"]);
+	$pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
+
+	define("TITLE", $_ENV["TITLE"]);
+
+	
+
+	if(empty($_GET)){
+		echo "想定外アクセス。";
+		exit();
+	}
+	$id=rot13decrypt2($_GET["i"]);
+	$UriNo=rot13decrypt2($_GET["u"]);
+	$Atena = (!empty($_GET["s"])?$_GET["s"] . "　　" . $_GET["k"]:"");
+	$type = ($_GET["tp"]==="1"?"領　収　書":"請　求　書");
+	$filename = ($_GET["tp"]==="1"?"Ryoushusho":"Seikyusho");
+	$qr_GUID=(!empty($_GET["qr"])?$_GET["qr"]:null);
+	$saiban=(!empty($_GET["sb"])?$_GET["sb"]:null);
 }
-
-define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
-//DB接続関連
-define("DNS","mysql:host=".$_ENV["SV"].";dbname=".$_ENV["DBNAME"].";charset=utf8");
-define("USER_NAME", $_ENV["DBUSER"]);
-define("PASSWORD", $_ENV["PASS"]);
-$pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
-
-define("TITLE", $_ENV["TITLE"]);
-
-use Dompdf\Dompdf;
-
-if(empty($_GET)){
-	echo "想定外アクセス。";
-	exit();
-}
-$id=rot13decrypt2($_GET["i"]);
-$UriNo=rot13decrypt2($_GET["u"]);
-$Atena = (!empty($_GET["s"])?$_GET["s"] . "　　" . $_GET["k"]:"");
-$type = ($_GET["tp"]==="1"?"領　収　書":"請　求　書");
-$filename = ($_GET["tp"]==="1"?"Ryoushusho":"Seikyusho");
-
 //$id=2;
 //$UriNo="206";
+use Dompdf\Dompdf;
+
+if(!empty($qr_GUID)){
+	$sql = "select * from ryoushu where QR_GUID = ?";
+	$stmt = $pdo_h->prepare($sql);
+	$stmt->bindValue(1, $qr_GUID, PDO::PARAM_STR);
+	$stmt->execute();
+	$ryoushu_info = $stmt->fetch(PDO::FETCH_ASSOC);
+	$html = $ryoushu_info["html"];
+	if(empty($html)){
+		$saiban="on";
+	}else{
+		output($html,$filename);
+		exit();
+	}
+}
 
 $sysname="WEBREZ+";
 
@@ -88,6 +109,25 @@ $Goukei = $Goukei+$ZeiGoukei;
 $ZeiGoukei = number_format($ZeiGoukei);
 $Goukei = number_format($Goukei);
 
+$message="";
+if($saiban==="on"){
+	//領収書Noの取得
+	$sql = "select max(R_NO) as R_NO from ryoushu where uid = ? group by uid";
+	$stmt = $pdo_h->prepare($sql);
+	$stmt->bindValue(1, $id, PDO::PARAM_INT);
+	$stmt->execute();
+	$result = $stmt->fetchAll();
+	$count = $stmt->rowCount();
+
+	if(empty($result[0]["R_NO"])){
+		$RyoushuuNO = 1;
+	}else{
+		$RyoushuuNO = $result[0]["R_NO"] + 1;
+	}
+}else{
+	$RyoushuuNO = "xxxxx";
+	$message = "<br><span style='font-size:12px;'>この領収書は確認表示のため、お客様に発行できません。</span>";
+}
 // PDFにする内容をHTMLで記述
 $html = <<< EOM
 <html>
@@ -147,6 +187,7 @@ $html = <<< EOM
 		</div>
 		<div style='height:70px;'>
 			<span class='title'> - $type - </span>
+			$message
 		</div>
 		<div style='text-align:left;font-size:25px;'>
 			<span style='border-bottom:solid;'>$Atena</span>
@@ -156,7 +197,7 @@ $html = <<< EOM
 			<p>$invoice</p>
 			<p>$add</p>
 			<p>取引日時[$insDT]</p>
-			<p>伝票番号[$UriNo]</p>
+			<p>伝票番号[$UriNo/$RyoushuuNO]</p>
 		</div>
 		<div class='Seikyu' style='display:flex;'>
 			<table style='width:100%;'>
@@ -192,14 +233,62 @@ $html = <<< EOM
 	</body>
 </html>
 EOM;
+try{
+	// PDFの設定～出力
+	/*
+		$dompdf = new Dompdf();
+		$dompdf->loadHtml($html);
+		$options = $dompdf->getOptions();
+		$options->set(array('isRemoteEnabled' => false));
+		$dompdf->setOptions($options);
+		$dompdf->setPaper('A4', 'portrait');
+		$dompdf->render();
+		$dompdf->stream($filename, array('Attachment' => 0));
+	*/
 
-// PDFの設定～出力
-$dompdf = new Dompdf();
-$dompdf->loadHtml($html);
-$options = $dompdf->getOptions();
-$options->set(array('isRemoteEnabled' => false));
-$dompdf->setOptions($options);
-$dompdf->setPaper('A4', 'portrait');
-$dompdf->render();
-$dompdf->stream($filename, array('Attachment' => 0));
+	output($html,$filename);
+
+	if($saiban==="on"){
+		$pdo_h->beginTransaction();
+		$sql = "insert into ryoushu(uid,R_NO,UriNO,Atena,html,QR_GUID) values(?,?,?,?,?,?)";
+		$stmt = $pdo_h->prepare($sql);
+		$stmt->bindValue(1, $id, PDO::PARAM_INT);
+		$stmt->bindValue(2, $RyoushuuNO, PDO::PARAM_INT);
+		$stmt->bindValue(3, $UriNo, PDO::PARAM_INT);
+		$stmt->bindValue(4, $Atena, PDO::PARAM_STR);
+		$stmt->bindValue(5, $html, PDO::PARAM_STR);
+		$stmt->bindValue(6, $qr_GUID, PDO::PARAM_STR);
+		$status = $stmt->execute();
+	
+		if($status!==false){
+			$pdo_h->commit();
+			log_writer2(basename(__FILE__)." [insert sql] =>",$sql,"lv0");
+			$msg = "登録が完了しました。";
+			$alert_status = "alert-success";
+			//file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",".basename(__FILE__).",UPDATE,succsess,".$sqlstr."\n",FILE_APPEND);
+		}else{
+			$pdo_h->rollBack();
+			$msg = "失敗。";
+			$alert_status = "alert-danger";
+			//file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",".basename(__FILE__).",UPDATE,failed,".$sqlstr."\n",FILE_APPEND);
+		}
+	}
+}catch(Exception $e){
+	$pdo_h->rollBack();
+	$msg = "システムエラーによる更新失敗。管理者へ通知しました。";
+	$alert_status = "alert-danger";
+	log_writer2(basename(__FILE__)." [Exception \$e] =>",$e,"lv0");
+	$reseve_status=true;
+}
+
+function output($html,$filename){
+	$dompdf = new Dompdf();
+	$dompdf->loadHtml($html);
+	$options = $dompdf->getOptions();
+	$options->set(array('isRemoteEnabled' => false));
+	$dompdf->setOptions($options);
+	$dompdf->setPaper('A4', 'portrait');
+	$dompdf->render();
+	$dompdf->stream($filename, array('Attachment' => 0));
+}
 ?>

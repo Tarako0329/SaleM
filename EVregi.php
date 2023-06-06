@@ -246,8 +246,9 @@
 		<footer class='rezfooter'>
 			<div class="container-fluid" style='padding:0;text-align:center;'>
 				<div class='row'>
-					<div class='col-12 kaikei'>
-						<span style='font-size:1.6rem;'>お会計</span> ￥<span id='kaikei'> {{pay.toLocaleString()}} </span>- <span style='font-size:1.6rem;'>内税</span>(<span id='utizei'>{{kaikei_zei.toLocaleString()}}</span>)
+					<div class='col-12 kaikei' ref='total_area'>
+						<span style='font-size:1.6rem;'>お会計</span> ￥<span id='kaikei'> {{pay.toLocaleString()}} </span>- 
+						<span style='font-size:1.6rem;'>内税</span>(<span id='utizei'>{{kaikei_zei.toLocaleString()}}</span>)
 					</div>
 				</div>
 				<div class='row' style='height:60px;'>
@@ -335,32 +336,43 @@
 					<table class="table table-sm" style='font-family:"Meiryo UI";'>
 						<thead class='header-color' style='color:var(--title-color);'>
 							<tr>
-								<th>No</th>
 								<th>時刻</th>
 								<th>商品</th>
 								<th>数量</th>
-								<th>税込売上</th>
+								<th>売上金額</th>
 							</tr>
 						</thead>
 						<tbody >
 							<template v-for='(row,index) in UriageList' :Key='row.UriageNO+row.ShouhinCD'>
 								<template v-if='row.UriageNO===row.lastNo'>
+									<template v-if='index===0'>
+										<tr class='table-success'>
+											<td colspan='4'><a href="#" style='color:inherit;' @click='open_R(row.URL)'>売上No：{{row.UriageNO}}</a></td>
+										</tr>
+									</template>
 									<tr class='table-success'>
-										<td><a href="#" style='color:inherit;' @click='open_R(row.URL)'>{{row.UriageNO}}</a></td><td>{{row.insDatetime.slice(-8)}}</td><td>{{row.ShouhinNM}}</td><td>{{row.su}}</td><td>{{row.ZeikomiUriage}}</td>
+										<td>{{row.insDatetime.slice(-8)}}</td><td>{{row.ShouhinNM}}</td><td align='right'>{{row.su}}</td><td align='right'>{{Number(row.ZeikomiUriage).toLocaleString()}}</td>
 									</tr>
 								</template>
+								
 								<template v-if='row.UriageNO!==row.lastNo'>
+									<template v-if='UriageList[index-1].UriageNO!==row.UriageNO'>
+										<tr>
+											<td colspan='4'><a href="#" style='color:inherit;' @click='open_R(row.URL)'>売上No：{{row.UriageNO}}</a></td>
+										</tr>
+									</template>
 									<tr>
-										<td><a href="#" style='color:inherit;' @click='open_R(row.URL)'>{{row.UriageNO}}</a></td><td>{{row.insDatetime.slice(-8)}}</td><td>{{row.ShouhinNM}}</td><td>{{row.su}}</td><td>{{row.ZeikomiUriage}}</td>
+										<td>{{row.insDatetime.slice(-8)}}</td><td>{{row.ShouhinNM}}</td><td align='right'>{{row.su}}</td><td align='right'>{{Number(row.ZeikomiUriage).toLocaleString()}}</td>
 									</tr>
 								</template>	
+
 							</template>
 						</tbody>
 					</table>
 					</div>
 				</div>
 				<div class='modal-footer' style='font-size:2.5rem;font-weight:600;'>
-					合計：{{total_uriage}} 円
+					合計：{{Number(total_uriage).toLocaleString()}} 円
 				</div>
 			</div>
 		</div>
@@ -428,7 +440,7 @@
 				</div>
 				<div class='modal-footer'>
 					<button type='button' style='font-size: 2rem;' class='btn btn-primary' @click='QRout()'>QR表示</button>
-					<button type='button' style='font-size: 2rem;' class='btn btn-primary' @click='prv()'>プレビュー</button>
+					<button type='button' style='font-size: 2rem;' class='btn btn-primary' @click='prv()'>領収書表示</button>
 				</div>
 			</div>
 		</div>
@@ -436,7 +448,7 @@
 
 	</div><!-- <div  id='register'> -->
 	<script>
-		const { createApp, ref, onMounted, computed, VueCookies, watch } = Vue;
+		const { createApp, ref, onMounted, computed, VueCookies, watch,nextTick  } = Vue;
 		createApp({
 			setup(){
 				//スクロールスムース
@@ -532,6 +544,7 @@
 
 				onMounted(() => {
 					console_log('onMounted','lv3')
+					total_area.value.style["fontSize"]="3.3rem"
 					get_shouhinMS()
 					get_UriageList()
 					v_get_gio()
@@ -553,6 +566,7 @@
 				const ordercounter = (e) => {//注文増減ボタン
 					//console_log(e.target.disabled,'lv3')
 					//console_log(shouhinMS_filter.value[e.target.value],'lv3')
+					
 					e.target.disabled = true	//ボタン連打対応：処理が終わるまでボタンを無効にする
 					let index = e.target.value
 					if(pm.value==="plus"){
@@ -591,7 +605,26 @@
 					
 					calculation()
 					e.target.disabled = false	//ボタン連打対応：処理が終わったらボタンを有効に戻す
+					nextTick (() => {
+						resize()
+        	})
 					return 0
+				}
+				const total_area = ref()
+				
+				const resize = () =>{
+					//console_log(total_area.value.style["fontSize"],"lv3")
+					//console_log(total_area.value.style,"lv3")
+
+					let size = total_area.value.style["fontSize"].slice(0,-3)
+
+					if(total_area.value.offsetHeight < total_area.value.scrollHeight){
+						while(total_area.value.offsetHeight < total_area.value.scrollHeight){
+							size = size - 0.1
+							total_area.value.style = `font-size:${size}rem;`
+							//console_log(`${total_area.value.offsetHeight}:${total_area.value.scrollHeight}(${size})`,'lv3') 
+						}
+					}
 				}
 				const calculation = () =>{
 					//税率ごとの本体額総合計から消費税を計算する(インボイス対応)
@@ -681,7 +714,7 @@
 						.post(php_name,params,{timeout: <?php echo $timeout; ?>}) //php側は15秒でタイムアウト
 						.then((response) => {
 							console_log(`on_submit SUCCESS`,'lv3')
-							console_log(response.data,'lv3')
+							//console_log(response.data,'lv3')
 							MSG.value = response.data.MSG
 							alert_status.value[1]=response.data.status
 							csrf.value = response.data.csrf_create
@@ -689,6 +722,7 @@
 							if(response.data.status==='alert-success'){
 								reset_order()
 								btn_changer('chk')
+								total_area.value.style["fontSize"]="3.3rem"
 							}
 						})
 						.catch((error) => {
@@ -812,10 +846,19 @@
 				const keishou = ref('様')
 				const oaite = ref('上')
 				const URL = ref('')
-				
+				const getGUID = () =>{
+    			let dt = new Date().getTime();
+    			let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    			    let r = (dt + Math.random()*16)%16 | 0;
+    			    dt = Math.floor(dt/16);
+    			    return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+    			});
+    			return uuid;
+				}
 				const QRout = () =>{
   				// 入力された文字列を取得
-  				let userInput = URL.value + '&tp=1&k=' + keishou.value + '&s=' + oaite.value
+					let guid = getGUID()
+  				let userInput = URL.value + '&qr=' + guid + '&tp=1&k=' + keishou.value + '&s=' + oaite.value
 					console.log(userInput)
   				var query = userInput.split(' ').join('+');
   				// QRコードの生成
@@ -838,7 +881,12 @@
 					var cvs = document.getElementById("qr");
 				}
 				const prv = () =>{
-					window.open(URL.value + '&tp=1&k=' + keishou.value + '&s=' + oaite.value, '_blank')
+					if(confirm("表示する領収書をお客様に発行しますか？")===true){
+						window.open(URL.value + '&sb=on&tp=1&k=' + keishou.value + '&s=' + oaite.value, '_blank')
+					}else{
+						window.open(URL.value + '&sb=off&tp=1&k=' + keishou.value + '&s=' + oaite.value, '_blank')
+					}
+					
 				}
 				const open_R = (setURL) =>{
 					if(setURL!==undefined){
@@ -846,7 +894,7 @@
 					}else{
 						URL.value = rtURL.value
 					}
-					console.log(URL.value)
+					//console.log(URL.value)
 					const myModal = new bootstrap.Modal(document.getElementById('ryoushuu'), {})
 					myModal.show()
 					/*
@@ -942,6 +990,7 @@
 					hontai,
 					Revised,
 					open_R,
+					total_area,
 				}
 			}
 		}).mount('#register');
