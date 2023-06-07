@@ -34,10 +34,11 @@ ver2.99.0-038:to[bs5&Vue3CompApi]インボイス対応・・・履歴からの�
 	  `QR_GUID` varchar(40) DEFAULT NULL,
 	  `LastHakkouDate` datetime DEFAULT current_timestamp() COMMENT '最終発行日時'
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-	ALTER TABLE `users` ADD `inquiry_tel` VARCHAR(20) NULL DEFAULT NULL COMMENT '問合TEL' AFTER `invoice_no`, ADD `inquiry_mail` VARCHAR(100) NULL DEFAULT NULL COMMENT '問合MAIL' AFTER `inquiry_tel`;
+	ALTER TABLE `Users` ADD `inquiry_tel` VARCHAR(20) NULL DEFAULT NULL COMMENT '問合TEL' AFTER `invoice_no`, ADD `inquiry_mail` VARCHAR(100) NULL DEFAULT NULL COMMENT '問合MAIL' AFTER `inquiry_tel`;
 	php load_font.php ipag css/ipag.ttf
 	php load_font.php ipagp css/ipagp.ttf
 	php load_font.php Kranky css/Kranky-Regular.ttf
+ver2.99.0-039:to[bs5&Vue3CompApi]bugfix
 
 
 
@@ -45,8 +46,6 @@ ver2.99.0-038:to[bs5&Vue3CompApi]インボイス対応・・・履歴からの�
 cd /home/ifduktdo/public_html/SaleM/TEST
 git fetch --all
 git reset --hard origin/master
-
-
 
 cd /home/ifduktdo/public_html/SaleM/WebRez
 git fetch --all

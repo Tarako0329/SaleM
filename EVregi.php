@@ -509,7 +509,7 @@
 						});
 					}else if(chk_register_show.value === "register"){//表示対象かつ注文数１以上を返す
 						order_panel = shouhinMS.value.filter((shouhin) => {
-							return (shouhin.hyoujiKBN1.includes('on') && shouhin.ordercounter > 0);
+							return (shouhin.hyoujiKBN1 && shouhin.hyoujiKBN1.includes('on') && shouhin.ordercounter > 0);
 						});
 					}
 
