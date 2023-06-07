@@ -67,6 +67,7 @@ $userinfo = $stmt->fetch(PDO::FETCH_ASSOC);
 $from = (!empty($userinfo["yagou"])?$userinfo["yagou"]:$userinfo["name"]);
 $invoice = $userinfo["invoice_no"];
 $add = $userinfo["address1"].$userinfo["address2"].$userinfo["address3"];
+$inquiry = (!empty($userinfo["inquiry_tel"])?$userinfo["inquiry_tel"]:"")."/".$userinfo["inquiry_mail"];
 
 //売上明細の取得
 $sql="select *,ZeiMS.hyoujimei as 税率desp,ZeiMS.zeiritu as 税率 from UriageData Uri inner join ZeiMS on Uri.zeiKBN = ZeiMS.zeiKBN where uid = ? and UriageNO like ? and zei = 0 order by Uri.zeiKBN,Uri.ShouhinCD";

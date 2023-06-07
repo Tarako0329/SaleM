@@ -25,6 +25,16 @@ ver2.99.0-037:to[bs5&Vue3CompApi]インボイス対応・・・レジ画面な�
 	ALTER TABLE `UriageData` CHANGE `tanka` `tanka` INT(11) NOT NULL DEFAULT '0' COMMENT '単価', CHANGE `UriageKin` `UriageKin` INT(11) NOT NULL DEFAULT '0' COMMENT '売上金額', CHANGE `zei` `zei` INT(11) NOT NULL DEFAULT '0' COMMENT '消費税';
 	ALTER TABLE `UriageData` CHANGE `ShouhinCD` `ShouhinCD` VARCHAR(7) NOT NULL COMMENT '商品CD';
 ver2.99.0-038:to[bs5&Vue3CompApi]インボイス対応・・・履歴からの領収書出力
+	CREATE TABLE `ryoushu` (
+	  `uid` int(5) NOT NULL,
+	  `R_NO` int(11) NOT NULL COMMENT '領収書No',
+	  `UriNo` int(11) NOT NULL COMMENT '売上No',
+	  `Atena` varchar(40) NOT NULL COMMENT '宛名',
+	  `html` longtext NOT NULL COMMENT 'pdf_html',
+	  `QR_GUID` varchar(40) DEFAULT NULL,
+	  `LastHakkouDate` datetime DEFAULT current_timestamp() COMMENT '最終発行日時'
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+	ALTER TABLE `users` ADD `inquiry_tel` VARCHAR(20) NULL DEFAULT NULL COMMENT '問合TEL' AFTER `invoice_no`, ADD `inquiry_mail` VARCHAR(100) NULL DEFAULT NULL COMMENT '問合MAIL' AFTER `inquiry_tel`;
 
 
 ローカルからテスト環境へ

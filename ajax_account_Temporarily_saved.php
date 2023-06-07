@@ -50,9 +50,11 @@ if($rtn !== true){
 				$_SESSION["ADD2"] = $_POST["ADD2"];
 				$_SESSION["ADD3"] = $_POST["ADD3"];
 				$_SESSION["invoice"] = $_POST["invoice"];
+				$_SESSION["inquiry_tel"] = $_POST["inquiry_tel"];
+				$_SESSION["inquiry_mail"] = $_POST["inquiry_mail"];
 				$_SESSION["chk_pass"] =  !empty($_POST["chk_pass"])?$_POST["chk_pass"]:"";
 				$_SESSION["PASS"] = passEX($_POST["PASS"],$_POST["MAIL"],$key);
-				$_SESSION["SHOUKAI"] = (!empty($_POST["shoukai"])?rot13decrypt2($_POST["shoukai"])-10000:"");
+				//$_SESSION["SHOUKAI"] = (!empty($_POST["shoukai"])?rot13decrypt2($_POST["shoukai"])-10000:"");
 			
 				$msg = "更新成功。";
 				$alert_status = "alert-success";

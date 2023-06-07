@@ -70,7 +70,7 @@ if($rtn !== true){
 					$stmt = $pdo_h->prepare($sqlstr);
 					$stmt->bindValue("password", $_SESSION["PASS"], PDO::PARAM_STR);
 				}else{
-					$sqlstr="update Users set mail=:mail,question=:question,answer=:answer,loginrez=:loginrez,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3,invoice_no=:invoice_no where uid=:uid";
+					$sqlstr="update Users set mail=:mail,question=:question,answer=:answer,loginrez=:loginrez,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3,invoice_no=:invoice_no ,inquiry_tel=:inquiry_tel ,inquiry_mail=:inquiry_mail where uid=:uid";
 					$stmt = $pdo_h->prepare($sqlstr);
 				}
 				$stmt->bindValue("mail", $_SESSION["MAIL"], PDO::PARAM_STR);
@@ -85,6 +85,8 @@ if($rtn !== true){
 				$stmt->bindValue("address3", $_SESSION["ADD3"], PDO::PARAM_STR);
 				$stmt->bindValue("uid", $_SESSION["user_id"], PDO::PARAM_INT);
 				$stmt->bindValue("invoice_no", $_SESSION["invoice"], PDO::PARAM_INT);
+				$stmt->bindValue("inquiry_tel", $_SESSION["inquiry_tel"], PDO::PARAM_STR);
+				$stmt->bindValue("inquiry_mail", $_SESSION["inquiry_mail"], PDO::PARAM_STR);
 				$status=$stmt->execute();
 				$count = 1;
 			}

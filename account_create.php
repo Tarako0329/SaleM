@@ -107,15 +107,19 @@ $token=csrf_create();
 						<input v-model='account["yagou"]["val"]' :='account["yagou"]["lock"]' type='text' class='form-control' id='yagou' name='YAGOU'  >
 						<label for='invoice' >インボイス登録番号</label>
 						<input v-model='account["invoice"]["val"]' :='account["invoice"]["lock"]' type='text' class='form-control' id='invoice' name='invoice'  >
-						<small id='invoice' class='form-text text-muted'>未登録だと税区分は<span style='color:red'>すべて非課税</span>となります。</small><br><br>
+						<!--<small id='invoice' class='form-text text-muted'>未登録だと税区分は<span style='color:red'>すべて非課税</span>となります。</small><br><br>-->
 						<label for='yubin' >郵便番号('-'抜き)</label>
 						<input v-model='account["yubin"]["val"]' :='account["yubin"]["lock"]' type='text' class='form-control' id='yubin' name='zip11' onKeyUp='AjaxZip3.zip2addr(this,"","addr11","addr11");' >
-						<label for='add1' >住所１</label>
-						<input value='<?php echo $row[0]["address1"];?>' :readonly='account["address1"]["lock"]["readonly"]' type='text' maxlength='20' class='form-control' id='add1' name='addr11' placeholder='納品書・請求書に使用。住所1行目' >
-						<label for='add2' >住所２</label>
-						<input v-model='account["address2"]["val"]' :='account["address2"]["lock"]' type='text' maxlength='20' class='form-control' id='add2' name='ADD2' placeholder='納品書・請求書に使用。住所2行目' >
-						<label for='add3' >住所３</label>
-						<input v-model='account["address3"]["val"]' :='account["address3"]["lock"]' type='text' maxlength='20' class='form-control' id='add3' name='ADD3' placeholder='納品書・請求書に使用。住所3行目' >
+						<label for='add1' >住所１行目</label>
+						<input value='<?php echo $row[0]["address1"];?>' :readonly='account["address1"]["lock"]["readonly"]' type='text' maxlength='20' class='form-control' id='add1' name='addr11' placeholder='住所1行目' >
+						<label for='add2' >住所２行目</label>
+						<input v-model='account["address2"]["val"]' :='account["address2"]["lock"]' type='text' maxlength='20' class='form-control' id='add2' name='ADD2' placeholder='住所2行目' >
+						<label for='add3' >住所３行目</label>
+						<input v-model='account["address3"]["val"]' :='account["address3"]["lock"]' type='text' maxlength='20' class='form-control' id='add3' name='ADD3' placeholder='住所3行目' >
+						<label for='inquiry_tel' >問合せ先TEL</label>
+						<input v-model='account["inquiry_tel"]["val"]' :='account["inquiry_tel"]["lock"]' type='tel' pattern="[0-9]{3,}-[0-9]{3,}-[0-9]{3,}" maxlength='20' class='form-control' id='inquiry_tel' name='inquiry_tel' placeholder='例：000-0000-0000' >
+						<label for='inquiry_mail' >問合せ先MAIL</label>
+						<input v-model='account["inquiry_mail"]["val"]' :='account["inquiry_mail"]["lock"]' type='email' maxlength='20' class='form-control' id='inquiry_mail' name='inquiry_mail' placeholder='メールアドレス' >
 					</template>
 					<div class='col-12' style=' padding:5px; margin-top:10px;display:flexbox;'>
 						<button v-if='step==="check"' type='submit' class='btn btn-primary' style='width:150px;height:40px;font-size:1.5rem'>確 認</button>
@@ -183,7 +187,15 @@ $token=csrf_create();
 					'invoice':{
 						'val':'<?php echo $row[0]["invoice_no"];?>'
 						,'lock':{'readonly':false}
-					}
+					},
+					'inquiry_tel':{
+						'val':'<?php echo $row[0]["inquiry_tel"];?>'
+						,'lock':{'readonly':false}
+					},
+					'inquiry_mail':{
+						'val':'<?php echo $row[0]["inquiry_mail"];?>'
+						,'lock':{'readonly':false}
+					},
 				})
 				const AllLock = () =>{
 					console.log('OnPress')
@@ -198,6 +210,8 @@ $token=csrf_create();
 					account.value['address1']['lock']['readonly']=true
 					account.value['address2']['lock']['readonly']=true
 					account.value['address3']['lock']['readonly']=true
+					account.value['inquiry_tel']['lock']['readonly']=true
+					account.value['inquiry_mail']['lock']['readonly']=true
 				}
 				const AllUnLock = () =>{
 					console.log('OnPress')
@@ -214,6 +228,8 @@ $token=csrf_create();
 						account.value['address1']['lock']['readonly']=false
 						account.value['address2']['lock']['readonly']=false
 						account.value['address3']['lock']['readonly']=false
+						account.value['inquiry_tel']['lock']['readonly']=false
+						account.value['inquiry_mail']['lock']['readonly']=false
 					}else if(mode.value==="insert"){
 						step.value="next"
 					}
