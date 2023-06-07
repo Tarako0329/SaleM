@@ -8,3 +8,4 @@ backup
 xxx*
 *copy.php
 .ini
+/vendor/dompdf/dompdf/lib/fonts/installed-fonts.json
