@@ -1,20 +1,20 @@
 {
     "ipag": {
-        "normal": "C:\\xampp\\htdocs\\SaleM\\vendor\\dompdf\\dompdf\/lib\/fonts\/ipag",
-        "bold": "C:\\xampp\\htdocs\\SaleM\\vendor\\dompdf\\dompdf\/lib\/fonts\/ipag",
-        "italic": "C:\\xampp\\htdocs\\SaleM\\vendor\\dompdf\\dompdf\/lib\/fonts\/ipag",
-        "bold_italic": "C:\\xampp\\htdocs\\SaleM\\vendor\\dompdf\\dompdf\/lib\/fonts\/ipag"
+        "normal": "\/home\/ifduktdo\/public_html\/SaleM\/TEST\/vendor\/dompdf\/dompdf\/lib\/fonts\/ipag",
+        "bold": "\/home\/ifduktdo\/public_html\/SaleM\/TEST\/vendor\/dompdf\/dompdf\/lib\/fonts\/ipag",
+        "italic": "\/home\/ifduktdo\/public_html\/SaleM\/TEST\/vendor\/dompdf\/dompdf\/lib\/fonts\/ipag",
+        "bold_italic": "\/home\/ifduktdo\/public_html\/SaleM\/TEST\/vendor\/dompdf\/dompdf\/lib\/fonts\/ipag"
     },
     "kranky": {
-        "normal": "C:\\xampp\\htdocs\\SaleM\\vendor\\dompdf\\dompdf\/lib\/fonts\/Kranky-Regular",
-        "bold": "C:\\xampp\\htdocs\\SaleM\\vendor\\dompdf\\dompdf\/lib\/fonts\/Kranky-Regular",
-        "italic": "C:\\xampp\\htdocs\\SaleM\\vendor\\dompdf\\dompdf\/lib\/fonts\/Kranky-Regular",
-        "bold_italic": "C:\\xampp\\htdocs\\SaleM\\vendor\\dompdf\\dompdf\/lib\/fonts\/Kranky-Regular"
+        "normal": "\/home\/ifduktdo\/public_html\/SaleM\/TEST\/vendor\/dompdf\/dompdf\/lib\/fonts\/Kranky-Regular",
+        "bold": "\/home\/ifduktdo\/public_html\/SaleM\/TEST\/vendor\/dompdf\/dompdf\/lib\/fonts\/Kranky-Regular",
+        "italic": "\/home\/ifduktdo\/public_html\/SaleM\/TEST\/vendor\/dompdf\/dompdf\/lib\/fonts\/Kranky-Regular",
+        "bold_italic": "\/home\/ifduktdo\/public_html\/SaleM\/TEST\/vendor\/dompdf\/dompdf\/lib\/fonts\/Kranky-Regular"
     },
     "ipagp": {
-        "normal": "C:\\xampp\\htdocs\\SaleM\\vendor\\dompdf\\dompdf\/lib\/fonts\/ipagp",
-        "bold": "C:\\xampp\\htdocs\\SaleM\\vendor\\dompdf\\dompdf\/lib\/fonts\/ipagp",
-        "italic": "C:\\xampp\\htdocs\\SaleM\\vendor\\dompdf\\dompdf\/lib\/fonts\/ipagp",
-        "bold_italic": "C:\\xampp\\htdocs\\SaleM\\vendor\\dompdf\\dompdf\/lib\/fonts\/ipagp"
+        "normal": "\/home\/ifduktdo\/public_html\/SaleM\/TEST\/vendor\/dompdf\/dompdf\/lib\/fonts\/ipagp",
+        "bold": "\/home\/ifduktdo\/public_html\/SaleM\/TEST\/vendor\/dompdf\/dompdf\/lib\/fonts\/ipagp",
+        "italic": "\/home\/ifduktdo\/public_html\/SaleM\/TEST\/vendor\/dompdf\/dompdf\/lib\/fonts\/ipagp",
+        "bold_italic": "\/home\/ifduktdo\/public_html\/SaleM\/TEST\/vendor\/dompdf\/dompdf\/lib\/fonts\/ipagp"
     }
 }
