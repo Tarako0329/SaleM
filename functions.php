@@ -498,8 +498,9 @@ function getGUID(){
 }
 
 // =========================================================
-// 表(table)の出力
+// 表(table)の出力(Vueの適用で廃止)
 // =========================================================
+/*
 function drow_table($aryColumn,$result){
     //var_dump($result);
     try{
@@ -549,7 +550,7 @@ function drow_table($aryColumn,$result){
 
     }
 }
-
+*/
 // =========================================================
 // 表(table)の出力
 // =========================================================
@@ -822,8 +823,36 @@ function redirect_to_login($message) {
     exit();
 }
 
+function sort_hash($val,$type){
+    $rtn="";
+    $hashids = new Hashids\Hashids('this is salt',6);
+    if($type==="enc"){
+        $rtn = $hashids->encode($val);    
+    }else if($type==="dec"){
+        $rtn = $hashids->decode($val);
 
+    }else{
 
+    }
 
+    return $rtn;
+}
+
+function sqllogger($sql,$params,$phpname,$result){
+    $logsql=$sql;
+    $i=0;
+    $logfilename="sid_".$_SESSION['user_id'].".log";
+    while(strstr($logsql,"?")!==false){
+        $logsql = strstr($logsql,"?",true)."\"".$params[$i]."\"".substr(strstr($logsql,"?"), ((strlen(strstr($logsql,"?"))-1)*(-1))) ;
+        $i++;
+    }
+    if($result==="ok"){
+        file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",".$phpname.",".$logsql."\n",FILE_APPEND);
+    }else{
+        log_writer2($phpname." [unsuccess sql] =>",$logsql,"lv0");
+    }
+    
+    //return $phpname.",".$logsql;
+}
 
 ?>

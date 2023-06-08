@@ -40,6 +40,7 @@ ver2.99.0-038:to[bs5&Vue3CompApi]インボイス対応・・・履歴からの�
 	php load_font.php Kranky css/Kranky-Regular.ttf
 ver2.99.0-039:to[bs5&Vue3CompApi]bugfix
 ver2.99.0-040:to[bs5&Vue3CompApi]bugfix
+ver2.99.0-041:to[bs5&Vue3CompApi]紹介CDの短縮
 
 
 ローカルからテスト環境へ

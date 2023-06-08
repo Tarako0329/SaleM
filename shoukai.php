@@ -39,6 +39,7 @@ $stmt->execute();
 $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $ShoukaiCD=rot13encrypt2($row[0]["uid"]+10000);
+$ShoukaiCD=sort_hash($row[0]["uid"],"enc");
 $ShoukaishaCD="";
 if($row[0]["introducer_id"]<>""){
     $ShoukaishaCD=rot13encrypt2($row[0]["introducer_id"]+10000);

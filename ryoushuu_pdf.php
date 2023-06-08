@@ -5,7 +5,7 @@
 	date_default_timezone_set('Asia/Tokyo');
 	require "./vendor/autoload.php";
 	require_once "functions.php";
-
+	
 	//.envの取得
 	$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 	$dotenv->load();
@@ -20,11 +20,31 @@
 	define("DNS","mysql:host=".$_ENV["SV"].";dbname=".$_ENV["DBNAME"].";charset=utf8");
 	define("USER_NAME", $_ENV["DBUSER"]);
 	define("PASSWORD", $_ENV["PASS"]);
-	$pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
 	define("TITLE", $_ENV["TITLE"]);
 
-	
+	//メール送信関連
+	define("HOST", $_ENV["HOST"]);
+	define("PORT", $_ENV["PORT"]);
+	define("FROM", $_ENV["FROM"]);
+	define("PROTOCOL", $_ENV["PROTOCOL"]);
+	define("POP_HOST", $_ENV["POP_HOST"]);
+	define("POP_USER", $_ENV["POP_USER"]);
+	define("POP_PASS", $_ENV["POP_PASS"]);
+
+	//システム通知
+	define("SYSTEM_NOTICE_MAIL",$_ENV["SYSTEM_NOTICE_MAIL"]);
+
+	$rtn=session_set_cookie_params(24*60*60*24*3,'/','.'.MAIN_DOMAIN,true);
+	if($rtn==false){
+			//echo "ERROR:session_set_cookie_params";
+			log_writer2("php_header.php","ERROR:[session_set_cookie_params] が FALSE を返しました。","lv0");
+			echo "システムエラー発生。システム管理者へ通知しました。";
+			//共通ヘッダーでのエラーのため、リダイレクトTOPは実行できない。
+			exit();
+	}
+	session_start();
+	$pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
 	if(empty($_GET)){
 		echo "想定外アクセス。";
@@ -38,8 +58,6 @@
 	$qr_GUID=(!empty($_GET["qr"])?$_GET["qr"]:null);
 	$saiban=(!empty($_GET["sb"])?$_GET["sb"]:null);
 }
-//$id=2;
-//$UriNo="206";
 use Dompdf\Dompdf;
 
 if(!empty($qr_GUID)){
@@ -70,46 +88,51 @@ $add = $userinfo["address1"].$userinfo["address2"].$userinfo["address3"];
 $inquiry = (!empty($userinfo["inquiry_tel"])?$userinfo["inquiry_tel"]:"")."/".$userinfo["inquiry_mail"];
 
 //売上明細の取得
-$sql="select *,ZeiMS.hyoujimei as 税率desp,ZeiMS.zeiritu as 税率 from UriageData Uri inner join ZeiMS on Uri.zeiKBN = ZeiMS.zeiKBN where uid = ? and UriageNO like ? and ShouhinCD not like 'Z%' order by Uri.zeiKBN,Uri.ShouhinCD";
-$stmt = $pdo_h->prepare($sql);
-$stmt->bindValue(1, $id, PDO::PARAM_INT);
-$stmt->bindValue(2, $UriNo, PDO::PARAM_STR);
-$stmt->execute();
-$result = $stmt->fetchAll();
+{
+	$sql="select *,ZeiMS.hyoujimei as 税率desp,ZeiMS.zeiritu as 税率 from UriageData Uri inner join ZeiMS on Uri.zeiKBN = ZeiMS.zeiKBN where uid = ? and UriageNO like ? and ShouhinCD not like 'Z%' order by Uri.zeiKBN,Uri.	ShouhinCD";
+	$stmt = $pdo_h->prepare($sql);
+	$stmt->bindValue(1, $id, PDO::PARAM_INT);
+	$stmt->bindValue(2, $UriNo, PDO::PARAM_STR);
+	$stmt->execute();
+	$result = $stmt->fetchAll();
 
-$i=0;
-$Goukei=0;
-foreach($result as $row){
-	if($i===0){
-		$UriageDate = (string)$row["UriDate"];
-		$insDT = (string)$row["insDatetime"];
-		$EvName = $row["Event"];
-		$TkName = $row["TokuisakiNM"];
-	}//
-	$meisai .= "<tr><td style='text-align:left;'>".($row["zeiKBN"]=="1001"?"※":"").$row["ShouhinNM"]."</td><td class='meisaival'>".number_format($row["su"]);
-	$meisai .= "</td><td class='meisaival'>".number_format($row["tanka"])."</td><td class='meisaival'>".number_format($row["UriageKin"])."</td></tr>\n";
-	$Goukei += $row["UriageKin"];
-	$i++;
+	$i=0;
+	$Goukei=0;
+	$meisai="";
+	$ZeiKei="";
+
+	foreach($result as $row){
+		if($i===0){
+			$UriageDate = (string)$row["UriDate"];
+			$insDT = (string)$row["insDatetime"];
+			$EvName = $row["Event"];
+			$TkName = $row["TokuisakiNM"];
+		}//
+		$meisai .= "<tr><td style='text-align:left;'>".($row["zeiKBN"]=="1001"?"※":"").$row["ShouhinNM"]."</td><td class='meisaival'>".number_format($row["su"]);
+		$meisai .= "</td><td class='meisaival'>".number_format($row["tanka"])."</td><td class='meisaival'>".number_format($row["UriageKin"])."</td></tr>\n";
+		$Goukei += $row["UriageKin"];
+		$i++;
+	}
 }
-
 
 //税率ごとの合計
-$sql="select ZeiMS.hyoujimei as 税率,ZeiMS.zeiKBN, sum(UriageKin) as 売上金額, sum(zei) as 消費税額 from UriageData Uri inner join ZeiMS on Uri.zeiKBN = ZeiMS.zeiKBN where uid = ? and UriageNO like ? group by ZeiMS.hyoujimei,ZeiMS.zeiKBN order by ZeiMS.zeiKBN";
-$stmt = $pdo_h->prepare($sql);
-$stmt->bindValue(1, $id, PDO::PARAM_INT);
-$stmt->bindValue(2, $UriNo, PDO::PARAM_STR);
-$stmt->execute();
-$result = $stmt->fetchAll();
-$ZeiGoukei = 0;
-foreach($result as $row){
-	$zeigaku = $row["消費税額"] ;
-	$ZeiKei .= "<tr><td style='width:30%;'>".$row["税率"]."対象</td><td style='text-align:right;width:30%;'>￥".number_format($row["売上金額"])."-</td><td style='width:20%;'>消費税</td><td style='text-align:right;width:20%;'>￥".number_format($zeigaku)."-</td></tr>\n";
-	$ZeiGoukei += $zeigaku;
+{
+	$sql="select ZeiMS.hyoujimei as 税率,ZeiMS.zeiKBN, sum(UriageKin) as 売上金額, sum(zei) as 消費税額 from UriageData Uri inner join ZeiMS on Uri.zeiKBN = ZeiMS.zeiKBN where uid = ? and UriageNO like ? group by ZeiMS.	hyoujimei,ZeiMS.zeiKBN order by ZeiMS.zeiKBN";
+	$stmt = $pdo_h->prepare($sql);
+	$stmt->bindValue(1, $id, PDO::PARAM_INT);
+	$stmt->bindValue(2, $UriNo, PDO::PARAM_STR);
+	$stmt->execute();
+	$result = $stmt->fetchAll();
+	$ZeiGoukei = 0;
+	foreach($result as $row){
+		$zeigaku = $row["消費税額"] ;
+		$ZeiKei .= "<tr><td style='width:30%;'>".$row["税率"]."対象</td><td style='text-align:right;width:30%;'>￥".number_format($row["売上金額"])."-</td><td style='width:20%;'>消費税</td><td style='text-align:right;width:20%;'>	￥".number_format($zeigaku)."-</td></tr>\n";
+		$ZeiGoukei += $zeigaku;
+	}
+	$Goukei = $Goukei+$ZeiGoukei;
+	$ZeiGoukei = number_format($ZeiGoukei);
+	$Goukei = number_format($Goukei);
 }
-$Goukei = $Goukei+$ZeiGoukei;
-$ZeiGoukei = number_format($ZeiGoukei);
-$Goukei = number_format($Goukei);
-
 $message="";
 if($saiban==="on"){
 	//領収書Noの取得
@@ -133,7 +156,7 @@ if($saiban==="on"){
 $html = <<< EOM
 <html>
 	<head>
-		<meta charset="utf-8">
+		<meta charset='utf-8'>
 		<style>
 			html{
 				font-family:ipagp;
@@ -236,17 +259,6 @@ $html = <<< EOM
 EOM;
 try{
 	// PDFの設定～出力
-	/*
-		$dompdf = new Dompdf();
-		$dompdf->loadHtml($html);
-		$options = $dompdf->getOptions();
-		$options->set(array('isRemoteEnabled' => false));
-		$dompdf->setOptions($options);
-		$dompdf->setPaper('A4', 'portrait');
-		$dompdf->render();
-		$dompdf->stream($filename, array('Attachment' => 0));
-	*/
-
 	output($html,$filename);
 
 	if($saiban==="on"){
@@ -263,15 +275,15 @@ try{
 	
 		if($status!==false){
 			$pdo_h->commit();
-			log_writer2(basename(__FILE__)." [insert sql] =>",$sql,"lv0");
+			
 			$msg = "登録が完了しました。";
 			$alert_status = "alert-success";
-			//file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",".basename(__FILE__).",UPDATE,succsess,".$sqlstr."\n",FILE_APPEND);
+			sqllogger($sql,[$id,$RyoushuuNO,$UriNo,$Atena,$html,$qr_GUID],basename(__FILE__),"ok");
 		}else{
 			$pdo_h->rollBack();
 			$msg = "失敗。";
 			$alert_status = "alert-danger";
-			//file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",".basename(__FILE__).",UPDATE,failed,".$sqlstr."\n",FILE_APPEND);
+			sqllogger($sql,[$id,$RyoushuuNO,$UriNo,$Atena,$html,$qr_GUID],basename(__FILE__),"ng");
 		}
 	}
 }catch(Exception $e){

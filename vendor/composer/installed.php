@@ -1,11 +1,11 @@
-<?php return array(
+<?php return array( 
     'root' => array(
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '51b101f86b978517dee91621f17b4eda5c98a7e1',
+        'reference' => '0eeb83fb5c6e3707844bc8b5a70f6b16ff3406dc',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '51b101f86b978517dee91621f17b4eda5c98a7e1',
+            'reference' => '0eeb83fb5c6e3707844bc8b5a70f6b16ff3406dc',
             'dev_requirement' => false,
         ),
         'dompdf/dompdf' => array(
@@ -35,6 +35,15 @@
             'install_path' => __DIR__ . '/../graham-campbell/result-type',
             'aliases' => array(),
             'reference' => '0690bde05318336c7221785f2a932467f98b64ca',
+            'dev_requirement' => false,
+        ),
+        'hashids/hashids' => array(
+            'pretty_version' => '5.0.2',
+            'version' => '5.0.2.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../hashids/hashids',
+            'aliases' => array(),
+            'reference' => '197171016b77ddf14e259e186559152eb3f8cf33',
             'dev_requirement' => false,
         ),
         'masterminds/html5' => array(
