@@ -6,7 +6,8 @@ $token = csrf_create();
 $sqlstr="select * from Users where uid=?";
 $flg="";
 if(!empty($_POST)){
-    $ShoukaishaCD=rot13decrypt2(secho($_POST["SHOUKAI"]))-10000;
+    //$ShoukaishaCD=rot13decrypt2(secho($_POST["SHOUKAI"]))-10000;
+    $ShoukaishaCD=sort_hash(secho($_POST["SHOUKAI"]),"dec");
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $ShoukaishaCD, PDO::PARAM_INT);
     $stmt->execute();
@@ -38,11 +39,12 @@ $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
 $stmt->execute();
 $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$ShoukaiCD=rot13encrypt2($row[0]["uid"]+10000);
+//$ShoukaiCD=rot13encrypt2($row[0]["uid"]+10000);
 $ShoukaiCD=sort_hash($row[0]["uid"],"enc");
 $ShoukaishaCD="";
 if($row[0]["introducer_id"]<>""){
-    $ShoukaishaCD=rot13encrypt2($row[0]["introducer_id"]+10000);
+    //$ShoukaishaCD=rot13encrypt2($row[0]["introducer_id"]+10000);
+    $ShoukaishaCD=sort_hash($row[0]["introducer_id"],"enc");
 }
 
 
@@ -52,44 +54,18 @@ if($row[0]["introducer_id"]<>""){
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
-    include "head.html" 
+    //include "head.html" ;
+    include "head_bs5.html" ;
     ?>
     <!--ページ専用CSS-->
+    <script src='script/jquery-3.6.0.min.js'></script>
     <link rel="stylesheet" href="css/style_menu.css?<?php echo $time; ?>" >
     <TITLE><?php echo $title;?></TITLE>
 </head>
-
-<script>
-window.onload = function() {
-    //アラート用
-    function alert(msg) {
-      return $('<div class="alert" role="alert"></div>')
-        .text(msg);
-    }
-    (function($){
-      const s = alert('<?php echo $msg; ?> ').addClass('alert-success');
-      const e = alert('<?php echo $msg; ?> ').addClass('alert-danger');
-      // アラートを表示する
-      $('#alert-s').append(s);
-      // 5秒後にアラートを消す
-      setTimeout(() => {
-        s.alert('close');
-      }, 5000);
-      $('#alert-e').append(e);
-      /* アラートを消さない
-      setTimeout(() => {
-        e.alert('close');
-      }, 5000);
-      */
-    })(jQuery);
-}  
-</script>
-
-<header class="header-color common_header">
-    <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div></a></div>
-</header>
-
 <body class='common_body'>
+    <header class="header-color common_header">
+        <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div></a></div>
+    </header>
     <?php
     if($flg=="success"){
         echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-s' class='lead'></div></div></div></div>";
@@ -130,6 +106,27 @@ window.onload = function() {
         </form>
         
     </div>
+    <script>
+        window.onload = function() {
+            //アラート用
+            function alert(msg) {
+              return $('<div class="alert" role="alert"></div>')
+                .text(msg);
+            }
+            (function($){
+              const s = alert('<?php echo $msg; ?> ').addClass('alert-success');
+              const e = alert('<?php echo $msg; ?> ').addClass('alert-danger');
+              // アラートを表示する
+              $('#alert-s').append(s);
+              // 5秒後にアラートを消す
+              setTimeout(() => {
+                s.alert('close');
+              }, 5000);
+              $('#alert-e').append(e);
+            })(jQuery);
+            console_log("<?php echo $url; ?>","lv3")
+        }  
+    </script>
     
 </body>
 
