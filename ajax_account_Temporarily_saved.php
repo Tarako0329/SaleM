@@ -74,6 +74,7 @@ if($rtn !== true){
 	$_SESSION["QUESTION"] = $_POST["QUESTION"];
 	$_SESSION["ANSWER"] = $_POST["ANSWER"];
 	$_SESSION["PASS"] = passEX($_POST["PASS"],$_POST["MAIL"],$key);
+	$_SESSION["SHOUKAI"] = sort_hash($_POST["shoukai"],"dec");
 	$msg = "更新成功。";
 	$alert_status = "alert-success";
 	$reseve_status=true;
