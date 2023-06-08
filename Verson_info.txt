@@ -41,6 +41,7 @@ ver2.99.0-038:to[bs5&Vue3CompApi]インボイス対応・・・履歴からの�
 ver2.99.0-039:to[bs5&Vue3CompApi]bugfix
 ver2.99.0-040:to[bs5&Vue3CompApi]bugfix
 ver2.99.0-041:to[bs5&Vue3CompApi]紹介CDの短縮
+ver2.99.0-042:to[bs5&Vue3CompApi]紹介CDの短縮
 
 
 ローカルからテスト環境へ
