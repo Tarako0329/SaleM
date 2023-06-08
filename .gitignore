@@ -1,6 +1,7 @@
 .env
 *error_log*
-差分SQL.sql
+*.sql
+*.sh
 qdmail.log
 *.log
 .bk
