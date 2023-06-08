@@ -829,8 +829,8 @@ function sort_hash($val,$type){
     if($type==="enc"){
         $rtn = $hashids->encode($val);    
     }else if($type==="dec"){
-        $rtn = $hashids->decode($val);
-
+        $tmp = $hashids->decode($val);
+        $rtn = $tmp[0];
     }else{
 
     }
