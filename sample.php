@@ -3,11 +3,11 @@ date_default_timezone_set('Asia/Tokyo');
 require "./vendor/autoload.php";
 require_once "functions.php";
 
-$enc = sort_hash(2,"enc");
-$dec = sort_hash($enc,"dec");
+$sql = "insert into hoge values(:hoge1,:hoge2,:hoge3)";
+$params["hoge1"] = "1";
+$params["hoge2"] = "2";
+$params["hoge3"] = "3";
 
-echo "enc => ".$enc;
-echo "<br>";
-echo "dec => ".$dec;
-
+var_dump(array_keys($params));
+sqllogger($sql,$params,"test","ng");
 ?>

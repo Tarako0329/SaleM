@@ -37,29 +37,67 @@ $stmt->execute();
 $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $new_shouhinCD = $row[0]["MCD"]+1;
 
+$params[0]=$_SESSION['user_id'];
+$params[1]=$new_shouhinCD;
+$params[2]=$_POST["shouhinNM"];
+$params[3]=$_POST["tanka"];
+$params[4]=$_POST["shouhizei"];
+$params[5]=$zeiritu;
+$params[6]=$zeikbn;
+$params[7]=$_POST["utisu"];
+$params[8]=$_POST["tani"];
+$params[9]=$_POST["genka"];
+$params[10]=$_POST["bunrui1"];
+$params[11]=$_POST["bunrui2"];
+$params[12]=$_POST["bunrui3"];
+$params[13]=$_POST["hyoujiKBN1"];
+$params[14]=$_POST["hyoujiKBN2"];
+$params[15]=$_POST["hyoujiKBN3"];
+$params[16]=$_POST["hyoujiNO"];
+
 $sqlstr="insert into ShouhinMS values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 $stmt = $pdo_h->prepare($sqlstr);
-$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-$stmt->bindValue(2, $new_shouhinCD, PDO::PARAM_INT);
-$stmt->bindValue(3, rot13encrypt($_POST["shouhinNM"]), PDO::PARAM_STR);
-$stmt->bindValue(4, $_POST["tanka"], PDO::PARAM_INT);
-$stmt->bindValue(5, $_POST["shouhizei"], PDO::PARAM_INT);
-$stmt->bindValue(6, $zeiritu, PDO::PARAM_INT);
-$stmt->bindValue(7, $zeikbn, PDO::PARAM_INT);
-$stmt->bindValue(8, $_POST["utisu"], PDO::PARAM_INT);
-$stmt->bindValue(9, $_POST["tani"], PDO::PARAM_STR);
-$stmt->bindValue(10, $_POST["genka"], PDO::PARAM_INT);
-$stmt->bindValue(11,$_POST["bunrui1"], PDO::PARAM_STR);
-$stmt->bindValue(12, $_POST["bunrui2"], PDO::PARAM_STR);
-$stmt->bindValue(13, $_POST["bunrui3"], PDO::PARAM_STR);
-$stmt->bindValue(14, $_POST["hyoujiKBN1"], PDO::PARAM_STR);
-$stmt->bindValue(15, $_POST["hyoujiKBN2"], PDO::PARAM_STR);
-$stmt->bindValue(16, $_POST["hyoujiKBN3"], PDO::PARAM_STR);
-$stmt->bindValue(17, $_POST["hyoujiNO"], PDO::PARAM_INT);
+/*
+    $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
+    $stmt->bindValue(2,  $new_shouhinCD, PDO::PARAM_INT);
+    $stmt->bindValue(3,  $_POST["shouhinNM"], PDO::PARAM_STR);
+    $stmt->bindValue(4,  $_POST["tanka"], PDO::PARAM_INT);
+    $stmt->bindValue(5,  $_POST["shouhizei"], PDO::PARAM_INT);
+    $stmt->bindValue(6,  $zeiritu, PDO::PARAM_INT);
+    $stmt->bindValue(7,  $zeikbn, PDO::PARAM_INT);
+    $stmt->bindValue(8,  $_POST["utisu"], PDO::PARAM_INT);
+    $stmt->bindValue(9,  $_POST["tani"], PDO::PARAM_STR);
+    $stmt->bindValue(10, $_POST["genka"], PDO::PARAM_INT);
+    $stmt->bindValue(11, $_POST["bunrui1"], PDO::PARAM_STR);
+    $stmt->bindValue(12, $_POST["bunrui2"], PDO::PARAM_STR);
+    $stmt->bindValue(13, $_POST["bunrui3"], PDO::PARAM_STR);
+    $stmt->bindValue(14, $_POST["hyoujiKBN1"], PDO::PARAM_STR);
+    $stmt->bindValue(15, $_POST["hyoujiKBN2"], PDO::PARAM_STR);
+    $stmt->bindValue(16, $_POST["hyoujiKBN3"], PDO::PARAM_STR);
+    $stmt->bindValue(17, $_POST["hyoujiNO"], PDO::PARAM_INT);
+*/
+$stmt->bindValue(1,  $params[0], PDO::PARAM_INT);
+$stmt->bindValue(2,  $params[1], PDO::PARAM_INT);
+$stmt->bindValue(3,  $params[2], PDO::PARAM_STR);
+$stmt->bindValue(4,  $params[3], PDO::PARAM_INT);
+$stmt->bindValue(5,  $params[4], PDO::PARAM_INT);
+$stmt->bindValue(6,  $params[5], PDO::PARAM_INT);
+$stmt->bindValue(7,  $params[6], PDO::PARAM_INT);
+$stmt->bindValue(8,  $params[7], PDO::PARAM_INT);
+$stmt->bindValue(9,  $params[8], PDO::PARAM_STR);
+$stmt->bindValue(10, $params[9], PDO::PARAM_INT);
+$stmt->bindValue(11, $params[10], PDO::PARAM_STR);
+$stmt->bindValue(12, $params[11], PDO::PARAM_STR);
+$stmt->bindValue(13, $params[12], PDO::PARAM_STR);
+$stmt->bindValue(14, $params[13], PDO::PARAM_STR);
+$stmt->bindValue(15, $params[14], PDO::PARAM_STR);
+$stmt->bindValue(16, $params[15], PDO::PARAM_STR);
+$stmt->bindValue(17, $params[16], PDO::PARAM_INT);
 
 $status=$stmt->execute();
 if($status==true){
     $_SESSION["MSG"] = secho($_POST["shouhinNM"])."　が登録されました。";
+    sqllogger($sqlstr,$params,basename(__FILE__),"ok");
 }else{
     $_SESSION["MSG"] = "登録が失敗しました。";
 }

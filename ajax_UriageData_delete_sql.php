@@ -28,6 +28,7 @@ if(csrf_chk()===false){
     
         try{
             $pdo_h->beginTransaction();
+            sqllogger("START TRANSACTION",[],basename(__FILE__),"ok");
             $stmt = $pdo_h->prepare( $sql );
             //bind処理
             $stmt->bindValue("w_uid", $_SESSION["user_id"], PDO::PARAM_INT);
@@ -39,12 +40,14 @@ if(csrf_chk()===false){
     
             if($status && $count<>0){
                 $pdo_h->commit();
+                sqllogger("commit",[],basename(__FILE__),"ok");
                 $reseve_status=true;
                 $msg = "削除成功。";
                 $alert_status = "alert-success";
                 file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,succsess,".$up_sqllog."\n",FILE_APPEND);
             }else{
                 $pdo_h->rollBack();
+                sqllogger("rollback",[],basename(__FILE__),"ok");
                 $reseve_status=true;
                 $msg = "削除失敗。";
                 $alert_status = "alert-danger";
@@ -52,6 +55,7 @@ if(csrf_chk()===false){
             }
         }catch(Exception $e){
             $pdo_h->rollBack();
+            sqllogger("rollback",[],basename(__FILE__),"ok");
             $msg = "システムエラーによる更新失敗。管理者へ通知しました。";
             $alert_status = "alert-danger";
             log_writer2("ajax_UriageData_update_sql.php [Exception \$e] =>",$e,"lv0");

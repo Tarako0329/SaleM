@@ -20,6 +20,7 @@ $array = $_POST["ORDERS"];
 $sqlstr = "";
 
 $pdo_h->beginTransaction();
+sqllogger("START TRANSACTION",[],basename(__FILE__),"ok");
 $E_Flg=0;
 
 if($_POST["categry"]=="cate1"){
@@ -52,6 +53,7 @@ foreach($array as $row){
     
 if($E_Flg==0){
     $pdo_h->commit();
+    sqllogger("commit",[],basename(__FILE__),"ok");
     $msg[0] = array(
         "EMSG" => "更新されました。"
         ,"status" => "alert-success"
@@ -60,6 +62,7 @@ if($E_Flg==0){
 }else{
     //1件でも失敗したらロールバック
     $pdo_h->rollBack();
+    sqllogger("rollback",[],basename(__FILE__),"ok");
     $msg[0] = array(
         "EMSG" => "更新が失敗しました。"
         ,"status" => "alert-danger"

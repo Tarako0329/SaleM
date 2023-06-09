@@ -31,6 +31,7 @@ if(csrf_chk()===false){
 
         try{
             $pdo_h->beginTransaction();
+            sqllogger("START TRANSACTION",[],basename(__FILE__),"ok");
 
             //同日同イベントの在庫情報があったらクリアする（delete&insert)
             $sqlstr = "select count(*) as cnt from Zaiko where uid=? and shuppindate=? and hokanbasho=?";
@@ -95,10 +96,12 @@ if(csrf_chk()===false){
 
             if($E_Flg===0){
                 $pdo_h->commit();
+                sqllogger("commit",[],basename(__FILE__),"ok");
                 $msg = "在庫が登録されました。（在庫№：".$zaikoNO."）";
                 $alert_status = "alert-success";
             }else{
                 $pdo_h->rollBack();
+                sqllogger("rollback",[],basename(__FILE__),"ok");
                 $msg = "在庫登録処理が失敗しました。";
                 $alert_status = "alert-danger";
             }
@@ -106,6 +109,7 @@ if(csrf_chk()===false){
 
         }catch(Exception $e){
             $pdo_h->rollBack();
+            sqllogger("rollback",[],basename(__FILE__),"ok");
             $msg = "システムエラーによる更新失敗。管理者へ通知しました。";
             $alert_status = "alert-danger";
             log_writer2("ajax_EVregi_zaiko_sql.php [Exception \$e] =>",$e,"lv0");

@@ -91,208 +91,169 @@ if(is_null($row[0]["UriageNO"])){
 	$UriageNO = $row[0]["UriageNO"]+1;
 }
 //echo (string)$UriageNO;
+$params=[];
+$params["uid"] = $_SESSION['user_id'];
+$params["UriageNO"] = $UriageNO;
+$params["UriDate"] = filter_input(INPUT_POST,'KEIJOUBI');
+$params["insDatetime"] = date("Y/m/d H:i:s");
+$params["Event"] = filter_input(INPUT_POST,'EV');
+$params["TokuisakiNM"] = filter_input(INPUT_POST,'KOKYAKU');
 
 try{
 	$pdo_h->beginTransaction();
-	$sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime,genka_tanka)";
-	$sqlstr = $sqlstr." values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)";
-	
-	$KEIJOUBI = filter_input(INPUT_POST,'KEIJOUBI');
-	$EV = filter_input(INPUT_POST,'EV');
-	$KOKYAKU = filter_input(INPUT_POST,'KOKYAKU');
-	$time = date("Y/m/d H:i:s");
+	sqllogger("START TRANSACTION",[],basename(__FILE__),"ok");
+	$sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zeiKBN,genka_tanka)";
+	$sqlstr = $sqlstr." values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:su,:Utisu,:tanka,:UriageKin,:zeiKBN,:genka_tanka)";
 
-	foreach($array as $row){
+	foreach($array as $row){//本体額明細の登録
 		if($row["SU"]==0){continue;}//売上数０はスキップ
-		
-		$sqllog = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime,genka_tanka) ";
-		$sqllog = $sqllog."values(".$_SESSION['user_id'].",".$UriageNO.",'".$KEIJOUBI."','".$time."','".$EV."','".$KOKYAKU."','".$row["CD"]."','".$row["NM"]."','".$row["SU"]."','".$row["UTISU"]."','".$row["TANKA"]."','".($row["SU"] * $row["TANKA"])."','".($row["SU"] * $row["ZEI"])."','".$row["ZEIKBN"]."',0,'".$row["GENKA_TANKA"]."')";
-		
 		$stmt = $pdo_h->prepare($sqlstr);
-		
-		$stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
-		$stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
-		$stmt->bindValue(3,  $KEIJOUBI, PDO::PARAM_STR);
-		$stmt->bindValue(4,  $time, PDO::PARAM_STR);
-		$stmt->bindValue(5,  $EV, PDO::PARAM_INT);
-		$stmt->bindValue(6,  $KOKYAKU, PDO::PARAM_STR);
-		$stmt->bindValue(7,  $row["CD"], PDO::PARAM_STR);                       //商品CD
-		$stmt->bindValue(8,  $row["NM"], PDO::PARAM_STR);                       //商品名
-		$stmt->bindValue(9,  $row["SU"], PDO::PARAM_INT);                       //数量
-		$stmt->bindValue(10, $row["UTISU"], PDO::PARAM_INT);                    //内数
-		$stmt->bindValue(11, $row["TANKA"], PDO::PARAM_INT);                    //単価
-		$stmt->bindValue(12, ($row["SU"] * $row["TANKA"]), PDO::PARAM_INT);     //数量×単価
-		//$stmt->bindValue(13, ($row["SU"] * $row["ZEI"]), PDO::PARAM_INT);     //数量×単価税
-		$stmt->bindValue(13, 0, PDO::PARAM_INT);       													//インボイス対応・消費税は合計から算出
-		$stmt->bindValue(14, $row["ZEIKBN"], PDO::PARAM_INT);                   //税区分
-		$stmt->bindValue(15, $row["GENKA_TANKA"], PDO::PARAM_INT);              //原価単価
-		
-		$flg=$stmt->execute();
-		
-		if($flg){
-			$ins_cnt++;
-			$emsg="売上のINSERTは正常終了\n";
-			file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,success,".$sqllog."\n",FILE_APPEND);
-		}else{
-			$emsg="売上のINSERTでエラー";
-			file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,failed,".$sqllog."\n",FILE_APPEND);
-			$E_Flg=1;
-			break;
-		}
+
+		$params["ShouhinCD"] = $row["CD"];
+		$params["ShouhinNM"] = $row["NM"];
+		$params["su"] = $row["SU"];
+		$params["Utisu"] = $row["UTISU"];
+		$params["tanka"] = $row["TANKA"];
+		$params["UriageKin"] = ($row["SU"] * $row["TANKA"]);
+		$params["zeiKBN"] = $row["ZEIKBN"];
+		$params["genka_tanka"] = $row["GENKA_TANKA"];
+
+		$stmt->bindValue("uid",  $params["uid"], PDO::PARAM_INT);
+		$stmt->bindValue("UriageNO",  $params["UriageNO"], PDO::PARAM_INT);
+		$stmt->bindValue("UriDate",  $params["UriDate"], PDO::PARAM_STR);
+		$stmt->bindValue("insDatetime",  $params["insDatetime"], PDO::PARAM_STR);
+		$stmt->bindValue("Event",  $params["Event"], PDO::PARAM_INT);
+		$stmt->bindValue("TokuisakiNM",  $params["TokuisakiNM"], PDO::PARAM_STR);
+		$stmt->bindValue("ShouhinCD",  $params["ShouhinCD"], PDO::PARAM_STR);      //商品CD
+		$stmt->bindValue("ShouhinNM",  $params["ShouhinNM"], PDO::PARAM_STR);      //商品名
+		$stmt->bindValue("su",  $params["su"], PDO::PARAM_INT);      //数量
+		$stmt->bindValue("Utisu", $params["Utisu"], PDO::PARAM_INT);      //内数
+		$stmt->bindValue("tanka", $params["tanka"], PDO::PARAM_INT);     //単価
+		$stmt->bindValue("UriageKin", $params["UriageKin"], PDO::PARAM_INT);     //数量×単価
+		$stmt->bindValue("zeiKBN", $params["zeiKBN"], PDO::PARAM_INT);     //税区分
+		$stmt->bindValue("genka_tanka", $params["genka_tanka"], PDO::PARAM_INT);     //原価単価
+
+		$stmt->execute();
+		sqllogger($sqlstr,$params,basename(__FILE__),"ok");
+		$ins_cnt++;
+		/*executeの戻り値チェックは不要。失敗時はExeptionが出るのでcatchで対応
+			$flg=$stmt->execute();
+			if($flg){
+				$ins_cnt++;
+				$emsg="売上のINSERTは正常終了\n";
+				sqllogger($sqlstr,$params,basename(__FILE__),"ok");
+			}else{
+				$emsg="売上のINSERTでエラー";
+				sqllogger($sqlstr,$params,basename(__FILE__),"ng");
+				$E_Flg=1;
+				break;
+			}
+		*/
 	}
 
 	//インボイス対応（消費税レコードと調整レコードの追加）
-	$sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,UriageKin,zei,zeiKBN)";
-	$sqlstr_val = " values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:UriageKin,:zei,:zeiKBN)";
+	$sqlstr_z = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,zei,zeiKBN)";
+	$sqlstr_z .= " values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:zei,:zeiKBN)";
+	$sqlstr_c = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,UriageKin,zeiKBN)";
+	$sqlstr_c .= " values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:UriageKin,:zeiKBN)";
 
 	foreach($ZeiKbnSummary as $row){
-		$sqllog = $sqlstr." values(".$_SESSION['user_id'].",".$UriageNO.",'".$KEIJOUBI."','".$time."','".$EV."','".$KOKYAKU."','Z".substr("000000".$row["ZEIKBN"],-6)."','".$row["ZEIKBNMEI"]."','0','".$row["SHOUHIZEI"]."','".$row["ZEIKBN"]."')";
-		$stmt = $pdo_h->prepare($sqlstr.$sqlstr_val);
+		$stmt = $pdo_h->prepare($sqlstr_z);
+
+		$params["ShouhinCD"] = "Z".substr("000000".$row["ZEIKBN"],-6);
+		$params["ShouhinNM"] = ($row["ZEIRITU"]<>0?$row["ZEIKBNMEI"]." 消費税額":$row["ZEIKBNMEI"]);
+		$params["zei"] = $row["SHOUHIZEI"];
+		$params["zeiKBN"] = $row["ZEIKBN"];
 		
-		$stmt->bindValue("uid",  $_SESSION['user_id'], PDO::PARAM_INT);
-		$stmt->bindValue("UriageNO",  $UriageNO, PDO::PARAM_INT);
-		$stmt->bindValue("UriDate",  $KEIJOUBI, PDO::PARAM_STR);
-		$stmt->bindValue("insDatetime",  $time, PDO::PARAM_STR);
-		$stmt->bindValue("Event",  $EV, PDO::PARAM_INT);
-		$stmt->bindValue("TokuisakiNM",  $KOKYAKU, PDO::PARAM_STR);
-		$stmt->bindValue("ShouhinCD",  "Z".substr("000000".$row["ZEIKBN"],-6), PDO::PARAM_STR);	//商品CD["Z" + 0埋 + 税区分] Z=税
-		$stmt->bindValue("ShouhinNM",  ($row["ZEIRITU"]<>0?$row["ZEIKBNMEI"]." 消費税額":$row["ZEIKBNMEI"]), PDO::PARAM_STR);                      //商品名
-		$stmt->bindValue("UriageKin",  0, PDO::PARAM_INT);                      								//売上０固定
-		$stmt->bindValue("zei", $row["SHOUHIZEI"], PDO::PARAM_INT);       											//消費税
-		$stmt->bindValue("zeiKBN", $row["ZEIKBN"], PDO::PARAM_INT);                   					//税区分
-		$flg=$stmt->execute();
-		
-		if($flg){
-			$ins_cnt++;
-			$emsg="売上消費税のINSERTは正常終了\n";
-			file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,success,".$sqllog."\n",FILE_APPEND);
-		}else{
-			$emsg="売上消費税のINSERTでエラー";
-			file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,failed,".$sqllog."\n",FILE_APPEND);
-			$E_Flg=1;
-			break;
-		}
-		if($row["CHOUSEIGAKU"]!=0){
-			$sqllog = $sqlstr." values(".$_SESSION['user_id'].",".$UriageNO.",'".$KEIJOUBI."','".$time."','".$EV."','".$KOKYAKU."','C".substr("000000".$row["ZEIKBN"],-6)."','".$row["ZEIKBNMEI"]."本体調整額','".$row["CHOUSEIGAKU"]."','0','".$row["ZEIKBN"]."')";
-			$stmt = $pdo_h->prepare($sqlstr.$sqlstr_val);
-			
+		$stmt->bindValue("uid",  $params["uid"], PDO::PARAM_INT);
+		$stmt->bindValue("UriageNO",  $params["UriageNO"], PDO::PARAM_INT);
+		$stmt->bindValue("UriDate",  $params["UriDate"], PDO::PARAM_STR);
+		$stmt->bindValue("insDatetime",  $params["insDatetime"], PDO::PARAM_STR);
+		$stmt->bindValue("Event",  $params["Event"], PDO::PARAM_INT);
+		$stmt->bindValue("TokuisakiNM",  $params["TokuisakiNM"], PDO::PARAM_STR);
+		$stmt->bindValue("ShouhinCD",  $params["ShouhinCD"], PDO::PARAM_STR);     //商品CD
+		$stmt->bindValue("ShouhinNM",  $params["ShouhinNM"], PDO::PARAM_STR);     //商品名
+		$stmt->bindValue("zei", $params["zei"], PDO::PARAM_INT);       						//消費税
+		$stmt->bindValue("zeiKBN", $params["zeiKBN"], PDO::PARAM_INT);            //税区分
+		/*
 			$stmt->bindValue("uid",  $_SESSION['user_id'], PDO::PARAM_INT);
 			$stmt->bindValue("UriageNO",  $UriageNO, PDO::PARAM_INT);
 			$stmt->bindValue("UriDate",  $KEIJOUBI, PDO::PARAM_STR);
 			$stmt->bindValue("insDatetime",  $time, PDO::PARAM_STR);
 			$stmt->bindValue("Event",  $EV, PDO::PARAM_INT);
 			$stmt->bindValue("TokuisakiNM",  $KOKYAKU, PDO::PARAM_STR);
-			$stmt->bindValue("ShouhinCD",  "C".substr("000000".$row["ZEIKBN"],-6), PDO::PARAM_STR);	//商品CD["C" + 0埋 + 税区分] C=調整
-			$stmt->bindValue("ShouhinNM",  $row["ZEIKBNMEI"]."本体調整額", PDO::PARAM_STR);          //商品名
-			$stmt->bindValue("UriageKin",  $row["CHOUSEIGAKU"], PDO::PARAM_INT);                    //売上本体調整額
-			$stmt->bindValue("zei", 0, PDO::PARAM_INT);       																			//消費税
+			$stmt->bindValue("ShouhinCD",  "Z".substr("000000".$row["ZEIKBN"],-6), PDO::PARAM_STR);	//商品CD["Z" + 0埋 + 税区分] Z=税
+			$stmt->bindValue("ShouhinNM",  ($row["ZEIRITU"]<>0?$row["ZEIKBNMEI"]." 消費税額":$row["ZEIKBNMEI"]), PDO::PARAM_STR);                      //商品名
+			$stmt->bindValue("zei", $row["SHOUHIZEI"], PDO::PARAM_INT);       											//消費税
 			$stmt->bindValue("zeiKBN", $row["ZEIKBN"], PDO::PARAM_INT);                   					//税区分
+		*/
+		$stmt->execute();
+		$ins_cnt++;
+		sqllogger($sqlstr_z,$params,basename(__FILE__),"ok");
+
+		/*executeの戻り値チェックは不要。失敗時はExeptionが出るのでcatchで対応
 			$flg=$stmt->execute();
-			
+
 			if($flg){
 				$ins_cnt++;
-				$emsg="調整額のINSERTは正常終了\n";
-				file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,success,".$sqllog."\n",FILE_APPEND);
+				$emsg="売上消費税のINSERTは正常終了\n";
+				sqllogger($sqlstr_z,$params,basename(__FILE__),"ok");
 			}else{
-				$emsg="調整額のINSERTでエラー";
-				file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,failed,".$sqllog."\n",FILE_APPEND);
+				$emsg="売上消費税のINSERTでエラー";
+				sqllogger($sqlstr_z,$params,basename(__FILE__),"ng");
 				$E_Flg=1;
 				break;
 			}
+		*/
+		if($row["CHOUSEIGAKU"]!=0){
+			$stmt = $pdo_h->prepare($sqlstr_c);
+
+			$params["ShouhinCD"] = "C".substr("000000".$row["ZEIKBN"],-6);
+			$params["ShouhinNM"] = $row["ZEIKBNMEI"]."本体調整額";
+			$params["UriageKin"] = $row["CHOUSEIGAKU"];
+			$params["zeiKBN"] = $row["ZEIKBN"];
+			
+			$stmt->bindValue("uid",  $params["uid"], PDO::PARAM_INT);
+			$stmt->bindValue("UriageNO",  $params["UriageNO"], PDO::PARAM_INT);
+			$stmt->bindValue("UriDate",  $params["UriDate"], PDO::PARAM_STR);
+			$stmt->bindValue("insDatetime",  $params["insDatetime"], PDO::PARAM_STR);
+			$stmt->bindValue("Event",  $params["Event"], PDO::PARAM_INT);
+			$stmt->bindValue("TokuisakiNM",  $params["TokuisakiNM"], PDO::PARAM_STR);
+			$stmt->bindValue("ShouhinCD",  $params["ShouhinCD"], PDO::PARAM_STR);     //商品CD
+			$stmt->bindValue("ShouhinNM",  $params["ShouhinNM"], PDO::PARAM_STR);     //商品名
+			$stmt->bindValue("UriageKin", $params["UriageKin"], PDO::PARAM_INT);      //売上本体調整額
+			$stmt->bindValue("zeiKBN", $params["zeiKBN"], PDO::PARAM_INT);            //税区分
+			/*
+				$stmt->bindValue("uid",  $_SESSION['user_id'], PDO::PARAM_INT);
+				$stmt->bindValue("UriageNO",  $UriageNO, PDO::PARAM_INT);
+				$stmt->bindValue("UriDate",  $KEIJOUBI, PDO::PARAM_STR);
+				$stmt->bindValue("insDatetime",  $time, PDO::PARAM_STR);
+				$stmt->bindValue("Event",  $EV, PDO::PARAM_INT);
+				$stmt->bindValue("TokuisakiNM",  $KOKYAKU, PDO::PARAM_STR);
+				$stmt->bindValue("ShouhinCD",  "C".substr("000000".$row["ZEIKBN"],-6), PDO::PARAM_STR);	//商品CD["C" + 0埋 + 税区分] C=調整
+				$stmt->bindValue("ShouhinNM",  $row["ZEIKBNMEI"]."本体調整額", PDO::PARAM_STR);          //商品名
+				$stmt->bindValue("UriageKin",  $row["CHOUSEIGAKU"], PDO::PARAM_INT);                    //売上本体調整額
+				$stmt->bindValue("zeiKBN", $row["ZEIKBN"], PDO::PARAM_INT);                   					//税区分
+			*/
+			$stmt->execute();
+			$ins_cnt++;
+			sqllogger($sqlstr_c,$params,basename(__FILE__),"ok");
 	
+			/*executeの戻り値チェックは不要。失敗時はExeptionが出るのでcatchで対応
+				$flg=$stmt->execute();
+				if($flg){
+					$ins_cnt++;
+					$emsg="調整額のINSERTは正常終了\n";
+					file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,success,".$sqllog."\n",FILE_APPEND);
+				}else{
+					$emsg="調整額のINSERTでエラー";
+					file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,failed,".$sqllog."\n",FILE_APPEND);
+					$E_Flg=1;
+					break;
+				}
+			*/
 		}
 	}
-	/*インボイス対応でクライアント側で調整額を算出するよう変更
-	if($_POST["CHOUSEI_GAKU"]>0 && $E_Flg!=1){
-		$emsg=$emsg."/割引割増処理開始\n";
-		$sqlstr="SELECT ZeiMS.zeiKBN as ZEIKBN ,1+ZeiMS.zeiritu/100 as zei_per ,sum(UriageKin+Zei) as uriage,T.total ";
-		$sqlstr=$sqlstr."FROM UriageData Umei inner join ZeiMS on Umei.zeiKBN = ZeiMS.zeiKBN ";
-		$sqlstr=$sqlstr."inner join (select UriageNO,sum(UriageKin+Zei) as total from UriageData WHERE uid=? and UriageNO=? group by UriageNO) as T on Umei.UriageNO = T.UriageNO ";
-		$sqlstr=$sqlstr."WHERE uid=? and Umei.UriageNO=? ";
-		$sqlstr=$sqlstr."group by ZeiMS.zeiKBN,1+ZeiMS.zeiritu/100";
-		$stmt = $pdo_h->prepare($sqlstr);
-		$stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
-		$stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
-		$stmt->bindValue(3,  $_SESSION['user_id'], PDO::PARAM_INT);
-		$stmt->bindValue(4,  $UriageNO, PDO::PARAM_INT);
-		$flg=$stmt->execute();
-		
-		$result = $stmt->fetchAll();
-		$goukei = 0;
-		$i=0;
-		foreach($result as $row){
-			$chouseigaku = $_POST["CHOUSEI_GAKU"] - $row["total"];
-			$chousei_hon = bcdiv(bcmul($chouseigaku , bcdiv($row["uriage"] , $row["total"],5),5),$row["zei_per"],0);//調整額×税率割合÷消費税率
-			$chousei_zei = bcsub(bcmul($chouseigaku , bcdiv($row["uriage"] , $row["total"],5),5) ,$chousei_hon,0);
-			
-			$goukei=$goukei+$chousei_hon+$chousei_zei;
-			$sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)";
-			$sqllog = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime) ";
-			$sqllog = $sqllog."values('".$_SESSION['user_id']."','".$UriageNO."','".$_POST["KEIJOUBI"]."','".$time."','".$_POST["EV"]."','".$_POST["KOKYAKU"]."','".(9999-$i)."','割引・割増:税率".(($row["zei_per"]-1)*100)."%分',0,0,0,'".$chousei_hon."','".$chousei_zei."','".$row["ZEIKBN"]."',0)";
-			$stmt = $pdo_h->prepare($sqlstr);
-			
-			$stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
-			$stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
-			$stmt->bindValue(3,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
-			$stmt->bindValue(4,  $time, PDO::PARAM_STR);
-			$stmt->bindValue(5,  $_POST["EV"], PDO::PARAM_INT);
-			$stmt->bindValue(6,  $_POST["KOKYAKU"], PDO::PARAM_STR);
-			$stmt->bindValue(7,  9999-$i, PDO::PARAM_INT);                                                          //商品CD
-			$stmt->bindValue(8,  "割引・割増:税率".(($row["zei_per"]-1)*100)."%分", PDO::PARAM_STR);  //商品名
-			$stmt->bindValue(9,  0, PDO::PARAM_INT);                                                                //数量
-			$stmt->bindValue(10, 0, PDO::PARAM_INT);                                                                //内数
-			$stmt->bindValue(11, 0, PDO::PARAM_INT);                                                                //単価
-			$stmt->bindValue(12, $chousei_hon, PDO::PARAM_INT);                                                     //数量×単価
-			$stmt->bindValue(13, $chousei_zei, PDO::PARAM_INT);                                                     //数量×単価税
-			$stmt->bindValue(14, $row["ZEIKBN"], PDO::PARAM_INT);                                                   //税区分
-			$flg=$stmt->execute();
-			
-			if($flg){
-				$emsg=$emsg."/割引割増のINSERTは正常終了\n";
-				file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,success,".$sqllog."\n",FILE_APPEND);
-			}else{
-				$E_Flg=1;
-				$emsg=$emsg."/割引割増のINSERTでエラー";
-				file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,failed,".$sqllog."\n",FILE_APPEND);
-				break;
-			}
-			$i++;
-		}
-		if($goukei!=$chouseigaku){
-			//端数あり
-			$emsg=$emsg."/割引割増の端数処理開始\n";
-			$sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)";
-			$sqllog = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zei,zeiKBN,updDatetime) ";
-			$sqllog = $sqllog."values('".$_SESSION['user_id']."','".$UriageNO."','".$_POST["KEIJOUBI"]."','".$time."','".$_POST["EV"]."','".$_POST["KOKYAKU"]."','".(9999-$i)."','割引・割増:端数".(($row["zei_per"]-1)*100)."%分',0,0,0,'".($chouseigaku-$goukei)."',0,0,0)";
-			$stmt = $pdo_h->prepare($sqlstr);
-			
-			$stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
-			$stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
-			$stmt->bindValue(3,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
-			$stmt->bindValue(4,  $time, PDO::PARAM_STR);
-			$stmt->bindValue(5,  $_POST["EV"], PDO::PARAM_INT);
-			$stmt->bindValue(6,  $_POST["KOKYAKU"], PDO::PARAM_STR);
-			$stmt->bindValue(7,  9999-$i, PDO::PARAM_INT);                             //商品CD
-			$stmt->bindValue(8,  "割引・割増:端数", PDO::PARAM_STR);  //商品名
-			$stmt->bindValue(9,  0, PDO::PARAM_INT);                                //数量
-			$stmt->bindValue(10, 0, PDO::PARAM_INT);                                //内数
-			$stmt->bindValue(11, 0, PDO::PARAM_INT);                                //単価
-			$stmt->bindValue(12, $chouseigaku-$goukei, PDO::PARAM_INT);             //数量×単価
-			$stmt->bindValue(13, 0, PDO::PARAM_INT);                                //数量×単価税
-			$stmt->bindValue(14, 0, PDO::PARAM_INT);                                //非課税//税区分
-			$flg=$stmt->execute();
-			 if($flg){
-				 $emsg=$emsg."/割引割増の端数調整のINSERTは正常終了\n";
-				 file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,success,".$sqllog."\n",FILE_APPEND);
-			}else{
-				$E_Flg=1;
-				$emsg=$emsg."/割引割増の端数調整のINSERTでエラー";
-				file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,failed,".$sqllog."\n",FILE_APPEND);
-			}
-		   
-		}
-	}
-	*/
 	//位置情報、天気情報の付与（uid,売上No,緯度、経度、住所、天気、気温、体感温度、天気アイコンping,無効FLG,insdate,update）
 	if(empty($_POST["nonadd"]) && $ins_cnt>0){
 		$emsg=$emsg."/位置情報、天気情報　処理開始\n";
@@ -311,17 +272,23 @@ try{
 		$stmt->bindValue(7,  $_POST['temp'], PDO::PARAM_INT);
 		$stmt->bindValue(8,  $_POST['feels_like'], PDO::PARAM_INT);
 		$stmt->bindValue(9,  $_POST['icon'], PDO::PARAM_STR);
-		$flg=$stmt->execute();
-		
-		if($flg){
-			$ins_cnt++;
-			$emsg="位置・天気のINSERTは正常終了\n";
-			file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,success,".$sqllog."\n",FILE_APPEND);
-		}else{
-			$emsg="位置・天気のINSERTでエラー";
-			file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,failed,".$sqllog."\n",FILE_APPEND);
-			$E_Flg=1;
-		}
+
+		/*executeの戻り値チェックは不要。失敗時はExeptionが出るのでcatchで対応
+			$flg=$stmt->execute();
+
+			if($flg){
+				$ins_cnt++;
+				$emsg="位置・天気のINSERTは正常終了\n";
+				file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,success,".$sqllog."\n",FILE_APPEND);
+			}else{
+				$emsg="位置・天気のINSERTでエラー";
+				file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,failed,".$sqllog."\n",FILE_APPEND);
+				$E_Flg=1;
+			}
+		*/
+		$stmt->execute();
+		$ins_cnt++;
+		sqllogger($sqlstr,$params,basename(__FILE__),"ok");
 	}else{
 		log_writer2("ajax_EVregi_sql.php","Gio insert skip","lv3");
 	}
@@ -329,6 +296,7 @@ try{
 	//
 	if($E_Flg==0){
 		$pdo_h->commit();
+		sqllogger("commit",[],basename(__FILE__),"ok");
 		file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,COMMIT,success,売上No".$UriageNO."\n",FILE_APPEND);
 		
 		$msg = array(
@@ -346,6 +314,7 @@ try{
 	}else{
 		//1件でも失敗したらロールバック
 		$pdo_h->rollBack();
+		sqllogger("rollback",[],basename(__FILE__),"ok");
 		file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,ROLLBACK,success,売上No".$UriageNO."\n",FILE_APPEND);
 		
 		$emsg=$emsg."/insert処理が失敗し、rollBackが発生しました。";
@@ -356,6 +325,7 @@ try{
 	
 }catch (Exception $e) {
 	$pdo_h->rollBack();
+	sqllogger("rollback",[],basename(__FILE__),"ok");
 	$emsg = $emsg."/レジ登録でERRORをCATHCしました。：".$e->getMessage();
 	file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,ROLLBACK,success,売上No".$UriageNO."\n",FILE_APPEND);
 	$E_Flg=1;
@@ -363,6 +333,7 @@ try{
 	$pdo_h = null;
 }catch(Throwable $t){
 	$pdo_h->rollBack();
+	sqllogger("rollback",[],basename(__FILE__),"ok");
 	$emsg = $emsg."/レジ登録でFATAL ERRORをCATHCしました。：".$t->getMessage();
 	file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,ROLLBACK,success,売上No".$UriageNO."\n",FILE_APPEND);
 	$E_Flg=1;

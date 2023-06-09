@@ -277,9 +277,9 @@
 			<input type='hidden' name='feels_like' :value='feels_like'>
 			<input type='hidden' name='icon' :value='icon'>
 			<template v-for='(list,index) in hontai' :key='list.税率'>
-			<input type='hidden' :name ="`ZeiKbnSummary[${index}][ZEIKBN]`" :value = "list.税区分">
-			<input type='hidden' :name ="`ZeiKbnSummary[${index}][ZEIKBNMEI]`" :value = "list.税区分名">
-			<input type='hidden' :name ="`ZeiKbnSummary[${index}][ZEIRITU]`" :value = "list.税率">
+				<input type='hidden' :name ="`ZeiKbnSummary[${index}][ZEIKBN]`" :value = "list.税区分">
+				<input type='hidden' :name ="`ZeiKbnSummary[${index}][ZEIKBNMEI]`" :value = "list.税区分名">
+				<input type='hidden' :name ="`ZeiKbnSummary[${index}][ZEIRITU]`" :value = "list.税率">
 				<input type='hidden' :name ="`ZeiKbnSummary[${index}][CHOUSEIGAKU]`" :value = "list.調整額">
 				<input type='hidden' :name ="`ZeiKbnSummary[${index}][HONTAIGAKU]`" :value = "list.本体額">
 				<input type='hidden' :name ="`ZeiKbnSummary[${index}][SHOUHIZEI]`" :value = "list.消費税">
@@ -886,7 +886,6 @@
 					}else{
 						window.open(URL.value + '&sb=off&tp=1&k=' + keishou.value + '&s=' + oaite.value, '_blank')
 					}
-					
 				}
 				const open_R = (setURL) =>{
 					if(setURL!==undefined){
@@ -894,15 +893,8 @@
 					}else{
 						URL.value = rtURL.value
 					}
-					//console.log(URL.value)
 					const myModal = new bootstrap.Modal(document.getElementById('ryoushuu'), {})
 					myModal.show()
-					/*
-					const btn = document.querySelector('#test')
- 			    btn.addEventListener('click', () => {
-        		myModal.show()
-      		})
-					*/
 				}
 
 				//細かな表示設定など

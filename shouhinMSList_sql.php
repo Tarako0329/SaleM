@@ -16,6 +16,7 @@ $array = $_POST["ORDERS"];
 $sqlstr = "";
 
 $pdo_h->beginTransaction();
+sqllogger("START TRANSACTION",[],basename(__FILE__),"ok");
 $result='none';
 foreach($array as $row){
     //var_dump($row);
@@ -52,11 +53,13 @@ foreach($array as $row){
 if($result==="none"){
 }else if($result==="success"){
     $pdo_h->commit();
+    sqllogger("commit",[],basename(__FILE__),"ok");
     $_SESSION["MSG"]= "更新されました。";
     $_SESSION["alert"] = "alert-success";
 }else{
     //1件でも失敗したらロールバック
     $pdo_h->rollBack();
+    sqllogger("rollback",[],basename(__FILE__),"ok");
     $_SESSION["MSG"]= "更新が失敗しました。";
     $_SESSION["alert"] = "alert-danger";
 }

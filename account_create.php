@@ -231,7 +231,7 @@ $token=csrf_create();
 						account.value['inquiry_tel']['lock']['readonly']=false
 						account.value['inquiry_mail']['lock']['readonly']=false
 					}else if(mode.value==="insert"){
-						step.value="next"
+						//step.value="next"
 					}
 				}
 				const on_submit = (e) =>{
@@ -261,14 +261,18 @@ $token=csrf_create();
 					axios
 						.post('ajax_account_sql.php',params) 
 						.then((response) => {
+							console_log(response.data,"lv3")
 							csrf.value = response.data.csrf_create
-							if(response.data.status !== "alert-success"){
+							if(response.data.status !== "alert-success"){//失敗
 								alert(response.data.MSG)
 								//MSG.value = response.data.MSG
 								//alert_status.value[1] = response.data.status
 							}else{
 								alert(response.data.MSG)
 								console.log(`UpdateValue SUCCESS`)
+								if(mode.value==="insert"){
+									step.value="next"
+								}
 							}
 						})
 						.catch((error) => {

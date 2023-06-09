@@ -213,19 +213,16 @@ if($rtn !== true){
             }
 
             if($status===true){
-                //$pdo_h->commit();
                 $msg = "取得成功。";
                 $alert_status = "alert-success";
                 //file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,succsess,".$up_sqllog."\n",FILE_APPEND);
             }else{
-                //$pdo_h->rollBack();
                 $msg = "取得失敗。";
                 $alert_status = "alert-danger";
                 //file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,failed,".$up_sqllog."\n",FILE_APPEND);
             }
             $reseve_status=true;
         }catch(Exception $e){
-            //$pdo_h->rollBack();
             $msg = "システムエラーによる取得処理失敗。管理者へ通知しました。";
             $alert_status = "alert-danger";
             log_writer2($myname." [Exc sql] =>",$sqlstr,"lv0");

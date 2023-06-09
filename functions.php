@@ -839,15 +839,31 @@ function sort_hash($val,$type){
 }
 
 function sqllogger($sql,$params,$phpname,$result){
+    log_writer2("function.php[func:sqllogger] \$sql =>",$sql,"lv3");
+    log_writer2("function.php[func:sqllogger] \$params =>",$params,"lv3");
     $logsql=$sql;
     $i=0;
     $logfilename="sid_".$_SESSION['user_id'].".log";
-    while(strstr($logsql,"?")!==false){
-        $logsql = strstr($logsql,"?",true)."\"".$params[$i]."\"".substr(strstr($logsql,"?"), ((strlen(strstr($logsql,"?"))-1)*(-1))) ;
-        $i++;
+    $userid = (!empty($_SESSION['user_id'])?$_SESSION['user_id']:"-");
+
+    if(strstr($logsql,"?")!==false){
+        log_writer2("function.php[func:sqllogger]","?あり","lv3");
+        while(strstr($logsql,"?")!==false){
+            $logsql = strstr($logsql,"?",true).(!is_null($params[$i])?"\"".$params[$i]."\"":"null").substr(strstr($logsql,"?"), ((strlen(strstr($logsql,"?"))-1)*(-1))) ;
+            $i++;
+        }
+    }else{
+        log_writer2("function.php[func:sqllogger]","?なし","lv3");
+        foreach(array_keys($params) as $row){
+            $logsql = str_replace(":".$row,(!is_null($params[$row])?"\"".$params[$row]."\"":"null"),$logsql);
+        }
     }
+
+    $logsql .= ";";
+    $logsql = str_replace(["\r","\n","\t"],"",$logsql);
     if($result==="ok"){
         file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",".$phpname.",".$logsql."\n",FILE_APPEND);
+        file_put_contents("sql_log/".date("Y-m-d").".log", date("Y-m-d H:i:s")."\t".$userid."\t".$phpname."\t".$logsql."\n",FILE_APPEND);
     }else{
         log_writer2($phpname." [unsuccess sql] =>",$logsql,"lv0");
     }

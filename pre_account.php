@@ -31,6 +31,7 @@ if(filter_input(INPUT_POST,"BTN") == "send"){
         //qdmailでメール送付
         $okflg = send_mail($to,$subject,$body);
     }
+    deb_echo("<a href=".$url.">".$url."</a>");
 }else{
     //echo "登録が失敗しました。";
 }

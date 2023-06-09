@@ -39,22 +39,24 @@ if($rtn !== true){
 				$alert_status = "alert-warning";
 				$reseve_status=true;
 			}else{
-				$_SESSION["MAIL"] = $_POST["MAIL"];
-				$_SESSION["QUESTION"] = $_POST["QUESTION"];
-				$_SESSION["ANSWER"] = $_POST["ANSWER"];
-				$_SESSION["LOGINREZ"] = empty($_POST["LOGINREZ"])?$_POST["LOGINREZ"]:"";
-				$_SESSION["NAME"] = $_POST["NAME"];
-				$_SESSION["YAGOU"] = $_POST["YAGOU"];
-				$_SESSION["zip11"] = $_POST["zip11"];
-				$_SESSION["addr11"] = $_POST["addr11"];
-				$_SESSION["ADD2"] = $_POST["ADD2"];
-				$_SESSION["ADD3"] = $_POST["ADD3"];
-				$_SESSION["invoice"] = $_POST["invoice"];
-				$_SESSION["inquiry_tel"] = $_POST["inquiry_tel"];
-				$_SESSION["inquiry_mail"] = $_POST["inquiry_mail"];
-				$_SESSION["chk_pass"] =  !empty($_POST["chk_pass"])?$_POST["chk_pass"]:"";
-				$_SESSION["PASS"] = passEX($_POST["PASS"],$_POST["MAIL"],$key);
-				//$_SESSION["SHOUKAI"] = (!empty($_POST["shoukai"])?rot13decrypt2($_POST["shoukai"])-10000:"");
+				$_SESSION["P"]=[];
+				$_SESSION["P"]["mail"] = $_POST["MAIL"];
+				$_SESSION["P"]["question"] = $_POST["QUESTION"];
+				$_SESSION["P"]["answer"] = $_POST["ANSWER"];
+				$_SESSION["P"]["loginrez"] = empty($_POST["LOGINREZ"])?$_POST["LOGINREZ"]:"";
+				$_SESSION["P"]["name"] = $_POST["NAME"];
+				$_SESSION["P"]["yagou"] = $_POST["YAGOU"];
+				$_SESSION["P"]["yubin"] = $_POST["zip11"];
+				$_SESSION["P"]["address1"] = $_POST["addr11"];
+				$_SESSION["P"]["address2"] = $_POST["ADD2"];
+				$_SESSION["P"]["address3"] = $_POST["ADD3"];
+				$_SESSION["P"]["invoice_no"] = $_POST["invoice"];
+				$_SESSION["P"]["inquiry_tel"] = $_POST["inquiry_tel"];
+				$_SESSION["P"]["inquiry_mail"] = $_POST["inquiry_mail"];
+				$_SESSION["P"]["password"] = passEX($_POST["PASS"],$_POST["MAIL"],$key);
+				$_SESSION["P"]["uid"] = $_SESSION['user_id'];
+
+				$_SESSION["P"]["chk_pass"] =  !empty($_POST["chk_pass"])?$_POST["chk_pass"]:"";
 			
 				$msg = "更新成功。";
 				$alert_status = "alert-success";
@@ -62,7 +64,6 @@ if($rtn !== true){
 			}
 	
 		}catch(Exception $e){
-			$pdo_h->rollBack();
 			$msg = "システムエラー。管理者へ通知しました。";
 			$alert_status = "alert-danger";
 			log_writer2($myname." [Exception \$e] =>",$e,"lv0");
@@ -70,11 +71,14 @@ if($rtn !== true){
 		}
 	}
 }else if($_POST["mode"]==="insert"){
-	$_SESSION["MAIL"] = $_POST["MAIL"];
-	$_SESSION["QUESTION"] = $_POST["QUESTION"];
-	$_SESSION["ANSWER"] = $_POST["ANSWER"];
-	$_SESSION["PASS"] = passEX($_POST["PASS"],$_POST["MAIL"],$key);
-	$_SESSION["SHOUKAI"] = sort_hash($_POST["shoukai"],"dec"); 
+	$_SESSION["P"]=[];
+	$_SESSION["P"][0] = $_POST["MAIL"];
+	$_SESSION["P"][1] = passEX($_POST["PASS"],$_POST["MAIL"],$key);
+	$_SESSION["P"][2] = $_POST["QUESTION"];
+	$_SESSION["P"][3] = $_POST["ANSWER"];
+	//試用期間は２ヶ月に変更。
+	$_SESSION["P"][4] = date('Y-m-d', strtotime(date("Y-m-d") . "+2 month"));	
+	$_SESSION["P"][5] = sort_hash($_POST["shoukai"],"dec"); 
 	$msg = "更新成功。";
 	$alert_status = "alert-success";
 	$reseve_status=true;
