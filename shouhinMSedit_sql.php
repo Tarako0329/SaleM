@@ -87,7 +87,8 @@ try{
     
 }catch(Exception $e){
     $pdo_h->rollBack();
-    $sqllog .= rtn_sqllog("rollBack",$e);
+    $sqllog .= rtn_sqllog("rollBack",[]);
+    sqllogger($sqllog,$e);
     $_SESSION["MSG"] = "登録が失敗しました。";
 }
 

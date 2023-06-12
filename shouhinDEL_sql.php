@@ -24,17 +24,29 @@ if($uri!=0){
     $flg=false;
 }
 
-if($flg === true){    
+if($flg === true){
+    try{
+        $pdo_h->beginTransaction();
+        $sqllog .= rtn_sqllog("START TRANSACTION",[]);
+    
+        $sqlstr="delete from ShouhinMS where shouhinCD=? and uid=?";
+        $stmt = $pdo_h->prepare($sqlstr);
+        $stmt->bindValue(1, $_GET["cd"], PDO::PARAM_INT);
+        $stmt->bindValue(2, $_SESSION['user_id'], PDO::PARAM_INT);
 
-    $sqlstr="delete from ShouhinMS where shouhinCD=? and uid=?";
-    $stmt = $pdo_h->prepare($sqlstr);
-    $stmt->bindValue(1, $_GET["cd"], PDO::PARAM_INT);
-    $stmt->bindValue(2, $_SESSION['user_id'], PDO::PARAM_INT);
-    $status=$stmt->execute();
-    if($status==true){
+        $sqllog .= rtn_sqllog($sqlstr,[$_GET["cd"],$_SESSION['user_id']]);
+        $status=$stmt->execute();
+        $sqllog .= rtn_sqllog("--execute():正常終了",[]);
+
+        $pdo_h->commit();
+        $sqllog .= rtn_sqllog("commit",[]);
+        sqllogger($sqllog,0);
         $_SESSION["MSG"]= secho($_GET["nm"])." が削除されました。";
         $_SESSION["alert"] = "alert-success";
-    }else{
+    }catch(Exception $e){
+        $pdo_h->rollBack();
+        $sqllog .= rtn_sqllog("rollBack",null);
+        sqllogger($sqllog,$e);
         $_SESSION["MSG"] = "登録が失敗しました。";
         $_SESSION["alert"] = "alert-danger";
     }

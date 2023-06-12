@@ -153,8 +153,8 @@ if(csrf_chk()===false){
                 */
             }catch(Exception $e){
                 $pdo_h->rollBack();
-                $sqllog .= rtn_sqllog("rollBack",$e);
-    
+                $sqllog .= rtn_sqllog("rollBack",[]);
+                sqllogger($sqllog,$e);
                 $msg = "システムエラーによる更新失敗。管理者へ通知しました。";
                 $alert_status = "alert-danger";
                 //log_writer2("ajax_UriageData_update_sql.php [Exception \$e] =>",$e,"lv0");

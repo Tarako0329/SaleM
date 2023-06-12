@@ -32,17 +32,17 @@ try{
     			$pdo_h->commit();
 	    		$sqllog .= rtn_sqllog("commit",[]);
 		    	sqllogger($sqllog,0);
-                $msg="登録者CDを登録いたしました。";
+                $msg="紹介者CDを登録いたしました。";
                 $flg="success";
             }else{
                 $pdo_h->rollBack();
                 $sqllog .= rtn_sqllog("rollBack",null);
                 sqllogger($sqllog,null);
-                $msg="別の登録者CDが登録されてます。";
+                $msg="別の紹介者CDが登録されてます。";
                 $flg="failed";
             }
         }else{
-            $msg="登録者CDが誤ってます。";
+            $msg="紹介者CDが誤ってます。";
             $flg="failed";
         }
     }
@@ -62,7 +62,10 @@ try{
 }catch(Exception $e){
     $pdo_h->rollBack();
     $sqllog .= rtn_sqllog("rollBack",null);
-    sqllogger($sqllog,null);
+    sqllogger($sqllog,$e);
+
+    $msg="紹介者CDの登録に失敗しました。";
+    $flg="failed";
 
 }
 

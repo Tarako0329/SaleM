@@ -19,39 +19,33 @@ if($rtn !== true){
 $array = $_POST["ORDERS"];
 $sqlstr = "";
 
-$pdo_h->beginTransaction();
-sqllogger("START TRANSACTION",[],basename(__FILE__),"ok");
-$E_Flg=0;
-
-if($_POST["categry"]=="cate1"){
-    $col="bunrui1";
-}elseif($_POST["categry"]=="cate2"){
-    $col="bunrui2";
-}elseif($_POST["categry"]=="cate3"){
-    $col="bunrui3";
-}
-
-foreach($array as $row){
-    if($row["chk"]!="on"){
-        continue;
+try{
+    $pdo_h->beginTransaction();
+    $sqllog .= rtn_sqllog("START TRANSACTION",[]);
+    $E_Flg=0;
+    
+    if($_POST["categry"]=="cate1"){
+        $col="bunrui1";
+    }elseif($_POST["categry"]=="cate2"){
+        $col="bunrui2";
+    }elseif($_POST["categry"]=="cate3"){
+        $col="bunrui3";
     }
-    $sqlstr = "update ShouhinMS set ".$col."=? where shouhinCD=? and uid=?";
-    $stmt = $pdo_h->prepare($sqlstr);
-    $stmt->bindValue(1, $_POST["upd_bunrui"], PDO::PARAM_STR);
-    $stmt->bindValue(2, $row["shouhinCD"], PDO::PARAM_INT);
-    $stmt->bindValue(3, $_SESSION['user_id'], PDO::PARAM_INT);
     
-    $status=$stmt->execute();
-    
-    if($status==true){
+    foreach($array as $row){
+        if($row["chk"]!="on"){
+            continue;
+        }
+        $sqlstr = "update ShouhinMS set ".$col."=? where shouhinCD=? and uid=?";
+        $stmt = $pdo_h->prepare($sqlstr);
+        $stmt->bindValue(1, $_POST["upd_bunrui"], PDO::PARAM_STR);
+        $stmt->bindValue(2, $row["shouhinCD"], PDO::PARAM_INT);
+        $stmt->bindValue(3, $_SESSION['user_id'], PDO::PARAM_INT);
         
-    }else{
-        $E_Flg=1;
-        break;
+        $sqllog .= rtn_sqllog($sqlstr,[$_POST["upd_bunrui"],$row["shouhinCD"],$_SESSION['user_id']]);
+        $status=$stmt->execute();
+        $sqllog .= rtn_sqllog("--execute():正常終了",[]);
     }
-}
-    
-if($E_Flg==0){
     $pdo_h->commit();
     $sqllog .= rtn_sqllog("commit",[]);
     sqllogger($sqllog,0);
@@ -61,16 +55,18 @@ if($E_Flg==0){
         ,"status" => "alert-success"
         ,"csrf_create" => csrf_create()
     );
-}else{
-    //1件でも失敗したらロールバック
+    
+}catch(Exception $e){
     $pdo_h->rollBack();
     $sqllog .= rtn_sqllog("rollBack",[]);
+    sqllogger($sqllog,$e);
     $msg[0] = array(
         "EMSG" => "更新が失敗しました。"
         ,"status" => "alert-danger"
         ,"csrf_create" => csrf_create()
     );
 }
+    
     
 $stmt  = null;
 $pdo_h = null;

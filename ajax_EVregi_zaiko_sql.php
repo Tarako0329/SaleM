@@ -49,8 +49,9 @@ if(csrf_chk()===false){
                 $stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
                 $stmt->bindValue(2,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
                 $stmt->bindValue(3,  $_POST["EV"], PDO::PARAM_INT);
-                $stmt->execute();
                 $sqllog .= rtn_sqllog($sqlstr,[$_SESSION['user_id'],$_POST["KEIJOUBI"],$_POST["EV"]]);
+                $stmt->execute();
+                $sqllog .= rtn_sqllog("--execute():正常終了",[]);
             }
 
             //在庫番号の取得

@@ -39,6 +39,7 @@ if(csrf_chk()===false){
             $stmt->bindValue("w_shouhinCD", $params["w_shouhinCD"], PDO::PARAM_INT);
             $sqllog .= rtn_sqllog($sql,$params);
             $status = $stmt->execute();
+            $sqllog .= rtn_sqllog("--execute():正常終了",[]);
             //$count = $stmt->rowCount();
             $pdo_h->commit();
             $sqllog .= rtn_sqllog("commit",[]);
@@ -69,7 +70,7 @@ if(csrf_chk()===false){
         }catch(Exception $e){
             $pdo_h->rollBack();
             $sqllog .= rtn_sqllog("rollBack",[]);
-            sqllogger($sqllog,0);
+            sqllogger($sqllog,$e);
             $msg = "システムエラーによる更新失敗。管理者へ通知しました。";
             $alert_status = "alert-danger";
             log_writer2("ajax_UriageData_update_sql.php [Exception \$e] =>",$e,"lv0");
