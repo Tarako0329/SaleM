@@ -259,12 +259,9 @@ $html = <<< EOM
 EOM;
 $html = str_replace(["\r","\n","\t"],"",$html);//改行・タブの削除
 try{
-	// PDFの設定～出力
-	output($html,$filename);
-
 	if($saiban==="on"){
 		$pdo_h->beginTransaction();
-		sqllogger("START TRANSACTION",[],basename(__FILE__),"ok");
+		$sqllog .= rtn_sqllog("START TRANSACTION",[]);
 		$sql = "insert into ryoushu(uid,R_NO,UriNO,Atena,html,QR_GUID) values(?,?,?,?,?,?)";
 		$stmt = $pdo_h->prepare($sql);
 		$stmt->bindValue(1, $id, PDO::PARAM_INT);
@@ -273,29 +270,25 @@ try{
 		$stmt->bindValue(4, $Atena, PDO::PARAM_STR);
 		$stmt->bindValue(5, $html, PDO::PARAM_STR);
 		$stmt->bindValue(6, $qr_GUID, PDO::PARAM_STR);
+
 		$status = $stmt->execute();
-	
-		if($status!==false){
-			$pdo_h->commit();
-			sqllogger($sql,[$id,$RyoushuuNO,$UriNo,$Atena,$html,$qr_GUID],basename(__FILE__),"ok");
-			sqllogger("commit",[],basename(__FILE__),"ok");
-			$msg = "登録が完了しました。";
-			$alert_status = "alert-success";
-		}else{
-			$pdo_h->rollBack();
-			sqllogger($sql,[$id,$RyoushuuNO,$UriNo,$Atena,$html,$qr_GUID],basename(__FILE__),"ng");
-			sqllogger("rollback",[],basename(__FILE__),"ok");
-			$msg = "失敗。";
-			$alert_status = "alert-danger";
-		}
+		$sqllog .= rtn_sqllog($sql,[$id,$RyoushuuNO,$UriNo,$Atena,$html,$qr_GUID]);
+
+		$pdo_h->commit();
+		$sqllog .= rtn_sqllog("commit",[]);
+		sqllogger($sqllog,0);
 	}
+	// PDFの設定～出力
+	output($html,$filename);
+	
 }catch(Exception $e){
 	$pdo_h->rollBack();
-	sqllogger("rollback",[],basename(__FILE__),"ok");
-	$msg = "システムエラーによる更新失敗。管理者へ通知しました。";
-	$alert_status = "alert-danger";
-	log_writer2(basename(__FILE__)." [Exception \$e] =>",$e,"lv0");
-	$reseve_status=true;
+	$sqllog .= rtn_sqllog("rollBack",[]);
+	sqllogger($sqllog,$e);
+	echo "システム不具合が発生したため、領収書が発行できませんでした。<br>";
+	echo "システム管理者に不具合発生を通知いたしました。<br>";
+	echo "ご迷惑をおかけいたしますが、復旧までお待ちください。<br>";
+	echo "<button onclick='window.close()'>戻る</button>\n";
 }
 
 function output($html,$filename){

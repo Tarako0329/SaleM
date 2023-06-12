@@ -31,7 +31,7 @@ if(csrf_chk()===false){
 
         try{
             $pdo_h->beginTransaction();
-            sqllogger("START TRANSACTION",[],basename(__FILE__),"ok");
+            $sqllog .= rtn_sqllog("START TRANSACTION",[]);
 
             //同日同イベントの在庫情報があったらクリアする（delete&insert)
             $sqlstr = "select count(*) as cnt from Zaiko where uid=? and shuppindate=? and hokanbasho=?";
@@ -50,6 +50,7 @@ if(csrf_chk()===false){
                 $stmt->bindValue(2,  $_POST["KEIJOUBI"], PDO::PARAM_STR);
                 $stmt->bindValue(3,  $_POST["EV"], PDO::PARAM_INT);
                 $stmt->execute();
+                $sqllog .= rtn_sqllog($sqlstr,[$_SESSION['user_id'],$_POST["KEIJOUBI"],$_POST["EV"]]);
             }
 
             //在庫番号の取得
@@ -68,8 +69,6 @@ if(csrf_chk()===false){
             $sqlstr = "insert into Zaiko(uid,sousa,shuppindate,zaikoNO,hokanbasho,shouhinCD,shouhinNM,su,genka_tanka) values(?,'entry',?,?,?,?,?,?,?)";
             $E_Flg=0;
             foreach($array as $row){
-                $sqllog = "insert into Zaiko(uid,sousa,shuppindate,zaikoNO,hokanbasho,shouhinCD,shouhinNM,su,genka_tanka) ";
-                $sqllog = $sqllog."values(".$_SESSION['user_id'].",'entry',".$_POST["KEIJOUBI"].",".$zaikoNO.",".$_POST["EV"].",".$row["CD"].",".$row["NM"].",".$row["SU"].",".$row["GENKA_TANKA"].")";
                 if($row["SU"]===0){continue;}
                 $stmt = $pdo_h->prepare($sqlstr);
             
@@ -81,38 +80,25 @@ if(csrf_chk()===false){
                 $stmt->bindValue(6,  $row["NM"], PDO::PARAM_STR);
                 $stmt->bindValue(7,  $row["SU"], PDO::PARAM_INT);                       //商品CD
                 $stmt->bindValue(8,  $row["GENKA_TANKA"], PDO::PARAM_INT);              //商品名
-
+                $sqllog .= rtn_sqllog($sqlstr,[$_SESSION['user_id'],$_POST["KEIJOUBI"],$zaikoNO,$_POST["EV"],$row["CD"],$row["NM"],$row["SU"],$row["GENKA_TANKA"]]);
                 $flg=$stmt->execute();
-
-                if($flg!==true){
-                    file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,failed,".$sqllog."\n",FILE_APPEND);
-                    $emsg=$emsg."/在庫登録のinsert処理が失敗し、rollBackが発生しました。";
-                    $E_Flg=1;
-                    break;  //1件でも失敗したらロールバック
-                }else{
-                    file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,succsess,".$sqllog."\n",FILE_APPEND);
-                }
+                $sqllog .= rtn_sqllog("--execute():正常終了",[]);
             }
-
-            if($E_Flg===0){
-                $pdo_h->commit();
-                sqllogger("commit",[],basename(__FILE__),"ok");
-                $msg = "在庫が登録されました。（在庫№：".$zaikoNO."）";
-                $alert_status = "alert-success";
-            }else{
-                $pdo_h->rollBack();
-                sqllogger("rollback",[],basename(__FILE__),"ok");
-                $msg = "在庫登録処理が失敗しました。";
-                $alert_status = "alert-danger";
-            }
+            $pdo_h->commit();
+            $sqllog .= rtn_sqllog("commit",[]);
+            sqllogger($sqllog,0);
+    
+            $msg = "在庫が登録されました。（在庫№：".$zaikoNO."）";
+            $alert_status = "alert-success";
             $reseve_status=true;
 
         }catch(Exception $e){
             $pdo_h->rollBack();
-            sqllogger("rollback",[],basename(__FILE__),"ok");
+            $sqllog .= rtn_sqllog("rollBack",[]);
+            sqllogger($sqllog,$e);
             $msg = "システムエラーによる更新失敗。管理者へ通知しました。";
             $alert_status = "alert-danger";
-            log_writer2("ajax_EVregi_zaiko_sql.php [Exception \$e] =>",$e,"lv0");
+            log_writer2(basename(__FILE__)." [Exception \$e] =>",$e,"lv0");
             $reseve_status=true;
         }
     }
@@ -143,14 +129,14 @@ function shutdown(){
       
       //直前でエラーあり、かつ、catch処理出来ていない場合に実行
       if($lastError!==null && $GLOBALS["reseve_status"] === false){
-        log_writer2("ajax_EVregi_zaiko_sql.php","shutdown","lv3");
-        log_writer2("ajax_EVregi_zaiko_sql.php",$lastError,"lv1");
+        log_writer2(basename(__FILE__),"shutdown","lv3");
+        log_writer2(basename(__FILE__),$lastError,"lv1");
           
-        $emsg = "/UriNO::".$GLOBALS["zaikoNO"]."　uid::".$_SESSION['user_id']." ERROR_MESSAGE::予期せぬエラー".$lastError['message'];
+        $emsg = "/zaikoNO::".$GLOBALS["zaikoNO"]."　uid::".$_SESSION['user_id']." ERROR_MESSAGE::予期せぬエラー".$lastError['message'];
         if(EXEC_MODE!=="Local"){
-            send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】ajax_EVregi_zaiko_sql.phpでシステム停止",$emsg);
+            send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】".basename(__FILE__)."でシステム停止",$emsg);
         }
-        log_writer2("ajax_EVregi_zaiko_sql.php [Exception \$lastError] =>",$lastError,"lv0");
+        log_writer2(basename(__FILE__)." [Exception \$lastError] =>",$lastError,"lv0");
     
         $token = csrf_create();
         $return_sts = array(

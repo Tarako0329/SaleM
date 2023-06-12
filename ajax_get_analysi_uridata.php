@@ -211,16 +211,17 @@ if($rtn !== true){
                 $xEndpoint=($xEndpoint + 1<=23)?$xEndpoint+1:$xEndpoint;
                 $xStartpoint=($xStartpoint - 1 >=0)?$xStartpoint-1:$xStartpoint;
             }
-
+            $msg = "取得成功。";
+            $alert_status = "alert-success";
+            /*
             if($status===true){
                 $msg = "取得成功。";
                 $alert_status = "alert-success";
-                //file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,succsess,".$up_sqllog."\n",FILE_APPEND);
             }else{
                 $msg = "取得失敗。";
                 $alert_status = "alert-danger";
-                //file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,failed,".$up_sqllog."\n",FILE_APPEND);
             }
+            */
             $reseve_status=true;
         }catch(Exception $e){
             $msg = "システムエラーによる取得処理失敗。管理者へ通知しました。";
@@ -263,14 +264,14 @@ function shutdown(){
       
       //直前でエラーあり、かつ、catch処理出来ていない場合に実行
       if($lastError!==null && $GLOBALS["reseve_status"] === false){
-        log_writer2($GLOBALS["myname"],"shutdown","lv3");
-        log_writer2($GLOBALS["myname"],$lastError,"lv1");
+        log_writer2(basename(__FILE__),"shutdown","lv3");
+        log_writer2(basename(__FILE__),$lastError,"lv1");
           
         $emsg = "/UriNO::".$GLOBALS["UriageNO"]."　uid::".$_SESSION['user_id']." ERROR_MESSAGE::予期せぬエラー".$lastError['message'];
         if(EXEC_MODE!=="Local"){
-            send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
+            send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】".basename(__FILE__)."でシステム停止",$emsg);
         }
-        log_writer2($GLOBALS["myname"]." [Exception \$lastError] =>",$lastError,"lv0");
+        log_writer2(basename(__FILE__)." [Exception \$lastError] =>",$lastError,"lv0");
     
         $token = csrf_create();
         $return_sts = array(

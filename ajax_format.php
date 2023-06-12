@@ -29,6 +29,7 @@ if($rtn !== true){
 
         try{
             $pdo_h->beginTransaction();
+            $sqllog .= rtn_sqllog("START TRANSACTION",[]);
             sqllogger("START TRANSACTION",[],basename(__FILE__),"ok");
             $stmt = $pdo_h->prepare( $sql );
             //bind処理
@@ -40,21 +41,21 @@ if($rtn !== true){
 
             if($status && $count<>0){
                 $pdo_h->commit();
-                sqllogger("commit",[],basename(__FILE__),"ok");
+                $sqllog .= rtn_sqllog("commit",[]);
+                sqllogger($sqllog,0);
+        
                 $msg = "更新成功。";
                 $alert_status = "alert-success";
-                file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",".basename(__FILE__).",UPDATE,succsess,".$up_sqllog."\n",FILE_APPEND);
             }else{
                 $pdo_h->rollBack();
-                sqllogger("rollback",[],basename(__FILE__),"ok");
+                $sqllog .= rtn_sqllog("rollBack",[]);
                 $msg = "更新失敗。";
                 $alert_status = "alert-danger";
-                file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",".basename(__FILE__).",UPDATE,failed,".$up_sqllog."\n",FILE_APPEND);
             }
             $reseve_status=true;
         }catch(Exception $e){
             $pdo_h->rollBack();
-            sqllogger("rollback",[],basename(__FILE__),"ok");
+            $sqllog .= rtn_sqllog("rollBack",[]);
             $msg = "システムエラーによる更新失敗。管理者へ通知しました。";
             $alert_status = "alert-danger";
             log_writer2(basename(__FILE__)." [Exception \$e] =>",$e,"lv0");

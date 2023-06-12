@@ -24,38 +24,52 @@ if(csrf_chk()===false){
 
         //更新モード(実行)
         $sql = "delete from UriageData where uid = :w_uid and UriageNO = :w_UriNO and ShouhinCD = :w_shouhinCD";
-        $up_sqllog = "delete from UriageData where uid = '".$_SESSION["user_id"]."' and UriageNO = '".$_POST["UriageNO"]."' and ShouhinCD = '".$_POST["ShouhinCD"]."'";
+        //$up_sqllog = "delete from UriageData where uid = '".$_SESSION["user_id"]."' and UriageNO = '".$_POST["UriageNO"]."' and ShouhinCD = '".$_POST["ShouhinCD"]."'";
     
         try{
             $pdo_h->beginTransaction();
-            sqllogger("START TRANSACTION",[],basename(__FILE__),"ok");
+            $sqllog .= rtn_sqllog("START TRANSACTION",[]);
             $stmt = $pdo_h->prepare( $sql );
             //bind処理
-            $stmt->bindValue("w_uid", $_SESSION["user_id"], PDO::PARAM_INT);
-            $stmt->bindValue("w_UriNO", $_POST["UriageNO"], PDO::PARAM_INT);
-            $stmt->bindValue("w_shouhinCD", $_POST["ShouhinCD"], PDO::PARAM_INT);
-    
+            $params["w_uid"]=$_SESSION["user_id"];
+            $params["w_UriNO"]=$_POST["UriageNO"];
+            $params["w_shouhinCD"]=$_POST["ShouhinCD"];
+            $stmt->bindValue("w_uid", $params["w_uid"], PDO::PARAM_INT);
+            $stmt->bindValue("w_UriNO", $params["w_UriNO"], PDO::PARAM_INT);
+            $stmt->bindValue("w_shouhinCD", $params["w_shouhinCD"], PDO::PARAM_INT);
+            $sqllog .= rtn_sqllog($sql,$params);
             $status = $stmt->execute();
-            $count = $stmt->rowCount();
-    
+            //$count = $stmt->rowCount();
+            $pdo_h->commit();
+            $sqllog .= rtn_sqllog("commit",[]);
+            sqllogger($sqllog,0);
+
+            $reseve_status=true;
+            $msg = "削除成功。";
+            $alert_status = "alert-success";
+            /*
             if($status && $count<>0){
                 $pdo_h->commit();
-                sqllogger("commit",[],basename(__FILE__),"ok");
+                $sqllog .= rtn_sqllog("commit",[]);
+                sqllogger($sqllog,0);
+        
                 $reseve_status=true;
                 $msg = "削除成功。";
                 $alert_status = "alert-success";
                 file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,succsess,".$up_sqllog."\n",FILE_APPEND);
             }else{
                 $pdo_h->rollBack();
-                sqllogger("rollback",[],basename(__FILE__),"ok");
+                $sqllog .= rtn_sqllog("rollBack",[]);
                 $reseve_status=true;
                 $msg = "削除失敗。";
                 $alert_status = "alert-danger";
                 file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,failed,".$up_sqllog."\n",FILE_APPEND);
             }
+            */
         }catch(Exception $e){
             $pdo_h->rollBack();
-            sqllogger("rollback",[],basename(__FILE__),"ok");
+            $sqllog .= rtn_sqllog("rollBack",[]);
+            sqllogger($sqllog,0);
             $msg = "システムエラーによる更新失敗。管理者へ通知しました。";
             $alert_status = "alert-danger";
             log_writer2("ajax_UriageData_update_sql.php [Exception \$e] =>",$e,"lv0");

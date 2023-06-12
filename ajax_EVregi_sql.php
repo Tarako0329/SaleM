@@ -48,7 +48,6 @@ if($rtn !== true){
 $MODE=(!empty($_POST["mode"])?$_POST["mode"]:"");
 $token = csrf_create();
 
-$E_Flg=0;
 $emsg="";
 $ins_cnt=0;
 
@@ -101,7 +100,7 @@ $params["TokuisakiNM"] = filter_input(INPUT_POST,'KOKYAKU');
 
 try{
 	$pdo_h->beginTransaction();
-	sqllogger("START TRANSACTION",[],basename(__FILE__),"ok");
+	$sqllog .= rtn_sqllog("START TRANSACTION",[]);
 	$sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zeiKBN,genka_tanka)";
 	$sqlstr = $sqlstr." values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:su,:Utisu,:tanka,:UriageKin,:zeiKBN,:genka_tanka)";
 
@@ -133,22 +132,10 @@ try{
 		$stmt->bindValue("zeiKBN", $params["zeiKBN"], PDO::PARAM_INT);     //税区分
 		$stmt->bindValue("genka_tanka", $params["genka_tanka"], PDO::PARAM_INT);     //原価単価
 
+		$sqllog .= rtn_sqllog($sqlstr,$params);
 		$stmt->execute();
-		sqllogger($sqlstr,$params,basename(__FILE__),"ok");
+		$sqllog .= rtn_sqllog("--execute():正常終了",[]);
 		$ins_cnt++;
-		/*executeの戻り値チェックは不要。失敗時はExeptionが出るのでcatchで対応
-			$flg=$stmt->execute();
-			if($flg){
-				$ins_cnt++;
-				$emsg="売上のINSERTは正常終了\n";
-				sqllogger($sqlstr,$params,basename(__FILE__),"ok");
-			}else{
-				$emsg="売上のINSERTでエラー";
-				sqllogger($sqlstr,$params,basename(__FILE__),"ng");
-				$E_Flg=1;
-				break;
-			}
-		*/
 	}
 
 	//インボイス対応（消費税レコードと調整レコードの追加）
@@ -175,36 +162,12 @@ try{
 		$stmt->bindValue("ShouhinNM",  $params["ShouhinNM"], PDO::PARAM_STR);     //商品名
 		$stmt->bindValue("zei", $params["zei"], PDO::PARAM_INT);       						//消費税
 		$stmt->bindValue("zeiKBN", $params["zeiKBN"], PDO::PARAM_INT);            //税区分
-		/*
-			$stmt->bindValue("uid",  $_SESSION['user_id'], PDO::PARAM_INT);
-			$stmt->bindValue("UriageNO",  $UriageNO, PDO::PARAM_INT);
-			$stmt->bindValue("UriDate",  $KEIJOUBI, PDO::PARAM_STR);
-			$stmt->bindValue("insDatetime",  $time, PDO::PARAM_STR);
-			$stmt->bindValue("Event",  $EV, PDO::PARAM_INT);
-			$stmt->bindValue("TokuisakiNM",  $KOKYAKU, PDO::PARAM_STR);
-			$stmt->bindValue("ShouhinCD",  "Z".substr("000000".$row["ZEIKBN"],-6), PDO::PARAM_STR);	//商品CD["Z" + 0埋 + 税区分] Z=税
-			$stmt->bindValue("ShouhinNM",  ($row["ZEIRITU"]<>0?$row["ZEIKBNMEI"]." 消費税額":$row["ZEIKBNMEI"]), PDO::PARAM_STR);                      //商品名
-			$stmt->bindValue("zei", $row["SHOUHIZEI"], PDO::PARAM_INT);       											//消費税
-			$stmt->bindValue("zeiKBN", $row["ZEIKBN"], PDO::PARAM_INT);                   					//税区分
-		*/
+		
+		$sqllog .= rtn_sqllog($sqlstr_z,$params);
 		$stmt->execute();
+		$sqllog .= rtn_sqllog("--execute():正常終了",[]);
 		$ins_cnt++;
-		sqllogger($sqlstr_z,$params,basename(__FILE__),"ok");
 
-		/*executeの戻り値チェックは不要。失敗時はExeptionが出るのでcatchで対応
-			$flg=$stmt->execute();
-
-			if($flg){
-				$ins_cnt++;
-				$emsg="売上消費税のINSERTは正常終了\n";
-				sqllogger($sqlstr_z,$params,basename(__FILE__),"ok");
-			}else{
-				$emsg="売上消費税のINSERTでエラー";
-				sqllogger($sqlstr_z,$params,basename(__FILE__),"ng");
-				$E_Flg=1;
-				break;
-			}
-		*/
 		if($row["CHOUSEIGAKU"]!=0){
 			$stmt = $pdo_h->prepare($sqlstr_c);
 
@@ -223,132 +186,71 @@ try{
 			$stmt->bindValue("ShouhinNM",  $params["ShouhinNM"], PDO::PARAM_STR);     //商品名
 			$stmt->bindValue("UriageKin", $params["UriageKin"], PDO::PARAM_INT);      //売上本体調整額
 			$stmt->bindValue("zeiKBN", $params["zeiKBN"], PDO::PARAM_INT);            //税区分
-			/*
-				$stmt->bindValue("uid",  $_SESSION['user_id'], PDO::PARAM_INT);
-				$stmt->bindValue("UriageNO",  $UriageNO, PDO::PARAM_INT);
-				$stmt->bindValue("UriDate",  $KEIJOUBI, PDO::PARAM_STR);
-				$stmt->bindValue("insDatetime",  $time, PDO::PARAM_STR);
-				$stmt->bindValue("Event",  $EV, PDO::PARAM_INT);
-				$stmt->bindValue("TokuisakiNM",  $KOKYAKU, PDO::PARAM_STR);
-				$stmt->bindValue("ShouhinCD",  "C".substr("000000".$row["ZEIKBN"],-6), PDO::PARAM_STR);	//商品CD["C" + 0埋 + 税区分] C=調整
-				$stmt->bindValue("ShouhinNM",  $row["ZEIKBNMEI"]."本体調整額", PDO::PARAM_STR);          //商品名
-				$stmt->bindValue("UriageKin",  $row["CHOUSEIGAKU"], PDO::PARAM_INT);                    //売上本体調整額
-				$stmt->bindValue("zeiKBN", $row["ZEIKBN"], PDO::PARAM_INT);                   					//税区分
-			*/
+			
+			$sqllog .= rtn_sqllog($sqlstr_c,$params);
 			$stmt->execute();
+			$sqllog .= rtn_sqllog("--execute():正常終了",[]);
 			$ins_cnt++;
-			sqllogger($sqlstr_c,$params,basename(__FILE__),"ok");
-	
-			/*executeの戻り値チェックは不要。失敗時はExeptionが出るのでcatchで対応
-				$flg=$stmt->execute();
-				if($flg){
-					$ins_cnt++;
-					$emsg="調整額のINSERTは正常終了\n";
-					file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,success,".$sqllog."\n",FILE_APPEND);
-				}else{
-					$emsg="調整額のINSERTでエラー";
-					file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,failed,".$sqllog."\n",FILE_APPEND);
-					$E_Flg=1;
-					break;
-				}
-			*/
 		}
 	}
 	//位置情報、天気情報の付与（uid,売上No,緯度、経度、住所、天気、気温、体感温度、天気アイコンping,無効FLG,insdate,update）
 	if(empty($_POST["nonadd"]) && $ins_cnt>0){
 		$emsg=$emsg."/位置情報、天気情報　処理開始\n";
-		
-		$sqlstr = "INSERT INTO `UriageData_GioWeather`(`uid`, `UriNo`, `lat`, `lon`, `weather`, `description`, `temp`, `feels_like`, `icon`) VALUES(?,?,?,?,?,?,?,?,?)";
-		$sqllog = "INSERT INTO `UriageData_GioWeather`(`uid`, `UriNo`, `lat`, `lon`, `weather`, `description`, `temp`, `feels_like`, `icon`) ";
+		$sqlstr = "insert into UriageData_GioWeather(uid, UriNo, lat, lon, weather, description, temp, feels_like, icon) values(:uid,:UriNo,:lat,:lon,:weather,:description,:temp,:feels_like,:icon)";
+		$params=[];
+		$params["uid"] = $_SESSION['user_id'];
+		$params["UriNo"] = $UriageNO;
+		$params["lat"] = $_POST['lat'];
+		$params["lon"] = $_POST['lon'];
+		$params["weather"] = $_POST['weather'];
+		$params["description"] = $_POST['description'];
+		$params["temp"] = $_POST['temp'];
+		$params["feels_like"] = $_POST['feels_like'];
+		$params["icon"] = $_POST['icon'];
 
-		$sqllog = $sqllog."VALUES('".$_SESSION['user_id']."','".$UriageNO."','".$_POST['lat']."','".$_POST['lon']."','".$_POST['weather']."','".$_POST['description']."','".$_POST['temp']."','".$_POST['feels_like']."','".$_POST['icon']."')";
 		$stmt = $pdo_h->prepare($sqlstr);
-		$stmt->bindValue(1,  $_SESSION['user_id'], PDO::PARAM_INT);
-		$stmt->bindValue(2,  $UriageNO, PDO::PARAM_INT);
-		$stmt->bindValue(3,  $_POST['lat'], PDO::PARAM_INT);
-		$stmt->bindValue(4,  $_POST['lon'], PDO::PARAM_INT);
-		$stmt->bindValue(5,  $_POST['weather'], PDO::PARAM_STR);
-		$stmt->bindValue(6,  $_POST['description'], PDO::PARAM_INT);
-		$stmt->bindValue(7,  $_POST['temp'], PDO::PARAM_INT);
-		$stmt->bindValue(8,  $_POST['feels_like'], PDO::PARAM_INT);
-		$stmt->bindValue(9,  $_POST['icon'], PDO::PARAM_STR);
+		$stmt->bindValue(1,  $params["uid"], PDO::PARAM_INT);
+		$stmt->bindValue(2,  $params["UriNo"], PDO::PARAM_INT);
+		$stmt->bindValue(3,  $params["lat"], PDO::PARAM_INT);
+		$stmt->bindValue(4,  $params["lon"], PDO::PARAM_INT);
+		$stmt->bindValue(5,  $params["weather"], PDO::PARAM_STR);
+		$stmt->bindValue(6,  $params["description"], PDO::PARAM_INT);
+		$stmt->bindValue(7,  $params["temp"], PDO::PARAM_INT);
+		$stmt->bindValue(8,  $params["feels_like"], PDO::PARAM_INT);
+		$stmt->bindValue(9,  $params["icon"], PDO::PARAM_STR);
 
-		/*executeの戻り値チェックは不要。失敗時はExeptionが出るのでcatchで対応
-			$flg=$stmt->execute();
-
-			if($flg){
-				$ins_cnt++;
-				$emsg="位置・天気のINSERTは正常終了\n";
-				file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,success,".$sqllog."\n",FILE_APPEND);
-			}else{
-				$emsg="位置・天気のINSERTでエラー";
-				file_put_contents("sql_log/".$logfilename,$time.",EVregi_sql.php,INSERT,failed,".$sqllog."\n",FILE_APPEND);
-				$E_Flg=1;
-			}
-		*/
+		$sqllog .= rtn_sqllog($sqlstr,$params);
 		$stmt->execute();
-		$ins_cnt++;
-		sqllogger($sqlstr,$params,basename(__FILE__),"ok");
+		$sqllog .= rtn_sqllog("--execute():正常終了",[]);
 	}else{
 		log_writer2("ajax_EVregi_sql.php","Gio insert skip","lv3");
 	}
+	$pdo_h->commit();
+	$sqllog .= rtn_sqllog("commit",[]);
+	sqllogger($sqllog,0);
 	
-	//
-	if($E_Flg==0){
-		$pdo_h->commit();
-		sqllogger("commit",[],basename(__FILE__),"ok");
-		file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,COMMIT,success,売上No".$UriageNO."\n",FILE_APPEND);
-		
-		$msg = array(
-			"MSG" => "売上が登録されました。（売上№：".$UriageNO."）"
-			,"status" => "alert-success"
-			,"csrf_create" => $token
-			,"RyoushuURL" => ROOT_URL."ryoushuu_pdf.php?u=".rot13encrypt2($UriageNO)."&i=".rot13encrypt2($_SESSION["user_id"])
-		);
-		header('Content-type: application/json');
-		echo json_encode($msg, JSON_UNESCAPED_UNICODE);
+	$msg = array(
+		"MSG" => "売上が登録されました。（売上№：".$UriageNO."）"
+		,"status" => "alert-success"
+		,"csrf_create" => $token
+		,"RyoushuURL" => ROOT_URL."ryoushuu_pdf.php?u=".rot13encrypt2($UriageNO)."&i=".rot13encrypt2($_SESSION["user_id"])
+	);
+	header('Content-type: application/json');
+	echo json_encode($msg, JSON_UNESCAPED_UNICODE);
 
-		$stmt = null;
-		$pdo_h = null;
-		exit();//success!
-	}else{
-		//1件でも失敗したらロールバック
-		$pdo_h->rollBack();
-		sqllogger("rollback",[],basename(__FILE__),"ok");
-		file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,ROLLBACK,success,売上No".$UriageNO."\n",FILE_APPEND);
-		
-		$emsg=$emsg."/insert処理が失敗し、rollBackが発生しました。";
-		$stmt = null;
-		$pdo_h = null;
-		$E_Flg=1;
-	}
-	
 }catch (Exception $e) {
 	$pdo_h->rollBack();
-	sqllogger("rollback",[],basename(__FILE__),"ok");
+	$sqllog .= rtn_sqllog("rollBack",[]);
+	sqllogger($sqllog,$e);
 	$emsg = $emsg."/レジ登録でERRORをCATHCしました。：".$e->getMessage();
-	file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,ROLLBACK,success,売上No".$UriageNO."\n",FILE_APPEND);
-	$E_Flg=1;
 	$stmt = null;
 	$pdo_h = null;
-}catch(Throwable $t){
-	$pdo_h->rollBack();
-	sqllogger("rollback",[],basename(__FILE__),"ok");
-	$emsg = $emsg."/レジ登録でFATAL ERRORをCATHCしました。：".$t->getMessage();
-	file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",EVregi_sql.php,ROLLBACK,success,売上No".$UriageNO."\n",FILE_APPEND);
-	$E_Flg=1;
-	$stmt = null;
-	$pdo_h = null;        
-}
-
-if($E_Flg==1){
 	$emsg = $emsg."/UriNO::".$UriageNO."　uid::".$_SESSION['user_id'];
 	if(EXEC_MODE!=="Local"){
 		send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
 	}else{
 		log_writer2("ajax.EVreg_sql.php",$emsg,"lv3");
 	}
-
 	$msg = array(
 		"MSG" => "登録が失敗しました。再度実行してもエラーとなる場合は、ご迷惑をおかけしますが復旧までお待ちください。エラーは管理者へ自動通知されました。"
 		,"status" => "alert-danger"
@@ -356,11 +258,8 @@ if($E_Flg==1){
 	);
 	header('Content-type: application/json');
 	echo json_encode($msg, JSON_UNESCAPED_UNICODE);
-	$stmt = null;
-	$pdo_h = null;
-	
-	exit();
 }
+
 
 $stmt = null;
 $pdo_h = null;

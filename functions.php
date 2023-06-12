@@ -838,37 +838,47 @@ function sort_hash($val,$type){
     return $rtn;
 }
 
-function sqllogger($sql,$params,$phpname,$result){
-    log_writer2("function.php[func:sqllogger] \$sql =>",$sql,"lv3");
-    log_writer2("function.php[func:sqllogger] \$params =>",$params,"lv3");
-    $logsql=$sql;
-    $i=0;
-    $logfilename="sid_".$_SESSION['user_id'].".log";
+function sqllogger($logsql,$e){//(sqlログ,Exception $e:$eセット時はメール通知あり)
+    //SQL文はトランザクション単位で共通ログファイルに書き込みを行う。
+    //エラーをキャッチした場合、ユーザーID別のログファイルにも書き込みを行う。
+    $logfilename="esql_sid_".$_SESSION['user_id'].".log";
     $userid = (!empty($_SESSION['user_id'])?$_SESSION['user_id']:"-");
+    $callphp = debug_backtrace();
+    $phpname = substr($callphp[0]["file"], (strrpos($callphp[0]["file"],"\\") +1));
+
+    if(!empty($logsql)){
+        file_put_contents("sql_log/".date("Y-m-d").".log", $logsql,FILE_APPEND);
+    }
+    if(!empty($e)){//主にロールバック時
+        $elog = print_r($e,true);
+        $eMsg = date("Y-m-d H:i:s")."\t".$userid."\t".$phpname."\t"."/*".$e->getMessage()."*/\n";
+        file_put_contents("sql_log/".date("Y-m-d").".log", $eMsg, FILE_APPEND);
+
+        file_put_contents("sql_log/".$logfilename,$logsql,FILE_APPEND);
+        file_put_contents("sql_log/".$logfilename,"/*".$elog."*/\n",FILE_APPEND);
+        log_writer2($phpname." [Exception \$e] =>",$e,"lv0");
+    }
+    
+}
+
+function rtn_sqllog($sql,$params){//(sql,パラメータ[],phpファイル名)w:書き込み r:整形SQLリターン
+    $logsql=$sql.";";
+    $i=0;
+    $userid = (!empty($_SESSION['user_id'])?$_SESSION['user_id']:"-");
+    $callphp = debug_backtrace();
+    $phpname = substr($callphp[0]["file"], (strrpos($callphp[0]["file"],"\\") +1));
 
     if(strstr($logsql,"?")!==false){
-        log_writer2("function.php[func:sqllogger]","?あり","lv3");
         while(strstr($logsql,"?")!==false){
             $logsql = strstr($logsql,"?",true).(!is_null($params[$i])?"\"".$params[$i]."\"":"null").substr(strstr($logsql,"?"), ((strlen(strstr($logsql,"?"))-1)*(-1))) ;
             $i++;
         }
     }else{
-        log_writer2("function.php[func:sqllogger]","?なし","lv3");
         foreach(array_keys($params) as $row){
             $logsql = str_replace(":".$row,(!is_null($params[$row])?"\"".$params[$row]."\"":"null"),$logsql);
         }
     }
-
-    $logsql .= ";";
-    $logsql = str_replace(["\r","\n","\t"],"",$logsql);
-    if($result==="ok"){
-        file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",".$phpname.",".$logsql."\n",FILE_APPEND);
-        file_put_contents("sql_log/".date("Y-m-d").".log", date("Y-m-d H:i:s")."\t".$userid."\t".$phpname."\t".$logsql."\n",FILE_APPEND);
-    }else{
-        log_writer2($phpname." [unsuccess sql] =>",$logsql,"lv0");
-    }
-    
-    //return $phpname.",".$logsql;
+    return date("Y-m-d H:i:s")."\t".$userid."\t".$phpname."\t".$logsql."\n";
 }
 
 ?>

@@ -53,7 +53,9 @@ foreach($array as $row){
     
 if($E_Flg==0){
     $pdo_h->commit();
-    sqllogger("commit",[],basename(__FILE__),"ok");
+    $sqllog .= rtn_sqllog("commit",[]);
+    sqllogger($sqllog,0);
+
     $msg[0] = array(
         "EMSG" => "更新されました。"
         ,"status" => "alert-success"
@@ -62,7 +64,7 @@ if($E_Flg==0){
 }else{
     //1件でも失敗したらロールバック
     $pdo_h->rollBack();
-    sqllogger("rollback",[],basename(__FILE__),"ok");
+    $sqllog .= rtn_sqllog("rollBack",[]);
     $msg[0] = array(
         "EMSG" => "更新が失敗しました。"
         ,"status" => "alert-danger"

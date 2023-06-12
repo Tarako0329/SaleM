@@ -33,7 +33,7 @@ if($rtn !== true){
 		$logfilename="sid_".$_SESSION['user_id'].".log";
 		try{
 			$pdo_h->beginTransaction();
-			sqllogger("START TRANSACTION",[],basename(__FILE__),"ok");
+			$sqllog .= rtn_sqllog("START TRANSACTION",[]);
 
 			if($_POST["mode"] === "insert"){
 				$sqlstr="insert into Users(uid,mail,password,question,answer,yuukoukigen,introducer_id) values(0,?,?,?,?,?,?)";
@@ -44,9 +44,10 @@ if($rtn !== true){
 				$stmt->bindValue(4, $_SESSION["P"][3], PDO::PARAM_STR);
 				$stmt->bindValue(5, $_SESSION["P"][4], PDO::PARAM_STR);
 				$stmt->bindValue(6, $_SESSION["P"][5], PDO::PARAM_STR);
-			
+				$sqllog .= rtn_sqllog($sqlstr,$_SESSION["P"]);
 				$status=$stmt->execute();
-				$count = $stmt->rowCount();
+				$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+				//$count = $stmt->rowCount();
 				
 				if($status){
 					$_SESSION["EMSG"]="パスワードを入力し、ログインしてください。<br>[AUTOLOGIN]のチェックを外すと自動ログインを行いません。セキュリティが気になる方は外してください。";
@@ -75,31 +76,43 @@ if($rtn !== true){
 				$stmt->bindValue("invoice_no", $_SESSION["P"]["invoice_no"], PDO::PARAM_INT);
 				$stmt->bindValue("inquiry_tel", $_SESSION["P"]["inquiry_tel"], PDO::PARAM_STR);
 				$stmt->bindValue("inquiry_mail", $_SESSION["P"]["inquiry_mail"], PDO::PARAM_STR);
+				$sqllog .= rtn_sqllog($sqlstr,$_SESSION["P"]);
 				$status=$stmt->execute();
-				$count = 1;
+				$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+				//$count = 1;
 			}
 			log_writer2(basename(__FILE__)." [\$status]",$status,"lv3");
 			log_writer2(basename(__FILE__)." [\$count]",$count,"lv3");
+			$pdo_h->commit();
+			$sqllog .= rtn_sqllog("commit",[]);
+			sqllogger($sqllog,0);
+	
+			$msg = "登録が完了しました。";
+			$alert_status = "alert-success";
+		/*
 			if($status!==false && $count<>0){
 				$pdo_h->commit();
-				sqllogger($sqlstr,$_SESSION["P"],basename(__FILE__),"ok");
-				sqllogger("commit",[],basename(__FILE__),"ok");
+				$sqllog .= rtn_sqllog("commit",[]);
+				sqllogger($sqllog,0);
+		
 				$msg = "登録が完了しました。";
 				$alert_status = "alert-success";
 			}else{
 				$pdo_h->rollBack();
-				sqllogger("rollback",[],basename(__FILE__),"ok");
+				$sqllog .= rtn_sqllog("rollBack",[]);
 				$msg = "失敗。";
 				$alert_status = "alert-danger";
 				sqllogger($sqlstr,$_SESSION["P"],basename(__FILE__),"ng");
 			}
+		*/
 			$reseve_status=true;
 		}catch(Exception $e){
 			$pdo_h->rollBack();
-			sqllogger("rollback",[],basename(__FILE__),"ok");
+			$sqllog .= rtn_sqllog("rollBack",null);
+			sqllogger($sqllog,$e);
 			$msg = "システムエラーによる更新失敗。管理者へ通知しました。";
 			$alert_status = "alert-danger";
-			log_writer2(basename(__FILE__)." [Exception \$e] =>",$e,"lv0");
+			//log_writer2(basename(__FILE__)." [Exception \$e] =>",$e,"lv0");
 			$reseve_status=true;
 		}
 	}

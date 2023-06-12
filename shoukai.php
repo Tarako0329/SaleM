@@ -3,48 +3,67 @@ require "php_header.php";
 $rtn=check_session_userid($pdo_h);
 $token = csrf_create();
 
-$sqlstr="select * from Users where uid=?";
-$flg="";
-if(!empty($_POST)){
-    //$ShoukaishaCD=rot13decrypt2(secho($_POST["SHOUKAI"]))-10000;
-    $ShoukaishaCD=sort_hash(secho($_POST["SHOUKAI"]),"dec");
-    $stmt = $pdo_h->prepare($sqlstr);
-    $stmt->bindValue(1, $ShoukaishaCD, PDO::PARAM_INT);
-    $stmt->execute();
-    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $rowcnt = $stmt->rowCount();
-    if($rowcnt==1){
-        $sqlstr2="update Users set introducer_id=? where uid=? and introducer_id is null";
-        $stmt = $pdo_h->prepare($sqlstr2);
+try{
+    
+    $sqlstr="select * from Users where uid=?";
+    $flg="";
+    if(!empty($_POST)){
+        $ShoukaishaCD=sort_hash(secho($_POST["SHOUKAI"]),"dec");
+        $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $ShoukaishaCD, PDO::PARAM_INT);
-        $stmt->bindValue(2, $_SESSION["user_id"], PDO::PARAM_INT);
         $stmt->execute();
-        $rowcnt2 = $stmt->rowCount();
-        if($rowcnt2==1){
-            $msg="登録者CDを登録いたしました。";
-            $flg="success";
+        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $rowcnt = $stmt->rowCount();
+        if($rowcnt==1){
+			$pdo_h->beginTransaction();
+			$sqllog .= rtn_sqllog("START TRANSACTION",[]);
+
+            $sqlstr2="update Users set introducer_id=? where uid=? and introducer_id is null";
+            $stmt = $pdo_h->prepare($sqlstr2);
+            $stmt->bindValue(1, $ShoukaishaCD, PDO::PARAM_INT);
+            $stmt->bindValue(2, $_SESSION["user_id"], PDO::PARAM_INT);
+
+            $sqllog .= rtn_sqllog($sqlstr,[$ShoukaishaCD,$_SESSION["user_id"]]);
+            $stmt->execute();
+            $sqllog .= rtn_sqllog("--execute():正常終了",[]);
+
+            $rowcnt2 = $stmt->rowCount();
+            if($rowcnt2==1){
+    			$pdo_h->commit();
+	    		$sqllog .= rtn_sqllog("commit",[]);
+		    	sqllogger($sqllog,0);
+                $msg="登録者CDを登録いたしました。";
+                $flg="success";
+            }else{
+                $pdo_h->rollBack();
+                $sqllog .= rtn_sqllog("rollBack",null);
+                sqllogger($sqllog,null);
+                $msg="別の登録者CDが登録されてます。";
+                $flg="failed";
+            }
         }else{
-            $msg="別の登録者CDが登録されてます。";
+            $msg="登録者CDが誤ってます。";
             $flg="failed";
         }
-    }else{
-        $msg="登録者CDが誤ってます。";
-        $flg="failed";
     }
-}
+    
+    
+    $stmt = $pdo_h->prepare($sqlstr);
+    $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    $ShoukaiCD=sort_hash($row[0]["uid"],"enc");
+    $ShoukaishaCD="";
+    if($row[0]["introducer_id"]<>""){
+        $ShoukaishaCD=sort_hash($row[0]["introducer_id"],"enc");
+    }
+    
+}catch(Exception $e){
+    $pdo_h->rollBack();
+    $sqllog .= rtn_sqllog("rollBack",null);
+    sqllogger($sqllog,null);
 
-
-$stmt = $pdo_h->prepare($sqlstr);
-$stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
-$stmt->execute();
-$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-//$ShoukaiCD=rot13encrypt2($row[0]["uid"]+10000);
-$ShoukaiCD=sort_hash($row[0]["uid"],"enc");
-$ShoukaishaCD="";
-if($row[0]["introducer_id"]<>""){
-    //$ShoukaishaCD=rot13encrypt2($row[0]["introducer_id"]+10000);
-    $ShoukaishaCD=sort_hash($row[0]["introducer_id"],"enc");
 }
 
 
