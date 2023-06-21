@@ -7,24 +7,36 @@ $rtn=check_session_userid($pdo_h);
 $msg="";
 
 if($_SESSION["flg"]=="succsess"){
-
-    $sqlstr="update Users set yuukoukigen=?,keiyakudate=?,plan=?,kaiyakudate=? where uid=?";
-    $stmt = $pdo_h->prepare($sqlstr);
-    $stmt->bindValue(1, $_SESSION["yuukoukigen"], PDO::PARAM_STR);
-    $stmt->bindValue(2, NULL, PDO::PARAM_STR);
-    $stmt->bindValue(3, NULL, PDO::PARAM_STR);
-    $stmt->bindValue(4, date("Y-m-d"), PDO::PARAM_STR);
-    $stmt->bindValue(5, $_SESSION["user_id"], PDO::PARAM_INT);
-    $flg=$stmt->execute();
+    try{
+        $pdo_h->beginTransaction();
+        $sqllog .= rtn_sqllog("START TRANSACTION",[]);
     
-    if($flg){
+        $sqlstr="update Users set yuukoukigen=?,keiyakudate=?,plan=?,kaiyakudate=? where uid=?";
+        $stmt = $pdo_h->prepare($sqlstr);
+        $stmt->bindValue(1, $_SESSION["yuukoukigen"], PDO::PARAM_STR);
+        $stmt->bindValue(2, NULL, PDO::PARAM_STR);
+        $stmt->bindValue(3, NULL, PDO::PARAM_STR);
+        $stmt->bindValue(4, date("Y-m-d"), PDO::PARAM_STR);
+        $stmt->bindValue(5, $_SESSION["user_id"], PDO::PARAM_INT);
+    
+        $sqllog .= rtn_sqllog($sqlstr,[NULL,$_GET["sid"],$keiyakudate,$_GET["M"],$_SESSION["user_id"]]);
+        $stmt->execute();
+        $pdo_h->commit();
+        $sqllog .= rtn_sqllog("commit",[]);
+        sqllogger($sqllog,0);
         $msg = "解約処理が完了しました。<br><br>ご利用いただきありがとうございました。";
         $mode=5;
-    }else{
+        $_SESSION["yuukoukigen"]="";
+    
+    }catch(Exception $e){
+        $pdo_h->rollBack();
+        $sqllog .= rtn_sqllog("rollBack",[]);
+        sqllogger($sqllog,$e);
+
         $msg = "解約の登録処理が失敗しました。";
         $mode=6;
+
     }
-    $_SESSION["yuukoukigen"]="";
 
 }else{
     //stripe側の解約処理が失敗

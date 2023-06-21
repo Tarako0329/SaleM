@@ -171,7 +171,7 @@
 				<p style='color:red;margin-bottom: 2px;font-size: large;'>※上記データが更新対象となります。</p>
 				<p style='color:red;margin-bottom: 2px;font-size: large;'>※<span style='color:blue;'>青字の項目</span>のタップで絞込みできます。</p>
 			</div>
-			<div class='row mb-2'>
+			<div class='row mb-2'><!--売上日/help icon-->
 				<div class="col-11" style='display:flex;'>
   	    	<div class="form-check">
     	    	<input class="form-check-input" type="checkbox" id="chk_uridate" name='chk_uridate' onchange='chk_visible(this,"#up_uridate")' >
@@ -185,7 +185,7 @@
 					</a>
 				</div>
 			</div><!--売上日/help icon-->
-			<div class='row mb-2'>
+			<div class='row mb-2'><!--イベント名-->
 				<div class="col-11" style='display:flex;'>
   	    	<div class="form-check">
     	    	<input class="form-check-input" type="checkbox" id="chk_event" name='chk_event' onchange='chk_visible(this,"#up_event")' >
@@ -194,7 +194,7 @@
 					<input type='text' style='font-size:1.5rem;width:250px;background-color:#999999;' name='up_event' id='up_event' maxlength='10'  class='form-control'>
     		</div>
 			</div><!--イベント名-->
-			<div class='row mb-2'>
+			<div class='row mb-2'><!--顧客名-->
 				<div class="col-11" style='display:flex;'>
   	    	<div class="form-check">
     	    	<input class="form-check-input" type="checkbox" id="chk_kokyaku" name='chk_kokyaku' onchange='chk_visible(this,"#up_kokyaku")' >
@@ -203,7 +203,7 @@
 					<input type='text' style='font-size:1.5rem;width:250px;background-color:#999999;' name='up_kokyaku' id='up_kokyaku' maxlength='10'  class='form-control'>
     		</div>
 			</div><!--顧客名-->
-			<div class='row mb-1'>
+			<div class='row mb-1'><!--売上単価-->
 				<div class="col-11" style='display:flex;'>
   	    	<div class="form-check">
     	    	<input class="form-check-input" type="checkbox" id="chk_urikin" name='chk_urikin' onchange='chk_visible(this,"#up_tanka")' >
@@ -226,7 +226,7 @@
 					</select>
     		</div>
 			</div><!--売上単価-->
-			<div class='row mb-2'>
+			<div class='row mb-2'><!--売上単価計算結果-->
 				<div class="col-11" style='display:flex;'>
   	    	<div class="form-check">
 						<!--space-->
@@ -234,7 +234,7 @@
 					税込単価：{{(upd_hontai+upd_zei_kin).toLocaleString()}}（本体：{{upd_hontai.toLocaleString()}}　消費税：{{upd_zei_kin.toLocaleString()}}-）
     		</div>
 			</div><!--売上単価計算結果-->
-			<div class='row mb-2'>
+			<div class='row mb-2'><!--原価単価-->
 				<div class="col-11" style='display:flex;'>
   	    	<div class="form-check">
     	    	<input class="form-check-input" type="checkbox" id="chk_genka" name='chk_genka' onchange='chk_visible(this,"#up_urigenka")'>
@@ -243,7 +243,7 @@
 					<input type='number' style='font-size:1.5rem;width:250px;background-color:#999999;' name='up_urigenka' id='up_urigenka' maxlength='10'  class='form-control'>
     		</div>
 			</div><!--原価単価-->
-			<div class='row mb-2'>
+			<div class='row mb-2'><!--ボタン-->
 				<div class="col-12" style='padding-left:80px;' >
 					<button @click='btn_controler()' type='button' class='btn-lg btn-primary' style='padding-left:30px;padding-right:30px;'>{{btn_controle[0]}}</button>
 					<button v-if='btn_controle[1]' type='submit' class='btn-lg btn-warning' style='padding-left:30px;padding-right:30px;margin-left:10px;'>更　新</button>

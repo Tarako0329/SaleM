@@ -307,9 +307,11 @@
 					}
 
 					if(kominuki==='komi'){
-						return kingaku - Math.round(kingaku / (1 + zeiritu / 100))
+						//return Math.floor(kingaku - (kingaku / (1 + zeiritu / 100)))
+						return Math.trunc(kingaku - (kingaku / (1 + zeiritu / 100)))
 					}else{
-						return Math.round(kingaku * (zeiritu / 100));
+						//return Math.floor(kingaku * (zeiritu / 100));
+						return Math.trunc(kingaku * (zeiritu / 100));
 					}
 				}
 				const set_new_value = (index,new_val_id) => {

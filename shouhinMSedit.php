@@ -31,58 +31,25 @@ $_SESSION["MSG"]=null;
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
-    include "head.html" 
+    //include "head.html" 
+    include "head_bs5.html" 
     ?>
     <!--ページ専用CSS--><link rel="stylesheet" href="css/style_ShouhinMSedit.css?<?php echo $time; ?>" >
     <TITLE><?php echo secho($title)." 取扱商品登録画面";?></TITLE>
 </head>
-<script>
-    window.onload = function() {
-        //アラート用
-        function alert(msg) {
-          return $('<div class="alert" role="alert"></div>')
-            .text(msg);
-        }
-        (function($){
-          const e = alert('<?php echo $success_msg; ?>').addClass('alert-success');
-          // アラートを表示する
-          $('#alert-1').append(e);
-          /* 2秒後にアラートを消す
-          setTimeout(() => {
-            e.alert('close');
-          }, 3000);
-          */
-        })(jQuery);
-        // Enterキーが押された時にSubmitされるのを抑制する
-        document.getElementById("form1").onkeypress = (e) => {
-            // form1に入力されたキーを取得
-            const key = e.keyCode || e.charCode || 0;
-            // 13はEnterキーのキーコード
-            if (key == 13) {
-                // アクションを行わない
-                e.preventDefault();
-            }
-        }    
-    };    
-</script>
-
-<header class="header-color common_header" style="flex-wrap:wrap">
-    <div class="title" style="width: 100%;"><a href="menu.php" class='item_15'><?php echo secho($title);?></a></div>
-    <p style="font-size:1rem;color:var(--user-disp-color);font-weight:400;">  取扱商品登録画面</p>
-</header>
-
 <body class='common_body'>
+    <header class="header-color common_header" style="flex-wrap:wrap">
+        <div class="title" style="width: 100%;"><a href="menu.php" class='item_15'><?php echo secho($title);?></a></div>
+        <p style="font-size:1rem;color:var(--user-disp-color);font-weight:400;">  取扱商品登録画面</p>
+    </header>
     <div class="container-fluid" style="padding-top:5px;">
     <?php if(empty($_SESSION["tour"])){?>        
     <a href="#" style='color:inherit;position:fixed;top:75px;right:5px;' onclick='help()'><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>
     <?php }?>
     <?php
-        //echo $success_msg."<br>";
-        //if($_SESSION["MSG"]!=""){
         if(!empty($success_msg)){
-            echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-1' class='lead '></div></div></div></div>";
+            echo "<div class='alert alert-success' role='alert' style='width:80%;'>".$success_msg."</div>";
         }
-        //$_SESSION["MSG"]="";
     ?>
     <form method="post" id="form1" class="form" action="shouhinMSedit_sql.php">
         <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
@@ -94,14 +61,10 @@ $_SESSION["MSG"]=null;
             <tr class='item_3'>
                 <td></td>
                 <td>
-                    <div class="btn-group btn-group-toggle" style="padding:0" data-toggle="buttons">
-                        <label class="btn btn-outline-primary active" style="font-size:1.2rem">
-                            <input type="radio" onchange="zei_math()" name="options" id="option1" value="zeikomi" autocomplete="off" checked> 税込
-                        </label>
-                        <label class="btn btn-outline-primary" style="font-size:1.2rem">
-                            <input type="radio" onchange="zei_math()" name="options" id="option2" value="zeinuki" autocomplete="off"> 税抜
-                        </label>
-                    </div>
+                    <input type="radio" class='btn-check' onchange="zei_math()" name="options" id="option1" value="zeikomi" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" style="font-size:1.2rem;border-radius:0;margin-right:0;" for='option1'>税込</label>
+                    <input type="radio" class='btn-check' onchange="zei_math()" name="options" id="option2" value="zeinuki" autocomplete="off">
+                    <label class="btn btn-outline-primary" style="font-size:1.2rem;border-radius:0;margin-left:-4px;" for='option2'>税抜</label>
                 </td>
             </tr>
             <tr class='item_4'><td>税区分</td>
@@ -187,32 +150,44 @@ $_SESSION["MSG"]=null;
                 switch(select.value){
                     case '1001':
                         zkomitanka.value=new_tanka.value;
-                        shouhizei.value=new_tanka.value - Math.round(new_tanka.value / (1 + 8 / 100));
-                        tanka.value = Math.round(new_tanka.value / (1 + 8 / 100));
+                        shouhizei.value=Math.trunc(new_tanka.value - (new_tanka.value / (1 + 8 / 100)));
+                        //tanka.value = Math.floor(new_tanka.value / (1 + 8 / 100));
                         break;
                     case '1101':
                         zkomitanka.value=new_tanka.value;
-                        shouhizei.value=new_tanka.value - Math.round(new_tanka.value / (1 + 10 / 100));
-                        tanka.value = Math.round(new_tanka.value / (1 + 10 / 100));
+                        shouhizei.value=Math.trunc(new_tanka.value - (new_tanka.value / (1 + 10 / 100)));
+                        //tanka.value = Math.floor(new_tanka.value / (1 + 10 / 100));
                         break;
                 }
+                tanka.value = zkomitanka.value - shouhizei.value;
             }else if(kominuki[1].checked){//税抜
                 switch(select.value){
                     case '1001':
-                        zkomitanka.value=Math.round(new_tanka.value * (1 + 8 / 100));
-                        tanka.value = new_tanka.value;
-                        shouhizei.value=Math.round(new_tanka.value * (8 / 100));
+                        zkomitanka.value=Math.trunc(new_tanka.value * (1 + 8 / 100));
+                        //tanka.value = new_tanka.value;
+                        shouhizei.value=Math.trunc(new_tanka.value * (8 / 100));
                         break;
                     case '1101':
-                        zkomitanka.value=Math.round(new_tanka.value * (1 + 10 / 100));
-                        tanka.value = new_tanka.value;
-                        shouhizei.value=Math.round(new_tanka.value * (10 / 100));
+                        zkomitanka.value=Math.trunc(new_tanka.value * (1 + 10 / 100));
+                        //tanka.value = new_tanka.value;
+                        shouhizei.value=Math.trunc(new_tanka.value * (10 / 100));
                         break;
                 }
+                tanka.value = new_tanka.value;
             }else{
                 //
             }
         }
+        document.getElementById("form1").onkeypress = (e) => {
+            // form1に入力されたキーを取得
+            const key = e.keyCode || e.charCode || 0;
+            // 13はEnterキーのキーコード
+            if (key == 13) {
+                // アクションを行わない
+                e.preventDefault();
+            }
+        }    
+
     </script>
 </body>
 <!--シェパードナビ

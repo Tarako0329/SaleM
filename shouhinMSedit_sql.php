@@ -79,7 +79,8 @@ try{
     $stmt->bindValue(16, $params[15], PDO::PARAM_STR);
     $stmt->bindValue(17, $params[16], PDO::PARAM_INT);
     $sqllog .= rtn_sqllog($sqlstr,$params);
-    $status=$stmt->execute();
+    $stmt->execute();
+    $pdo_h->commit();
     $sqllog .= rtn_sqllog("commit",[]);
     sqllogger($sqllog,0);
 
