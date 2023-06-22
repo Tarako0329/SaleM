@@ -22,7 +22,6 @@
 <head>
 	<?php 
 	//共通部分、bootstrap設定、フォントCND、ファビコン等
-	//include "head.html";
 	include "head_bs5.html";
 	?>
 	<!--ページ専用CSS-->

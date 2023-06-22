@@ -46,6 +46,7 @@ ver2.99.0-043:gitignore更新
 ver2.99.0-044:トランザクションログ関連の更新
 ver2.99.0-045:to[bs5&Vue3CompApi]インボイス対応・・・端数処理・売上修正の改修
 	create view ryoshu_hakkou_chk as SELECT `uid`,`UriNo` FROM `ryoushu` GROUP by `uid`,`UriNo`;
+ver2.99.0-046:to[bs5&Vue3CompApi]インボイス対応:bugfix
 
 
 ローカルからテスト環境へ

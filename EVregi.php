@@ -624,8 +624,8 @@
 					if(pm.value==="plus"){
 						shouhinMS_filter.value[index].ordercounter ++
 						if(auto_ajust.value===true){
-							pay.value += shouhinMS_filter.value[index].tanka + shouhinMS_filter.value[index].tanka_zei
-							kaikei_zei.value += shouhinMS_filter.value[index].tanka_zei
+							pay.value += Number(shouhinMS_filter.value[index].tanka) + Number(shouhinMS_filter.value[index].tanka_zei)
+							kaikei_zei.value += Number(shouhinMS_filter.value[index].tanka_zei)
 						}
 						//税率ごとに本体額を計上
 						if(pay.value===0){
@@ -634,8 +634,8 @@
 							let counted=false
 							for(const row of hontai.value){
 								if(row['税区分']===Number(shouhinMS_filter.value[index].zeiKBN)){
-									row['本体額'] = row['本体額'] + Number(shouhinMS_filter.value[index].tanka)
-									row['消費税'] = row['消費税'] + Number(shouhinMS_filter.value[index].tanka_zei)
+									row['本体額'] = Number(row['本体額']) + Number(shouhinMS_filter.value[index].tanka)
+									row['消費税'] = Number(row['消費税']) + Number(shouhinMS_filter.value[index].tanka_zei)
 									counted = true
 									break
 								}
@@ -652,13 +652,13 @@
 						}else{
 							shouhinMS_filter.value[index].ordercounter --
 							if(auto_ajust.value===true){
-								pay.value -= shouhinMS_filter.value[index].tanka + shouhinMS_filter.value[index].tanka_zei
-								kaikei_zei.value -= shouhinMS_filter.value[index].tanka_zei
+								pay.value -= Number(shouhinMS_filter.value[index].tanka) + Number(shouhinMS_filter.value[index].tanka_zei)
+								kaikei_zei.value -= Number(shouhinMS_filter.value[index].tanka_zei)
 							}
 							for(const row of hontai.value){
 								if(row['税区分']===Number(shouhinMS_filter.value[index].zeiKBN)){
-									row['本体額'] = row['本体額'] - Number(shouhinMS_filter.value[index].tanka)
-									row['消費税'] = row['消費税'] - Number(shouhinMS_filter.value[index].tanka_zei)
+									row['本体額'] = Number(row['本体額']) - Number(shouhinMS_filter.value[index].tanka)
+									row['消費税'] = Number(row['消費税']) - Number(shouhinMS_filter.value[index].tanka_zei)
 									break
 								}
 							}
@@ -693,12 +693,12 @@
 				}
 				const calculation = () =>{
 					//税率ごとの本体額総合計から消費税を計算する(インボイス対応)
-					pay.value=0
-					kaikei_zei.value=0
+					pay.value=Number(0)
+					kaikei_zei.value=Number(0)
 					for(const row of hontai.value){
 						row["消費税"] = Math.trunc((Number(row['本体額']) + Number(row['調整額'])) * (Number(row['税率']))/100)	
-						pay.value = pay.value + Number(row['本体額']) + Number(row['調整額']) + Number(row['消費税'])		//税込額
-						kaikei_zei.value = kaikei_zei.value + Number(row['消費税']) 	//内消費税
+						pay.value = Number(pay.value) + Number(row['本体額']) + Number(row['調整額']) + Number(row['消費税'])		//税込額
+						kaikei_zei.value = Number(kaikei_zei.value) + Number(row['消費税']) 	//内消費税
 					}
 				}
 				const Revised = () => {

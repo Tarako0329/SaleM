@@ -89,7 +89,7 @@ $inquiry = (!empty($userinfo["inquiry_tel"])?$userinfo["inquiry_tel"]:"")."/".$u
 
 //売上明細の取得
 {
-	$sql="select *,ZeiMS.hyoujimei as 税率desp,ZeiMS.zeiritu as 税率 from UriageData Uri inner join ZeiMS on Uri.zeiKBN = ZeiMS.zeiKBN where uid = ? and UriageNO like ? and ShouhinCD not like 'Z%' order by Uri.zeiKBN,Uri.	ShouhinCD";
+	$sql="select *,ZeiMS.hyoujimei as 税率desp,ZeiMS.zeiritu as 税率 from UriageData Uri inner join ZeiMS on Uri.zeiKBN = ZeiMS.zeiKBN where uid = ? and UriageNO like ? and ShouhinCD not like 'Z%' order by Uri.zeiKBN,Uri.ShouhinCD";
 	$stmt = $pdo_h->prepare($sql);
 	$stmt->bindValue(1, $id, PDO::PARAM_INT);
 	$stmt->bindValue(2, $UriNo, PDO::PARAM_STR);
@@ -134,8 +134,8 @@ $inquiry = (!empty($userinfo["inquiry_tel"])?$userinfo["inquiry_tel"]:"")."/".$u
 	$Goukei = number_format($Goukei);
 }
 $message="";
-if($saiban==="on"){
-	//領収書Noの取得
+if($saiban==="on"){//領収書Noの取得
+	
 	$sql = "select max(R_NO) as R_NO from ryoushu where uid = ? group by uid";
 	$stmt = $pdo_h->prepare($sql);
 	$stmt->bindValue(1, $id, PDO::PARAM_INT);

@@ -59,7 +59,6 @@ $msg = array(
 
 
 //入力画面の前回値を記録
-//if($_POST["EV"]<>""){
 if(filter_input(INPUT_POST,"EV")<>""){
 	//イベント名
 	$_SESSION["EV"] = $_POST["EV"];
