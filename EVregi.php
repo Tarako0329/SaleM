@@ -584,8 +584,8 @@
 							let hontai_val
 							let chouseigo
 							for(const row of hontai.value){
-								zeiritu = new Decimal((100+row['税率'])/100)
-								zeikomi = new Decimal(row['本体額']+row['消費税'])
+								zeiritu = new Decimal((100 + Number(row['税率']))/100)
+								zeikomi = new Decimal(Number(row['本体額']) + Number(row['消費税']))
 								hontai_val = new Decimal(row['本体額'])
 								chouseigo = new Decimal(zeikomi.div(zeiritu))
 								console_log(`zeikomi:${zeikomi}`,"lv3")
@@ -593,8 +593,8 @@
 								console_log(`本体:${hontai_val.toNumber()}`,"lv3")
 								console_log(`調整後本体:${chouseigo.toNumber()}`,"lv3")
 								row['調整額'] = Math.trunc(chouseigo.sub(hontai_val))
-								zeiritu = new Decimal(row['税率']/100)
-								hontai_val = new Decimal(row['本体額']+row['調整額'])
+								zeiritu = new Decimal(Number(row['税率']) / 100)
+								hontai_val = new Decimal(Number(row['本体額']) + Number(row['調整額']))
 								row['消費税bk'] = row['消費税']
 								row['消費税'] = Math.trunc(hontai_val.mul(zeiritu))
 							}	
@@ -734,10 +734,10 @@
 							console_log(`消費税:${row['消費税']}`,"lv3")
 							console_log(`税率:${row['税率']}`,"lv3")
 
-							wariai = new Decimal(row['本体額']+row['消費税'])
+							wariai = new Decimal(Number(row['本体額']) + Number(row['消費税']))
 							wariai = wariai.div(pay_val)
 							target_val = new Decimal((Revised_pay_val.mul(wariai)))
-							zeiritu = new Decimal((100+row['税率'])/100)
+							zeiritu = new Decimal((100 + Number(row['税率']))/100)
 							
 							console_log(`wariai:${wariai}`,"lv3")
 							console_log(`目標額:${Math.round(target_val)}`,"lv3")
@@ -750,7 +750,7 @@
 						}
 						if(sagaku_zan !== 0){
 							console_log(sagaku_zan,"lv3")
-							hontai.value[0]["調整額"] += sagaku_zan
+							hontai.value[0]["調整額"] += Number(sagaku_zan)
 						}
 						calculation()
 						auto_ajust_flg = true
