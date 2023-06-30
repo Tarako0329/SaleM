@@ -48,6 +48,7 @@ ver2.99.0-045:to[bs5&Vue3CompApi]インボイス対応・・・端数処理・�
 	create view ryoshu_hakkou_chk as SELECT `uid`,`UriNo` FROM `ryoushu` GROUP by `uid`,`UriNo`;
 ver2.99.0-046:to[bs5&Vue3CompApi]インボイス対応:bugfix
 ver2.99.0-047:to[bs5&Vue3CompApi]インボイス対応:bugfix
+ver2.99.0-048:to[bs5&Vue3CompApi]インボイス対応:調整機能bugfix
 
 
 ローカルからテスト環境へ

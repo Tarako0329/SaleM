@@ -28,9 +28,11 @@
         var console_log=(log,lv)=>{
             let kankyo = '<?php echo EXEC_MODE; ?>'
             //$kankyo:lv1=全環境 lv2=本番以外 lv3=テスト・ローカル環境のみ
+            /*
             if(kankyo==="Product"){
                 console.log(log)
             }else
+            */
             if(lv==="lv1"){
                 console.log(log)
             }else if(lv==="lv2" && kankyo!=="Product"){

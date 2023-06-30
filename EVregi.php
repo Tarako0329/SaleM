@@ -583,7 +583,11 @@
 							let zeikomi
 							let hontai_val
 							let chouseigo
+							let zeikomisougaku = 0
+							let utizei = 0
+							let index = -1
 							for(const row of hontai.value){
+								index++
 								zeiritu = new Decimal((100 + Number(row['税率']))/100)
 								zeikomi = new Decimal(Number(row['本体額']) + Number(row['消費税']))
 								hontai_val = new Decimal(row['本体額'])
@@ -593,11 +597,34 @@
 								console_log(`本体:${hontai_val.toNumber()}`,"lv3")
 								console_log(`調整後本体:${chouseigo.toNumber()}`,"lv3")
 								row['調整額'] = Math.trunc(chouseigo.sub(hontai_val))
+								
 								zeiritu = new Decimal(Number(row['税率']) / 100)
 								hontai_val = new Decimal(Number(row['本体額']) + Number(row['調整額']))
 								row['消費税bk'] = row['消費税']
 								row['消費税'] = Math.trunc(hontai_val.mul(zeiritu))
-							}	
+
+								zeikomisougaku += Number(hontai_val) + Number(row['消費税'])
+								utizei += Number(row['消費税'])
+							}
+							if(pay_bk !== zeikomisougaku){
+								//端数切捨てで調整しきれない場合、再調整し、四捨五入で処理する
+								console_log(`調整差額be：${zeikomisougaku}`,'lv3')
+								console_log(`調整差額：${Number(pay_bk) - Number(zeikomisougaku)}`,'lv3')
+
+								hontai.value[index]['調整額'] += Number(pay_bk) - Number(zeikomisougaku)
+								hontai_val = new Decimal(Number(hontai.value[index]['本体額']) + Number(hontai.value[index]['調整額']))
+								hontai.value[index]['消費税'] = Math.round(hontai_val.mul(zeiritu))
+								
+								zeikomisougaku = 0
+								for(const row of hontai.value){
+									zeikomisougaku += Number(row['本体額']) + Number(row['消費税']) + Number(row['調整額'])
+								}
+								console_log(`調整差額af：${zeikomisougaku}`,'lv3')
+							}
+							if(pay_bk !== zeikomisougaku){
+								console_log(`それでもだめなのか！：${Number(pay_bk) - Number(zeikomisougaku)}`,'lv3')
+							}
+
 						}
 					}
 					if(args==='chk'){				//戻る時は調整額を０にクリアする
@@ -725,10 +752,12 @@
 						let pay_val = new Decimal(pay.value)
 						let hontai_val
 						let shouhizei_val
-						let target_val
+						let target_val		//税区分ごとで目標となる増減後税込金額
 						let zeiritu
+						let index = -1
 						for(const row of hontai.value){
 							//税区分ごとに請求額の割合を算出し、調整額に掛ける
+							index++
 							console_log(`pay_val:${pay_val}`,"lv3")
 							console_log(`本体額:${row['本体額']}`,"lv3")
 							console_log(`消費税:${row['消費税']}`,"lv3")
@@ -746,13 +775,28 @@
 							//調整額＝変更後税込額/税率-変更前本体額
 							row["調整額"] = Math.trunc(target_val.div(zeiritu)-Number(row['本体額']))	//割引税抜本体
 							console_log(`調整額:${row["調整額"]}`,"lv3")
-							sagaku_zan = sagaku_zan - (Math.trunc(zeiritu.mul(Number(row['本体額']) + Number(row['調整額']))))
+
+							zeiritu = new Decimal((Number(row['税率']))/100)
+							row['消費税bk'] = row['消費税']
+							row["消費税"] = Math.trunc(zeiritu.mul(Number(row['本体額']) + Number(row['調整額'])))
+							//sagaku_zan = sagaku_zan - (Math.trunc(zeiritu.mul(Number(row['本体額']) + Number(row['調整額']))))
+							sagaku_zan = sagaku_zan - (Number(row['本体額']) + Number(row['調整額']) + row["消費税"])
 						}
 						if(sagaku_zan !== 0){
 							console_log(sagaku_zan,"lv3")
-							hontai.value[0]["調整額"] += Number(sagaku_zan)
+							//hontai.value[0]["調整額"] += Number(sagaku_zan)
+
+							hontai.value[index]['調整額'] += Number(sagaku_zan)
+							hontai_val = new Decimal(Number(hontai.value[index]['本体額']) + Number(hontai.value[index]['調整額']))
+							hontai.value[index]['消費税'] = Math.round(hontai_val.mul(zeiritu))
 						}
-						calculation()
+						pay.value = 0
+						kaikei_zei.value = 0
+						for(const row of hontai.value){
+							pay.value += Number(row['本体額']) + Number(row['消費税']) + Number(row['調整額'])
+							kaikei_zei.value += Number(row['消費税'])
+						}
+						//calculation()
 						auto_ajust_flg = true
 					}else{
 						console_log("調整スキップ","lv3")
