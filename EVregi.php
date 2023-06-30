@@ -763,7 +763,9 @@
 				const reset_order = () => {//オーダーリセット
 					shouhinMS_filter.value.forEach((list)=>list.ordercounter=0)
 					pay.value = 0
+					pay_bk = 0
 					kaikei_zei.value = 0
+					kaikei_zei_bk = 0
 					hontai.value = []
 					auto_ajust_flg = false
 					Revised_pay.value = ''

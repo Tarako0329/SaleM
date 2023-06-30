@@ -277,7 +277,7 @@ function shutdown(){
 		log_writer("ajax_EVregi_sql.php",$lastError);
 		if(empty($GLOBALS["msg"])===true){
 			$emsg = $GLOBALS["emsg"]."/UriNO::".$GLOBALS["UriageNO"]."　uid::".$_SESSION['user_id']." ERROR_MESSAGE::予期せぬエラー".$lastError['message'];
-			send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
+			send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】".basename(__FILE__)."でシステム停止",$emsg);
 		
 			$token = csrf_create();
 			$msg = array(
