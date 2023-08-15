@@ -170,7 +170,7 @@ html{
 		vertical-align: middle;
 		text-decoration: none;
 		/*letter-spacing: 0.1em; 文字と文字の間隔*/
-		border-radius: 0.5rem;
+		border-radius: 0.2rem;
 		white-space: normal;  
 }
 .btn-view:active,

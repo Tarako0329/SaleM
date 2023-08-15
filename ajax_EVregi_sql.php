@@ -246,7 +246,7 @@ try{
 	$pdo_h = null;
 	$emsg = $emsg."/UriNO::".$UriageNO."　uid::".$_SESSION['user_id'];
 	if(EXEC_MODE!=="Local"){
-		send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
+		send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】".basename(__FILE__)."でシステム停止",$emsg);
 	}else{
 		log_writer2("ajax.EVreg_sql.php",$emsg,"lv3");
 	}

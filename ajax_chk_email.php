@@ -35,10 +35,13 @@ if($rtn !== true){
             
             if($status===true){
                 if($row[0]["cnt"]>=1){
-                    $msg = "メールアドレスは登録済みになります。";
-                    $alert_status = "alert-warning";
+                    //$msg = "メールアドレスは登録済みになります。";
+                    //$alert_status = "alert-warning";
+                    $msg="Registered";
+                    $alert_status = "alert-success";
                 }else{
-                    $msg = "メールアドレスは登録可能です。";
+                    //$msg = "メールアドレスは登録可能です。";
+                    $msg="unRegistered";
                     $alert_status = "alert-success";
                 }
             }else{
@@ -77,14 +80,14 @@ function shutdown(){
       
       //直前でエラーあり、かつ、catch処理出来ていない場合に実行
       if($lastError!==null && $GLOBALS["reseve_status"] === false){
-        log_writer2("ajax_EVregi_sql.php","shutdown","lv3");
-        log_writer2("ajax_EVregi_sql.php",$lastError,"lv1");
+        log_writer2(basename(__FILE__),"shutdown","lv3");
+        log_writer2(basename(__FILE__),$lastError,"lv1");
           
         $emsg = "/UriNO::".$GLOBALS["UriageNO"]."　uid::".$_SESSION['user_id']." ERROR_MESSAGE::予期せぬエラー".$lastError['message'];
         if(EXEC_MODE!=="Local"){
-            send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】EVregi_sql.phpでシステム停止",$emsg);
+            send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-WARNING】".basename(__FILE__)."でシステム停止",$emsg);
         }
-        log_writer2("ajax_UriageData_update_sql.php [Exception \$lastError] =>",$lastError,"lv0");
+        log_writer2(basename(__FILE__)." [Exception \$lastError] =>",$lastError,"lv0");
     
         $token = csrf_create();
         $return_sts = array(

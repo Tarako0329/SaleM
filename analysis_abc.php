@@ -1,208 +1,296 @@
-<!DOCTYPE html>
-<html lang="ja">
 <?php
-/*関数メモ
-check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
+    /*関数メモ
+    check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
 
-【想定して無いページからの遷移チェック】
-csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容を返す。(POSTorGETで遷移先に渡す)
-　　　　　　　 headerでリダイレクトされた場合、COOKIEにセットされないので注意。
+    【想定して無いページからの遷移チェック】
+    csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容を返す。(POSTorGETで遷移先に渡す)
+    　　　　　　　 headerでリダイレクトされた場合、COOKIEにセットされないので注意。
 
-*/
+    */
 
-require "php_header.php";
+    require "php_header.php";
 
-$rtn = csrf_checker(["analysis_menu.php","analysis_uriagejisseki.php","analysis_abc.php"],["G","C","S"]);
-if($rtn !== true){
-    $rtn = csrf_checker(["analysis_menu.php","analysis_uriagejisseki.php","analysis_abc.php"],["P","C","S"]);
+    $rtn = csrf_checker(["analysis_menu.php","analysis_uriagejisseki.php","analysis_abc.php"],["G","C","S"]);
     if($rtn !== true){
-        redirect_to_login($rtn);
+        $rtn = csrf_checker(["analysis_menu.php","analysis_uriagejisseki.php","analysis_abc.php"],["P","C","S"]);
+        if($rtn !== true){
+            redirect_to_login($rtn);
+        }
     }
-}
 
-$rtn=check_session_userid($pdo_h);
-$csrf_create = csrf_create();
+    $rtn=check_session_userid($pdo_h);
+    $csrf_create = csrf_create();
 
-if(!empty($_POST)){
-    $ymfrom = $_POST["ymfrom"];
-    $ymto = $_POST["ymto"];
-    $list = $_POST["list"];
-    $analysis_type=$_POST["sum_tani"];
-}else{
-    $ymfrom = (int)((string)date('Y')."01");
-    $ymto = (string)date('Y')."12";
-    $list = "%";
-    $analysis_type=$_GET["sum_tani"];
-}
-//get_getsumatsu($ymfrom);
-//deb_echo($list);
-$cols=0;
-if($analysis_type==1 ){//全商品（金額）
-    $sqlstr = "select tmp.* ,sum(税抜売上) over() as 総売上 from (select ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ";
-    $gp_sqlstr = "group by ShouhinNM) tmp order by 税抜売上 desc";
-    $aryColumn = ["商品名","税抜売上"];
-    $cols=2;
-}elseif($analysis_type==2 ){//イベントごと
-    $sqlstr = "select tmp.* ,sum(税抜売上) over(PARTITION BY Event) as 総売上 from (select Event,ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ";
-    $gp_sqlstr = "group by Event,ShouhinNM) tmp order by Event,税抜売上 desc";
-    $aryColumn = ["商品名","税抜売上"];
-    $cols=3;
-}
-$sqlstr = $sqlstr." where ShouhinCD<9900 and DATE_FORMAT(UriDate, '%Y%m') between :ymfrom and :ymto AND uid = :user_id ";
-$sqlstr = $sqlstr." AND (Event like :event OR TokuisakiNM like :tokui )";
-$sqlstr = $sqlstr." ".$gp_sqlstr;
+    if(!empty($_POST)){
+        $ymfrom = $_POST["ymfrom"];
+        $ymto = $_POST["ymto"];
+        $list = $_POST["list"];
+        $analysis_type=$_POST["sum_tani"];
+    }else{
+        $ymfrom = (int)((string)date('Y')."01");
+        $ymto = (string)date('Y')."12";
+        $list = "%";
+        $analysis_type=$_GET["sum_tani"];
+    }
+    //get_getsumatsu($ymfrom);
+    //deb_echo($list);
+    /*
+    $cols=0;
+    if($analysis_type==1 ){//全商品（金額）
+        $sqlstr = "select tmp.* ,sum(税抜売上) over() as 総売上 from (select ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ";
+        $gp_sqlstr = "group by ShouhinNM) tmp order by 税抜売上 desc";
+        $aryColumn = ["商品名","税抜売上"];
+        $cols=2;
+    }elseif($analysis_type==2 ){//イベントごと
+        $sqlstr = "select tmp.* ,sum(税抜売上) over(PARTITION BY Event) as 総売上 from (select Event,ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ";
+        $gp_sqlstr = "group by Event,ShouhinNM) tmp order by Event,税抜売上 desc";
+        $aryColumn = ["商品名","税抜売上"];
+        $cols=3;
+    }
+    $sqlstr = $sqlstr." where ShouhinCD<9900 and DATE_FORMAT(UriDate, '%Y%m') between :ymfrom and :ymto AND uid = :user_id ";
+    $sqlstr = $sqlstr." and (Event like :event OR TokuisakiNM like :tokui )";
+    $sqlstr = $sqlstr." ".$gp_sqlstr;
 
-//deb_echo($sqlstr);
-$_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
+    //deb_echo($sqlstr);
+    $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
+    
+    $stmt = $pdo_h->prepare( $sqlstr );
+    $stmt->bindValue("ymfrom", $ymfrom, PDO::PARAM_INT);
+    $stmt->bindValue("ymto", $ymto, PDO::PARAM_INT);
+    $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
+    $stmt->bindValue("event", $list, PDO::PARAM_STR);
+    $stmt->bindValue("tokui", $list, PDO::PARAM_STR);
+    $rtn=$stmt->execute();
+    if($rtn==false){
+        deb_echo("失敗<br>");
+    }
+    $result=$stmt->fetchAll();
+    */
+    //検索年月リスト ユーザの最初の売上年月～今年12月までのリストを作成する
+    $SLVsql = "select DATE_FORMAT(min(UriDate), '%Y-%m') as min_uridate from UriageData where uid = :user_id";
+    $stmt = $pdo_h->prepare($SLVsql);
+    $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
+    $stmt->execute();
+    $SLVresult = $stmt->fetchAll();
 
-$stmt = $pdo_h->prepare( $sqlstr );
-$stmt->bindValue("ymfrom", $ymfrom, PDO::PARAM_INT);
-$stmt->bindValue("ymto", $ymto, PDO::PARAM_INT);
-$stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
-$stmt->bindValue("event", $list, PDO::PARAM_STR);
-$stmt->bindValue("tokui", $list, PDO::PARAM_STR);
-$rtn=$stmt->execute();
-if($rtn==false){
-    deb_echo("失敗<br>");
-}
-$result=$stmt->fetchAll();
+    $next_ymd = date('Y-m-d',strtotime($SLVresult[0]["min_uridate"]."-01"));
+    $next_ym = date('Ym',strtotime($next_ymd));
+    for($i=0;$next_ym<=date("Y")."12";$i++){
+        
+        $SLVresult[$i]["display"] = date('Y年m月',strtotime($next_ymd));
+        $SLVresult[$i]["fromValue"] = date('Y-m-d',strtotime($next_ymd));
+        $SLVresult[$i]["toValue"] = date('Y-m-d',strtotime($next_ymd." last day of this month"));
 
-//検索年月リスト
-$SLVsql = "select * from SerchValMS where type='yyyymm' order by Value";
-$stmt = $pdo_h->prepare($SLVsql);
-$stmt->execute();
-$SLVresult = $stmt->fetchAll();
+        $next_ymd = date('Y-m-d',strtotime($next_ymd." +1 month"));
+        $next_ym = date('Ym',strtotime($next_ymd));
+        
+    }
 
 ?>
+<!DOCTYPE html>
+<html lang="ja">
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
-    include "head.html" 
+    include "head_bs5.html" 
     ?>
     <!--ページ専用CSS-->
     <link rel="stylesheet" href="css/style_analysis.css?<?php echo $time; ?>" >
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>-->
     <TITLE><?php echo $title." 売上分析";?></TITLE>
 </head>
-<script>
-    window.onload = function(){
-        function getAllData(List,date_from,date_to,get_list_type){
-            //検索用のイベント・顧客・商品リストを取得
-            //id名[List]のリストデータを[date_from]～[date_to]に発生した[get_list_type]に更新
-            $.ajax({
-                // 通信先ファイル名
-                type        : 'POST',
-                url         : 'ajax_get_event_list.php',
-                //dataType    : 'application/json',
-                data        :{
-                                user_id     :'<?php echo $_SESSION["user_id"];?>',
-                                date_from   :$(date_from)[0].value,
-                                date_to     :$(date_to)[0].value,
-                                list_type   :get_list_type //イベントリスト or 商品リスト
-                            }
-                },
-            ).done(
-                // 通信が成功した時
-                function(data) {
-                    //selectの子要素をすべて削除
-                    $(List).children().remove();
-                    $(List).append("<option value='%'>イベント名選択</option>\n");
-                    $(List).append("<option value='%'>全て</option>\n");
-                    // 取得したレコードをeachで順次取り出す
-                    $.each(data, function(key, value){
-                        // appendで追記していく
-                        if(get_list_type=='Event'){
-                            if(value.LIST == '<?php echo $_SESSION["Event"]; ?>'){
-                                $(List).append("<option value='" + value.LIST + "' selected>" + value.LIST + "</option>\n");
-                            }else{
-                                $(List).append("<option value='" + value.LIST + "'>" + value.LIST + "</option>\n");
-                            }
-                        }else if(get_list_type=='Shouhin'){
-                            $(List).append("<option value='" + value.CODE + "'>" + value.CODE+ ":" + value.LIST + "</option>\n");
-                        }
-                    });
-                    
-                    //console.log("通信成功");
-                    //console.log(data);
-                    
-                }
-            ).fail(
-                // 通信が失敗した時
-                function(XMLHttpRequest, textStatus, errorThrown){
-                    console.log("通信失敗2");
-                    console.log("XMLHttpRequest : " + XMLHttpRequest.status);
-                    console.log("textStatus     : " + textStatus);
-                    console.log("errorThrown    : " + errorThrown.message);
-                }
-            )};
-            
-        //起動時にリストを取得
-        getAllData('#Event','#uridate','#uridateto','Event');
-        
-    };
-</script>
-<header class="header-color common_header" style="flex-wrap:wrap;height:50px">
-    <div class="title" style="width: 100%;"><a href="analysis_menu.php?csrf_token=<?php echo $csrf_create; ?>"><?php echo $title;?></a></div>
-
-</header>
-
 <body class='common_body' style='padding-top:55px'>
+    <div id='app'> 
+    <header class="header-color common_header" style="flex-wrap:wrap;height:50px">
+        <div class="title" style="width: 100%;">
+            <a :href="url"><?php echo $title;?></a>
+        </div>
+    </header>
     <div class="container-fluid">
-    <div class="row">
-    <div class="col-md-3" style='padding:5px;background:white'>
-        <form class="form" method="post" action="analysis_abc.php" style='font-size:1.5rem' id='form1'>
-            <input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
-            集計期間:
-            <select name='ymfrom' class="form-control" style="padding:0;width:11rem;display:inline-block;margin:5px" onchange='send()' id='uridate'>
-            <?php
-            foreach($SLVresult as $row){
-                if($ymfrom==$row["Value"]){
-                    echo "<option value='".$row["Value"]."' selected>".$row["display"]."</option>\n";
+        <div class="row">
+            <div class="col-md-3" style='padding:5px;background:white'>
+                <form class="form" method="post" action="analysis_abc.php" style='font-size:1.5rem'>
+                    <input type='hidden' name='csrf_token' value='CSRF'>
+                    集計期間:
+                    <select v-model='date_from' name='ymfrom' class="form-select form-select-lg" style="padding:0;width:11rem;display:inline-block;margin:5px">
+                        <template v-for='(list,index) in ym_list' :key='list.Value'>
+                            <option :value='list.fromValue'>{{list.display}}</option>
+                        </template>
+                    </select>
+                    から
+                    <select v-model='date_to' name='ymto' class="form-select form-select-lg" style="padding:0;width:11rem;display:inline-block;margin:5px">
+                        <template v-for='(list,index) in ym_list' :key='list.Value'>
+                            <option :value='list.toValue'>{{list.display}}</option>
+                        </template>
+                    </select>
+
+                    <select v-model='analysis_type' name='sum_tani' class="form-select form-select-lg" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px" ><!--集計単位-->
+                        <option value='13'>商品別ABC分析</option>
+                        <option value='14'>イベント・店舗/商品別ABC分析</option>
+                    </select>
+                    <select v-model='ev_selected' name='list' class="form-select form-select-lg" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px" >
+                        <template v-for='(list,index) in ev_list' :key='list.Value'>
+                            <option :value='list.CODE'>{{list.LIST}}</option>
+                        </template>
+                    </select>
+                </form>
+            </div>
+            <div class="col-md-9" style='padding:5px'>
+            <!--
+                <table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'>
+                    <thead>
+			    		<tr>
+                            <template v-for='(list,index) in table_labels' :key='list'>
+                                <th scope='col' style='width:auto;'>{{list}}</th>
+                            </template>
+                        </tr>
+                    </thead>
+                    <tbody v-for='(row,index) in table_data' :key='row.Labels'>
+                        <tr>
+                            <template v-for='(data,index) in row' :key='data'>
+                                <td align='right' v-if='data.match(/[^0-9,\\.]/)===null'>{{Number(data).toLocaleString()}}</td>
+                                <td v-if='data.match(/[^0-9,\\.]/)!==null'>{{data}}</td>
+                            </template>
+                        </tr>
+                    </tbody>
+                </table>
+            -->
+                <table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
+                    <tr><td colspan='4' align='center' style='padding-top:5px;font-size:32px;font-weight:700;'>{{first_event}}</td></tr>
+			    		<tr>
+                            <template v-for='(list,index) in table_labels' :key='list'>
+                                <th scope='col'style='width:auto;'>{{list}}</th>
+                            </template>
+                        </tr>
+                    <tbody>
+                        <template v-for='(row,index) in table_data' :key='row.Labels'>
+                            <template v-if='(index!==0) && row.Event !== table_data[index - 1].Event'>
+                                <tr><td colspan='4' align='center' style='padding-top:5px;font-size:32px;font-weight:700;'>{{table_data[index].Event}}</td></tr>
+			    	            <tr>
+                                    <template v-for='(list,index) in table_labels' :key='list'>
+                                        <th scope='col' style='width:auto;'>{{list}}</th>
+                                    </template>
+                                </tr>
+                            </template>
+                            <tr>
+                            <td>{{row.Event}} : {{row.ShouhinNM}}</td>
+                            <td align='right' >{{Number(row.税抜売上).toLocaleString()}}</td>
+                            <td align='right' >{{Number(row.売上占有率).toLocaleString()}}</td>
+                            <td align='center' >{{row.rank}}</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+
+            </div>
+        </div><!--row-->
+    </div>
+    </div><!--app-->
+    <script>
+        const { createApp, ref, onMounted, computed, VueCookies, watch, watchEffect } = Vue
+		createApp({
+			setup(){
+                const ym_list = ref([<?php
+                        $i=0;
+                        foreach($SLVresult as $row){
+                            if($i!==0){
+                                echo ",";
+                            }
+                            echo "{display:'".$row["display"]."',fromValue:'".$row["fromValue"]."',toValue:'".$row["toValue"]."'}";
+                            $i++;
+                        }
+                    ?>])
+                const date_from = ref('<?php echo date("Y")."-01-01"; ?>')
+                const date_to = ref('<?php echo date("Y")."-12-31"; ?>')
+                const ev_list = ref([])
+				const get_event = () => {//期間内のイベント一覧取得ajax
+					console_log("get_event start",'lv3')
+					let params = new URLSearchParams()
+					params.append('user_id', '<?php echo $_SESSION["user_id"];?>')
+					params.append('date_from', date_from.value)
+					params.append('date_to', date_to.value)
+					params.append('list_type', 'Event')
+					axios
+					.post('ajax_get_event_list.php',params)
+					.then((response) => {
+						console_log(response.data,'lv3')
+						ev_list.value = [...response.data]
+					})
+					.catch((error) => {
+						console_log(`get_event ERROR:${error}`,'lv3')
+					})
+					return 0;
+				};//イベントリスト取得ajax
+                watch([date_from,date_to],() => {
+                    get_event()
+                })
+                const table_labels = ref([])
+                const table_data = ref([])
+                const analysis_type = ref(14)
+                const ev_selected = ref('')
+                const first_event = ref('')
+                const CSRF = ref('<?php echo $csrf_create;?>')
+                const get_analysis_data = () => {//売上分析データ取得ajax
+					console_log("get_analysis_data start",'lv3')
+					let params = new URLSearchParams()
+					params.append('user_id', '<?php echo $_SESSION["user_id"];?>')
+					params.append('date_from', date_from.value)
+					params.append('date_to', date_to.value)
+					params.append('analysis_type', analysis_type.value)
+					params.append('event', ev_selected.value)
+					params.append('tokui', ev_selected.value)
+					params.append('csrf_token', CSRF.value)
+
+					axios
+					.post('ajax_get_analysi_uridata.php',params)
+					.then((response) => {
+						console_log(response.data,'lv3')
+                        CSRF.value = response.data.csrf_create
+                        table_labels.value = [...response.data.aryColumn]
+                        table_data.value = [...response.data.result]
+                        first_event.value = table_data.value[0].Event
+					})
+					.catch((error) => {
+						console_log(`get_analysis_data ERROR:${error}`,'lv3')
+					})
+                    .finally(()=>{
+                        //console_log(myChart,'lv3')
+                    })
+					return 0;
+				};//売上分析データ取得ajax
+
+                onMounted(() => {
+                    get_event()
+                    get_analysis_data()
+                })
+                const url = computed(() =>{
+                    return 'analysis_menu.php?csrf_token=' + CSRF.value
+                })
+                watch([date_from,date_to,analysis_type,ev_selected],() => {
+                    get_analysis_data()
+                })
+                return{
+                    ym_list
+                    ,date_from
+                    ,date_to
+                    ,ev_list
+                    ,get_event
+                    ,analysis_type
+                    ,ev_selected
+                    ,CSRF
+                    ,url
+                    ,table_labels
+                    ,table_data
+                    ,first_event
                 }
-                echo "<option value='".$row["Value"]."'>".$row["display"]."</option>\n";
             }
-            ?>
-            </select>
-            から
-            <select name='ymto' class="form-control" style="padding:0;width:11rem;display:inline-block;margin:5px" onchange='send()' id='uridateto'>
-            <?php
-            foreach($SLVresult as $row){
-                if($ymto==$row["Value"]){
-                    echo "<option value='".$row["Value"]."' selected>".$row["display"]."</option>\n";
-                }
-                echo "<option value='".$row["Value"]."'>".$row["display"]."</option>\n";
-            }
-            ?>
-            </select>
-            
-            <select name='sum_tani' class="form-control" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px" onchange='send()' ><!--集計単位-->
-                <option value='1' <?php if($analysis_type==1){echo "selected";} ?> >商品別ABC分析</option>
-                <option value='2' <?php if($analysis_type==2){echo "selected";} ?>>イベント・店舗/商品別ABC分析</option>
-            </select>
-            <select name='list' class="form-control" style="padding:0;width:auto;max-width:100%;display:inline-block;margin:5px" onchange='send()' id='Event' >
-            </select>
-        </form>
-    </div>
-    <div class="col-md-9" style='padding:5px'>
-    <?php
-        drow_table_abc($aryColumn,$result,$cols);
-    ?>
-    </div>
-    </div><!--row-->
-    </div>
+        }).mount('#app');
+    </script>
 </body>
-<script>
-    function send(){
-        const form1 = document.getElementById('form1');
-        form1.submit();
-    }
-    
-</script>
+
 </html>
 <?php
-$EVresult  = null;
-$TKresult = null;
 $stmt = null;
 $pdo_h = null;
 ?>

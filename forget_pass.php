@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="ja">
 <?php
 /*関数メモ
 check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
@@ -57,32 +55,14 @@ if(filter_input(INPUT_POST,"answer")){
 }
 
 ?>
+<!DOCTYPE html>
+<html lang="ja">
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
-    include "head.html" 
+    include "head_bs5.html" 
     ?>
     <!--ページ専用CSS-->
-    <script>
-    window.onload = function() {
-        //アラート用
-        function alert(msg) {
-          return $('<div class="alert" role="alert"></div>')
-            .text(msg);
-        }
-        (function($){
-          const e = alert('<?php echo $_SESSION["MSG"]; ?>').addClass('alert-success');
-          // アラートを表示する
-          $('#alert-1').append(e);
-          /* 2秒後にアラートを消す
-          setTimeout(() => {
-            e.alert('close');
-          }, 3000);
-          */
-        })(jQuery);
-    </script>
-
-    
     <TITLE><?php echo $title." forget password";?></TITLE>
 </head>
  
@@ -102,7 +82,7 @@ if(filter_input(INPUT_POST,"answer")){
         <input type='text' class="form-control" style='font-size:1.6rem' name='answer' required="required">
         <br>
         <br>
-        <input type='submit' class="btn btn-primary" style="width:150px;hight:30px;font-size:1.5rem" value='回 答'>
+        <input type='submit' class="btn btn-primary" style="width:150px;height:30px;font-size:1.5rem" value='回 答'>
         <input type='hidden' name='mail' value='<?php echo $mail; ?>'>
         </form>
     </div>

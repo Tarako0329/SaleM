@@ -5,7 +5,6 @@
     ymto            :yyyy-mm-dd
     event
     tokui
-    
 
     【return】
     aryColumn : []
@@ -30,7 +29,7 @@ $labels=[];
 $data=[];
 $chart_type="";
 
-$rtn = csrf_checker(["analysis_uriagejisseki.php"],["P","C","S"]);
+$rtn = csrf_checker(["analysis_uriagejisseki.php","analysis_abc.php"],["P","C","S"]);
 if($rtn !== true){
     $msg=$rtn;
     $alert_status = "alert-warning";
@@ -145,13 +144,27 @@ if($rtn !== true){
             $gp_sqlstr = "group by ".$sql_category." order by sum(UriageKin) desc";
             $aryColumn = ["カテゴリー","売上"];
             $chart_type="doughnut";
+        }elseif($analysis_type==13){//abc分析(全体)
+            $sqlstr = "select tmp.* ,truncate(100 * (税抜売上 / (sum(税抜売上) over())),1) as 売上占有率 from (select ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ";
+            $gp_sqlstr = "group by ShouhinNM) tmp order by 税抜売上 desc";
+            $aryColumn = ["商品名","売上","占有率","Rank"];
+            $chart_type="";
+        }elseif($analysis_type==14){//abc分析(Event別)
+            $sqlstr = "select tmp.* ,truncate(100 * (税抜売上 / (sum(税抜売上) over(PARTITION BY Event))),1) as 売上占有率 from (select concat(Event,TokuisakiNM) as Event,ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ";
+            $gp_sqlstr = "group by Event,ShouhinNM) tmp order by Event,税抜売上 desc";
+            $aryColumn = ["商品名","売上","占有率","Rank"];
+            $chart_type="";
         }
         
-        $sqlstr = $sqlstr." where UriageData.ShouhinCD<9900 and UriDate between :ymfrom and :ymto AND UriageData.uid = :user_id ";
+        //$sqlstr = $sqlstr." where UriageData.ShouhinCD<9900 and UriDate between :ymfrom and :ymto AND UriageData.uid = :user_id ";
+        $sqlstr = $sqlstr." where UriageData.ShouhinCD<9900 and left(UriageData.ShouhinCD,1) not in ('C','Z') and UriDate between :ymfrom and :ymto AND UriageData.uid = :user_id ";
         $sqlstr = $sqlstr." AND ((TokuisakiNM ='' and Event like :event) OR (Event = '' and TokuisakiNM like :tokui ))";
         $sqlstr = $sqlstr.(!empty($sql_category_where)?$sql_category_where:"");
         
         $sqlstr = $sqlstr." ".$gp_sqlstr;
+
+        log_writer2($myname." [Exc sql] =>",$sqlstr,"lv0");
+        log_writer2($myname." [\$_POST] =>",$_POST,"lv0");
         
         try{
             $stmt = $pdo_h->prepare( $sqlstr );
@@ -210,18 +223,46 @@ if($rtn !== true){
                 }
                 $xEndpoint=($xEndpoint + 1<=23)?$xEndpoint+1:$xEndpoint;
                 $xStartpoint=($xStartpoint - 1 >=0)?$xStartpoint-1:$xStartpoint;
+            }else{
+                //グラフデータ不要
             }
+
+            if($analysis_type==13){
+                $par = 0;
+                $i = 0;
+                foreach($result as $row){
+                    if($par < 70){
+                        $result[$i]["rank"]="A";
+                    }elseif($par < 90){
+                        $result[$i]["rank"]="B";
+                    }else{
+                        $result[$i]["rank"]="C";
+                    }
+                    $par += $row["売上占有率"];
+                    $i++;
+                }
+            }
+            if($analysis_type==14){
+                $par = 0;
+                $i = 0;
+                foreach($result as $row){
+                    if($par < 70){
+                        $result[$i]["rank"]="A";
+                    }elseif($par < 90){
+                        $result[$i]["rank"]="B";
+                    }else{
+                        $result[$i]["rank"]="C";
+                    }
+                    $par += $row["売上占有率"];
+                    $i++;
+                    if($result[$i]["Event"] !== $result[$i-1]["Event"]){
+                        $par = 0;
+                    }
+                }
+            }
+
             $msg = "取得成功。";
             $alert_status = "alert-success";
-            /*
-            if($status===true){
-                $msg = "取得成功。";
-                $alert_status = "alert-success";
-            }else{
-                $msg = "取得失敗。";
-                $alert_status = "alert-danger";
-            }
-            */
             $reseve_status=true;
         }catch(Exception $e){
             $msg = "システムエラーによる取得処理失敗。管理者へ通知しました。";

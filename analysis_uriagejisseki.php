@@ -148,13 +148,8 @@ log_writer2("test",$SLVresult,"lv3");
                             <td v-if='data.match(/[^0-9]/)!==null'>{{data}}</td>
                         </template>
                     </tr>
-
                 </tbody>
             </table>
-        <?php
-            //var_dump($result);
-            //drow_table($aryColumn,$result);
-        ?>
         </div>
         </div><!--row-->
         </div>

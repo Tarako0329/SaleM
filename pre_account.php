@@ -110,10 +110,17 @@ $pdo_h=null;
 									window.location.href = 'index.php';
 								}
 							}
-							MSG.value = response.data.MSG
-							alert_status.value[1] = response.data.status
+							//MSG.value = response.data.MSG
+							//alert_status.value[1] = response.data.status
+                            if(response.data.MSG==='Registered'){
+                                MSG.value = 'メールアドレスは登録済みになります。'
+                                alert_status.value[1] = 'alert-warning'
+                            }else if(response.data.MSG==='unRegistered'){
+                                MSG.value = 'メールアドレスは登録可能です。'
+                                alert_status.value[1] = 'alert-success'
+                            }else{}
 						})
-						.catch((error) => {
+						.catch((error) => { 
 							console_log(`email_chk ERROR:${error}`,'lv3')
 							MSG.value = 'axios 通信エラー'
 							alert_status.value[1]='alert-danger'

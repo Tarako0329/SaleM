@@ -36,7 +36,7 @@ if(!empty($_SESSION["MAIL"])){
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
-    include "head.html" 
+    include "head_bs5.html" 
     ?>
     <!--ページ専用CSS-->
     <link rel="stylesheet" href="css/style_index.css?<?php echo $time; ?>" >
@@ -50,15 +50,10 @@ if(!empty($_SESSION["MAIL"])){
 <body class='common_body'>
     <div class="container">
         <div class="card card-container">
-            <!-- 
-            <img class="profile-img-card" src="//lh3.googleusercontent.com/-6V8xOA6M7BA/AAAAAAAAAAI/AAAAAAAAAAA/rzlHcD0KYwo/photo.jpg?sz=120" alt="" />
-            <img id="profile-img" class="profile-img-card" src="//ssl.gstatic.com/accounts/ui/avatar_2x.png" />　class="form-check-input"
-            <p id="profile-name" class="profile-name-card"></p>
-            -->
             <?php echo $errmsg; ?>
             <form class="form-signin" id="form1" method="post" action="logincheck.php">
                 <span id="reauth-email" class="reauth-email"></span>
-                <input type="email" id="inputEmail" class="form-control" placeholder="Email address" name="LOGIN_EMAIL" required autofocus value='<?php echo $mail;// echo (EXEC_MODE=="Local"?"green.green.midori@green-island.mixh.jp":""); ?>'>
+                <input type="email" id="inputEmail" class="form-control" placeholder="Email address" name="LOGIN_EMAIL" required autofocus value='<?php echo $mail;?>'>
                 <input type="password" id="inputPassword" class="form-control" name="LOGIN_PASS" placeholder="Password" required value='<?php echo (EXEC_MODE=="Local"?"123456":""); ?>'>
                 <div id="remember" class="checkbox">
                     <label>
@@ -76,23 +71,22 @@ if(!empty($_SESSION["MAIL"])){
             <a href="pre_account.php" class="btn btn-lg btn-primary btn-block btn-signin" style="padding-top:8px" >新 規 登 録</a>
         </div><!-- /card-container -->
     </div><!-- /container -->    
-</body>
-<script>
-window.onload = function() {
-    // Enterキーが押された時にSubmitされるのを抑制する
-    document.getElementById("form1").onkeypress = (e) => {
-        // form1に入力されたキーを取得
-        const key = e.keyCode || e.charCode || 0;
-        // 13はEnterキーのキーコード
-        if (key == 13) {
-            // アクションを行わない
-            e.preventDefault();
-        }
-    }    
-    
-};    
+    <script>
+        window.onload = function() {
+            // Enterキーが押された時にSubmitされるのを抑制する
+            document.getElementById("form1").onkeypress = (e) => {
+                // form1に入力されたキーを取得
+                const key = e.keyCode || e.charCode || 0;
+                // 13はEnterキーのキーコード
+                if (key == 13) {
+                    // アクションを行わない
+                    e.preventDefault();
+                }
+            }    
 
-</script>
+        };    
+    </script>
+</body>
 </html>
 <?php
 //log_writer2("index.php > \$_SESSION",$_SESSION,"lv3");
