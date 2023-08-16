@@ -85,8 +85,7 @@ $token=csrf_create();
     }
     ?>
     <br><br>
-    <a href='<?php echo PAY_CANCEL_URL; ?>?token=<?php echo $token; ?>' class='btn btn-primary' style='color:#fff;' >解 約（確定）</a>
-    
+    <a href='<?php echo rot13decrypt2(PAY_CANCEL_URL); ?>?token=<?php echo $token; ?>' class='btn btn-primary' style='color:#fff;' >解 約（確定）</a>
 
 </body>
     

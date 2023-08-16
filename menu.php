@@ -93,7 +93,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             exit();
         }
         //契約状況の確認
-        if($row[0]["yuukoukigen"]<>""){
+        if(empty($row[0]["yuukoukigen"])===true){
             if(strtotime($row[0]["yuukoukigen"]) < strtotime(date("Y-m-d"))){
                 //有効期限切れ。申込日から即課金
                 $_SESSION["KIGEN"] = strtotime("+3 day");
@@ -178,35 +178,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
 <?php
     deb_echo(ROOT_URL);
     deb_echo(EXEC_MODE."：uid_".$_SESSION["user_id"]);
-    /*
-    if($logoff){
-        if($_GET["ForcedLogout"]==true){
-            echo "システム更新時に追加した機能を有効にするため、強制ログアウトしました。<br>お手数ですが、再度ログインしてご利用ください。<br><br>";
-        }else{
-            echo "ログオフしました。<br>";
-        }
-        echo "<a href='index.php'>再ログインする</a>";
-        echo "</body>\n";
-        ?>
-        <!--
-        <script>
-            
-            if ('serviceWorker' in navigator) {
-                window.navigator.serviceWorker.getRegistrations()
-                .then(registrations => {
-                    for(let registration of registrations) {
-                        registration.unregister();
-                        console.log('Service Worker is delete');
-                    }
-                });
-            }
-        </script>
-        -->
-        <?php
-        
-        exit();
-    }
-    */
+
     echo $msg;
 
     if(EXEC_MODE==="Trial"){
@@ -238,13 +210,13 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     
     if(EXEC_MODE=="Product"){
         if($plan==0){
-            $array2 = ['本契約'=>[PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku']];
+            $array2 = ['本契約'=>[rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku']];
         }else{
             $array2 = ['契約解除へ'=>['sub_cancel.php','kaijo']];
         }
     }else if(EXEC_MODE=="Test" || EXEC_MODE=="Local"){
         if($plan==0){
-            $array2 = ['本契約'=>[PAY_CONTRACT_URL."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku'],'機能テスト'=>['sample.php?a=a','kinoutest']];
+            $array2 = ['本契約'=>[rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku'],'機能テスト'=>['sample.php?a=a','kinoutest']];
         }else{
             $array2 = ['契約解除へ'=>['sub_cancel.php','kaijo'],'機能テスト'=>['sample.php','kinoutest']];
         }
