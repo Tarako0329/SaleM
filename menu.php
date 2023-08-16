@@ -93,7 +93,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             exit();
         }
         //契約状況の確認
-        if(empty($row[0]["yuukoukigen"])===true){
+        if(empty($row[0]["keiyakudate"])===true){
             if(strtotime($row[0]["yuukoukigen"]) < strtotime(date("Y-m-d"))){
                 //有効期限切れ。申込日から即課金
                 $_SESSION["KIGEN"] = strtotime("+3 day");
