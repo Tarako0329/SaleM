@@ -8,7 +8,8 @@ $alert_status = "alert-warning";    //bootstrap alert class
 $reseve_status=false; //処理結果セット済みフラグ。
 $timeout=false; //セッション切れ。ログイン画面に飛ばすフラグ
 
-if(csrf_chk()===false){
+//if(csrf_chk()===false){
+if(csrf_checker(["UriageData_Correct.php"],["C","P","S"])===false){
     $msg="セッションが正しくありませんでした②";
     $alert_status = "alert-warning";
     $reseve_status = true;

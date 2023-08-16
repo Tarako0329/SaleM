@@ -150,28 +150,28 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     <link rel='stylesheet' href='css/style_menu.css?<?php echo $time; ?>' >
     <TITLE><?php echo $title;?></TITLE>
 </head>
-<header class='common_header header-color' style='display:block'>
-    <?php
-    if($logoff==false){
-    ?>
-        <div class='yagou title'><a href='menu.php'><?php echo $title;?></a></div>
-        <div class='user_disp'>LogIn：<?php echo $user; ?></div>
-        <div style='position:fixed;top:3px;right:3px;'><a href='menu.php?action=logout'><i class='fa-solid fa-right-from-bracket fa-lg logoff-color'></i></a></div>
-    <?php
-    }else{
-    ?>
-        <div class='yagou title'><a href='index.php'><?php echo $title;?></a></div>
-    <?php
-    }
-    ?>
-    <div class='<?php echo $bell_action;?> logoff-color' style='position:fixed;top:35px;right:5px;'>
-        <a href="#" style='color:var(--user-disp-color);' onclick='new_releace_start()'>
-            <?php echo $bell_msg; ?><i class="fa-regular fa-bell <?php echo $bell_size;?> logoff-color"></i>
-        </a>
-    </div>
-</header>
 
 <body class='common_body' >
+    <header class='common_header header-color' style='display:block'>
+        <?php
+        if($logoff==false){
+        ?>
+            <div class='yagou title'><a href='menu.php'><?php echo $title;?></a></div>
+            <div class='user_disp'>LogIn：<?php echo $user; ?></div>
+            <div style='position:fixed;top:3px;right:3px;'><a href='menu.php?action=logout'><i class='fa-solid fa-right-from-bracket fa-lg logoff-color'></i></a></div>
+        <?php
+        }else{
+        ?>
+            <div class='yagou title'><a href='index.php'><?php echo $title;?></a></div>
+        <?php
+        }
+        ?>
+        <div class='<?php echo $bell_action;?> logoff-color' style='position:fixed;top:35px;right:5px;'>
+            <a href="#" style='color:var(--user-disp-color);' onclick='new_releace_start()'>
+                <?php echo $bell_msg; ?><i class="fa-regular fa-bell <?php echo $bell_size;?> logoff-color"></i>
+            </a>
+        </div>
+    </header>
     <div style='position:fixed;top:70px;right:0;' class='rainbow-color'><b><a href='menu.php?action=color_change&color=<?php echo $color_No; ?>'>COLOR<i class='fa-solid fa-rotate-right fa-lg rainbow-color'></i></a></b></div>
     <div class='container-fluid' style='padding-top:15px;'>
 
@@ -182,7 +182,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     echo $msg;
 
     if(EXEC_MODE==="Trial"){
-        echo "有効期限を過ぎると初期状態に戻りますので、ご自由に操作して下さい。<br>";
+        echo "有効期限を過ぎると入力内容はすべてクリアされます。ご自由に操作して下さい。<br>";
     }
 
     $array = [
@@ -201,10 +201,6 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     ];
     
     //契約・解約関連は各時で実装したファイルを指定する
-    /*
-    $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', null)); Product
-    $dir_path = bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', null));
-    */
     $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', "1"));
     $dir_path = bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', "1"));
     
@@ -245,12 +241,12 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
 ?> 
               
     </div>
+    <footer class='common_footer' style='padding:5px;'>
+        <p style='padding:5px;'>お問い合わせはコチラ</p>
+        <a href='https://lin.ee/HLSLl23' style='padding:5px;'><i class="fa-brands fa-line fa-2x line-green"></i></a>
+        <a href='https://green-island.mixh.jp/wdps/%e3%81%8a%e5%95%8f%e3%81%84%e5%90%88%e3%82%8f%e3%81%9b/' style='padding:5px;' target='_blank' rel='noopener noreferrer'><i class="fa-solid fa-square-envelope fa-2x"></i></a>
+    </footer>
 </body>
-<footer class='common_footer' style='padding:5px;'>
-    <p style='padding:5px;'>お問い合わせはコチラ</p>
-    <a href='https://lin.ee/HLSLl23' style='padding:5px;'><i class="fa-brands fa-line fa-2x line-green"></i></a>
-    <a href='https://green-island.mixh.jp/wdps/%e3%81%8a%e5%95%8f%e3%81%84%e5%90%88%e3%82%8f%e3%81%9b/' style='padding:5px;' target='_blank' rel='noopener noreferrer'><i class="fa-solid fa-square-envelope fa-2x"></i></a>
-</footer>
 <!--シェパードナビshepherd
 <script src="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/js/shepherd.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/css/shepherd.css"/>

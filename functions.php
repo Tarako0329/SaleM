@@ -271,83 +271,6 @@ function csrf_checker($from,$chkpoint){
 }
 
 
-// =========================================================
-// データ更新時のセキュリティ対応（セッション・クッキー・ポストのチェック）
-// =========================================================
-function csrf_chk(){
-    $csrf_token = $_POST['csrf_token'];
-    $cookie_token = $_COOKIE['csrf_token'];
-    $session_token = $_SESSION['csrf_token'];
-    log_writer2("func:csrf_chk",$_SERVER['HTTP_REFERER'],"lv3");
-    unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
-
-    if ($cookie_token != $csrf_token || $csrf_token != $session_token) {
-        //不正アクセス
-        log_writer2("func:csrf_chk","failed [".$cookie_token."::".$csrf_token."::".$session_token."]","lv3");
-        return false;
-    }else{
-        log_writer2("func:csrf_chk","success","lv3");
-        return true;
-    }
-}
-// =========================================================
-// データ更新時のセキュリティ対応（クッキー・ポストのチェック）
-// =========================================================
-function csrf_chk_nonsession(){
-    //長期滞在できるページはセッション切れを許す
-    $csrf_token = (!empty($_POST['csrf_token'])?$_POST['csrf_token']:"no-post-token");
-    $cookie_token = (!empty($_COOKIE['csrf_token'])?$_COOKIE['csrf_token']:"no-cookie-token");
-
-    unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
-    setCookie("csrf_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
-
-    if ($csrf_token !== $cookie_token) {
-        //不正アクセス
-        log_writer2("func:csrf_chk_nonsession","failed [".$cookie_token."::".$csrf_token."]","lv3");
-        return false;
-    }else{
-        log_writer2("func:csrf_chk_nonsession","success","lv3");
-        return true;
-    }
-}
-// =========================================================
-// データ更新時のセキュリティ対応（クッキー・ゲットのチェック）
-// =========================================================
-function csrf_chk_nonsession_get($csrf_token){
-    //長期滞在できるページはセッション切れを許すGET版 引数にGETを渡す
-    $cookie_token = $_COOKIE['csrf_token'];
-
-    unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
-    setCookie("csrf_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
-
-    if ($csrf_token != $cookie_token) {
-        //不正アクセス
-        log_writer2("func:csrf_chk_nonsession_get","failed [".$cookie_token."::".$csrf_token."]","lv3");
-        return false;
-    }else{
-        log_writer2("func:csrf_chk_nonsession_get","success","lv3");
-        return true;
-    }
-}
-// =========================================================
-// データ更新時のセキュリティ対応（セッション・ゲットのチェック）
-// =========================================================
-function csrf_chk_redirect($csrf_token){
-    //リダイレクト用GET版 引数にGETを渡す
-    $session_token = (!empty($_SESSION['csrf_token'])?$_SESSION['csrf_token']:"");
-    unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
-    setCookie("csrf_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
-
-    if ($csrf_token != $session_token) {
-        //不正アクセス
-        log_writer2("func:csrf_chk_nonsession_get","failed [".$session_token."::".$csrf_token."]","lv3");
-        return false;
-    }else{
-        log_writer2("func:csrf_chk_redirect","success","lv3");
-        return true;
-    }
-}
-
 function csrf_create(){
     //INPUT HIDDEN で呼ぶ
     $token = get_token();
@@ -474,8 +397,6 @@ function send_mail($to,$subject,$body){
     return $return_flag;
 }
 
-
-
 // =========================================================
 // GUID取得
 // =========================================================
@@ -495,6 +416,301 @@ function getGUID(){
             .chr(125);// "}"
         return $uuid;
     }
+}
+
+// =========================================================
+// CSV出力
+// =========================================================
+function output_csv($data,$kikan){
+    $date = date("Ymd");
+    header("Content-Type: application/octet-stream");
+    header("Content-Disposition: attachment; filename=売上実績_{$date}_{$kikan}.csv");
+    
+    // データ行の文字コード変換・加工
+    foreach ($data as $data_key => $line) {
+        foreach ($line as $line_key => $value) {
+            $data[$data_key][$line_key] = mb_convert_encoding($value, "SJIS", "UTF-8");
+        }
+    }
+
+    foreach ($data as $key => $line) {
+        echo implode(",", $line ) . "\r\n";
+    }
+    exit;
+}
+
+// =========================================================
+// 日付未指定時にルールに沿ってYMDを返す
+// =========================================================
+function rtn_date($date,$mode){
+    //rtn_date(empty($date),$mode)
+    //$date:チェックする日付　$mode:日付が空白の場合　today=今日　min=0000-00-00 max=2999-12-31 を返す
+    
+    if($date==false){
+        //何かしら入ってる
+        $rtn_date = (string)$date;
+    }elseif($mode=="today"){
+        $rtn_date = (string)date("Y-m-d");
+    }elseif($mode=="min"){
+        $rtn_date = "0000-00-00";
+    }elseif($mode=="max"){
+        $rtn_date = "2999-12-31";
+    }else{
+        $rtn_date = "";
+    }
+    
+    return $rtn_date;
+}
+
+// =========================================================
+// 検索ワード未指定時にワイルドカード(%)を返す
+// =========================================================
+function rtn_wildcard($word){
+    //rtn_wildcard(empty($word))で使用する
+    if($word==true){
+        //空白の場合
+        return "%";
+    }else{
+        return $word;
+    }
+}
+
+
+// =========================================================
+// 登録メール(メールサーバーを使わない場合PHPから送信)
+// =========================================================
+function touroku_mail($to,$subject,$body){
+    $mail2=rot13encrypt2($to);
+    $s_name=$_SERVER['SCRIPT_NAME'];
+    $dir_a=explode("/",$s_name,-1);
+    
+    // 送信元
+    $from = "From: テスト送信者<information@WEBREZ.jp>";
+    
+    // メールタイトル
+    $subject = "WEBREZ＋ 登録案内";
+    
+    // メール送信
+    mail($to, $subject, $body, $from);
+    return 1;
+}
+
+function get_getsumatsu($ym){
+    if(strlen($ym)<>6){
+        return $ym;
+    }
+    $yyyymm = substr($ym,0,4)."-".substr($ym,4,2);
+    
+    return date('Y-m-d',strtotime($yyyymm.' last day of this month'));
+}
+
+
+// =========================================================
+// ログイン画面へ飛ばす
+// =========================================================
+function redirect_to_login($message) {
+	$_SESSION = array();
+	session_destroy();
+	session_start();
+    if(EXEC_MODE!=="Local"){
+        session_regenerate_id(true);
+    }
+    setCookie("login_type", "", -1, "/", "", TRUE, TRUE);
+    setCookie("webrez_token", "", -1, "/", "", TRUE, TRUE);
+    setCookie("csrf_token", "", -1, "/", "", TRUE, TRUE);
+
+    $_SESSION["EMSG"] = $message;
+    log_writer2("function.php[func:redirect_to_login] $_SESSION values ",$_SESSION,"lv3");
+
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: index.php");
+    exit();
+}
+
+function sort_hash($val,$type){
+    $rtn="";
+    $hashids = new Hashids\Hashids('this is salt',6);
+    if($type==="enc"){
+        $rtn = $hashids->encode($val);    
+    }else if($type==="dec"){
+        $tmp = $hashids->decode($val);
+        $rtn = $tmp[0];
+    }else{
+
+    }
+
+    return $rtn;
+}
+
+function sqllogger($logsql,$e){//(sqlログ,Exception $e:$eセット時はメール通知あり)
+    //SQL文はトランザクション単位で共通ログファイルに書き込みを行う。
+    //エラーをキャッチした場合、ユーザーID別のログファイルにも書き込みを行う。
+    $logfilename="esql_sid_".$_SESSION['user_id'].".log";
+    $userid = (!empty($_SESSION['user_id'])?$_SESSION['user_id']:"-");
+    $callphp = debug_backtrace();
+    $phpname = substr($callphp[0]["file"], (strrpos($callphp[0]["file"],"\\") +1));
+
+    if(!empty($logsql)){
+        file_put_contents("sql_log/".date("Y-m-d").".log", $logsql,FILE_APPEND);
+    }
+    if(!empty($e)){//主にロールバック時
+        $elog = print_r($e,true);
+        $eMsg = date("Y-m-d H:i:s")."\t".$userid."\t".$phpname."\t"."/*".$e->getMessage()."*/\n";
+        file_put_contents("sql_log/".date("Y-m-d").".log", $eMsg, FILE_APPEND);
+
+        file_put_contents("sql_log/".$logfilename,$logsql,FILE_APPEND);
+        file_put_contents("sql_log/".$logfilename,"/*".$elog."*/\n",FILE_APPEND);
+        log_writer2($phpname." [Exception \$e] =>",$e,"lv0");
+    }
+    
+}
+
+function rtn_sqllog($sql,$params){//(sql,パラメータ[],phpファイル名)w:書き込み r:整形SQLリターン
+    $logsql=$sql.";";
+    $i=0;
+    $userid = (!empty($_SESSION['user_id'])?$_SESSION['user_id']:"-");
+    $callphp = debug_backtrace();
+    $phpname = substr($callphp[0]["file"], (strrpos($callphp[0]["file"],"\\") +1));
+
+    if(strstr($logsql,"?")!==false){
+        while(strstr($logsql,"?")!==false){
+            $logsql = strstr($logsql,"?",true).(!is_null($params[$i])?"\"".$params[$i]."\"":"null").substr(strstr($logsql,"?"), ((strlen(strstr($logsql,"?"))-1)*(-1))) ;
+            $i++;
+        }
+    }else{
+        foreach(array_keys($params) as $row){
+            $logsql = str_replace(":".$row,(!is_null($params[$row])?"\"".$params[$row]."\"":"null"),$logsql);
+        }
+    }
+    return date("Y-m-d H:i:s")."\t".$userid."\t".$phpname."\t".$logsql."\n";
+}
+
+
+
+// =========================================================
+// データ更新時のセキュリティ対応（セッション・クッキー・ポストのチェック）廃止：csrf_checkerに置き換え
+// =========================================================
+/*
+function csrf_chk(){
+    $csrf_token = $_POST['csrf_token'];
+    $cookie_token = $_COOKIE['csrf_token'];
+    $session_token = $_SESSION['csrf_token'];
+    log_writer2("func:csrf_chk",$_SERVER['HTTP_REFERER'],"lv3");
+    unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
+
+    if ($cookie_token != $csrf_token || $csrf_token != $session_token) {
+        //不正アクセス
+        log_writer2("func:csrf_chk","failed [".$cookie_token."::".$csrf_token."::".$session_token."]","lv3");
+        return false;
+    }else{
+        log_writer2("func:csrf_chk","success","lv3");
+        return true;
+    }
+}
+*/
+// =========================================================
+// データ更新時のセキュリティ対応（クッキー・ポストのチェック）廃止：csrf_checkerに置き換え
+// =========================================================
+/*
+function csrf_chk_nonsession(){
+    //長期滞在できるページはセッション切れを許す
+    $csrf_token = (!empty($_POST['csrf_token'])?$_POST['csrf_token']:"no-post-token");
+    $cookie_token = (!empty($_COOKIE['csrf_token'])?$_COOKIE['csrf_token']:"no-cookie-token");
+
+    unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
+    setCookie("csrf_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
+
+    if ($csrf_token !== $cookie_token) {
+        //不正アクセス
+        log_writer2("func:csrf_chk_nonsession","failed [".$cookie_token."::".$csrf_token."]","lv3");
+        return false;
+    }else{
+        log_writer2("func:csrf_chk_nonsession","success","lv3");
+        return true;
+    }
+}
+*/
+// =========================================================
+// データ更新時のセキュリティ対応（クッキー・ゲットのチェック）廃止：csrf_checkerに置き換え
+// =========================================================
+/*
+function csrf_chk_nonsession_get($csrf_token){
+    //長期滞在できるページはセッション切れを許すGET版 引数にGETを渡す
+    $cookie_token = $_COOKIE['csrf_token'];
+
+    unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
+    setCookie("csrf_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
+
+    if ($csrf_token != $cookie_token) {
+        //不正アクセス
+        log_writer2("func:csrf_chk_nonsession_get","failed [".$cookie_token."::".$csrf_token."]","lv3");
+        return false;
+    }else{
+        log_writer2("func:csrf_chk_nonsession_get","success","lv3");
+        return true;
+    }
+}
+*/
+// =========================================================
+// データ更新時のセキュリティ対応（セッション・ゲットのチェック）廃止：csrf_checkerに置き換え
+// =========================================================
+/*
+function csrf_chk_redirect($csrf_token){
+    //リダイレクト用GET版 引数にGETを渡す
+    $session_token = (!empty($_SESSION['csrf_token'])?$_SESSION['csrf_token']:"");
+    unset($_SESSION['csrf_token']) ; // セッション側のトークンを削除し再利用を防止
+    setCookie("csrf_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly// クッキー側のトークンを削除し再利用を防止
+
+    if ($csrf_token != $session_token) {
+        //不正アクセス
+        log_writer2("func:csrf_chk_nonsession_get","failed [".$session_token."::".$csrf_token."]","lv3");
+        return false;
+    }else{
+        log_writer2("func:csrf_chk_redirect","success","lv3");
+        return true;
+    }
+}
+*/
+// =========================================================
+// 天気取得（無効・jsに移植）
+// =========================================================
+function get_weather( $type = null,$lat,$lon ){
+    /* openweathermap で &amp;が受け付けられなくなったため、廃止
+    if(EXEC_MODE==="Local"){
+        return ["",0,0,0,0];
+    }
+    $url = "http://api.openweathermap.org/data/2.5/weather?lat=".$lat."&lon=".$lon."&units=metric&APPID=" .WEATHER_ID;
+
+    $json = file_get_contents( $url );
+    $json = mb_convert_encoding( $json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN' );
+    $json_decode = json_decode( $json );
+    
+    //現在の天気
+    if( $type  === "weather" ){
+        $out = $json_decode->weather[0]->main;
+    
+    //現在の天気アイコン
+    }elseif( $type === "icon" ){
+        $out = "<img src='https://openweathermap.org/img/wn/" . $json_decode->weather[0]->icon . "@2x.png'>";
+    
+    //現在の気温
+    }elseif( $type  === "temp" ){
+        $out = $json_decode->main->temp;
+    
+    //DB登録（現在の天気・気温・体感温度）
+    }elseif( $type  === "insert" ){
+        $out[0] = $json_decode->weather[0]->main;
+        $out[1] = $json_decode->weather[0]->description;
+        $out[2] = $json_decode->main->temp;
+        $out[3] = $json_decode->main->feels_like;
+        $out[4] = $json_decode->weather[0]->icon . ".png";
+    //パラメータがないときは配列を出力
+    }else{
+      $out = $json_decode;
+    }
+
+    return $out;
+    */
 }
 
 // =========================================================
@@ -552,8 +768,9 @@ function drow_table($aryColumn,$result){
 }
 */
 // =========================================================
-// 表(table)の出力
+// 表(table)の出力(Vueの適用で廃止)
 // =========================================================
+/*
 function drow_table_abc($aryColumn,$result,$cols){
     //２カラムの場合は１表、３カラムの場合は３カラム目が大分類として分類ごとに表を作成
 
@@ -673,212 +890,5 @@ function drow_table_abc($aryColumn,$result,$cols){
         
     }
 }
-
-// =========================================================
-// CSV出力
-// =========================================================
-function output_csv($data,$kikan){
-    $date = date("Ymd");
-    header("Content-Type: application/octet-stream");
-    header("Content-Disposition: attachment; filename=売上実績_{$date}_{$kikan}.csv");
-    
-    // データ行の文字コード変換・加工
-    foreach ($data as $data_key => $line) {
-        foreach ($line as $line_key => $value) {
-            $data[$data_key][$line_key] = mb_convert_encoding($value, "SJIS", "UTF-8");
-        }
-    }
-
-    foreach ($data as $key => $line) {
-        echo implode(",", $line ) . "\r\n";
-    }
-    exit;
-}
-
-// =========================================================
-// 日付未指定時にルールに沿ってYMDを返す
-// =========================================================
-function rtn_date($date,$mode){
-    //rtn_date(empty($date),$mode)
-    //$date:チェックする日付　$mode:日付が空白の場合　today=今日　min=0000-00-00 max=2999-12-31 を返す
-    
-    if($date==false){
-        //何かしら入ってる
-        $rtn_date = (string)$date;
-    }elseif($mode=="today"){
-        $rtn_date = (string)date("Y-m-d");
-    }elseif($mode=="min"){
-        $rtn_date = "0000-00-00";
-    }elseif($mode=="max"){
-        $rtn_date = "2999-12-31";
-    }else{
-        $rtn_date = "";
-    }
-    
-    return $rtn_date;
-}
-
-// =========================================================
-// 検索ワード未指定時にワイルドカード(%)を返す
-// =========================================================
-function rtn_wildcard($word){
-    //rtn_wildcard(empty($word))で使用する
-    if($word==true){
-        //空白の場合
-        return "%";
-    }else{
-        return $word;
-    }
-}
-
-
-// =========================================================
-// 登録メール(メールサーバーを使わない場合PHPから送信)
-// =========================================================
-function touroku_mail($to,$subject,$body){
-    $mail2=rot13encrypt2($to);
-    $s_name=$_SERVER['SCRIPT_NAME'];
-    $dir_a=explode("/",$s_name,-1);
-    
-    // 送信元
-    $from = "From: テスト送信者<information@WEBREZ.jp>";
-    
-    // メールタイトル
-    $subject = "WEBREZ＋ 登録案内";
-    
-    // メール送信
-    mail($to, $subject, $body, $from);
-    return 1;
-}
-
-function get_getsumatsu($ym){
-    if(strlen($ym)<>6){
-        return $ym;
-    }
-    $yyyymm = substr($ym,0,4)."-".substr($ym,4,2);
-    
-    return date('Y-m-d',strtotime($yyyymm.' last day of this month'));
-}
-
-// =========================================================
-// 天気取得（無効・jsに移植）
-// =========================================================
-function get_weather( $type = null,$lat,$lon ){
-    /* openweathermap で &amp;が受け付けられなくなったため、廃止
-    if(EXEC_MODE==="Local"){
-        return ["",0,0,0,0];
-    }
-    $url = "http://api.openweathermap.org/data/2.5/weather?lat=".$lat."&lon=".$lon."&units=metric&APPID=" .WEATHER_ID;
-
-    $json = file_get_contents( $url );
-    $json = mb_convert_encoding( $json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN' );
-    $json_decode = json_decode( $json );
-    
-    //現在の天気
-    if( $type  === "weather" ){
-        $out = $json_decode->weather[0]->main;
-    
-    //現在の天気アイコン
-    }elseif( $type === "icon" ){
-        $out = "<img src='https://openweathermap.org/img/wn/" . $json_decode->weather[0]->icon . "@2x.png'>";
-    
-    //現在の気温
-    }elseif( $type  === "temp" ){
-        $out = $json_decode->main->temp;
-    
-    //DB登録（現在の天気・気温・体感温度）
-    }elseif( $type  === "insert" ){
-        $out[0] = $json_decode->weather[0]->main;
-        $out[1] = $json_decode->weather[0]->description;
-        $out[2] = $json_decode->main->temp;
-        $out[3] = $json_decode->main->feels_like;
-        $out[4] = $json_decode->weather[0]->icon . ".png";
-    //パラメータがないときは配列を出力
-    }else{
-      $out = $json_decode;
-    }
-
-    return $out;
-    */
-}
-// =========================================================
-// ログイン画面へ飛ばす
-// =========================================================
-function redirect_to_login($message) {
-	$_SESSION = array();
-	session_destroy();
-	session_start();
-    if(EXEC_MODE!=="Local"){
-        session_regenerate_id(true);
-    }
-    setCookie("login_type", "", -1, "/", "", TRUE, TRUE);
-    setCookie("webrez_token", "", -1, "/", "", TRUE, TRUE);
-    setCookie("csrf_token", "", -1, "/", "", TRUE, TRUE);
-
-    $_SESSION["EMSG"] = $message;
-    log_writer2("function.php[func:redirect_to_login] $_SESSION values ",$_SESSION,"lv3");
-
-    header("HTTP/1.1 301 Moved Permanently");
-    header("Location: index.php");
-    exit();
-}
-
-function sort_hash($val,$type){
-    $rtn="";
-    $hashids = new Hashids\Hashids('this is salt',6);
-    if($type==="enc"){
-        $rtn = $hashids->encode($val);    
-    }else if($type==="dec"){
-        $tmp = $hashids->decode($val);
-        $rtn = $tmp[0];
-    }else{
-
-    }
-
-    return $rtn;
-}
-
-function sqllogger($logsql,$e){//(sqlログ,Exception $e:$eセット時はメール通知あり)
-    //SQL文はトランザクション単位で共通ログファイルに書き込みを行う。
-    //エラーをキャッチした場合、ユーザーID別のログファイルにも書き込みを行う。
-    $logfilename="esql_sid_".$_SESSION['user_id'].".log";
-    $userid = (!empty($_SESSION['user_id'])?$_SESSION['user_id']:"-");
-    $callphp = debug_backtrace();
-    $phpname = substr($callphp[0]["file"], (strrpos($callphp[0]["file"],"\\") +1));
-
-    if(!empty($logsql)){
-        file_put_contents("sql_log/".date("Y-m-d").".log", $logsql,FILE_APPEND);
-    }
-    if(!empty($e)){//主にロールバック時
-        $elog = print_r($e,true);
-        $eMsg = date("Y-m-d H:i:s")."\t".$userid."\t".$phpname."\t"."/*".$e->getMessage()."*/\n";
-        file_put_contents("sql_log/".date("Y-m-d").".log", $eMsg, FILE_APPEND);
-
-        file_put_contents("sql_log/".$logfilename,$logsql,FILE_APPEND);
-        file_put_contents("sql_log/".$logfilename,"/*".$elog."*/\n",FILE_APPEND);
-        log_writer2($phpname." [Exception \$e] =>",$e,"lv0");
-    }
-    
-}
-
-function rtn_sqllog($sql,$params){//(sql,パラメータ[],phpファイル名)w:書き込み r:整形SQLリターン
-    $logsql=$sql.";";
-    $i=0;
-    $userid = (!empty($_SESSION['user_id'])?$_SESSION['user_id']:"-");
-    $callphp = debug_backtrace();
-    $phpname = substr($callphp[0]["file"], (strrpos($callphp[0]["file"],"\\") +1));
-
-    if(strstr($logsql,"?")!==false){
-        while(strstr($logsql,"?")!==false){
-            $logsql = strstr($logsql,"?",true).(!is_null($params[$i])?"\"".$params[$i]."\"":"null").substr(strstr($logsql,"?"), ((strlen(strstr($logsql,"?"))-1)*(-1))) ;
-            $i++;
-        }
-    }else{
-        foreach(array_keys($params) as $row){
-            $logsql = str_replace(":".$row,(!is_null($params[$row])?"\"".$params[$row]."\"":"null"),$logsql);
-        }
-    }
-    return date("Y-m-d H:i:s")."\t".$userid."\t".$phpname."\t".$logsql."\n";
-}
-
+*/
 ?>

@@ -39,12 +39,7 @@ INPUT.ev{
 .btn--rezi{
     height:70%;
     width:100%;
-    font-size: 2.0rem;
-}
-@media screen and (max-width:400px) {
-    .btn--rezi{
-        font-size: 1.8rem;
-    }
+    font-size: 1.8rem;
 }
 /*レジボタン マイナスマーク*/
 .btn--rezi-minus{
@@ -107,13 +102,13 @@ INPUT{
     width:100%;
     margin:0;
     padding:0;
+    padding-top:5px;
     height:35%; /*itemsの下20％部分。上はメニューボタン*/
     line-height:21px;
     background:transparent;
     text-align:center;
-    font-size: 2.0rem;
+    font-size: 2.2rem;
     font-weight: 700;
-
 }
 INPUT.order{
     border:none;
@@ -291,12 +286,54 @@ INPUT.su{
     */
 }
 @media screen and (max-width:400px) {
-.address_disp{
-    font-size:9px;
-}
+    .address_disp{
+        font-size:9px;
+    }
 }
 
-
+.order_list{
+    border:solid var(--panel-bd-color) 0.5px;
+    width: 24%;
+    
+    position: fixed;
+    overflow: auto;
+}
+.order_item{
+    font-size:1.6rem;
+    margin:5px;
+    font-weight: 700;
+}
+.order_su{
+    width: 25%;
+    margin:5px;
+    font-size:1.6rem;
+    text-align:right;
+}
+.order_kin{
+    width: 75%;
+    margin:5px 10px;
+    font-size:1.6rem;
+    text-align:right;
+    font-weight: 700;
+}
+@media screen and (max-width:767px) {/*md以下*/
+    .order_list{
+        display:NONE;
+    }
+}
+@media screen and (min-width:767px) {/*md以上*/
+    .ordered{
+        font-size:1.8rem;
+    }
+    .btn--rezi{
+        font-size: 1.6rem;
+    }
+}
+@media screen and (min-width:992px) {/*lg以上*/
+    .order_list{
+        width: 16%;
+    }
+}
 
 
 

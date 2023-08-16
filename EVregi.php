@@ -187,72 +187,102 @@
 		</div>
 		<main class='common_body'>
 			<div class="container-fluid">
-				<template v-if='MSG!==""'>
-					<div v-bind:class='alert_status' role='alert' >
-						{{MSG}}
-						<button type='button' class='btn btn-primary' @click='open_R()'> <!-- data-bs-toggle='modal' data-bs-target='#ryoushuu'-->
-							領収書
-						</button>
-					</div>
-				</template>
-				<div class='accordion item_11 item_12' id="accordionExample">
-					<div v-if='chk_register_show==="register"' class='row' style='padding-top:5px;'>
+				<div class='row'>
+					<div class='col-xg-2 col-lg-2 col-md-3 col-sm-0 col-0'>
 						<hr>
-						<div class='accordion-item'>
-							<h2 class='accordion-header' id='headingOne'>
-								<button type='button' class='accordion-button collapsed' style='font-size:2.2rem;' data-bs-toggle='collapse' data-bs-target='#collapseOne' aria-expanded='false' aria-controls='collapseOne'>
-									割引・割増
-								</button>
-							</h2>
-							<div id='collapseOne' class='accordion-collapse collapse' aria-labelledby='headingOne' data-bs-parent='#accordionExample'>
-					      <div class='accordion-body'>
-									<div class='row'>
-										<div class='col-1 col-md-0' ></div>
-										<div class='col-10 col-md-7' >
-											<p>お会計額：￥{{pay.toLocaleString()}}</p>
-											<label for='CHOUSEI_GAKU' class='form-label'>変更後お会計額</label>
-											<input type='number' v-model='Revised_pay' class='form-control order tanka' 
-											style='font-size:2.2rem;width:100%;border:solid;border-top:none;border-right:none;border-left:none;' name='CHOUSEI_GAKU' id='CHOUSEI_GAKU'>
-											<br>
-											<button class='btn btn-primary' type='button' @click='Revised()'>決　定</button>
-										</div>
-										<div class='col-1' ></div>
-									</div>
-      					</div>
-    					</div>
+						
+						<div class='order_list' ref='order_list_area'>
+							<template v-for='(list,index) in shouhinMS_Order' :key='list.shouhinCD'>
+							<div class='order_item'>{{list.shouhinNM}}</div>
+							<div style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;'>
+								<div class='order_su'>{{list.ordercounter}}点</div>
+								<div class='order_kin'>¥{{(list.ordercounter *  list.zeikomigaku).toLocaleString()}}</div>
+							</div>
+							</template>	
 						</div>
+						
 					</div>
-				</div><!--割引処理-->
-				<div id='jump_0'><hr ></div>
-				<div class='row item_3' id=''>
-					<template v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
-						<template v-if='(index===0) || (index!==0 && list.disp_category !== shouhinMS_filter[index-1].disp_category)'>
-							<div class='row' style='background:var(--jumpbar-color);margin-top:5px;' >
-								<div class='col-12' :id='`jump_${index}`' style='color:var(--categ-font-color);'><a href='#jump_".$befor."' class='btn-updown'><i class='fa-solid fa-angles-up'></i></a>
-									{{list.disp_category}}<a href='#jump_".$next."'  class='btn-updown'><i class='fa-solid fa-angles-down'></i></a>
+					<div class='col-lg-10 col-md-9 col-12'>
+			
+						<div class="container-fluid"><!--オーダーパネル部分-->
+							<template v-if='MSG!==""'>
+								<div v-bind:class='alert_status' role='alert' >
+									{{MSG}}
+									<button type='button' class='btn btn-primary' @click='open_R()'> 
+										領収書
+									</button>
 								</div>
+							</template>
+							<div class='accordion item_11 item_12' id="accordionExample">
+								<div v-if='chk_register_show==="register"' class='row' style='padding-top:5px;'>
+									<hr>
+									<div class='accordion-item'>
+										<h2 class='accordion-header' id='headingOne'>
+											<button type='button' class='accordion-button collapsed' style='font-size:2.2rem;' data-bs-toggle='collapse' data-bs-target='#collapseOne' aria-expanded='false' aria-controls='collapseOne'>
+												割引・割増
+											</button>
+										</h2>
+										<div id='collapseOne' class='accordion-collapse collapse' aria-labelledby='headingOne' data-bs-parent='#accordionExample'>
+								      <div class='accordion-body'>
+												<div class='row'>
+													<div class='col-1 col-md-0' ></div>
+													<div class='col-10 col-md-7' >
+														<p>お会計額：￥{{pay.toLocaleString()}}</p>
+														<label for='CHOUSEI_GAKU' class='form-label'>変更後お会計額</label>
+														<input type='number' v-model='Revised_pay' class='form-control order tanka' 
+														style='font-size:2.2rem;width:100%;border:solid;border-top:none;border-right:none;border-left:none;' name='CHOUSEI_GAKU' id='CHOUSEI_GAKU'>
+														<br>
+														<button class='btn btn-primary' type='button' @click='Revised()'>決　定</button>
+													</div>
+													<div class='col-1' ></div>
+												</div>
+      								</div>
+    								</div>
+									</div>
+								</div>
+							</div><!--割引処理-->
+							<div id='jump_0'><hr ></div>
+							<div class='row item_3' id=''>
+								<template v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
+									<template v-if='(index===0) || (index!==0 && list.disp_category !== shouhinMS_filter[index-1].disp_category)'>
+										<div class='row' style='background:var(--jumpbar-color);margin-top:5px;' >
+											<div class='col-12' :id='`jump_${index}`' style='color:var(--categ-font-color);'><a href='#jump_".$befor."' class='btn-updown'><i class='fa-solid fa-angles-up'></i></a>
+												{{list.disp_category}}<a href='#jump_".$next."'  class='btn-updown'><i class='fa-solid fa-angles-down'></i></a>
+											</div>
+										</div>
+									</template>
+									<div class ='col-lg-2 col-md-3 col-sm-6 col-6 items'>
+										<template v-if='encodeURI(list.shouhinNM).replace(/%../g, "*").length <= 24'>
+											<button type='button' @click="ordercounter" class='btn-view btn--rezi' :id="`btn_menu_${list.shouhinCD}`" :value = "index">
+												{{list.shouhinNM}}
+											</button>
+										</template>
+										<template v-if='encodeURI(list.shouhinNM).replace(/%../g, "*").length > 24'>
+											<button type='button' @click="ordercounter" class='btn-view btn--rezi' style='font-size:1.2rem;' :id="`btn_menu_${list.shouhinCD}`" :value = "index">
+												{{list.shouhinNM}}
+											</button>
+										</template>
+										<div v-if='pm==="minus"' class='btn-view btn--rezi-minus bg-warning minus_disp'></div>
+										<input type='hidden' :name ="`ORDERS[${index}][CD]`" :value = "list.shouhinCD">
+										<input type='hidden' :name ="`ORDERS[${index}][NM]`" :value = "list.shouhinNM">
+										<input type='hidden' :name ="`ORDERS[${index}][UTISU]`" :value = "list.utisu">
+										<input type='hidden' :name ="`ORDERS[${index}][ZEIKBN]`" :value = "list.zeiKBN">
+										<input type='hidden' :name ="`ORDERS[${index}][TANKA]`" :value = "list.tanka">
+										<input type='hidden' :name ="`ORDERS[${index}][ZEI]`" :value = "list.tanka_zei">  
+										<input type='hidden' :name ="`ORDERS[${index}][GENKA_TANKA]`" :value = "list.genka_tanka">
+										<input type='hidden' v-model='list.ordercounter' :name ="`ORDERS[${index}][SU]`" :id="`suryou_${list.shouhinCD}`">
+										<div class ='ordered'>
+												￥{{list.zeikomigaku.toLocaleString()}} ×{{list.ordercounter.toLocaleString()}}
+										</div>
+									</div>
+								</template>
 							</div>
-						</template>
-						<div class ='col-md-3 col-sm-6 col-6 items'>
-							<button type='button' @click="ordercounter" class='btn-view btn--rezi' :id="`btn_menu_${list.shouhinCD}`" :value = "index">{{list.shouhinNM}}
-							</button>
-							<div v-if='pm==="minus"' class='btn-view btn--rezi-minus bg-warning minus_disp'></div>
-							<input type='hidden' :name ="`ORDERS[${index}][CD]`" :value = "list.shouhinCD">
-							<input type='hidden' :name ="`ORDERS[${index}][NM]`" :value = "list.shouhinNM">
-							<input type='hidden' :name ="`ORDERS[${index}][UTISU]`" :value = "list.utisu">
-							<input type='hidden' :name ="`ORDERS[${index}][ZEIKBN]`" :value = "list.zeiKBN">
-							<input type='hidden' :name ="`ORDERS[${index}][TANKA]`" :value = "list.tanka">
-							<input type='hidden' :name ="`ORDERS[${index}][ZEI]`" :value = "list.tanka_zei">  
-							<input type='hidden' :name ="`ORDERS[${index}][GENKA_TANKA]`" :value = "list.genka_tanka">
-							<input type='hidden' v-model='list.ordercounter' :name ="`ORDERS[${index}][SU]`" :id="`suryou_${list.shouhinCD}`">
-							<div class ='ordered' style='font-size:2.5rem;padding-top:5px;'>
-									￥{{list.zeikomigaku.toLocaleString()}}
-									× {{list.ordercounter.toLocaleString()}}
-							</div>
-						</div>
-					</template>
+						</div><!--オーダーパネル部分-->
+
+					</div>
 				</div>
-			</div><!--オーダーパネル部分-->
+			</div>
+			
 		</main>
 		<footer class='rezfooter'>
 			<div class="container-fluid" style='padding:0;text-align:center;'>
@@ -552,14 +582,6 @@
 						disp_category.value ++
 					}
 				}
-
-				onMounted(() => {
-					console_log('onMounted','lv3')
-					total_area.value.style["fontSize"]="3.3rem"
-					get_shouhinMS()
-					get_UriageList()
-					v_get_gio()
-				})
 
 				//オーダー処理関連
 				const pay = ref(0)		//会計税込金額
@@ -1043,6 +1065,26 @@
 					myModal.show()
 				}
 
+				const shouhinMS_Order = computed(() => {//商品パネルのソート・フィルタ
+					let order_panel = ([])
+					//表示対象かつ注文数１以上を返す
+					order_panel = shouhinMS.value.filter((shouhin) => {
+						return (shouhin.hyoujiKBN1 && shouhin.hyoujiKBN1.includes('on') && shouhin.ordercounter > 0);
+					});
+					return order_panel.sort((a,b) => {//フィルタ結果をソートして親に返す
+						return (a.category > b.category?1:-1)
+						return (a.shouhinNM > b.shouhinNM?1:-1)
+						return 0
+					})
+				})
+				const order_list_area = ref()
+				const order_list_area_set = () => {
+					console.log('order_list_area_set start')
+					let size = window.innerHeight
+					console.log(size)
+					order_list_area.value.style=`height:${size-300}px`
+				}
+
 				//細かな表示設定など
 				const labels_address_check = ref()
 				const labels = computed(() =>{
@@ -1082,6 +1124,16 @@
 					}
 				})
 
+
+				onMounted(() => {
+					console_log('onMounted','lv3')
+					total_area.value.style["fontSize"]="3.3rem"
+					get_shouhinMS()
+					get_UriageList()
+					v_get_gio()
+					order_list_area_set()
+					window.addEventListener('resize', order_list_area_set)
+				})
 				return{
 					get_shouhinMS,
 					shouhinMS_filter,
@@ -1130,6 +1182,8 @@
 					open_R,
 					total_area,
 					auto_ajust,
+					shouhinMS_Order,
+					order_list_area,
 				}
 			}
 		}).mount('#register');

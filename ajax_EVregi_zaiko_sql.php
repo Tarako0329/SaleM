@@ -10,7 +10,8 @@ $timeout=false;                     //セッション切れ。ログイン画面
 
 $MODE=(!empty($_POST["mode"])?$_POST["mode"]:"");
 
-if(csrf_chk()===false){
+//if(csrf_chk()===false){
+if(csrf_checker(["EVregi.php"],["C","P","S"])===false){
     $msg="セッションが正しくありませんでした②";
     $alert_status = "alert-warning";
     $reseve_status = true;
