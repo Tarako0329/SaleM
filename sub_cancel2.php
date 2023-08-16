@@ -1,5 +1,3 @@
-<DOCTYPE html>
-<html lang="ja">
 <?php
 require "php_header.php";
 $rtn=check_session_userid($pdo_h);
@@ -48,10 +46,12 @@ $_SESSION["msg"]="";
 $token=csrf_create();
 
 ?>
+<DOCTYPE html>
+<html lang="ja">
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
-    include "head.html" 
+    include "head_bs5.html" 
     ?>
     <!--ページ専用CSS-->
     <link rel="stylesheet" href="css/style_account_create.css?<?php echo $time; ?>" >

@@ -15,7 +15,7 @@ $msg="";
 
 if($_GET["acc"]<>""){
     $mail=rot13decrypt2($_GET["acc"]);
-}else if($_POST["mail"]<>""){
+}else if(!empty($_POST["mail"])){
     $mail=$_POST["mail"];
 }else{
     echo "不正アクセスです。";
@@ -53,7 +53,6 @@ if(filter_input(INPUT_POST,"answer")){
         $msg="秘密の答えが間違ってます。<br>";
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -65,11 +64,9 @@ if(filter_input(INPUT_POST,"answer")){
     <!--ページ専用CSS-->
     <TITLE><?php echo $title." forget password";?></TITLE>
 </head>
- 
 <header class="header-color common_header" style="flex-wrap:wrap;height:50px">
     <div class="title" style="width: 100%;"><a href="menu.php"><?php echo $title;?></a></div>
 </header>
-
 <body class='common_body' style='padding-top:55px'>
     <div class="container">
         <form method='post' action='forget_pass.php' style='font-size:1.6rem'>

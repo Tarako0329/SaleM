@@ -19,7 +19,7 @@ if($_GET["mode"]==="0" && !empty($_GET["acc"])){
 	//GETからメールアドレスを復元
 	$row[0]["mail"]=rot13decrypt2($_GET["acc"]);
 }else if($_GET["mode"]==="1"){
-	$rtn=csrf_checker(["menu.php"],["G","C","S"]);
+	$rtn=csrf_checker(["menu.php","forget_pass.php"],["G","C","S"]);
 	if($rtn!==true){
 		redirect_to_login($rtn);
 	}
