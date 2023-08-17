@@ -51,31 +51,35 @@ $_SESSION["MSG"]=null;
             ?>
         
             
-            <div class='row mb-3 item_1' data-bs-toggle="tooltip" data-bs-title="１度登録すると商品名は変更できません。">
+            <div class='row mb-3 item_1' 
+                data-bs-placement="top" data-bs-trigger="click" data-bs-custom-class="custom-tooltip" data-bs-toggle="tooltip" title="１度登録すると商品名は変更できません。">
                 <label for="shouhinNM" class="col-3 col-sm-2 col-form-label">商品名</label>
                 <div class="col-8" >
                     <input type="text" class="form-control form-control-lg" id="shouhinNM" name="shouhinNM" required="required" placeholder="必須">
                 </div>
             </div>
-            <div class='row mb-3 item_2'>
+            <div class='row mb-3 item_2'
+            data-bs-placement="top" data-bs-trigger="click" data-bs-custom-class="custom-tooltip" data-bs-toggle="tooltip" title="消費税は『税率』と『税抜・税込』の選択に応じて自動計算されます。">
                 <label for="new_tanka" class="col-3 col-sm-2 col-form-label">商品単価</label>
                 <div class="col-8">
                     <input type="number" onchange="zei_math()" class="form-control form-control-lg" id="new_tanka" required="required" placeholder="必須">
                 </div>
             </div>
             <div class='row mb-3 item_3'>
-                <div class='col-2'></div>
+                <div class='col-3 col-sm-2'></div>
                 <div class="col-8">
-                    <input type="radio" class='btn-check' onchange="zei_math()" name="options" id="option1" value="zeikomi" autocomplete="off" checked>
-                    <label class="btn btn-outline-primary" style="font-size:1.2rem;border-radius:0;margin-right:0;" for='option1'>税込</label>
-                    <input type="radio" class='btn-check' onchange="zei_math()" name="options" id="option2" value="zeinuki" autocomplete="off">
-                    <label class="btn btn-outline-primary" style="font-size:1.2rem;border-radius:0;margin-left:-4px;" for='option2'>税抜</label>
+                    <div class='input-group'>
+                        <input type="radio" class='btn-check' onchange="zei_math()" name="options" id="option1" value="zeikomi" autocomplete="off" checked>
+                        <label class="btn btn-outline-primary" style="font-size:1.2rem;border-radius:0;margin-right:0;" for='option1'>税込</label>
+                        <input type="radio" class='btn-check' onchange="zei_math()" name="options" id="option2" value="zeinuki" autocomplete="off">
+                        <label class="btn btn-outline-primary" style="font-size:1.2rem;border-radius:0;margin-left:0px;" for='option2'>税抜</label>
+                    </div>
                 </div>
             </div>
             <div class='row mb-3 item_4'>
                 <label for="zeikbn" class="col-3 col-sm-2 col-form-label">税区分</label>
                 <div class="col-8">
-                    <select class="form-select form-select-lg" aria-label=".form-select-lg example" onchange="zei_math()" style="padding-top:0;" id="zeikbn" name="zeikbn" required="required">
+                    <select class="form-select form-select-lg" aria-label=".form-select-lg example" onchange="zei_math()" id="zeikbn" name="zeikbn" required="required">
                     <option value="">税率選択</option>
                     <?php
                     foreach($stmt as $row){
@@ -86,27 +90,28 @@ $_SESSION["MSG"]=null;
                 </div>
             </div>
             <div class='item_5'>
-                <div class='row mb-3'>
+                <div class='row mb-1'>
                     <label for="tanka" class="col-3 col-sm-2 col-form-label">税抜単価</label>
                     <div class="col-8">
-                        <input type="number" readonly='readonly' class="form-control form-control-lg" id="tanka" name="tanka" >
+                        <input type="number"  disabled readonly class="form-control form-control-lg" id="tanka" name="tanka" >
                     </div>
                 </div>
-                <div class='row mb-3'>
+                <div class='row mb-1'>
                     <label for="shouhizei" class="col-3 col-sm-2 col-form-label">消費税</label>
                     <div class="col-8">
-                        <input type="number" readonly='readonly' class="form-control form-control-lg" id="shouhizei" name="shouhizei" >
+                        <input type="number"  disabled readonly class="form-control form-control-lg" id="shouhizei" name="shouhizei" >
                     </div>
                 </div>                
                 <div class='row mb-3'>
                     <label for="zkomitanka" class="col-3 col-sm-2 col-form-label">税込単価</label>
                     <div class="col-8">
-                        <input type="number" readonly='readonly' class="form-control form-control-lg" style="border:none;" id="zkomitanka" aria-describedby="zkomitankaHelp">
+                        <input type="number"  disabled readonly class="form-control form-control-lg" id="zkomitanka" aria-describedby="zkomitankaHelp">
                         <small id="zkomitankaHelp" class="form-text text-muted">レジ画面に表示される金額は税込価格です。</small>
                     </div>
                 </div>
             </div>
-            <div class='row mb-3 item_6'>
+            <div class='row mb-3 item_6'
+                data-bs-placement="top" data-bs-trigger="click" data-bs-custom-class="custom-tooltip" data-bs-toggle="tooltip" title="原価を入れると利益の把握に役立ちます。">
                 <label for="genka" class="col-3 col-sm-2 col-form-label">原価単価</label>
                 <div class="col-8">
                     <input type="number" class="form-control form-control-lg" id="genka" name="genka" aria-describedby="genka">
@@ -426,36 +431,7 @@ $_SESSION["MSG"]=null;
             }
         ]
     });
-    /*
-    tutorial_2.addStep({
-        title: `<p class='tour_header'>チュートリアル</p>`,
-        text: `<p class='tour_discription'>商品の中カテゴリー入力欄です。（大><span style='font-weight:bold;'>中</span>>小）</p>`,
-        attachTo: {
-            element: '.item_10',
-            on: 'top'
-        },
-        buttons: [
-            {
-                text: 'Next',
-                action: tutorial_2.next
-            }
-        ]
-    });
-    tutorial_2.addStep({
-        title: `<p class='tour_header'>チュートリアル</p>`,
-        text: `<p class='tour_discription'>商品の小カテゴリー入力欄です。（大>中><span style='font-weight:bold;'>小</span>）</p>`,
-        attachTo: {
-            element: '.item_11',
-            on: 'top'
-        },
-        buttons: [
-            {
-                text: 'Next',
-                action: tutorial_2.next
-            }
-        ]
-    });
-    */
+   
     tutorial_2.addStep({
         title: `<p class='tour_header'>チュートリアル</p>`,
         text: `<p class='tour_discription'>チェックを外すと「レジ画面」の表示対象外となります。</p>`,

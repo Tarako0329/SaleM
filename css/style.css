@@ -323,3 +323,8 @@ a:active{
 	}
 	
 
+
+.custom-tooltip {
+	--bs-tooltip-bg: var(--bs-primary);
+	--bs-tooltip-font-size :16px;
+}

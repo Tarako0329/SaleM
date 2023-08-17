@@ -334,39 +334,12 @@ INPUT.su{
     }
 }
 
-
-
-/* 表示時の状態 */
-.fade-enter-from {
-    opacity: 0;
-  }
-  /* 表示時のアクティブ状態 */
-  .fade-enter-active {
-    transition: all 1.5s;
-  }
-  /* 表示時の終了状態 */
-  .fade-enter-to {
-    opacity: 1;
-  }
-  /* 非表示時の状態 */
-  .fade-leave-from {
-    opacity: 1;
-  }
-  /* 非表示時のアクティブ状態 */
-  .fade-leave-active {
-    transition: all .5s;
-  }
-  /* 非表示時の終了状態 */
-  .fade-leave-to {
-    opacity: 0;
-  }
-
-  .container {
+.container {
     animation: fadein 0.7s ease-out forwards;
     padding:0 5px;
-  }
+}
   
-  @keyframes fadein {
+@keyframes fadein {
     0% {opacity: 0}
     100% {opacity: 1}
-  }
+}
