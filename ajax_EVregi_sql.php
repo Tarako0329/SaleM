@@ -144,28 +144,30 @@ try{
 	$sqlstr_c .= " values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:UriageKin,:zeiKBN)";
 
 	foreach($ZeiKbnSummary as $row){
-		$stmt = $pdo_h->prepare($sqlstr_z);
+		if($row["SHOUHIZEI"]!=0){
+			$stmt = $pdo_h->prepare($sqlstr_z);
 
-		$params["ShouhinCD"] = "Z".substr("000000".$row["ZEIKBN"],-6);
-		$params["ShouhinNM"] = ($row["ZEIRITU"]<>0?$row["ZEIKBNMEI"]." 消費税額":$row["ZEIKBNMEI"]);
-		$params["zei"] = $row["SHOUHIZEI"];
-		$params["zeiKBN"] = $row["ZEIKBN"];
-		
-		$stmt->bindValue("uid",  $params["uid"], PDO::PARAM_INT);
-		$stmt->bindValue("UriageNO",  $params["UriageNO"], PDO::PARAM_INT);
-		$stmt->bindValue("UriDate",  $params["UriDate"], PDO::PARAM_STR);
-		$stmt->bindValue("insDatetime",  $params["insDatetime"], PDO::PARAM_STR);
-		$stmt->bindValue("Event",  $params["Event"], PDO::PARAM_INT);
-		$stmt->bindValue("TokuisakiNM",  $params["TokuisakiNM"], PDO::PARAM_STR);
-		$stmt->bindValue("ShouhinCD",  $params["ShouhinCD"], PDO::PARAM_STR);     //商品CD
-		$stmt->bindValue("ShouhinNM",  $params["ShouhinNM"], PDO::PARAM_STR);     //商品名
-		$stmt->bindValue("zei", $params["zei"], PDO::PARAM_INT);       						//消費税
-		$stmt->bindValue("zeiKBN", $params["zeiKBN"], PDO::PARAM_INT);            //税区分
-		
-		$sqllog .= rtn_sqllog($sqlstr_z,$params);
-		$stmt->execute();
-		$sqllog .= rtn_sqllog("--execute():正常終了",[]);
-		$ins_cnt++;
+			$params["ShouhinCD"] = "Z".substr("000000".$row["ZEIKBN"],-6);
+			$params["ShouhinNM"] = ($row["ZEIRITU"]<>0?$row["ZEIKBNMEI"]." 消費税額":$row["ZEIKBNMEI"]);
+			$params["zei"] = $row["SHOUHIZEI"];
+			$params["zeiKBN"] = $row["ZEIKBN"];
+			
+			$stmt->bindValue("uid",  $params["uid"], PDO::PARAM_INT);
+			$stmt->bindValue("UriageNO",  $params["UriageNO"], PDO::PARAM_INT);
+			$stmt->bindValue("UriDate",  $params["UriDate"], PDO::PARAM_STR);
+			$stmt->bindValue("insDatetime",  $params["insDatetime"], PDO::PARAM_STR);
+			$stmt->bindValue("Event",  $params["Event"], PDO::PARAM_INT);
+			$stmt->bindValue("TokuisakiNM",  $params["TokuisakiNM"], PDO::PARAM_STR);
+			$stmt->bindValue("ShouhinCD",  $params["ShouhinCD"], PDO::PARAM_STR);     //商品CD
+			$stmt->bindValue("ShouhinNM",  $params["ShouhinNM"], PDO::PARAM_STR);     //商品名
+			$stmt->bindValue("zei", $params["zei"], PDO::PARAM_INT);       						//消費税
+			$stmt->bindValue("zeiKBN", $params["zeiKBN"], PDO::PARAM_INT);            //税区分
+			
+			$sqllog .= rtn_sqllog($sqlstr_z,$params);
+			$stmt->execute();
+			$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+			$ins_cnt++;
+		}
 
 		if($row["CHOUSEIGAKU"]!=0){
 			$stmt = $pdo_h->prepare($sqlstr_c);

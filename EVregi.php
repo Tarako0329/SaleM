@@ -193,11 +193,13 @@
 						
 						<div class='order_list' ref='order_list_area'>
 							<template v-for='(list,index) in shouhinMS_Order' :key='list.shouhinCD'>
-							<div class='order_item'>{{list.shouhinNM}}</div>
-							<div style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;'>
-								<div class='order_su'>{{list.ordercounter}}点</div>
-								<div class='order_kin'>¥{{(list.ordercounter *  list.zeikomigaku).toLocaleString()}}</div>
-							</div>
+								<div class='container'>
+								<div class='order_item'>{{list.shouhinNM}}</div>
+								<div style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;'>
+									<div class='order_su'>{{list.ordercounter}}点</div>
+									<div class='order_kin'>¥{{(list.ordercounter *  list.zeikomigaku).toLocaleString()}}</div>
+								</div>
+								</div>
 							</template>	
 						</div>
 						
@@ -595,6 +597,7 @@
 				let auto_ajust_flg = false
 				const btn_changer = (args) => {
 					chk_register_show.value = args
+					
 					if(args==='register'){	//登録モード
 						pay_bk = pay.value
 						kaikei_zei_bk = kaikei_zei.value
@@ -661,6 +664,7 @@
 				}
 				const pm = ref('plus')
 				const ordercounter = (e) => {//注文増減ボタン
+					
 					//console_log(e.target.disabled,'lv3')
 					//console_log(shouhinMS_filter.value[e.target.value],'lv3')
 					if(chk_register_show.value==="register"){
@@ -719,6 +723,7 @@
 					}
 					
 					e.target.disabled = false	//ボタン連打対応：処理が終わったらボタンを有効に戻す
+					
 					nextTick (() => {
 						resize()
         	})
@@ -1079,7 +1084,7 @@
 				})
 				const order_list_area = ref()
 				const order_list_area_set = () => {
-					console.log('order_list_area_set start')
+					console_log('order_list_area_set start','lv3')
 					let size = window.innerHeight
 					console.log(size)
 					order_list_area.value.style=`height:${size-300}px`
@@ -1123,8 +1128,18 @@
 						return ''
 					}
 				})
-
-
+				/*
+				const order_item_fade_switch = ref(false)
+				const order_item_fade_switch_changer_on = () => {
+					console_log('order_item_fade_switch_changer_on start','lv3')
+					order_item_fade_switch.value = true
+				}
+				const order_item_fade_switch_changer = () => {
+					console_log('order_item_fade_switch_changer start','lv3')
+					order_item_fade_switch.value = false
+					setTimeout(order_item_fade_switch_changer_on, 100)
+				}
+				*/
 				onMounted(() => {
 					console_log('onMounted','lv3')
 					total_area.value.style["fontSize"]="3.3rem"
@@ -1184,6 +1199,8 @@
 					auto_ajust,
 					shouhinMS_Order,
 					order_list_area,
+					//order_item_fade_switch,
+					//order_item_fade_switch_changer,
 				}
 			}
 		}).mount('#register');
