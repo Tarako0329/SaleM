@@ -17,7 +17,6 @@ if($rtn !== true){
     redirect_to_login($rtn);
 }
 
-
 $rtn=check_session_userid($pdo_h);
 $token = csrf_create();
 
@@ -32,17 +31,12 @@ $token = csrf_create();
     <TITLE><?php echo $title;?></TITLE>
 </head>
 
-<script>
-  
-</script>
-
-<header class="header-color common_header">
-    <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div></a></div>
-</header>
-
-<body class='common_body'>
-    <div class="container-fluid">
-
+<body class=''>
+    <header class="header-color common_header">
+        <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div></a></div>
+    </header>
+    <main class="common_body">
+        <div class="container">
 <?php
     $array = [
          '売上金額ランキング'=>['analysis_uriagejisseki.php?sum_tani=4&csrf_token='.$token,'商品ごとの売上金額ランキングを表示。']
@@ -55,29 +49,35 @@ $token = csrf_create();
         ,'時間帯別売上実績'=>['analysis_uriagejisseki.php?sum_tani=10&csrf_token='.$token,'時間帯ごとに何がどれだけ売れているかを分析・グラフ化します。<br>グラフ化して見ることで商品の売れる勢いを確認出来ます。<br>例えば、開店と同時に売れる商品は人気商品なので多めに準備するといいでしょうし、地味に売れ続ける商品も根強い人気があると分析できます。']
         ,'時間帯別来客実績'=>['analysis_uriagejisseki.php?sum_tani=11&csrf_token='.$token,'１時間ごとの来客数を集計・グラフ化します。<br>グラフがグンと伸びたところが繁忙期。なだらかなとこは凪となります。']
         ,'期間毎売上集計'=>['analysis_uriagejisseki.php?sum_tani=2&csrf_token='.$token,'日ごと、月毎、年間の売上金額を確認<br>イベント名を指定することで過去の売上傾向を確認出来ます。']
-        ,'ABC分析'=>['analysis_abc.php?sum_tani=2&csrf_token='.$token,'売上の8割は2割の製品で構成されている。という統計学的な話があります。<br>売上げの7割を支える商品群をAグループ、2割を支える商品群をBグループ、残り1割をCグループに分類してます。<br>Aグループは人気商品。Cグループはあまり売上げに貢献していない商品と位置づけられます。<br>取扱商品の検討材料等に利用できます。']
+        ,'ABC分析'=>['analysis_abc.php?sum_tani=2&csrf_token='.$token,'売上げの7割を支える商品群をAグループ、2割を支える商品群をBグループ、残り1割をCグループに分類してます。<br>Aグループは人気商品。Cグループはあまり売上げに貢献していない商品と位置づけられます。<br>取扱商品の検討材料等に利用できます。']
         //,'バスケット分析'=>['xxxx.php?mode=1&csrf_token='.$token]
     ];
-
-
+//<i class="fa-regular fa-circle-question fa-lg logoff-color"></i>
+    echo "<div class='row' >";
 	foreach(array_merge($array) as $key=>$vals){
-        echo "<div class='row' style='margin-top:20px;'>";
-        echo "  <div class ='col-md-3 col-sm-6 col-6' >\n";
-        echo "      <a href='".$vals[0]."' class='btn--topmenu btn-view' style='font-size:1.5rem;width:170px;'>".$key."\n";
+        
+        echo "  <div class ='col-md-4 col-sm-6 col-6 mb-3' >\n";
+        echo "      <a href='".$vals[0]."' class='btn--topmenu btn-view' style='font-size:1.5rem;width:85%;height:80px;padding:20px 10px;'>".$key."\n";
         echo "      </a>\n";
+        echo "      <i class='fa-regular fa-circle-question fa-2x' data-bs-placement='top' data-bs-trigger='click' data-bs-custom-class='custom-tooltip' data-bs-toggle='tooltip' data-bs-html='true' title='".$vals[1]."'></i>";
         echo "  </div>\n";
-        echo "</div>";
-        echo "<div class='row'>";
-        echo "  <div class ='col-12'  style='paddin-left:10px' >\n";
-        echo "<div>".$vals[1]."</div>";
-        echo "  </div>\n";
-        echo "</div>";
+        //echo "</div>";
+        //echo "<div class='row'>";
+        //echo "  <div class ='col-12'  style='paddin-left:10px' >\n";
+        //echo "<div>".$vals[1]."</div>";
+        //echo "  </div>\n";
+        
 	}
+    echo "</div>";
     
 	
 ?> 
-              
-    </div>
+        </div>
+    </main>
+    <script>
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    </script>
 </body>
 
 </html>

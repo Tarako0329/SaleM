@@ -65,7 +65,6 @@ log_writer2("test",$SLVresult,"lv3");
     ?>
     <!--ページ専用CSS-->
     <link rel="stylesheet" href="css/style_analysis.css?<?php echo $time; ?>" >
-    <!--<script src='script/jquery-3.6.0.min.js'></script>-->
 
     <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js' integrity='sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==' crossorigin='anonymous' referrerpolicy='no-referrer'></script>    
     
@@ -76,7 +75,7 @@ log_writer2("test",$SLVresult,"lv3");
     <header class='header-color common_header' style='flex-wrap:wrap;height:50px'>
         <div class='title' style='width: 100%;'><a :href='url'><?php echo $title;?></a></div>
     </header>
-    <main class='common_body' style='padding-top:55px'>
+    <main class='common_body' style='padding-top:55px;width:100%;'>
         <div class='container-fluid'>
         <div class='row'>
         <div class='col-md-3' style='padding:5px;background:white'>
@@ -129,10 +128,10 @@ log_writer2("test",$SLVresult,"lv3");
                 </select>
             </form>
         </div>
-        <div class='col-md-6'>
-            <canvas id='ChartCanvas' width='95%' height='100%-55px' ></canvas>
+        <div class='col-md-9'>
+            <div style='width:95%; height:100%'> <canvas id='ChartCanvas'></canvas></div>
         </div>
-        <div class='col-md-3' style='padding:5px'>
+        <div class='col-md-12' style='padding:5px'>
             <table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
                 <thead>
 					<tr>

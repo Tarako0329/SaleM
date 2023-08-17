@@ -30,7 +30,9 @@
     border-bottom:none;
     border-color:var(--rez-border-color);
 }
-
+.common_body {
+    padding-top:100px;
+}
 
 @media (display-mode: standalone){
     .common_footer{

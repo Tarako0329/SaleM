@@ -53,7 +53,8 @@ ver2.99.0-049:to[bs5&Vue3CompApi]bs4駆逐中-commited
 ver2.99.0-050:to[bs5&Vue3CompApi]bs4駆逐中-commited
 ver2.99.0-051:to[bs5&Vue3CompApi]bs4駆逐完了-commited
 ver2.99.0-052:レジ画面のタブレット対応-commited
-ver2.99.0-053:商品登録画面のレイアウト手法変更
+ver2.99.0-053:商品登録画面のレイアウト手法変更-commited
+ver2.99.0-054:分析画面のレイアウト調整
 
 
 ローカルからテスト環境へ
