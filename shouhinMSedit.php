@@ -40,100 +40,139 @@ $_SESSION["MSG"]=null;
     <header class="header-color common_header" style="flex-wrap:wrap">
         <div class="title" style="width: 100%;"><a href="menu.php" class='item_15'><?php echo secho($title);?></a></div>
         <p style="font-size:1rem;color:var(--user-disp-color);font-weight:400;">  取扱商品登録画面</p>
+        <a href="#" style='color:inherit;position:fixed;top:75px;right:5px;' onclick='help()'><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>
     </header>
-    <div class="container-fluid" style="padding-top:5px;">
-    <?php if(empty($_SESSION["tour"])){?>        
-    <a href="#" style='color:inherit;position:fixed;top:75px;right:5px;' onclick='help()'><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>
-    <?php }?>
-    <?php
-        if(!empty($success_msg)){
-            echo "<div class='alert alert-success' role='alert' style='width:80%;'>".$success_msg."</div>";
-        }
-    ?>
     <form method="post" id="form1" class="form" action="shouhinMSedit_sql.php">
-        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
-        <table>
-            <div >
-            <tr class='item_1'><td>商品名</td><td><input type="text" class="form-control" style="width:95%" id="shouhinNM" name="shouhinNM" required="required" placeholder="必須"></td></tr>
-            <tr class='item_2'><td>商品単価</td><td><input type="number" onchange="zei_math()" class="form-control" style="width:95%" id="new_tanka" required="required" placeholder="必須"></td></tr>
+        <main class="container" style="padding-top:5px;padding-bottom:100px;">
+            <?php
+                if(!empty($success_msg)){
+                    echo "<div class='alert alert-success' role='alert' style='width:80%;'>".$success_msg."</div>";
+                }
+            ?>
+        
+            
+            <div class='row mb-3 item_1' data-bs-toggle="tooltip" data-bs-title="１度登録すると商品名は変更できません。">
+                <label for="shouhinNM" class="col-3 col-sm-2 col-form-label">商品名</label>
+                <div class="col-8" >
+                    <input type="text" class="form-control form-control-lg" id="shouhinNM" name="shouhinNM" required="required" placeholder="必須">
+                </div>
             </div>
-            <tr class='item_3'>
-                <td></td>
-                <td>
+            <div class='row mb-3 item_2'>
+                <label for="new_tanka" class="col-3 col-sm-2 col-form-label">商品単価</label>
+                <div class="col-8">
+                    <input type="number" onchange="zei_math()" class="form-control form-control-lg" id="new_tanka" required="required" placeholder="必須">
+                </div>
+            </div>
+            <div class='row mb-3 item_3'>
+                <div class='col-2'></div>
+                <div class="col-8">
                     <input type="radio" class='btn-check' onchange="zei_math()" name="options" id="option1" value="zeikomi" autocomplete="off" checked>
                     <label class="btn btn-outline-primary" style="font-size:1.2rem;border-radius:0;margin-right:0;" for='option1'>税込</label>
                     <input type="radio" class='btn-check' onchange="zei_math()" name="options" id="option2" value="zeinuki" autocomplete="off">
                     <label class="btn btn-outline-primary" style="font-size:1.2rem;border-radius:0;margin-left:-4px;" for='option2'>税抜</label>
-                </td>
-            </tr>
-            <tr class='item_4'><td>税区分</td>
-                <td>
-                    <select class="form-control" onchange="zei_math()" style="width:80%;padding-top:0;" id="zeikbn" name="zeikbn" required="required" placeholder="必須" >
-                    <option value=""></option>
+                </div>
+            </div>
+            <div class='row mb-3 item_4'>
+                <label for="zeikbn" class="col-3 col-sm-2 col-form-label">税区分</label>
+                <div class="col-8">
+                    <select class="form-select form-select-lg" aria-label=".form-select-lg example" onchange="zei_math()" style="padding-top:0;" id="zeikbn" name="zeikbn" required="required">
+                    <option value="">税率選択</option>
                     <?php
                     foreach($stmt as $row){
                         echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
                     }
-                    ?>
+                    ?> 
                     </select>
-                </td>
-            </tr>
-            <tr><td>税抜単価</td><td><input type="number" readonly='readonly' class="form-control" style="width:95%" id="tanka" name="tanka" ></td></tr>
-            <tr><td>消費税</td><td><input type="number" readonly='readonly' class="form-control" style="width:95%" id="shouhizei" name="shouhizei" ></td></tr>
-            <tr><td>税込単価</td>
-                <td>
-                    <input type="number" readonly='readonly' class="form-control" style="width:95%;border:none;" id="zkomitanka" aria-describedby="zkomitankaHelp">
-                    <small id="zkomitankaHelp" class="form-text text-muted">レジ画面に表示される金額は税込価格です。</small>
-                </td>
-            </tr>
-            <tr class='item_5' style='height:0px'></tr>
-            <tr class='item_6'>
-                <td>原価単価</td>
-                <td>
-                    <input type="number" class="form-control" style="width:95%" id="genka" name="genka" aria-describedby="genka">
+                </div>
+            </div>
+            <div class='item_5'>
+                <div class='row mb-3'>
+                    <label for="tanka" class="col-3 col-sm-2 col-form-label">税抜単価</label>
+                    <div class="col-8">
+                        <input type="number" readonly='readonly' class="form-control form-control-lg" id="tanka" name="tanka" >
+                    </div>
+                </div>
+                <div class='row mb-3'>
+                    <label for="shouhizei" class="col-3 col-sm-2 col-form-label">消費税</label>
+                    <div class="col-8">
+                        <input type="number" readonly='readonly' class="form-control form-control-lg" id="shouhizei" name="shouhizei" >
+                    </div>
+                </div>                
+                <div class='row mb-3'>
+                    <label for="zkomitanka" class="col-3 col-sm-2 col-form-label">税込単価</label>
+                    <div class="col-8">
+                        <input type="number" readonly='readonly' class="form-control form-control-lg" style="border:none;" id="zkomitanka" aria-describedby="zkomitankaHelp">
+                        <small id="zkomitankaHelp" class="form-text text-muted">レジ画面に表示される金額は税込価格です。</small>
+                    </div>
+                </div>
+            </div>
+            <div class='row mb-3 item_6'>
+                <label for="genka" class="col-3 col-sm-2 col-form-label">原価単価</label>
+                <div class="col-8">
+                    <input type="number" class="form-control form-control-lg" id="genka" name="genka" aria-describedby="genka">
                     <small id="genka" class="form-text text-muted">おおよその原材料費</small>
-                </td>
-            </tr>
-            <tr class='item_7'><td>内容量</td><td><input type="number" class="form-control" style="width:95%" id="utisu" name="utisu" placeholder="個数・グラム等"></td></tr>
-            <tr class='item_8'><td>単位</td><td><input type="text" class="form-control" style="width:95%" id="tani" name="tani" placeholder="内容量の単位（g,個）等"></td></tr>
-            <tr>
-                <td colspan='2'>
+                </div>
+            </div>
+            <div class='row mb-3 item_7'>
+                <label for="utisu" class="col-3 col-sm-2 col-form-label">内容量</label>
+                <div class="col-8">
+                    <input type="number" class="form-control form-control-lg" id="utisu" name="utisu" placeholder="個数・グラム等">
+                </div>
+            </div>
+            <div class='row mb-3 item_8'>
+                <label for="tani" class="col-3 col-sm-2 col-form-label">単位</label>
+                <div class="col-8">
+                    <input type="text" class="form-control form-control-lg" id="tani" name="tani" placeholder="内容量の単位（g,個）等">
+                </div>
+            </div>
+            <div class='row mb-3'>
                 <hr aria-describedby="setumei">
                 <small id="setumei" class="form-text text-muted">カテゴリー別画面でまとめて登録可能です</small>
-                </td>
-            </tr>
-            <tr class='item_9'><td>大カテゴリー</td><td><input type="text" class="form-control" style="width:95%" id="bunrui1" name="bunrui1" placeholder="例：物販"></td></tr>
-            <tr class='item_10'><td>中カテゴリー</td><td><input type="text" class="form-control" style="width:95%" id="bunrui2" name="bunrui2" placeholder="例：食品"></td></tr>
-            <tr class='item_11'><td>小カテゴリー</td><td><input type="text" class="form-control" style="width:95%" id="bunrui3" name="bunrui3" placeholder="例：惣菜"></td></tr>
-            <tr class='item_12'><td>レジ対象</td><td><label for="hyoujiKBN1" style="float:left;width:8rem;">
-                     <input type="checkbox" style="vertical-align:middle;" id="hyoujiKBN1" name="hyoujiKBN1" checked="checked">表示する
-                </label></td></tr>
-        </table>
-        <input type="hidden" class="form-control" style="width:50%" id="hyoujiNO" name="hyoujiNO" placeholder="レジ表示順。未指定の場合は「カテゴリー大>中>小>商品名」の五十音順" value=0>
-        <input type="hidden" class="form-control" id="hyoujiKBN2" name="hyoujiKBN2" value="">
-        <input type="hidden" class="form-control" id="hyoujiKBN3" name="hyoujiKBN3" value="">
-        <!--用途が未定なので非表示
-        <div class="form-group form-inline">
-            <label for="hyoujiKBN2" class="col-2 col-md-1 control-label">表示区分2</label>
-            <div class=" col-10">
-                <input type="text" class="form-control" id="hyoujiKBN2" name="hyoujiKBN2">
             </div>
-        </div>
-        <div class="form-group form-inline">
-            <label for="hyoujiKBN3" class="col-2 col-md-1 control-label">表示区分3</label>
-            <div class=" col-10">
-                <input type="text" class="form-control" id="hyoujiKBN3" name="hyoujiKBN3">
+            <div class='item_9'>
+                <div class='row mb-3'>
+                    <label for="bunrui1" class="col-3 col-sm-2 col-form-label">大カテゴリー</label>
+                    <div class="col-8">
+                        <input type="text" class="form-control form-control-lg" id="bunrui1" name="bunrui1" placeholder="例：物販">
+                    </div>
+                </div>
+                <div class='row mb-3'>
+                    <label for="bunrui2" class="col-3 col-sm-2 col-form-label">中カテゴリー</label>
+                    <div class="col-8">
+                        <input type="text" class="form-control form-control-lg" id="bunrui2" name="bunrui2" placeholder="例：食品">
+                    </div>
+                </div>
+                <div class='row mb-3'>
+                    <label for="bunrui3" class="col-3 col-sm-2 col-form-label">小カテゴリー</label>
+                    <div class="col-8">
+                        <input type="text" class="form-control form-control-lg" id="bunrui3" name="bunrui3" placeholder="例：惣菜">
+                    </div>
+                </div>
             </div>
-        </div>
-        -->
+            <div class='row mb-3 item_12'>
+                <label for="hyoujiKBN1" class="col-3 col-sm-2 col-form-label">レジ表示</label>
+                <div class="col-8">
+                    <input type="checkbox" class='form-check-input' id="hyoujiKBN1" name="hyoujiKBN1" checked="checked">
+                </div>
+                
+            </div>
+
+
+            <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+            <input type="hidden" style="width:50%" id="hyoujiNO" name="hyoujiNO" placeholder="レジ表示順。未指定の場合は「カテゴリー大>中>小>商品名」の五十音順" value=0>
+            <input type="hidden" id="hyoujiKBN2" name="hyoujiKBN2" value="">
+            <input type="hidden" id="hyoujiKBN3" name="hyoujiKBN3" value="">
+        </main>
         <footer class='common_footer'>
             <button type='submit' class='btn--chk item_13' style='border-radius:0;' name='btn' value="登録" >登　録</button>
         </footer>
         
     </form>
-    </div>
+    
 
     <script>
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
         var select = document.getElementById('zeikbn');
         var tanka = document.getElementById('tanka');
         var new_tanka = document.getElementById('new_tanka');

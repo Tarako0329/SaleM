@@ -640,30 +640,30 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
 </script>
 <!--pwa対応部(メニューのURL_GETをPOSTに変更)-->
 <script>
-function postFormRG(url,mode,token) {
- 
-    var form = document.createElement('form');
-    var request_mode = document.createElement('input');
-    var request_token = document.createElement('input');
- 
-    form.method = 'POST';
-    form.action = url;
- 
-    request_mode.type = 'hidden'; //入力フォームが表示されないように
-    request_mode.name = 'mode';
-    request_mode.value = mode;
-
-    request_token.type = 'hidden'; //入力フォームが表示されないように
-    request_token.name = 'csrf_token';
-    request_token.value = token;
- 
-    form.appendChild(request_mode);
-    form.appendChild(request_token);
-    document.body.appendChild(form);
- 
-    form.submit();
- 
-}    
+    function postFormRG(url,mode,token) {
+    
+        var form = document.createElement('form');
+        var request_mode = document.createElement('input');
+        var request_token = document.createElement('input');
+    
+        form.method = 'POST';
+        form.action = url;
+    
+        request_mode.type = 'hidden'; //入力フォームが表示されないように
+        request_mode.name = 'mode';
+        request_mode.value = mode;
+    
+        request_token.type = 'hidden'; //入力フォームが表示されないように
+        request_token.name = 'csrf_token';
+        request_token.value = token;
+    
+        form.appendChild(request_mode);
+        form.appendChild(request_token);
+        document.body.appendChild(form);
+    
+        form.submit();
+    
+    }    
 </script>
 </html>
 <?php
