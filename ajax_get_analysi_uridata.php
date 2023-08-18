@@ -52,24 +52,28 @@ if($rtn !== true){
 
         //SQL文作成
         if($analysis_type==1){//日ごと
-            $sqlstr = "select UriDate as Labels ,sum(UriageKin) as datasets,sum(zei) as 税,sum(UriageKin+zei) as datasets_withTax from UriageData ";
+            //$sqlstr = "select UriDate as Labels ,sum(UriageKin) as datasets,sum(zei) as 税,sum(UriageKin+zei) as datasets_withTax from UriageData ";
+            $sqlstr = "select UriDate as Labels ,sum(UriageKin) as datasets from UriageData ";
             $gp_sqlstr = "group by UriDate order by UriDate";
-            $aryColumn = ["計上日","税抜売上","消費税","税込売上"];
+            $aryColumn = ["計上日","売上(税抜)"];
             $chart_type="bar";
         }elseif($analysis_type==2){//月毎
-            $sqlstr = "select DATE_FORMAT(UriDate, '%Y/%m') as Labels ,sum(UriageKin) as datasets,sum(zei) as 税,sum(UriageKin+zei) as datasets_withTax from UriageData ";
+            //$sqlstr = "select DATE_FORMAT(UriDate, '%Y/%m') as Labels ,sum(UriageKin) as datasets,sum(zei) as 税,sum(UriageKin+zei) as datasets_withTax from UriageData ";
+            $sqlstr = "select DATE_FORMAT(UriDate, '%Y/%m') as Labels ,sum(UriageKin) as datasets from UriageData ";
             $gp_sqlstr = "group by DATE_FORMAT(UriDate, '%Y%m') order by DATE_FORMAT(UriDate, '%Y%m')";
-            $aryColumn = ["計上年月","税抜売上","消費税","税込売上"];
+            $aryColumn = ["計上年月","売上(税抜)"];
             $chart_type="bar";
         }elseif($analysis_type==3){//年ごと
-            $sqlstr = "select DATE_FORMAT(UriDate, '%Y') as Labels ,sum(UriageKin) as datasets,sum(zei) as 税,sum(UriageKin+zei) as datasets_withTax from UriageData ";
+            //$sqlstr = "select DATE_FORMAT(UriDate, '%Y') as Labels ,sum(UriageKin) as datasets,sum(zei) as 税,sum(UriageKin+zei) as datasets_withTax from UriageData ";
+            $sqlstr = "select DATE_FORMAT(UriDate, '%Y') as Labels ,sum(UriageKin) as datasets from UriageData ";
             $gp_sqlstr = "group by DATE_FORMAT(UriDate, '%Y') order by DATE_FORMAT(UriDate, '%Y')";
-            $aryColumn = ["計上年度","税抜売上","消費税","税込売上"];
+            $aryColumn = ["計上年度","売上(税抜)"];
             $chart_type="bar";
         }elseif($analysis_type==4){//製品名ごと売上金額ランキング
-            $sqlstr = "select ShouhinNM as Labels ,sum(UriageKin) as datasets,sum(zei) as 税,sum(UriageKin+zei) as datasets_withTax from UriageData ";
+            //$sqlstr = "select ShouhinNM as Labels ,sum(UriageKin) as datasets,sum(zei) as 税,sum(UriageKin+zei) as datasets_withTax from UriageData ";
+            $sqlstr = "select ShouhinNM as Labels ,sum(UriageKin) as datasets from UriageData ";
             $gp_sqlstr = "group by ShouhinNM order by sum(UriageKin) desc";
-            $aryColumn = ["商品名","税抜売上","消費税","税込売上"];
+            $aryColumn = ["商品名","売上(税抜)"];
             $chart_type="bar";
             $top15="on";
         }elseif($analysis_type==5){//製品名ごと売上数量ランキング
@@ -131,10 +135,11 @@ if($rtn !== true){
                 $category="%";
             }elseif($category_lv==="1"){
                 $sql_category = "concat(if(bunrui1<>'',bunrui1,'未分類'),'>',if(bunrui2<>'',bunrui2,'未分類'))";
-                
+                $category = $_POST["over_category"]."%";
             }elseif($category_lv==="2"){
                 $sql_category = "concat(if(bunrui1<>'',bunrui1,'未分類'),'>',if(bunrui2<>'',bunrui2,'未分類'),'>',if(bunrui3<>'',bunrui3,'未分類'))";
-                $category_lv=-1;
+                $category = $_POST["over_category"]."%";
+                //$category_lv=-1;
             }else{
                 $sql_category = "";
                 $sql_category_where="";

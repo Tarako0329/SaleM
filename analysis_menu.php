@@ -32,8 +32,11 @@ $token = csrf_create();
 </head>
 
 <body class=''>
-    <header class="header-color common_header">
-        <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div></a></div>
+    <header class="header-color common_header" style='display:block'>
+        <div class="yagou title">
+            <a href="menu.php"><?php echo $title;?></a>
+        </div>
+        <div style='color:var(--user-disp-color);font-weight:400;'>データ分析メニュー</div>
     </header>
     <main class="common_body">
         <div class="container">
@@ -41,7 +44,7 @@ $token = csrf_create();
     $array = [
          '売上金額ランキング'=>['analysis_uriagejisseki.php?sum_tani=4&csrf_token='.$token,'商品ごとの売上金額ランキングを表示。']
         ,'売上個数ランキング'=>['analysis_uriagejisseki.php?sum_tani=5&csrf_token='.$token,'商品ごとの売上個数ランキングを表示。']
-        ,'売上カテゴリー別集計'=>['analysis_uriagejisseki.php?sum_tani=12&csrf_token='.$token,'カテゴリーごとの売上を集計し、円グラフで表示。']
+        ,'ジャンル別売上集計'=>['analysis_uriagejisseki.php?sum_tani=12&csrf_token='.$token,'ジャンルごとの売上を集計し、円グラフで表示。']
         ,'客単価実績'=>['analysis_uriagejisseki.php?sum_tani=6&csrf_token='.$token,'日ごとの平均客単価を表示します。']
         ,'平均客単価ランキング'=>['analysis_uriagejisseki.php?sum_tani=7&csrf_token='.$token,'イベントごとの平均客単価を算出し、ランキングを表示。']
         ,'来客数実績'=>['analysis_uriagejisseki.php?sum_tani=8&csrf_token='.$token,'日ごとの来客数（会計数）を表示。']
@@ -56,8 +59,8 @@ $token = csrf_create();
     echo "<div class='row' >";
 	foreach(array_merge($array) as $key=>$vals){
         
-        echo "  <div class ='col-md-4 col-sm-6 col-6 mb-3' >\n";
-        echo "      <a href='".$vals[0]."' class='btn--topmenu btn-view' style='font-size:1.5rem;width:85%;height:80px;padding:20px 10px;'>".$key."\n";
+        echo "  <div class ='col-md-4 col-sm-6 col-12 mb-3' >\n";
+        echo "      <a href='".$vals[0]."' class='btn--topmenu btn-view' style='font-size:1.5rem;width:80%;height:50px;padding:12px 10px;'>".$key."\n";
         echo "      </a>\n";
         echo "      <i class='fa-regular fa-circle-question fa-2x' data-bs-placement='top' data-bs-trigger='click' data-bs-custom-class='custom-tooltip' data-bs-toggle='tooltip' data-bs-html='true' title='".$vals[1]."'></i>";
         echo "  </div>\n";

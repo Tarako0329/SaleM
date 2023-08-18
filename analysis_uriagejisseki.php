@@ -78,61 +78,78 @@ log_writer2("test",$SLVresult,"lv3");
     <main class='common_body' style='padding-top:55px;width:100%;'>
         <div class='container-fluid'>
         <div class='row'>
-        <div class='col-md-3' style='padding:5px;background:white'>
-                    
-            <form id='form1' class='form' method='post' action='analysis_uriagejisseki.php' style='font-size:1.5rem'>
-                <input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
-                <div>
-                    集計期間:    
-                    <input type='radio' class='btn-check' name='options' autocomplete='off' id='ym' checked>
-                    <label @click='change_mode_ym()' class='btn btn-outline-primary' for='ym' style='font-size:1.2rem;height:25px;border-radius:0'>年月</label>
-                    <input type='radio' class='btn-check' name='options' autocomplete='off' id='ymd'> 
-                    <label @click='change_mode_ymd()' class='btn btn-outline-primary' for='ymd' style='font-size:1.2rem;height:25px;border-radius:0'>年月日</label>
+        <div class='col-md-12' style='padding:5px;background:white'>
+            <input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
+            <div class='container-fluid'>
+                <div class='row'>
+                    <div class='col-3' style='padding-top:3px;'>集計期間:</div>
+                    <div class='col-9'>
+                    <div class='input-group' id='YM'>
+                        <input type='radio' class='btn-check' name='options' autocomplete='off' id='ym' checked>
+                        <label @click='change_mode_ym()' class='btn btn-outline-primary' for='ym' style='font-size:1.2rem;height:25px;border-radius:0;padding-top:2px;'>年月</label>
+                        <input type='radio' class='btn-check' name='options' autocomplete='off' id='ymd'> 
+                        <label @click='change_mode_ymd()' class='btn btn-outline-primary' for='ymd' style='font-size:1.2rem;height:25px;border-radius:0;padding-top:2px;'>年月日</label>
+                    </div>
+                    </div>
                 </div>
-                <div v-if='serch_ym===true' style='display:flex'>
-                    <select v-model='date_from' name='date_from' class='form-select form-select-lg' style='width:11rem;margin:5px;' >
-                    <template v-for='(list,index) in ym_list' :key='list.Value'>
-                        <option :value='list.fromValue'>{{list.display}}</option>
-                    </template>
-                    </select>
-                    <label for='ymto1'>から</label>
-                    <select v-model='date_to' name='date_to' class='form-select form-select-lg' style='width:11rem;margin:5px;' >
-                    <template v-for='(list,index) in ym_list' :key='list.Value'>
-                        <option :value='list.toValue'>{{list.display}}</option>
-                    </template>
-                    </select>
+                <div v-if='serch_ym===true' class='row'>
+                    <div class='col-5'>
+                        <select v-model='date_from' name='date_from' class='form-select form-select-lg' style='margin:5px;' >
+                        <template v-for='(list,index) in ym_list' :key='list.Value'>
+                            <option :value='list.fromValue'>{{list.display}}</option>
+                        </template>
+                        </select>
+                    </div>
+                    <div class='col-2 text-center ' style='padding-top:8px;'>から</div>
+                    <div class='col-5'>
+                        <select v-model='date_to' name='date_to' class='form-select form-select-lg' style='margin:5px;' >
+                        <template v-for='(list,index) in ym_list' :key='list.Value'>
+                            <option :value='list.toValue'>{{list.display}}</option>
+                        </template>
+                        </select>
+                    </div>
                 </div>
-                <div v-if='serch_ym===false' style='display:flex'>
-                    <input v-model='date_from' type='date' class='form-control' style='width:11rem;margin:5px;' name='date_from'>
-                    から
-                    <input v-model='date_to' type='date' class='form-control'  style='width:11rem;margin:5px;' name='date_to'>
+                <div v-if='serch_ym===false' class='row'>
+                    <div class='col-5'>
+                        <input v-model='date_from' type='date' class='form-control' style='margin:5px;' name='date_from'>
+                    </div>
+                    <div class='col-2 text-center' style='padding-top:8px;'>から</div>
+                    <div class='col-5'>
+                        <input v-model='date_to' type='date' class='form-control'  style='margin:5px;' name='date_to'>
+                    </div>
                 </div>
-                <select v-model='analysis_type' name='sum_tani' class='form-select form-select-lg' style='width:auto;max-width:100%;display:inline-block;margin:5px' ><!--集計単位-->
-                    <option value='1' >売上実績(日計)</option>
-                    <option value='2' >売上実績(月計)</option>
-                    <option value='3' >売上実績(年計)</option>
-                    <option value='12'>ジャンル別売上比</option>
-                    <option value='4' >売上ランキング(金額)</option>
-                    <option value='5' >売上ランキング(個数)</option>
-                    <option value='6' >客単価実績(イベントごと)</option>
-                    <option value='7' >平均客単価ランキング</option>
-                    <option value='8' >来客数実績(イベントごと)</option>
-                    <option value='9' >平均来客数ランキング</option>
-                    <option value='10'>売れる勢い</option>
-                    <option value='11'>来客数推移</option>
-                </select>
-                <select v-model='ev_selected' name='list' class='form-select form-select-lg' style='width:auto;max-width:100%;display:inline-block;margin:5px'>
-                    <option value='0'>イベントで絞る</option>
-                    <template v-for='(list,index) in ev_list' :key='list.LIST'>
-                        <option :value='list.CODE'>{{list.LIST}}</option>
-                    </template>
-                </select>
-            </form>
+                <div class='row'>
+                    <div class='col-6'>
+                        <select v-model='analysis_type' name='sum_tani' class='form-select form-select-lg' style='margin:5px' ><!--集計単位-->
+                            <option value='1' >売上実績(日計)</option>
+                            <option value='2' >売上実績(月計)</option>
+                            <option value='3' >売上実績(年計)</option>
+                            <option value='12'>ジャンル別売上比</option>
+                            <option value='4' >売上ランキング(金額)</option>
+                            <option value='5' >売上ランキング(個数)</option>
+                            <option value='6' >客単価実績(イベントごと)</option>
+                            <option value='7' >平均客単価ランキング</option>
+                            <option value='8' >来客数実績(イベントごと)</option>
+                            <option value='9' >平均来客数ランキング</option>
+                            <option value='10'>売れる勢い</option>
+                            <option value='11'>来客数推移</option>
+                        </select>
+                    </div>
+                    <div class='col-6'>
+                        <select v-model='ev_selected' name='list' class='form-select form-select-lg' style='margin:5px'>
+                            <option value=''>イベントで絞る</option>
+                            <template v-for='(list,index) in ev_list' :key='list.LIST'>
+                                <option :value='list.CODE'>{{list.LIST}}</option>
+                            </template>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class='col-md-9'>
             <div style='width:95%; height:100%'> <canvas id='ChartCanvas'></canvas></div>
         </div>
-        <div class='col-md-12' style='padding:5px'>
+        <div class='col-md-3' style='padding:5px'>
             <table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
                 <thead>
 					<tr>
@@ -184,6 +201,8 @@ log_writer2("test",$SLVresult,"lv3");
 			setup(){
                 //chart_type(bar or doughnut)
                 const analysis_type = ref(<?php echo $analysis_type; ?>)
+                var category_lv = 0 //商品分類ごとの売上円グラフで使用。0：大分類　1：中分類　2：小分類
+                var over_category   //商品分類ごとの売上円グラフで使用。クリックした分類の下分類の円グラフを表示する際に使用
                 var myChart
                 const drow_chart = (chart_type) => {
                     console_log('drow_chart start','lv3')
@@ -221,8 +240,17 @@ log_writer2("test",$SLVresult,"lv3");
                             onClick: function (e, el,chart) {
                                     //円グラフタップ時の子分類データ取得処理を記述
                                     if (! el || el.length === 0) return;
-                                    console.log('onClick : label ' + el[0]._model);
+                                    console.log('onClick : label ' + chart.data.labels[el[0].index]);
+                                    console.log('onClick : category_lv ' + category_lv);
+                                    console.log('onClick : label ' + e);
                                     //send2(chart.data.labels[el[0].index],<?php //echo ($category_lv+1); ?>);
+                                    if(category_lv>=2){
+                                        category_lv = 0
+                                    }else{
+                                        category_lv += 1
+                                    }
+                                    over_category = chart.data.labels[el[0].index]
+                                    get_analysis_data()
                                 }
                         }
                     }else if(chart_type==='line'){
@@ -252,7 +280,7 @@ log_writer2("test",$SLVresult,"lv3");
                     serch_ym.value = true
                 }
                 const ev_list = ref([])
-                const ev_selected = ref('0')
+                const ev_selected = ref('')
                 const date_from = ref('<?php echo date("Y")."-01-01"; ?>')
                 const date_to = ref('<?php echo date("Y")."-12-31"; ?>')
 
@@ -287,6 +315,7 @@ log_writer2("test",$SLVresult,"lv3");
 				const get_analysis_data = () => {//売上分析データ取得ajax
 					console_log("get_analysis_data start",'lv3')
 					let params = new URLSearchParams()
+                    if(analysis_type.value!==12){category_lv=0}
 					params.append('user_id', '<?php echo $_SESSION["user_id"];?>')
 					params.append('date_from', date_from.value)
 					params.append('date_to', date_to.value)
@@ -294,6 +323,8 @@ log_writer2("test",$SLVresult,"lv3");
 					params.append('event', ev_selected.value)
 					params.append('tokui', ev_selected.value)
 					params.append('csrf_token', CSRF.value)
+                    params.append('category_lv', category_lv)
+                    params.append('over_category', over_category)
 
 					axios
 					.post('ajax_get_analysi_uridata.php',params)
