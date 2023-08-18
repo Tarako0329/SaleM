@@ -85,29 +85,29 @@ log_writer2("test",$SLVresult,"lv3");
                 <div>
                     集計期間:    
                     <input type='radio' class='btn-check' name='options' autocomplete='off' id='ym' checked>
-                    <label @click='change_mode_ym()' class='btn btn-outline-primary' for='ym' style='font-size:1.2rem;height:25px;'>年月</label>
+                    <label @click='change_mode_ym()' class='btn btn-outline-primary' for='ym' style='font-size:1.2rem;height:25px;border-radius:0'>年月</label>
                     <input type='radio' class='btn-check' name='options' autocomplete='off' id='ymd'> 
-                    <label @click='change_mode_ymd()' class='btn btn-outline-primary' for='ymd' style='font-size:1.2rem;height:25px;'>年月日</label>
+                    <label @click='change_mode_ymd()' class='btn btn-outline-primary' for='ymd' style='font-size:1.2rem;height:25px;border-radius:0'>年月日</label>
                 </div>
                 <div v-if='serch_ym===true' style='display:flex'>
-                    <select v-model='date_from' name='date_from' class='form-select form-select-lg' style='padding:0;width:11rem;margin:5px;' >
+                    <select v-model='date_from' name='date_from' class='form-select form-select-lg' style='width:11rem;margin:5px;' >
                     <template v-for='(list,index) in ym_list' :key='list.Value'>
                         <option :value='list.fromValue'>{{list.display}}</option>
                     </template>
                     </select>
                     <label for='ymto1'>から</label>
-                    <select v-model='date_to' name='date_to' class='form-select form-select-lg' style='padding:0;width:11rem;margin:5px;' >
+                    <select v-model='date_to' name='date_to' class='form-select form-select-lg' style='width:11rem;margin:5px;' >
                     <template v-for='(list,index) in ym_list' :key='list.Value'>
                         <option :value='list.toValue'>{{list.display}}</option>
                     </template>
                     </select>
                 </div>
                 <div v-if='serch_ym===false' style='display:flex'>
-                    <input v-model='date_from' type='date' class='form-control' style='padding:0;width:11rem;margin:5px;' name='date_from'>
+                    <input v-model='date_from' type='date' class='form-control' style='width:11rem;margin:5px;' name='date_from'>
                     から
-                    <input v-model='date_to' type='date' class='form-control'  style='padding:0;width:11rem;margin:5px;' name='date_to'>
+                    <input v-model='date_to' type='date' class='form-control'  style='width:11rem;margin:5px;' name='date_to'>
                 </div>
-                <select v-model='analysis_type' name='sum_tani' class='form-select form-select-lg' style='padding:0;width:auto;max-width:100%;display:inline-block;margin:5px' ><!--集計単位-->
+                <select v-model='analysis_type' name='sum_tani' class='form-select form-select-lg' style='width:auto;max-width:100%;display:inline-block;margin:5px' ><!--集計単位-->
                     <option value='1' >売上実績(日計)</option>
                     <option value='2' >売上実績(月計)</option>
                     <option value='3' >売上実績(年計)</option>
@@ -121,7 +121,8 @@ log_writer2("test",$SLVresult,"lv3");
                     <option value='10'>売れる勢い</option>
                     <option value='11'>来客数推移</option>
                 </select>
-                <select v-model='ev_selected' name='list' class='form-select form-select-lg' style='padding:0;width:auto;max-width:100%;display:inline-block;margin:5px'>
+                <select v-model='ev_selected' name='list' class='form-select form-select-lg' style='width:auto;max-width:100%;display:inline-block;margin:5px'>
+                    <option value='0'>イベントで絞る</option>
                     <template v-for='(list,index) in ev_list' :key='list.LIST'>
                         <option :value='list.CODE'>{{list.LIST}}</option>
                     </template>
@@ -251,7 +252,7 @@ log_writer2("test",$SLVresult,"lv3");
                     serch_ym.value = true
                 }
                 const ev_list = ref([])
-                const ev_selected = ref([])
+                const ev_selected = ref('0')
                 const date_from = ref('<?php echo date("Y")."-01-01"; ?>')
                 const date_to = ref('<?php echo date("Y")."-12-31"; ?>')
 
@@ -379,8 +380,6 @@ log_writer2("test",$SLVresult,"lv3");
 </BODY>
 </html>
 <?php
-$EVresult  = null;
-$TKresult = null;
 $stmt = null;
 $pdo_h = null;
 ?>

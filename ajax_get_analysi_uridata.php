@@ -163,8 +163,8 @@ if($rtn !== true){
         
         $sqlstr = $sqlstr." ".$gp_sqlstr;
 
-        log_writer2($myname." [Exc sql] =>",$sqlstr,"lv0");
-        log_writer2($myname." [\$_POST] =>",$_POST,"lv0");
+        //log_writer2($myname." [Exc sql] =>",$sqlstr,"lv3");
+        //log_writer2($myname." [\$_POST] =>",$_POST,"lv3");
         
         try{
             $stmt = $pdo_h->prepare( $sqlstr );
