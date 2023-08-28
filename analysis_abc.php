@@ -96,8 +96,6 @@
     ?>
     <!--ページ専用CSS-->
     <link rel="stylesheet" href="css/style_analysis.css?<?php echo $time; ?>" >
-    
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>-->
     <TITLE><?php echo $title." 売上分析";?></TITLE>
 </head>
 <body class='common_body' style='padding-top:55px'>
@@ -137,25 +135,6 @@
                 </form>
             </div>
             <div class="col-md-9" style='padding:5px'>
-            <!--
-                <table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'>
-                    <thead>
-			    		<tr>
-                            <template v-for='(list,index) in table_labels' :key='list'>
-                                <th scope='col' style='width:auto;'>{{list}}</th>
-                            </template>
-                        </tr>
-                    </thead>
-                    <tbody v-for='(row,index) in table_data' :key='row.Labels'>
-                        <tr>
-                            <template v-for='(data,index) in row' :key='data'>
-                                <td align='right' v-if='data.match(/[^0-9,\\.]/)===null'>{{Number(data).toLocaleString()}}</td>
-                                <td v-if='data.match(/[^0-9,\\.]/)!==null'>{{data}}</td>
-                            </template>
-                        </tr>
-                    </tbody>
-                </table>
-            -->
                 <table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
                     <tr><td colspan='4' align='center' style='padding-top:5px;font-size:32px;font-weight:700;'>{{first_event}}</td></tr>
 			    		<tr>

@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="ja">
 <?php
 /*関数メモ
 check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
@@ -44,7 +42,7 @@ try{
     $params[0]=$_SESSION['user_id'];
     $params[1]=$new_shouhinCD;
     $params[2]=$_POST["shouhinNM"];
-    $params[3]=$_POST["tanka"];
+    $params[3]=$_POST["tanka"]; 
     $params[4]=$_POST["shouhizei"];
     $params[5]=$zeiritu;
     $params[6]=$zeikbn;
@@ -91,6 +89,7 @@ try{
     $sqllog .= rtn_sqllog("rollBack",[]);
     sqllogger($sqllog,$e);
     $_SESSION["MSG"] = "登録が失敗しました。";
+    log_writer2(basename(__FILE__)."[\$_POST]",$_POST,"lv0");
 }
 
 $stmt  = null;

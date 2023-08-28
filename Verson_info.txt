@@ -55,6 +55,7 @@ ver2.99.0-051:to[bs5&Vue3CompApi]bs4駆逐完了-commited
 ver2.99.0-052:レジ画面のタブレット対応-commited
 ver2.99.0-053:商品登録画面のレイアウト手法変更-commited
 ver2.99.0-054:分析画面のレイアウト調整中
+ver2.99.0-055:bugfix-
 
 
 ローカルからテスト環境へ

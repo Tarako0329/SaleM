@@ -80,7 +80,6 @@ $_SESSION["MSG"]=null;
                 <label for='zeikbn' class='col-3 col-sm-2 col-form-label'>税区分</label>
                 <div class='col-8'>
                     <select class='form-select form-select-lg' aria-label='.form-select-lg example' onchange='zei_math()' id='zeikbn' name='zeikbn' required='required'>
-                    <option value=''>税率選択</option>
                     <?php
                     foreach($stmt as $row){
                         echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
@@ -93,19 +92,19 @@ $_SESSION["MSG"]=null;
                 <div class='row mb-1'>
                     <label for='tanka' class='col-3 col-sm-2 col-form-label'>税抜単価</label>
                     <div class='col-8'>
-                        <input type='number'  disabled readonly class='form-control form-control-lg' id='tanka' name='tanka' >
+                        <input type='number' readonly class='form-control form-control-lg' id='tanka' name='tanka' >
                     </div>
                 </div>
                 <div class='row mb-1'>
                     <label for='shouhizei' class='col-3 col-sm-2 col-form-label'>消費税</label>
                     <div class='col-8'>
-                        <input type='number'  disabled readonly class='form-control form-control-lg' id='shouhizei' name='shouhizei' >
+                        <input type='number' readonly class='form-control form-control-lg' id='shouhizei' name='shouhizei' >
                     </div>
                 </div>                
                 <div class='row mb-3'>
                     <label for='zkomitanka' class='col-3 col-sm-2 col-form-label'>税込単価</label>
                     <div class='col-8'>
-                        <input type='number'  disabled readonly class='form-control form-control-lg' id='zkomitanka' aria-describedby='zkomitankaHelp'>
+                        <input type='number' readonly class='form-control form-control-lg' id='zkomitanka' aria-describedby='zkomitankaHelp'>
                         <small id='zkomitankaHelp' class='form-text text-muted'>レジ画面に表示される金額は税込価格です。</small>
                     </div>
                 </div>
@@ -169,7 +168,7 @@ $_SESSION["MSG"]=null;
             <input type='hidden' id='hyoujiKBN3' name='hyoujiKBN3' value=''>
         </main>
         <footer class='common_footer'>
-            <button type='submit' class='btn--chk item_13' style='border-radius:0;' name='btn' value='登録' >登　録</button>
+            <button type='submit' class='btn--chk item_13' style='border-radius:0;' value='登録' >登　録</button>
         </footer>
         
     </form>
