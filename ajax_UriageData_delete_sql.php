@@ -7,7 +7,7 @@ $msg = "";  //ユーザー向け処理結果メッセージ
 $alert_status = "alert-warning";    //bootstrap alert class
 $reseve_status=false; //処理結果セット済みフラグ。
 $timeout=false; //セッション切れ。ログイン画面に飛ばすフラグ
-
+$sqllog="";
 //if(csrf_chk()===false){
 if(csrf_checker(["UriageData_Correct.php"],["C","P","S"])===false){
     $msg="セッションが正しくありませんでした②";
@@ -24,7 +24,8 @@ if(csrf_checker(["UriageData_Correct.php"],["C","P","S"])===false){
         $logfilename="sid_".$_SESSION['user_id'].".log";
 
         //更新モード(実行)
-        $sql = "delete from UriageData where uid = :w_uid and UriageNO = :w_UriNO and ShouhinCD = :w_shouhinCD";
+        $sql = "delete from UriageData where uid = :w_uid and UriageNO = :w_UriNO and ShouhinCD like :w_shouhinCD";
+        $sql2 = "delete from UriageData_GioWeather where uid = :w_uid and UriNO = :w_UriNO";
         //$up_sqllog = "delete from UriageData where uid = '".$_SESSION["user_id"]."' and UriageNO = '".$_POST["UriageNO"]."' and ShouhinCD = '".$_POST["ShouhinCD"]."'";
     
         try{
@@ -41,10 +42,23 @@ if(csrf_checker(["UriageData_Correct.php"],["C","P","S"])===false){
             $sqllog .= rtn_sqllog($sql,$params);
             $status = $stmt->execute();
             $sqllog .= rtn_sqllog("--execute():正常終了",[]);
-            //$count = $stmt->rowCount();
+
+
+            $stmt = $pdo_h->prepare( $sql2 );
+            //bind処理
+            $stmt->bindValue("w_uid", $params["w_uid"], PDO::PARAM_INT);
+            $stmt->bindValue("w_UriNO", $params["w_UriNO"], PDO::PARAM_INT);
+            $sqllog .= rtn_sqllog($sql2,$params);
+            $status = $stmt->execute();
+            $sqllog .= rtn_sqllog("--execute():正常終了",[]);
+
+
             $pdo_h->commit();
             $sqllog .= rtn_sqllog("commit",[]);
             sqllogger($sqllog,0);
+
+
+
 
             $reseve_status=true;
             $msg = "削除成功。";

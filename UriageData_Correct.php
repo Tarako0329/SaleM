@@ -36,7 +36,7 @@
 		</div>
 		<div style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>期間：{{UriDateFrom}} ～ {{UriDateTo}}</div>
 		<div v-if='filter_flg[0]' style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>
-			<button type='button' class='btn-view' @click='reset_filter' style='padding:1px 3px;font-size:1rem;background-color: var(--panel-bk-color);'>解除</button>
+			<button type='button' class='btn-view' @click='reset_filter' style='padding:1px 3px;font-size:1rem;background-color: var(--panel-bk-color);margin-right:5px;'><i class="fa-solid fa-filter fa-lg "></i>解除</button>
 			<i class="fa-solid fa-filter fa-lg awesome-color-white"></i>：{{filter_flg[1]}}
 		</div>
 		<a href="#" style='position:fixed;color:inherit;right:15px;top:45px;' data-bs-toggle='modal' data-bs-target='#modal_help1'>
@@ -86,7 +86,7 @@
 				<table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
 					<thead>
 					<tr>
-						<th scope='col' style='width:20px;'></th>
+						<th scope='col' style='width:10px;'></th>
 						<th scope='col' style='width:130px;'>商品</th>
 						<th v-if='Type==="sum_items"' scope='col' style='width:35px;'>出品数</th>
 						<th scope='col' style='width:30px;'>数</th>
@@ -96,24 +96,50 @@
 						<th scope='col' style='width:60px;' class='d-none d-md-table-cell'>税</th>
 						<th scope='col' style='width:50px;'>原価</th>
 						<th scope='col' style='width:60px;'>粗利</th>
-						<th v-if='Type==="rireki"' scope='col' class='d-none d-md-table-cell'>天候</th>
+						<!--<th v-if='Type==="rireki"' scope='col' class='d-none d-md-table-cell'>天候</th>-->
 						<th v-if='Type==="rireki"' scope='col' style='width:20px;'></th>
 					</tr>
 					</thead>
 					<tbody v-for='(list,index) in UriageList_filter' :key='list.uid + list.UriDate + list.UriageNO + list.ShouhinCD'>
+						<!--売上日+Event行-->
 						<tr v-if='(index===0) || (index!==0 && list.UriDate + list.Event !== UriageList_filter[index-1].UriDate + UriageList_filter[index-1].Event)' class='tr_stiky'>
 							<td :colspan='colspan' class='tr_stiky' style='white-space:nowrap;'>
-							<span role='button' class='link' @click='set_filter("UriDate",list.UriDate,"")'> 売上日：{{list.UriDate}}</span>
-							<span role='button' class='link' @click='set_filter("Event",list.Event+list.TokuisakiNM,"")'>『{{list.Event}}{{list.TokuisakiNM}}』</span>
-							<img v-if='list.icon.length>=5' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>（<span style='color:red;'>{{list.max_temp}}</span>/<span style='color:blue;'>{{list.min_temp}}</span>）
+								<span role='button' class='link' @click='set_filter("UriDate",list.UriDate,"")'> 売上日：{{list.UriDate}}</span>
+								<span role='button' class='link' @click='set_filter("Event",list.Event+list.TokuisakiNM,"")'>『{{list.Event}}{{list.TokuisakiNM}}』</span>
+								<img v-if='(list.icon.length>=5) && (Type!=="rireki")' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>
+								<template v-if='(Type!=="rireki")'>（<span style='color:red;'>{{list.max_temp}}</span>/<span style='color:blue;'>{{list.min_temp}}</span>）</template>
 							</td>
 							<td class='text-right d-none d-md-table-cell'></td>
 							<td class='text-right d-none d-md-table-cell'></td>
 							<td v-if='Type==="rireki"' class='text-right d-none d-md-table-cell'></td>
-						</tr>
-						<tr>
+							<td v-if='Type==="rireki"' class='text-right d-table-cell d-md-none'></td>
+							<!--<td></td>-->
+						</tr><!--売上日+Event行-->
+						<tr v-if='(index===0 && (Type==="rireki")) || (index!==0 && list.UriageNO !== UriageList_filter[index-1].UriageNO)'><!--売上No行-->
+							<td :colspan='colspan' role='button' @click='set_filter("UriNO",list.UriageNO,"")'>
+								<span class='link'>
+									No.{{list.UriageNO}}
+								</span>
+								<img style='margin-left:5px;height:20px;' v-if='list.icon.length>=5' :src='`https://openweathermap.org/img/wn/${list.icon}`'>
+								<span>（{{list.temp}}℃ {{list.description}}）</span>
+							</td>
+							<td class='text-right d-none d-md-table-cell'></td>
+							<td class='text-right d-none d-md-table-cell'></td>
+							<!--<td v-if='Type==="rireki"' class='text-right d-none d-md-table-cell'></td>-->
+							<td v-if='Type==="rireki"'>
+								<template v-if='list.RNO===0'>
+								<a @click='delete_Uriage(list.UriageNO, "%")' href='#'>
+									<i class='fa-regular fa-trash-can'></i>
+								</a>
+								</template>
+							</td>
+						</tr><!--売上No行-->
+						<tr><!--売上明細行-->
+							<!--
 							<td v-if='list.UriageNO%2===0' role='button' class='text-center' @click='set_filter("UriNO",list.UriageNO,"")'><span class='link'>★</span></td>
 							<td v-if='list.UriageNO%2!==0' role='button' class='text-center' @click='set_filter("UriNO",list.UriageNO,"")'><span class='link'>☆</span></td>
+							-->
+							<td></td>
 							<td role='button' class='link' @click='set_filter("ShouhinCD",list.ShouhinCD,list.ShouhinNM)'>{{list.ShouhinNM}}</td>
 							<td align='right' v-if='Type==="sum_items"' class='text-right'>{{Number(list.shuppin_su)}}</td>
 							<td align='right' class='text-right'>{{Number(list.su)}}</td>
@@ -123,15 +149,19 @@
 							<td align='right' class='text-right d-none d-md-table-cell'>{{Number(list.zei).toLocaleString()}}</td>
 							<td align='right' class='text-right'>{{Number(list.genka).toLocaleString()}}</td>
 							<td align='right' class='text-right'>{{Number(list.arari).toLocaleString()}}</td>
+							<!--
 							<td v-if='Type==="rireki"' class='d-none d-md-table-cell'>
 								<img v-if='list.icon.length>=5' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>（<span>{{list.temp}}℃ </span><span>{{list.description}}</span>）
 							</td>
+							-->
 							<td v-if='Type==="rireki"' >
+								<template v-if='list.RNO===0 && list.zeiKBN===0'><!--領収書未発行かつ非課税売上のみ削除可能-->
 								<a @click='delete_Uriage(list.UriageNO, list.ShouhinCD)' href='#'>
 									<i class='fa-regular fa-trash-can'></i>
 								</a>
+								</template>
 							</td>
-						</tr>
+						</tr><!--売上明細行-->
 					</tbody>
 				</table>
 			</div>
@@ -430,11 +460,11 @@
 				})
 				const colspan = computed(()=>{//表タイプ毎の日付・イベント行のセル結合数返す
 					if(Type.value==='sum_items'){
-						return 8 
+						return 8
 					}else if(Type.value==='sum_events'){
-						return 6 
-					}else{
-						return 7
+						return 6
+					}else{//rireki
+						return 7-1
 					}
 				})
 				const sum_uriage = computed(() => {//表示売上データの売上本体合計

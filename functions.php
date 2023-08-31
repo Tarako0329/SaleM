@@ -520,7 +520,7 @@ function redirect_to_login($message) {
     setCookie("csrf_token", "", -1, "/", "", TRUE, TRUE);
 
     $_SESSION["EMSG"] = $message;
-    log_writer2("function.php[func:redirect_to_login] $_SESSION values ",$_SESSION,"lv3");
+    log_writer2("function.php[func:redirect_to_login] \$_SESSION values ",$_SESSION,"lv3");
 
     header("HTTP/1.1 301 Moved Permanently");
     header("Location: index.php");
