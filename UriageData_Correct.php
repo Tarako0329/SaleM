@@ -127,7 +127,7 @@
 							<td class='text-right d-none d-md-table-cell'></td>
 							<!--<td v-if='Type==="rireki"' class='text-right d-none d-md-table-cell'></td>-->
 							<td v-if='Type==="rireki"'>
-								<template v-if='list.RNO===0'>
+								<template v-if='list.RNO==0'>
 								<a @click='delete_Uriage(list.UriageNO, "%")' href='#'>
 									<i class='fa-regular fa-trash-can'></i>
 								</a>
@@ -155,7 +155,7 @@
 							</td>
 							-->
 							<td v-if='Type==="rireki"' >
-								<template v-if='list.RNO===0 && list.zeiKBN===0'><!--領収書未発行かつ非課税売上のみ削除可能-->
+								<template v-if='list.RNO==0 && list.zeiKBN==0'><!--領収書未発行かつ非課税売上のみ削除可能-->
 								<a @click='delete_Uriage(list.UriageNO, list.ShouhinCD)' href='#'>
 									<i class='fa-regular fa-trash-can'></i>
 								</a>
