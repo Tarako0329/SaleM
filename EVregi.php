@@ -85,8 +85,11 @@
 			}
 		}
 	}
-	$stmt = null;
-	$pdo_h = null;
+
+	//税区分MSリスト取得
+	$sqlstr="select * from ZeiMS order by zeiKBN;";
+	$stmt = $pdo_h->query($sqlstr);
+
 
 }
 ?>
@@ -161,22 +164,18 @@
 		</div>
 		<div class='header-plus-minus d-flex justify-content-center align-items-center item_4' style='font-size:1.4rem;font-weight:700;'>
 			<!--<span style='position:fixed;top:95px;left:10px;' id='gio_exec'></span>開発モードでGET_GIO実行時の通知に使用-->
-
-			<div class="form-check form-switch" style='position:fixed;top:110px;left:10px;padding:0;'>
-				<p>端数自動調整</p>
+			<div class="form-check form-switch" style='position:fixed;top:105px;left:10px;padding:0;'>
+				<p style='margin-bottom:2px;'>端数自動調整</p>
 				<input type='checkbox' style='margin:0;' v-model='auto_ajust' class='form-check-input'  id='chousei'><!---->
 				<label v-if='auto_ajust!==true' style='margin-left:3px;' class='form-check-label' for='chousei'>OFF</label><!---->
 				<label v-if='auto_ajust===true' style='margin-left:3px;' class='form-check-label' for='chousei'>ON</label><!-- -->
 			</div>
-
-
-
 			<i class="fa-regular fa-circle-question fa-lg logoff-color"></i><!--スペーシングのため白アイコンを表示-->
-			<div style='padding:0;'>
-				<input type='radio' class='btn-check' name='options' value='plus' autocomplete='off' v-model='pm' id='plus_mode' checked>
-				<label class='btn btn-outline-primary' for='plus_mode' style='border-radius:0;'>　▲　</label>
-				<input type='radio' class='btn-check' name='options' value='minus' autocomplete='off' v-model='pm' id='minus_mode' >
-				<label class='btn btn-outline-warning' for='minus_mode' style='border-radius:0;'>　▼　</label>
+			<div id='header-pm' style='padding:0;'>
+				<input type='radio' class='btn-check' name='options' value='1' autocomplete='off' v-model='pm' id='plus_mode'>
+				<label class='btn btn-outline-primary plus' for='plus_mode' style='border-radius:0;'>　</label>
+				<input type='radio' class='btn-check' name='options' value='-1' autocomplete='off' v-model='pm' id='minus_mode' >
+				<label class='btn btn-outline-warning minus' for='minus_mode' style='border-radius:0;'>　</label>
 			</div>
 			<a href="#" style='color:inherit;margin-left:5px;' data-bs-toggle='modal' data-bs-target='#modal_help2'>
 				<i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i>
@@ -185,28 +184,45 @@
 				<i class="fa-solid fa-cash-register fa-2x awesome-color-panel-border-same"></i>
 			</a>
 		</div>
+		<div class='header-plus-minus d-flex justify-content-center align-items-center ' style='font-size:1.4rem;font-weight:700;top: 156px;height:52px;'>
+			<div id='header-pm' style='padding:0;'>
+			<input type='radio' class='btn-check' name='ZeiChange' value='10' autocomplete='off' v-model='ZeiChange' id='eatin'>
+				<label class='btn btn-outline-danger ' for='eatin' style='border-radius:0;'>イートイン</label>
+				<input type='radio' class='btn-check' name='ZeiChange' value='8' autocomplete='off' v-model='ZeiChange' id='takeout'>
+				<label class='btn btn-outline-danger ' for='takeout' style='border-radius:0;'>テイクアウト</label>
+				<input type='radio' class='btn-check' name='ZeiChange' value='0' autocomplete='off' v-model='ZeiChange' id='defo' >
+				<label class='btn btn-outline-primary ' for='defo' style='border-radius:0;'>戻る</label>
+			</div>
+		</div>
 		<main class='common_body'>
 			<div class="container-fluid">
 				<div class='row'>
 					<div class='col-xg-2 col-lg-2 col-md-3 col-sm-0 col-0'>
-						<hr>
-						
 						<div class='order_list' ref='order_list_area'>
-							<template v-for='(list,index) in shouhinMS_Order' :key='list.shouhinCD'>
+							<template v-for='(list,index) in order_list' :key='list.shouhinCD'>
 								<div class='container'>
-								<div class='order_item'>{{list.shouhinNM}}</div>
-								<div style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;'>
-									<div class='order_su'>{{list.ordercounter}}点</div>
-									<div class='order_kin'>¥{{(list.ordercounter *  list.zeikomigaku).toLocaleString()}}</div>
-								</div>
+									<div class='order_item'>{{list.NM}}</div>
+									<div style='display:flex;'>
+										<div class='order_su' >{{list.SU}}点</div>
+										<div class='order_kin'>¥{{(list.SU * list.TANKA).toLocaleString()}}</div>
+									</div>
+									<div id='side-pm'style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;padding-bottom:3px;'>
+										<button type='button' class='order_list_area_btn plus' @click='order_list_pm(index,1)'></button>
+										<button type='button' class='order_list_area_btn minus' @click='order_list_pm(index,-1)'></button>
+										<select v-model='list.ZEIKBN' class="form-select form-select-lg " style='margin-left:10px;padding-left:10px;'>
+											<?php
+  	            	      foreach($stmt as $row){
+                	        echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
+    	          	      }
+                	    ?> 
+										</select>
+									</div>
 								</div>
 							</template>	
 						</div>
-						
 					</div>
-					<div class='col-lg-10 col-md-9 col-12'>
-			
-						<div class="container-fluid"><!--オーダーパネル部分-->
+					<div class='col-lg-10 col-md-9 col-sm-12 col-12'><!--オーダーパネル部分-->
+						<div class="container-fluid">
 							<template v-if='MSG!==""'>
 								<div v-bind:class='alert_status' role='alert' >
 									{{MSG}}
@@ -215,7 +231,7 @@
 									</button>
 								</div>
 							</template>
-							<div class='accordion item_11 item_12' id="accordionExample">
+							<div class='accordion item_11 item_12' id="accordionExample"><!--割引処理-->
 								<div v-if='chk_register_show==="register"' class='row' style='padding-top:5px;'>
 									<hr>
 									<div class='accordion-item'>
@@ -243,28 +259,29 @@
 									</div>
 								</div>
 							</div><!--割引処理-->
-							<div id='jump_0'><hr ></div>
+							<div id='jump_0'><hr ></div> 
 							<div class='row item_3' id=''>
 								<template v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
-									<template v-if='(index===0) || (index!==0 && list.disp_category !== shouhinMS_filter[index-1].disp_category)'>
+									<template v-if='(index===0) || (index!==0 && list.disp_category !== shouhinMS_filter[index-1].disp_category)'><!--カテゴリーバー-->
 										<div class='row' style='background:var(--jumpbar-color);margin-top:5px;' >
 											<div class='col-12' :id='`jump_${index}`' style='color:var(--categ-font-color);'><a href='#jump_".$befor."' class='btn-updown'><i class='fa-solid fa-angles-up'></i></a>
 												{{list.disp_category}}<a href='#jump_".$next."'  class='btn-updown'><i class='fa-solid fa-angles-down'></i></a>
 											</div>
 										</div>
-									</template>
+									</template><!--カテゴリーバー-->
 									<div class ='col-lg-2 col-md-3 col-sm-6 col-6 items'>
 										<template v-if='encodeURI(list.shouhinNM).replace(/%../g, "*").length <= 24'>
-											<button type='button' @click="ordercounter" class='btn-view btn--rezi' :id="`btn_menu_${list.shouhinCD}`" :value = "index">
+											<button type='button' @click="ordercounter($event)" class='btn-view btn--rezi' :id="`btn_menu_${list.shouhinCD}`" :value = "index">
 												{{list.shouhinNM}}
 											</button>
 										</template>
 										<template v-if='encodeURI(list.shouhinNM).replace(/%../g, "*").length > 24'>
-											<button type='button' @click="ordercounter" class='btn-view btn--rezi' style='font-size:1.2rem;' :id="`btn_menu_${list.shouhinCD}`" :value = "index">
+											<button type='button' @click="ordercounter($event)" class='btn-view btn--rezi' style='font-size:1.2rem;' :id="`btn_menu_${list.shouhinCD}`" :value = "index">
 												{{list.shouhinNM}}
 											</button>
 										</template>
-										<div v-if='pm==="minus"' class='btn-view btn--rezi-minus bg-warning minus_disp'></div>
+										<div v-if='pm==="-1"' class='btn-view btn--rezi-minus bg-warning'></div>
+										<div class='btn--rezi-tax bg-warning text-center'>{{list.hyoujimei}}</div>
 										<input type='hidden' :name ="`ORDERS[${index}][CD]`" :value = "list.shouhinCD">
 										<input type='hidden' :name ="`ORDERS[${index}][NM]`" :value = "list.shouhinNM">
 										<input type='hidden' :name ="`ORDERS[${index}][UTISU]`" :value = "list.utisu">
@@ -279,9 +296,8 @@
 									</div>
 								</template>
 							</div>
-						</div><!--オーダーパネル部分-->
-
-					</div>
+						</div>
+					</div><!--オーダーパネル部分-->
 				</div>
 			</div>
 			
@@ -327,6 +343,10 @@
 				<input type='hidden' :name ="`ZeiKbnSummary[${index}][HONTAIGAKU]`" :value = "list.本体額">
 				<input type='hidden' :name ="`ZeiKbnSummary[${index}][SHOUHIZEI]`" :value = "list.消費税">
 			</template>
+			<template v-for='(list,index) in order_list' :key='list.CD'>
+				<input type='hidden' :name ="`OrderList[${index}][CD]`" :value = "list.CD">
+				<input type='hidden' :name ="`OrderList[${index}][NM]`" :value = "list.NM">
+			</template>order_list
 		</div>
 	</form>
 	<div class="loader-wrap" v-show='loader'>
@@ -428,10 +448,10 @@
 					<!--<div class='modal-title' id='myModalLabel'>電　卓</div>-->
 				</div>
 				<div class='modal-body'>
-					<input type='radio' class='btn-check' name='options1' value='minus' autocomplete='off' v-model='pm' id='minus_mode' checked>
+					<input type='radio' class='btn-check' name='options1' value='minus' autocomplete='off' id='minus_mode' checked>
 					<label class='btn btn-outline-warning' for='minus_mode'>　▼　</label>
 					をタップすると、注文数を減らせるようになります。<br>
-					<input type='radio' class='btn-check' name='options2' value='plus' autocomplete='off' v-model='pm' id='plus_mode' checked>
+					<input type='radio' class='btn-check' name='options2' value='plus' autocomplete='off' id='plus_mode' checked>
 					<label class='btn btn-outline-primary' for='plus_mode'>　▲　</label>
 
 					をタップすると元に戻ります。<br>
@@ -546,7 +566,7 @@
  
 				const shouhinMS_filter = computed(() => {//商品パネルのソート・フィルタ
 					let order_panel = ([])
-					if (chk_register_show.value === "chk"){//表示対象のみを返す
+					if (chk_register_show.value === "chk"){//表示対象のみを返す(商品マスタの[レジ表示]chk)
 						order_panel = shouhinMS.value.filter((shouhin) => {
 							return (shouhin.hyoujiKBN1 && shouhin.hyoujiKBN1.includes('on') );
 						});
@@ -595,7 +615,7 @@
 				const chk_register_show = ref('chk')		//確認・登録ボタンの表示
 				const auto_ajust = ref(true)
 				let auto_ajust_flg = false
-				const btn_changer = (args) => {
+				const btn_changer = (args) => {	//確認ボタン・戻るボタンを押したとき
 					chk_register_show.value = args
 					
 					if(args==='register'){	//登録モード
@@ -662,29 +682,98 @@
 						Revised_pay.value =''
 					}
 				}
-				const pm = ref('plus')
+				const pm = ref('1')
+				const ZeiChange = ref('0')
+				watch([ZeiChange],() => {
+					//console_log('watch now','lv3')
+          if(ZeiChange.value[0]==='0'){
+						get_shouhinMS()
+					}else if(ZeiChange.value==='8' ||ZeiChange.value==='10'){
+						shouhinMS.value.forEach((list) =>{
+							let tanka = new Decimal(list.tanka)
+							list.tanka_zei = Math.trunc(tanka.mul(Number(ZeiChange.value) / 100))
+							list.zeikomigaku = Math.trunc(tanka.mul((Number(ZeiChange.value) + 100) / 100))
+							list.zeiKBN = ZeiChange.value==='8' ? 1001 : 1101
+							list.hyoujimei = ZeiChange.value==='8' ? '8%' : '10%'
+						})
+					}else{
+						
+					}
+        })
 				const ordercounter = (e) => {//注文増減ボタン
-					
 					//console_log(e.target.disabled,'lv3')
 					//console_log(shouhinMS_filter.value[e.target.value],'lv3')
 					if(chk_register_show.value==="register"){
 						alert('『戻る』ボタンをタップしてから増減してください。')
 						return 0
 					}
-					
 					e.target.disabled = true	//ボタン連打対応：処理が終わるまでボタンを無効にする
 					let index = e.target.value
-					if(pm.value==="plus"){
-						shouhinMS_filter.value[index].ordercounter ++
+
+					//console_log(`${shouhinMS_filter.value[index].shouhinCD}:${shouhinMS_filter.value[index].hyoujimei}`,'lv3')
+					const order_list_index = order_list.value.findIndex(//同一商品・同一税率の注文があった場合、該当レコードのindexを取得。ない場合は[-1]を返す
+						item => item.CD == shouhinMS_filter.value[index].shouhinCD && item.ZEIKBN == shouhinMS_filter.value[index].zeiKBN
+					)
+					//console_log(order_list_index,'lv3')
+
+					
+					if(shouhinMS_filter.value[index].ordercounter + Number(pm.value) < 0){
+						shouhinMS_filter.value[index].ordercounter = 0
+						e.target.disabled = false	//ボタン連打対応：ボタンを有効に戻す
+						return 0
+					}else{
+						shouhinMS_filter.value[index].ordercounter = Number(shouhinMS_filter.value[index].ordercounter) + Number(pm.value)
+					}
+
+					if(order_list_index === -1){
+						order_list.value.unshift({
+							CD:shouhinMS_filter.value[index].shouhinCD
+							,NM:shouhinMS_filter.value[index].shouhinNM
+							,SU:1
+							,UTISU:shouhinMS_filter.value[index].utisu
+							,TANKA:shouhinMS_filter.value[index].tanka
+							,ZEIKBN:shouhinMS_filter.value[index].zeiKBN
+							,GENKA_TANKA:shouhinMS_filter.value[index].genka_tanka
+							,order_panel_index:index
+						});
+					}else{
+						order_list.value[order_list_index].SU = Number(order_list.value[order_list_index].SU) + Number(pm.value)
+					}
+
+					if(auto_ajust.value===true){//レジ表示税込価格をそのまま使用して総支払額を算出
+						pay.value += (Number(shouhinMS_filter.value[index].tanka) + Number(shouhinMS_filter.value[index].tanka_zei)) * Number(pm.value)
+						kaikei_zei.value += Number(shouhinMS_filter.value[index].tanka_zei) * Number(pm.value)
+					}
+
+					const hontai_index = hontai.value.findIndex(//同一商品・同一税率の注文があった場合、該当レコードのindexを取得。ない場合は[-1]を返す
+						item => item.税区分 === shouhinMS_filter.value[index].zeiKBN
+					)
+					console_log(hontai_index,'lv3')
+					if(hontai_index===-1){
+						hontai.value.push({'税区分':Number(shouhinMS_filter.value[index].zeiKBN) ,'税区分名':shouhinMS_filter.value[index].hyoujimei ,'税率':Number(shouhinMS_filter.value[index].zeiritu) ,'本体額':Number(shouhinMS_filter.value[index].tanka),'調整額':0,'消費税':shouhinMS_filter.value[index].tanka_zei,'消費税bk':0})
+					}else{
+						hontai.value[hontai_index].本体額 = Number(hontai.value[hontai_index].本体額) + (Number(shouhinMS_filter.value[index].tanka) * Number(pm.value))
+						hontai.value[hontai_index].消費税 = Number(hontai.value[hontai_index].消費税) + (Number(shouhinMS_filter.value[index].tanka_zei) * Number(pm.value))
+
+					}
+
+
+
+
+					if(pm.value==="1"){
+						//shouhinMS_filter.value[index].ordercounter ++
+						/*
 						if(auto_ajust.value===true){
 							pay.value += Number(shouhinMS_filter.value[index].tanka) + Number(shouhinMS_filter.value[index].tanka_zei)
 							kaikei_zei.value += Number(shouhinMS_filter.value[index].tanka_zei)
 						}
+						*/
 						//税率ごとに本体額を計上
 						if(pay.value===0){
-							hontai.value.push({'税区分':Number(shouhinMS_filter.value[index].zeiKBN) ,'税区分名':shouhinMS_filter.value[index].hyoujimei ,'税率':Number(shouhinMS_filter.value[index].zeiritu) ,'本体額':Number(shouhinMS_filter.value[index].tanka),'調整額':0,'消費税':shouhinMS_filter.value[index].tanka_zei,'消費税bk':0})
+							//hontai.value.push({'税区分':Number(shouhinMS_filter.value[index].zeiKBN) ,'税区分名':shouhinMS_filter.value[index].hyoujimei ,'税率':Number(shouhinMS_filter.value[index].zeiritu) ,'本体額':Number(shouhinMS_filter.value[index].tanka),'調整額':0,'消費税':shouhinMS_filter.value[index].tanka_zei,'消費税bk':0})
 						}else{
 							let counted=false
+							/*
 							for(const row of hontai.value){
 								if(row['税区分']===Number(shouhinMS_filter.value[index].zeiKBN)){
 									row['本体額'] = Number(row['本体額']) + Number(shouhinMS_filter.value[index].tanka)
@@ -693,21 +782,30 @@
 									break
 								}
 							}
+							*/
 							if(counted===false){
-								hontai.value.push({'税区分':Number(shouhinMS_filter.value[index].zeiKBN) ,'税区分名':shouhinMS_filter.value[index].hyoujimei ,'税率':Number(shouhinMS_filter.value[index].zeiritu) ,'本体額':Number(shouhinMS_filter.value[index].tanka),'調整額':0,'消費税':shouhinMS_filter.value[index].tanka_zei,'消費税bk':0})
+								//hontai.value.push({'税区分':Number(shouhinMS_filter.value[index].zeiKBN) ,'税区分名':shouhinMS_filter.value[index].hyoujimei ,'税率':Number(shouhinMS_filter.value[index].zeiritu) ,'本体額':Number(shouhinMS_filter.value[index].tanka),'調整額':0,'消費税':shouhinMS_filter.value[index].tanka_zei,'消費税bk':0})
 							}
 						}
-					}else if(pm.value==="minus"){
-						if(shouhinMS_filter.value[index].ordercounter - 1 < 0){
-							alert("注文数は０以下にはできません。")
+
+
+
+
+					}else if(pm.value==="-1"){
+						/*if(shouhinMS_filter.value[index].ordercounter - 1 < 0){
+							//alert("注文数は０以下にはできません。")
 							e.target.disabled = false	//ボタン連打対応：処理が終わったらボタンを有効に戻す
 							return 0
-						}else{
-							shouhinMS_filter.value[index].ordercounter --
+						}else*/{
+							//shouhinMS_filter.value[index].ordercounter --
+							//order_list.value[order_list_index].SU--
+							/*
 							if(auto_ajust.value===true){
 								pay.value -= Number(shouhinMS_filter.value[index].tanka) + Number(shouhinMS_filter.value[index].tanka_zei)
 								kaikei_zei.value -= Number(shouhinMS_filter.value[index].tanka_zei)
 							}
+							*/
+							/*
 							for(const row of hontai.value){
 								if(row['税区分']===Number(shouhinMS_filter.value[index].zeiKBN)){
 									row['本体額'] = Number(row['本体額']) - Number(shouhinMS_filter.value[index].tanka)
@@ -715,6 +813,7 @@
 									break
 								}
 							}
+							*/
 						}
 					}
 					
@@ -729,6 +828,19 @@
         	})
 					return 0
 				}
+				const order_list_pm = (index,value) =>{
+					//console_log(index,'lv3')
+					order_list.value[index].SU = Number(order_list.value[index].SU) + Number(value)
+					if(Number(order_list.value[index].SU) < 0){
+						order_list.value[index].SU = Number(0)
+						return
+					}
+					shouhinMS_filter.value[order_list.value[index].order_panel_index].ordercounter += Number(value)
+					if(shouhinMS_filter.value[order_list.value[index].order_panel_index].ordercounter < 0){
+						shouhinMS_filter.value[order_list.value[index].order_panel_index].ordercounter = Number(0)
+					}
+				}
+
 				const total_area = ref()
 				
 				const resize = () =>{
@@ -833,6 +945,7 @@
 				
 				const reset_order = () => {//オーダーリセット
 					shouhinMS_filter.value.forEach((list)=>list.ordercounter=0)
+					order_list.value = []
 					pay.value = 0
 					pay_bk = 0
 					kaikei_zei.value = 0
@@ -969,8 +1082,8 @@
 
 									await res_add
 									.then((response) => (
-										console_log(response.data,'lv3')
-										,address = response.data.results
+										//console_log(response.data,'lv3')
+										address = response.data.results
 										// 変換表から都道府県などを取得
 										,muniData = GSI.MUNI_ARRAY[address.muniCd]
 										// 都道府県コード,都道府県名,市区町村コード,市区町村名 に分割
@@ -986,7 +1099,7 @@
 
 									await res_weat
 									.then((response) => {
-										console_log(response.data,'lv3')
+										//console_log(response.data,'lv3')
 										weather.value = response.data.weather[0].main
 										description.value = response.data.weather[0].description
 										temp.value = response.data.main.temp
@@ -1032,7 +1145,7 @@
   				// 入力された文字列を取得
 					let guid = getGUID()
   				let userInput = URL.value + '&qr=' + guid + '&tp=1&k=' + keishou.value + '&s=' + oaite.value
-					console.log(userInput)
+					console_log(userInput,'lv3')
   				var query = userInput.split(' ').join('+');
   				// QRコードの生成
   				(function() {
@@ -1086,9 +1199,10 @@
 				const order_list_area_set = () => {
 					console_log('order_list_area_set start','lv3')
 					let size = window.innerHeight
-					console.log(size)
+					//console.log(size)
 					order_list_area.value.style=`height:${size-300}px`
 				}
+				const order_list = ref([])
 
 				//細かな表示設定など
 				const labels_address_check = ref()
@@ -1199,6 +1313,9 @@
 					auto_ajust,
 					shouhinMS_Order,
 					order_list_area,
+					order_list,
+					order_list_pm,
+					ZeiChange,
 					//order_item_fade_switch,
 					//order_item_fade_switch_changer,
 				}
@@ -1315,7 +1432,7 @@
 	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `
-				<input type='radio' class='btn-check' name='options' value='minus' autocomplete='off' v-model='pm' id='minus_mode' >
+				<input type='radio' class='btn-check' name='options' value='minus' autocomplete='off' id='minus_mode' >
 				<label class='btn btn-outline-warning' for='minus_mode'>　▼　</label>
 				<br><p class='tour_discription'>を選択すると、メニュータップ時にマイナスされるようになります。</p>`,
 		attachTo: {
@@ -1336,7 +1453,7 @@
 	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `
-				<input type='radio' class='btn-check' name='options' value='plus' autocomplete='off' v-model='pm' id='plus_mode' checked>
+				<input type='radio' class='btn-check' name='options' value='plus' autocomplete='off' id='plus_mode' checked>
 				<label class='btn btn-outline-primary' for='plus_mode'>　▲　</label>
 				<br><p class='tour_discription'>を選択すると、元に戻ります。</p>`,
 		attachTo: {
@@ -1994,4 +2111,7 @@
 </script><!--ジオコーディング-->
 <script src="https://maps.gsi.go.jp/js/muni.js"></script><!--gio住所逆引リスト-->
 </html>
-
+<?php
+$stmt = null;
+$pdo_h = null;
+?>

@@ -193,12 +193,10 @@ $_SESSION["MSG"]=null;
                     case '1001':
                         zkomitanka.value=new_tanka.value;
                         shouhizei.value=Math.trunc(new_tanka.value - (new_tanka.value / (1 + 8 / 100)));
-                        //tanka.value = Math.floor(new_tanka.value / (1 + 8 / 100));
                         break;
                     case '1101':
                         zkomitanka.value=new_tanka.value;
                         shouhizei.value=Math.trunc(new_tanka.value - (new_tanka.value / (1 + 10 / 100)));
-                        //tanka.value = Math.floor(new_tanka.value / (1 + 10 / 100));
                         break;
                 }
                 tanka.value = zkomitanka.value - shouhizei.value;
@@ -206,12 +204,10 @@ $_SESSION["MSG"]=null;
                 switch(select.value){
                     case '1001':
                         zkomitanka.value=Math.trunc(new_tanka.value * (1 + 8 / 100));
-                        //tanka.value = new_tanka.value;
                         shouhizei.value=Math.trunc(new_tanka.value * (8 / 100));
                         break;
                     case '1101':
                         zkomitanka.value=Math.trunc(new_tanka.value * (1 + 10 / 100));
-                        //tanka.value = new_tanka.value;
                         shouhizei.value=Math.trunc(new_tanka.value * (10 / 100));
                         break;
                 }

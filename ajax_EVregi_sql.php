@@ -90,7 +90,7 @@ if(is_null($row[0]["UriageNO"])){
 }
 //echo (string)$UriageNO;
 $params=[];
-$params["uid"] = $_SESSION['user_id'];
+$params["uid"] = $_SESSION['user_id']; 
 $params["UriageNO"] = $UriageNO;
 $params["UriDate"] = filter_input(INPUT_POST,'KEIJOUBI');
 $params["insDatetime"] = date("Y/m/d H:i:s");

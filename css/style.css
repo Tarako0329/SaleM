@@ -328,3 +328,31 @@ a:active{
 	--bs-tooltip-bg: var(--bs-primary);
 	--bs-tooltip-font-size :16px;
 }
+
+.plus {
+	position: relative;
+}
+.plus::before,.plus::after  {
+	content: '';
+	display: inline-block;
+	position: absolute;
+	width: 3px;
+	height: 25px;
+	/*background-color: var(--panel-bd-color);*/
+}
+.plus::after {
+	transform: rotate(90deg);
+}
+
+.minus {
+	position: relative;
+}
+.minus::before {
+	content: '';
+	display: inline-block;
+	position: absolute;
+	width: 3px;
+	height: 25px;
+	/*background-color: var(--panel-bd-color);*/
+	transform: rotate(90deg);
+}

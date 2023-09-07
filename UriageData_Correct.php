@@ -232,6 +232,7 @@
 					<input type='text' style='font-size:1.5rem;width:250px;background-color:#999999;' name='up_kokyaku' id='up_kokyaku' maxlength='10'  class='form-control'>
     		</div>
 			</div><!--顧客名-->
+			<template v-if='false'>
 			<div class='row mb-1'><!--売上単価-->
 				<div class="col-11" style='display:flex;'>
   	    	<div class="form-check">
@@ -263,6 +264,7 @@
 					税込単価：{{(upd_hontai+upd_zei_kin).toLocaleString()}}（本体：{{upd_hontai.toLocaleString()}}　消費税：{{upd_zei_kin.toLocaleString()}}-）
     		</div>
 			</div><!--売上単価計算結果-->
+			</template>
 			<div class='row mb-2'><!--原価単価-->
 				<div class="col-11" style='display:flex;'>
   	    	<div class="form-check">

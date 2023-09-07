@@ -45,7 +45,7 @@ INPUT.ev{
 .btn--rezi-minus{
     height:64.5%;
     width:5%;
-    font-size: 2.0rem;
+    /*font-size: 2.0rem;*/
     position:absolute;
     top:5px;
     left:5px;
@@ -62,6 +62,29 @@ INPUT.ev{
     */
     padding-bottom:5px;
 }
+/*レジボタン税率*/
+.btn--rezi-tax{
+    height:15%;
+    width:20%;
+    font-size: 1.3rem;
+    position:absolute;
+    top:53%;
+    left:75%;
+    padding-top:6px;
+    /*bottom:5px;*/
+    /*background:var(--minus-area-color);*/
+    /*opacity:0.5;*/
+    border-top-right-radius:0;
+    border-bottom-right-radius:0;
+    border-right:none;
+    /*
+    border-top:none;
+    border-left:none;
+    border-bottom:none;
+    padding-bottom:5px;
+    */
+}
+
 INPUT.date{
     /*INPUT イベント名・店舗名部*/
     border-right:none;
@@ -84,7 +107,7 @@ INPUT{
 
 .items{
     padding:5px;
-    height:12rem;
+    height:13rem;
     line-height:80%;
     position:relative;
 
@@ -94,7 +117,7 @@ INPUT{
 }
 @media screen and (max-width:400px) {
     .items{
-        height:10rem;
+        height:11rem;
 
     }
 }
@@ -103,7 +126,7 @@ INPUT{
     margin:0;
     padding:0;
     padding-top:5px;
-    height:35%; /*itemsの下20％部分。上はメニューボタン*/
+    height:30%; /*itemsの下20％部分。上はメニューボタン*/
     line-height:21px;
     background:transparent;
     text-align:center;
@@ -213,7 +236,7 @@ INPUT.su{
     display: flex;
 }
 .header-plus-minus{
-    height: 45px; /* 高さを指定 */
+    height: 55px; /* 高さを指定 */
     padding-top: 5px; /* ヘッダーに余白を指定 */
     padding-bottom: 5px; /* ヘッダーに余白を指定 */
     box-sizing: border-box; /* padding分を含んで幅を100%にするため */
@@ -224,9 +247,10 @@ INPUT.su{
     z-index: 99;
     /*display: inline-block;*/
     background:#fff;
+    border-bottom:solid var(--panel-bd-color) 0.3px;
 }
 .common_body {
-    padding-top: 160px; /* ヘッダーの後ろに要素が隠れないようにするため */
+    padding-top: 210px; /* ヘッダーの後ろに要素が隠れないようにするため  160*/
     padding-bottom:145px;  /*フッターーの後ろに要素が隠れないようにするため */
 }
 
@@ -293,9 +317,11 @@ INPUT.su{
 
 .order_list{
     border:solid var(--panel-bd-color) 0.5px;
-    width: 24%;
+    width: 23.7%;
     position: fixed;
     overflow: auto;
+    margin-top:26px;
+    margin-right:3px;
 }
 .order_item{
     font-size:1.6rem;
@@ -315,6 +341,35 @@ INPUT.su{
     text-align:right;
     font-weight: 700;
 }
+.order_list_area_btn{
+    padding:0px;
+    height:24px;
+    width:120px;
+    border:solid var(--panel-bd-color) 0.3px;
+    color: var(--panel-bd-color);
+    background-color: var(--panel-bk-color);
+    opacity: 0.7;
+}
+#side-pm>.plus::before,#side-pm>.plus::after,#side-pm>.minus::before {
+    height: 15px;
+    width: 5px;
+    top:3.5px;
+    left:19px;
+    background-color: var(--panel-bd-color);
+}
+#header-pm>.plus::before,#header-pm>.plus::after,#header-pm>.minus::before {
+    height: 17px;
+    width: 3.5px;
+    top:5px;
+    left:23px;
+}
+#header-pm>.plus::before,#header-pm>.plus::after{
+    background-color: #7bf2f7;
+}
+#header-pm>.minus::before {
+    background-color: #ebee3f;
+}
+
 @media screen and (max-width:767px) {/*md以下*/
     .order_list{
         display:NONE;
@@ -330,7 +385,7 @@ INPUT.su{
 }
 @media screen and (min-width:992px) {/*lg以上*/
     .order_list{
-        width: 16%;
+        width: 15.7%;
     }
 }
 
