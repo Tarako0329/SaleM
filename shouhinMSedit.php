@@ -31,7 +31,7 @@ $_SESSION["MSG"]=null;
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
-    include "head_bs5.html" 
+    include "head_bs5.php" 
     ?>
     <!--ページ専用CSS--><link rel="stylesheet" href="css/style_ShouhinMSedit.css?<?php echo $time; ?>" >
     <TITLE><?php echo secho($title)." 取扱商品登録画面";?></TITLE>

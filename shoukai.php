@@ -76,7 +76,7 @@ try{
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
-    include "head_bs5.html" ;
+    include "head_bs5.php" ;
     ?>
     <!--ページ専用CSS-->
     <script src='script/jquery-3.6.0.min.js'></script>

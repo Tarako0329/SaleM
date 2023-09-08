@@ -44,7 +44,7 @@ $pdo_h=null;
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
-    include "head_bs5.html" 
+    include "head_bs5.php" 
     ?>
     <!--ページ専用CSS-->
     <link rel="stylesheet" href="css/style_account_create.css?<?php echo $time; ?>" >

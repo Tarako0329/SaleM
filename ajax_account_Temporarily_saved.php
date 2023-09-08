@@ -43,6 +43,7 @@ if($rtn !== true){
 				$_SESSION["P"]["mail"] = $_POST["MAIL"];
 				$_SESSION["P"]["question"] = $_POST["QUESTION"];
 				$_SESSION["P"]["answer"] = $_POST["ANSWER"];
+				$_SESSION["P"]["zeihasu"] = $_POST["ZEIHASU"];
 				$_SESSION["P"]["loginrez"] = empty($_POST["LOGINREZ"])?$_POST["LOGINREZ"]:"";
 				$_SESSION["P"]["name"] = $_POST["NAME"];
 				$_SESSION["P"]["yagou"] = $_POST["YAGOU"];

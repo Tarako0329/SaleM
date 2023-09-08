@@ -59,7 +59,7 @@ if(filter_input(INPUT_POST,"answer")){
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
-    include "head_bs5.html" 
+    include "head_bs5.php" 
     ?>
     <!--ページ専用CSS-->
     <TITLE><?php echo $title." forget password";?></TITLE>

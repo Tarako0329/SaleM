@@ -31,12 +31,14 @@
 	//セッションのuserIDがクリアされた場合の再取得処理。
 	$rtn=check_session_userid($pdo_h);
 	
-	//有効期限チェック
-	$sql="select yuukoukigen from Users where uid=?";
+	//ユーザ情報取得
+	$sql="select yuukoukigen,ZeiHasu from Users where uid=?";
 	$stmt = $pdo_h->prepare($sql);
 	$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 	$stmt->execute();
 	$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	
+	//有効期限チェック
 	if($row[0]["yuukoukigen"]==""){
 		//本契約済み
 	}elseif($row[0]["yuukoukigen"] < date("Y-m-d")){
@@ -45,6 +47,9 @@
 		$dir_path =  bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', 1));
 		$emsg="お試し期間、もしくは解約後有効期間が終了しました。<br>継続してご利用頂ける場合は<a href='".PAY_CONTRACT_URL."?system=".TITLE."&sysurl=".$root_url."&dirpath=".$dir_path."'>こちらから本契約をお願い致します </a>";
 	}
+
+	//端数処理設定
+	$ZeiHasu = $row[0]["ZeiHasu"];
 
 	$token = csrf_create();
 
@@ -98,13 +103,10 @@
 <head>
 	<?php
 	//共通部分、bootstrap設定、フォントCND、ファビコン等
-	include 'head_bs5.html'
+	include 'head_bs5.php'
 	?>
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_EVregi.css?<?php echo $time; ?>' >
-	<!--QR生成API-->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.js"></script><!--QRコードライブラリ-->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/9.0.0/decimal.min.js"></script><!--小数演算ライブラリ-->
 	<TITLE><?php echo TITLE.' レジ';?></TITLE>
 	<style>
 		#qrOutput {
@@ -1255,6 +1257,7 @@
 				}
 				*/
 				onMounted(() => {
+					console_log(get_value(1000,0.1,'IN'),'lv3')
 					console_log('onMounted','lv3')
 					total_area.value.style["fontSize"]="3.3rem"
 					get_shouhinMS()

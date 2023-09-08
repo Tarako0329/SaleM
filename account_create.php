@@ -49,7 +49,7 @@ $token=csrf_create();
 <head>
 	<?php 
 	//共通部分、bootstrap設定、フォントCND、ファビコン等
-	include "head_bs5.html" 
+	include "head_bs5.php" 
 	?>
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_account_create.css?<?php echo $time; ?>' >
@@ -64,7 +64,7 @@ $token=csrf_create();
 
 <body class='common_body'>
 	<div id='accountform'>
-		<div class='container' style='padding-top:15px;'>
+		<div class='container' style='padding-top:15px;padding-bottom:50px;'>
 			<div class='col-12 col-md-8'>
 				<template v-if='MSG!==""'>
 					<div v-bind:class='alert_status' role='alert' >{{MSG}}</div>
@@ -95,7 +95,14 @@ $token=csrf_create();
 					<br>
 					<template v-if='mode==="update"'>
 						<input v-model='account["loginrez"]["val"]' :='account["loginrez"]["lock"]' type='checkbox'  id='loginrez' name='LOGINREZ' >
-						<label for='loginrez' >ログイン後レジ画面表示</label>
+						<label for='loginrez' >ログイン後レジ画面表示</label><br>
+						<label for='hasushori' >消費税の端数処理</label>
+						<select v-model='account["ZeiHasu"]["val"]' :='account["ZeiHasu"]["lock"]' class="form-select form-select-lg" style='font-size:1.5rem' id='hasushori' name='ZEIHASU'>
+							<option value=0>切り捨て</option>
+							<option value=1>四捨五入</option>
+							<option value=2>切り上げ</option>
+						</select>
+
 						<br>
 						<hr>
 						<div>ここから下は請求書・納品書・自動送信メールに使用します。<br>使用しない方は入力不要です。</div>
@@ -159,6 +166,10 @@ $token=csrf_create();
 						'val':'<?php echo $row[0]["loginrez"];?>'
 						,'lock':{'readonly':false}
 					},
+					'ZeiHasu':{
+						'val':'<?php echo $row[0]["ZeiHasu"];?>'
+						,'lock':{'readonly':false}
+					},
 					'name':{
 						'val':'<?php echo $row[0]["name"];?>'
 						,'lock':{'readonly':false}
@@ -202,6 +213,7 @@ $token=csrf_create();
 					account.value['question']['lock']['readonly']=true
 					account.value['answer']['lock']['readonly']=true
 					account.value['loginrez']['lock']['readonly']=true
+					account.value['ZeiHasu']['lock']['readonly']=true
 					account.value['name']['lock']['readonly']=true
 					account.value['yagou']['lock']['readonly']=true
 					account.value['yubin']['lock']['readonly']=true
@@ -220,6 +232,7 @@ $token=csrf_create();
 						account.value['question']['lock']['readonly']=false
 						account.value['answer']['lock']['readonly']=false
 						account.value['loginrez']['lock']['readonly']=false
+						account.value['ZeiHasu']['lock']['readonly']=false
 						account.value['name']['lock']['readonly']=false
 						account.value['yagou']['lock']['readonly']=false
 						account.value['yubin']['lock']['readonly']=false

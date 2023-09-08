@@ -55,17 +55,18 @@ if($rtn !== true){
 			}elseif($_POST["mode"] === "update"){
 			
 				if($_SESSION["chk_pass"]==="on"){
-					$sqlstr="update Users set mail=:mail,password=:password,question=:question,answer=:answer,loginrez=:loginrez,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3,invoice_no=:invoice_no where uid=:uid";
+					$sqlstr="update Users set mail=:mail,password=:password,question=:question,answer=:answer,loginrez=:loginrez,zeihasu=:zeihasu,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3,invoice_no=:invoice_no where uid=:uid";
 					$stmt = $pdo_h->prepare($sqlstr);
 					$stmt->bindValue("password", $_SESSION["P"]["password"], PDO::PARAM_STR);
 				}else{
-					$sqlstr="update Users set mail=:mail,question=:question,answer=:answer,loginrez=:loginrez,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3,invoice_no=:invoice_no ,inquiry_tel=:inquiry_tel ,inquiry_mail=:inquiry_mail where uid=:uid";
+					$sqlstr="update Users set mail=:mail,question=:question,answer=:answer,loginrez=:loginrez,zeihasu=:zeihasu,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3,invoice_no=:invoice_no ,inquiry_tel=:inquiry_tel ,inquiry_mail=:inquiry_mail where uid=:uid";
 					$stmt = $pdo_h->prepare($sqlstr);
 				}
 				$stmt->bindValue("mail", $_SESSION["P"]["mail"], PDO::PARAM_STR);
 				$stmt->bindValue("question", $_SESSION["P"]["question"], PDO::PARAM_STR);
 				$stmt->bindValue("answer", $_SESSION["P"]["answer"], PDO::PARAM_STR);
 				$stmt->bindValue("loginrez", $_SESSION["P"]["loginrez"], PDO::PARAM_STR);
+				$stmt->bindValue("zeihasu", $_SESSION["P"]["zeihasu"], PDO::PARAM_STR);
 				$stmt->bindValue("name", $_SESSION["P"]["name"], PDO::PARAM_STR);
 				$stmt->bindValue("yagou", $_SESSION["P"]["yagou"], PDO::PARAM_STR);
 				$stmt->bindValue("yubin", $_SESSION["P"]["yubin"], PDO::PARAM_STR);
@@ -89,22 +90,6 @@ if($rtn !== true){
 	
 			$msg = "登録が完了しました。";
 			$alert_status = "alert-success";
-		/*
-			if($status!==false && $count<>0){
-				$pdo_h->commit();
-				$sqllog .= rtn_sqllog("commit",[]);
-				sqllogger($sqllog,0);
-		
-				$msg = "登録が完了しました。";
-				$alert_status = "alert-success";
-			}else{
-				$pdo_h->rollBack();
-				$sqllog .= rtn_sqllog("rollBack",[]);
-				$msg = "失敗。";
-				$alert_status = "alert-danger";
-				sqllogger($sqlstr,$_SESSION["P"],basename(__FILE__),"ng");
-			}
-		*/
 			$reseve_status=true;
 		}catch(Exception $e){
 			$pdo_h->rollBack();
