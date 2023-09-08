@@ -17,6 +17,17 @@ if($rtn !== true){
 //セッションのIDがクリアされた場合の再取得処理。
 $rtn=check_session_userid($pdo_h);
 
+//ユーザ情報取得
+$sql="select yuukoukigen,ZeiHasu from Users where uid=?";
+$stmt = $pdo_h->prepare($sql);
+$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+$stmt->execute();
+$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//端数処理設定
+$ZeiHasu = $row[0]["ZeiHasu"];
+
+
 //税区分MSリスト取得
 $sqlstr="select * from ZeiMS order by zeiKBN;";
 $stmt = $pdo_h->query($sqlstr);
@@ -49,8 +60,6 @@ $_SESSION["MSG"]=null;
                     echo "<div class='alert alert-success' role='alert' style='width:80%;'>".$success_msg."</div>";
                 }
             ?>
-        
-            
             <div class='row mb-3 item_1' 
                 data-bs-placement='top' data-bs-trigger='click' data-bs-custom-class='custom-tooltip' data-bs-toggle='tooltip' title='１度登録すると商品名は変更できません。'>
                 <label for='shouhinNM' class='col-3 col-sm-2 col-form-label'>商品名</label>
@@ -62,16 +71,16 @@ $_SESSION["MSG"]=null;
             data-bs-placement='top' data-bs-trigger='click' data-bs-custom-class='custom-tooltip' data-bs-toggle='tooltip' title='消費税は『税率』と『税抜・税込』の選択に応じて自動計算されます。'>
                 <label for='new_tanka' class='col-3 col-sm-2 col-form-label'>商品単価</label>
                 <div class='col-8'>
-                    <input type='number' onchange='zei_math()' class='form-control form-control-lg' id='new_tanka' required='required' placeholder='必須'>
+                    <input type='number' v-model='new_tanka' class='form-control form-control-lg' id='new_tanka' required='required' placeholder='必須'>
                 </div>
             </div>
             <div class='row mb-3 item_3'>
                 <div class='col-3 col-sm-2'></div>
                 <div class='col-8'>
                     <div class='input-group'>
-                        <input type='radio' class='btn-check' onchange='zei_math()' name='options' id='option1' value='zeikomi' autocomplete='off' checked>
+                        <input type='radio' v-model='kominuki' class='btn-check' name='options' id='option1' value='IN' autocomplete='off'>
                         <label class='btn btn-outline-primary' style='font-size:1.2rem;border-radius:0;margin-right:0;' for='option1'>税込</label>
-                        <input type='radio' class='btn-check' onchange='zei_math()' name='options' id='option2' value='zeinuki' autocomplete='off'>
+                        <input type='radio' v-model='kominuki' class='btn-check' name='options' id='option2' value='NOTIN' autocomplete='off'>
                         <label class='btn btn-outline-primary' style='font-size:1.2rem;border-radius:0;margin-left:0px;' for='option2'>税抜</label>
                     </div>
                 </div>
@@ -79,7 +88,7 @@ $_SESSION["MSG"]=null;
             <div class='row mb-3 item_4'>
                 <label for='zeikbn' class='col-3 col-sm-2 col-form-label'>税区分</label>
                 <div class='col-8'>
-                    <select class='form-select form-select-lg' aria-label='.form-select-lg example' onchange='zei_math()' id='zeikbn' name='zeikbn' required='required'>
+                    <select class='form-select form-select-lg' aria-label='.form-select-lg example' id='zeikbn' name='zeikbn' required='required'>
                     <?php
                     foreach($stmt as $row){
                         echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
@@ -92,19 +101,19 @@ $_SESSION["MSG"]=null;
                 <div class='row mb-1'>
                     <label for='tanka' class='col-3 col-sm-2 col-form-label'>税抜単価</label>
                     <div class='col-8'>
-                        <input type='number' readonly class='form-control form-control-lg' id='tanka' name='tanka' >
+                        <input type='number' :='tanka' readonly class='form-control form-control-lg' id='tanka' name='tanka' >
                     </div>
                 </div>
                 <div class='row mb-1'>
                     <label for='shouhizei' class='col-3 col-sm-2 col-form-label'>消費税</label>
                     <div class='col-8'>
-                        <input type='number' readonly class='form-control form-control-lg' id='shouhizei' name='shouhizei' >
+                        <input type='number' :='shouhizei' readonly class='form-control form-control-lg' id='shouhizei' name='shouhizei' >
                     </div>
                 </div>                
                 <div class='row mb-3'>
                     <label for='zkomitanka' class='col-3 col-sm-2 col-form-label'>税込単価</label>
                     <div class='col-8'>
-                        <input type='number' readonly class='form-control form-control-lg' id='zkomitanka' aria-describedby='zkomitankaHelp'>
+                        <input type='number' :='zkomitanka' readonly class='form-control form-control-lg' id='zkomitanka' aria-describedby='zkomitankaHelp'>
                         <small id='zkomitankaHelp' class='form-text text-muted'>レジ画面に表示される金額は税込価格です。</small>
                     </div>
                 </div>
@@ -160,8 +169,6 @@ $_SESSION["MSG"]=null;
                 </div>
                 
             </div>
-
-
             <input type='hidden' name='csrf_token' value='<?php echo $csrf_token; ?>'>
             <input type='hidden' style='width:50%' id='hyoujiNO' name='hyoujiNO' placeholder='レジ表示順。未指定の場合は「カテゴリー大>中>小>商品名」の五十音順' value=0>
             <input type='hidden' id='hyoujiKBN2' name='hyoujiKBN2' value=''>
@@ -170,19 +177,17 @@ $_SESSION["MSG"]=null;
         <footer class='common_footer'>
             <button type='submit' class='btn--chk item_13' style='border-radius:0;' value='登録' >登　録</button>
         </footer>
-        
     </form>
-    
-
     <script>
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
         var select = document.getElementById('zeikbn');
-        var tanka = document.getElementById('tanka');
-        var new_tanka = document.getElementById('new_tanka');
-        var shouhizei = document.getElementById('shouhizei');
-        var zkomitanka = document.getElementById('zkomitanka');
-        var kominuki = document.getElementsByName('options')
+        //var tanka = document.getElementById('tanka');
+        //var new_tanka = document.getElementById('new_tanka');
+        //var shouhizei = document.getElementById('shouhizei');
+        //var zkomitanka = document.getElementById('zkomitanka');
+        //var kominuki = document.getElementsByName('options')
+        /*
         var zei_math = function(){
             if(select.value=='0'){//非課税
                 zkomitanka.value=new_tanka.value;
@@ -216,6 +221,7 @@ $_SESSION["MSG"]=null;
                 //
             }
         }
+        */
         document.getElementById("form1").onkeypress = (e) => {
             // form1に入力されたキーを取得
             const key = e.keyCode || e.charCode || 0;
@@ -225,7 +231,39 @@ $_SESSION["MSG"]=null;
                 e.preventDefault();
             }
         }    
-
+    </script>
+	<script>
+		const { createApp, ref, onMounted, computed, VueCookies, watch,nextTick  } = Vue;
+		createApp({
+            setup(){
+                const tanka = ref(0)
+                const new_tanka = ref(0)
+                const shouhizei = ref(0)
+                const zkomitanka = ref(0)
+                const kominuki = ref('IN')
+                const zm = [
+                    <?php
+                    reset($stmt);
+                    foreach($stmt as $row){
+                        echo "{税区分:".secho($row["zeiKBN"]).",税率:".secho($row["zeiritu"])."},\n";
+                    }
+                    ?> 
+                    
+                ]
+				onMounted(() => {
+					console_log(get_value(1000,0.1,'IN'),'lv3')
+                    console_log(zm,'lv3')
+					console_log('onMounted','lv3')
+				})
+				return{
+                    tanka,
+                    new_tanka,
+                    shouhizei,
+                    zkomitanka,
+                    kominuki,
+                }                
+            }
+        }).mount('#form1');
     </script>
 </body>
 <!--シェパードナビ
