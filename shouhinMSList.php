@@ -11,7 +11,8 @@
 
 	//税区分M取得.基本変動しないので残す
 	$ZEIsql="select * from ZeiMS order by zeiKBN;";
-	$ZEIresult = $pdo_h->query($ZEIsql);
+	$stmt = $pdo_h->query($ZEIsql);
+	$ZEIresult = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 <!DOCTYPE html>
@@ -37,9 +38,9 @@
 		<div class='header2'>
 			<div class='container-fluid'>
 				<div style='padding:0 5px;'>
-					<input type='radio' class='btn-check' name='options' value='komi' autocomplete='off' v-model='upd_zei_kominuki' id='plus_mode'>
+					<input type='radio' class='btn-check' name='options' value='IN' autocomplete='off' v-model='upd_zei_kominuki' id='plus_mode'>
 					<label class='btn btn-outline-primary' style='font-size:1.2rem;border-radius:0;' for='plus_mode'>税込入力</label>
-					<input type='radio' class='btn-check' name='options' value='nuki' autocomplete='off' v-model='upd_zei_kominuki' id='minus_mode'>
+					<input type='radio' class='btn-check' name='options' value='NOTIN' autocomplete='off' v-model='upd_zei_kominuki' id='minus_mode'>
 					<label class='btn btn-outline-primary' style='font-size:1.2rem;border-radius:0;' for='minus_mode'>税抜入力</label>
 				</div>
 				<div style='position:fixed;right:10px;top:75px;width:120px;display:block;'>
@@ -63,7 +64,7 @@
 			</div>
 		</div>
 	
-		<main class='common_body'>
+		<main class='common_body' >
 			<div class='container-fluid'>
 				<template v-if='MSG!==""'>
 					<div :class='alert_status' role='alert'>{{MSG}}</div>
@@ -98,7 +99,6 @@
 								￥{{Number(list.moto_kin).toLocaleString()}}
 							</td>
 							<td style='padding:10px 10px;'>
-								<!--<input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' class='form-check-input' style='transform:scale(1.4);' v-model='list.disp_rezi'>-->
 								<div class="form-check form-switch">
 									<input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' class='form-check-input' v-model='list.disp_rezi' :id='`${list.shouhinCD}`'>
 									<label v-if='list.disp_rezi!==true' class='form-check-label' :for='`${list.shouhinCD}`'>非表示</label>
@@ -109,7 +109,6 @@
 						<tr>
 							<td><input @blur='set_new_value(index,`#new_val_${index}`)' :id='`new_val_${index}`' type='number' class='form-contral' style='width:100%;text-align:center' placeholder='新価格' ></td>   <!--単価修正欄 -->
 							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' align='right'>
-								<!--<input type='hidden' readonly='readonly' :name ='`ORDERS[${index}][tanka]`' class='form-contral' style='font-size:1.7rem;width:7rem;background-color:#fff;border:0;' :value='list.tanka'>-->
 								￥{{Number(list.tanka).toLocaleString()}}
 							</td><!--登録単価-->
 							<td>
@@ -123,11 +122,10 @@
 								</select>
 							</td>
 							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' align='right'><!--list.tanka_zei-->
-								<!--<input type='number' readonly='readonly' :name ='`ORDERS[${index}][shouhizei]`' class='form-contral' style='font-size:1.7rem;width:7rem;background-color:#fff;border:0' :value='list.tanka_zei'>-->
 								￥{{Number(list.tanka_zei).toLocaleString()}}
-							</td>
+							</td> 
 						</tr>
-						<tr>
+						<tr style='border-bottom:3px;'>
 							<td><input type='number' :name ='`ORDERS[${index}][genka]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.genka_tanka'></td>
 							<td class=''><input type='number' :name ='`ORDERS[${index}][utisu]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.utisu'></td>
 							<td class=''><input type='text'   :name ='`ORDERS[${index}][tani]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.tani'></td>
@@ -291,9 +289,19 @@
 				})//商品マスタバックアップもソート・フィルタ
 
 				//更新関連
-				const upd_zei_kominuki = ref('komi')
+				const upd_zei_kominuki = ref('IN')
+				const zm = [
+                    <?php
+                    reset($ZEIresult);
+                    foreach($ZEIresult as $row2){
+                        echo "{税区分:".$row2["zeiKBN"].",税率:".($row2["zeiritu"]/100)."},\n";
+                    }
+                    ?> 
+                ]
 				const return_tax = (kingaku,zeikbn,kominuki) => {
-					//console_log('return_tax start','lv3')
+					console_log('return_tax start','lv3')
+					console_log(zm,'lv3')
+					/*
 					let zeiritu
 					if(zeikbn==='0'){
 						zeiritu=0
@@ -312,24 +320,39 @@
 						//return Math.floor(kingaku * (zeiritu / 100));
 						return Math.trunc(kingaku * (zeiritu / 100));
 					}
+					*/
+					let zmrec = ([])
+          zmrec = zm.filter((list)=>{
+              return list.税区分 == zeikbn
+          })
+					const values = get_value(Number(kingaku),Number(zmrec[0]["税率"]),kominuki)
+					return values;
 				}
 				const set_new_value = (index,new_val_id) => {
 					//単価入力欄から本体と消費税を算出し、セットする
-					//console_log(`set_new_value start (${index}:${new_val_id})`,'lv3')
+					console_log(`set_new_value start (${index}:${new_val_id})`,'lv3')
 					const new_val = document.querySelector(new_val_id).value
-					let tax = return_tax(new_val, shouhinMS.value[index].zeiKBN.toString(), upd_zei_kominuki.value)
+					let values 
 					//console_log(`set_new_value start (${index}:${new_val_id} new_val = ${new_val})`,'lv3')
 
 					if(new_val !== ''){
-						if(upd_zei_kominuki.value==='komi'){
+						/*
+						if(upd_zei_kominuki.value==='IN'){
 							shouhinMS.value[index].tanka = Number(new_val) - Number(tax)
 							shouhinMS.value[index].tanka_zei = tax
 						}else{
 							shouhinMS.value[index].tanka = new_val
 							shouhinMS.value[index].tanka_zei = tax
 						}
+						*/
+						values = return_tax(new_val, shouhinMS.value[index].zeiKBN, upd_zei_kominuki.value)
+						shouhinMS.value[index].tanka = values[0]["本体価格"]
+						shouhinMS.value[index].tanka_zei = values[0].消費税
 					}else if(shouhinMS.value[index].zeiKBN !== shouhinMS_BK.value[index].zeiKBN){
-						shouhinMS.value[index].tanka_zei = return_tax(shouhinMS.value[index].tanka, shouhinMS.value[index].zeiKBN.toString(), 'nuki')
+						//税率のみ変更した場合は現在の単価から算出する
+						//shouhinMS.value[index].tanka_zei = return_tax(shouhinMS.value[index].tanka, shouhinMS.value[index].zeiKBN.toString(), 'nuki')
+						values = return_tax(shouhinMS.value[index].tanka, shouhinMS.value[index].zeiKBN, 'NOTIN')
+						shouhinMS.value[index].tanka_zei = values[0].消費税
 					}else{//新価格が空白の場合、本体・税額・税区分を元に戻す
 						shouhinMS.value[index].tanka = shouhinMS_BK.value[index].tanka
 						shouhinMS.value[index].tanka_zei = shouhinMS_BK.value[index].tanka_zei
@@ -352,6 +375,7 @@
 
 				const MSG = ref('<?php echo $_SESSION["MSG"]; ?>')
 				const alert_status = ref(['alert','<?php echo $_SESSION["alert"]; ?>'])
+
 				onMounted(() => {
 					console_log('onMounted','lv3')
 					get_shouhinMS()

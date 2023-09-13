@@ -22,7 +22,9 @@ const get_value=(value,zei,kbn) => {
   let zeikomi
   let zeiritu = new Decimal(zei)
   let temp,temp2
-  let msg
+  let msg = 'OK'
+
+  console_log(`NewVal:${value}, %:${zei}, :${kbn}`,'lv3')
 
   if(ZEIHASU===0 || ZEIHASU===1 || ZEIHASU===2){
   }else{
@@ -31,7 +33,7 @@ const get_value=(value,zei,kbn) => {
   }
   
   if(zei===0){
-    return [{本体価格:value,消費税:0,税込価格:value,E:''}]
+    return [{本体価格:value,消費税:0,税込価格:value,E:msg}]
   }else if(kbn==='NOTIN'){
     temp = new Decimal(Number(value))
     hontai = value
@@ -68,6 +70,8 @@ const get_value=(value,zei,kbn) => {
   zeikomi = Number(hontai) + Number(zeigaku)
   if(kbn==='IN' && value!==zeikomi){
     msg = '税込金額は設定できません'
+  }else{
+    //msg=''
   }
   return [{本体価格:hontai,消費税:zeigaku,税込価格:zeikomi,E:msg}]
 }

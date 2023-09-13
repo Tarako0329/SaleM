@@ -31,6 +31,7 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 //税区分MSリスト取得
 $sqlstr="select * from ZeiMS order by zeiKBN;";
 $stmt = $pdo_h->query($sqlstr);
+$zeimaster = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $csrf_token=csrf_create();
 
 $success_msg = (!empty($_SESSION["MSG"])?$_SESSION["MSG"]:"");
@@ -88,9 +89,9 @@ $_SESSION["MSG"]=null;
             <div class='row mb-3 item_4'>
                 <label for='zeikbn' class='col-3 col-sm-2 col-form-label'>税区分</label>
                 <div class='col-8'>
-                    <select class='form-select form-select-lg' aria-label='.form-select-lg example' id='zeikbn' name='zeikbn' required='required'>
+                    <select v-model='zeikbn' class='form-select form-select-lg' style='font-size:1.2rem;' id='zeikbn' name='zeikbn' required='required'>
                     <?php
-                    foreach($stmt as $row){
+                    foreach($zeimaster as $row){
                         echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
                     }
                     ?> 
@@ -101,19 +102,19 @@ $_SESSION["MSG"]=null;
                 <div class='row mb-1'>
                     <label for='tanka' class='col-3 col-sm-2 col-form-label'>税抜単価</label>
                     <div class='col-8'>
-                        <input type='number' :='tanka' readonly class='form-control form-control-lg' id='tanka' name='tanka' >
+                        <input type='number' v-model='tanka' readonly class='form-control form-control-lg' id='tanka' name='tanka' >
                     </div>
                 </div>
                 <div class='row mb-1'>
                     <label for='shouhizei' class='col-3 col-sm-2 col-form-label'>消費税</label>
                     <div class='col-8'>
-                        <input type='number' :='shouhizei' readonly class='form-control form-control-lg' id='shouhizei' name='shouhizei' >
+                        <input type='number' v-model='shouhizei' readonly class='form-control form-control-lg' id='shouhizei' name='shouhizei' >
                     </div>
                 </div>                
                 <div class='row mb-3'>
                     <label for='zkomitanka' class='col-3 col-sm-2 col-form-label'>税込単価</label>
                     <div class='col-8'>
-                        <input type='number' :='zkomitanka' readonly class='form-control form-control-lg' id='zkomitanka' aria-describedby='zkomitankaHelp'>
+                        <input type='number' v-model='zkomitanka' readonly class='form-control form-control-lg' id='zkomitanka' aria-describedby='zkomitankaHelp'>
                         <small id='zkomitankaHelp' class='form-text text-muted'>レジ画面に表示される金額は税込価格です。</small>
                     </div>
                 </div>
@@ -179,49 +180,9 @@ $_SESSION["MSG"]=null;
         </footer>
     </form>
     <script>
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-        var select = document.getElementById('zeikbn');
-        //var tanka = document.getElementById('tanka');
-        //var new_tanka = document.getElementById('new_tanka');
-        //var shouhizei = document.getElementById('shouhizei');
-        //var zkomitanka = document.getElementById('zkomitanka');
-        //var kominuki = document.getElementsByName('options')
-        /*
-        var zei_math = function(){
-            if(select.value=='0'){//非課税
-                zkomitanka.value=new_tanka.value;
-                tanka.value = new_tanka.value;
-                shouhizei.value=0;
-            }else if(kominuki[0].checked){//税込
-                switch(select.value){
-                    case '1001':
-                        zkomitanka.value=new_tanka.value;
-                        shouhizei.value=Math.trunc(new_tanka.value - (new_tanka.value / (1 + 8 / 100)));
-                        break;
-                    case '1101':
-                        zkomitanka.value=new_tanka.value;
-                        shouhizei.value=Math.trunc(new_tanka.value - (new_tanka.value / (1 + 10 / 100)));
-                        break;
-                }
-                tanka.value = zkomitanka.value - shouhizei.value;
-            }else if(kominuki[1].checked){//税抜
-                switch(select.value){
-                    case '1001':
-                        zkomitanka.value=Math.trunc(new_tanka.value * (1 + 8 / 100));
-                        shouhizei.value=Math.trunc(new_tanka.value * (8 / 100));
-                        break;
-                    case '1101':
-                        zkomitanka.value=Math.trunc(new_tanka.value * (1 + 10 / 100));
-                        shouhizei.value=Math.trunc(new_tanka.value * (10 / 100));
-                        break;
-                }
-                tanka.value = new_tanka.value;
-            }else{
-                //
-            }
-        }
-        */
+        //const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        //const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
         document.getElementById("form1").onkeypress = (e) => {
             // form1に入力されたキーを取得
             const key = e.keyCode || e.charCode || 0;
@@ -237,23 +198,39 @@ $_SESSION["MSG"]=null;
 		createApp({
             setup(){
                 const tanka = ref(0)
-                const new_tanka = ref(0)
+                const new_tanka = ref()
                 const shouhizei = ref(0)
                 const zkomitanka = ref(0)
                 const kominuki = ref('IN')
+                const zeikbn = ref('')
                 const zm = [
                     <?php
-                    reset($stmt);
-                    foreach($stmt as $row){
-                        echo "{税区分:".secho($row["zeiKBN"]).",税率:".secho($row["zeiritu"])."},\n";
+                    reset($zeimaster);
+                    foreach($zeimaster as $row2){
+                        echo "{税区分:".$row2["zeiKBN"].",税率:".($row2["zeiritu"]/100)."},\n";
                     }
                     ?> 
-                    
                 ]
+
+                watch([zeikbn,new_tanka,kominuki],() => {
+                    let zmrec = ([])
+                    zmrec = zm.filter((list)=>{
+                        return list.税区分 == zeikbn.value
+                    })
+                    const values = get_value(Number(new_tanka.value),Number(zmrec[0]["税率"]),kominuki.value)
+                    tanka.value = values[0]["本体価格"]
+                    shouhizei.value = values[0].消費税
+                    zkomitanka.value = values[0].税込価格
+                    if(values[0].E !== 'OK'){
+                        alert('指定の税込額は本体価格に小数を設定しないと実現できません')
+                    }
+                })
 				onMounted(() => {
-					console_log(get_value(1000,0.1,'IN'),'lv3')
-                    console_log(zm,'lv3')
+					//console_log(get_value(1000,0.1,'IN'),'lv3')
 					console_log('onMounted','lv3')
+                    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+                    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
 				})
 				return{
                     tanka,
@@ -261,6 +238,7 @@ $_SESSION["MSG"]=null;
                     shouhizei,
                     zkomitanka,
                     kominuki,
+                    zeikbn,
                 }                
             }
         }).mount('#form1');

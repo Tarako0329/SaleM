@@ -188,9 +188,9 @@
 		</div>
 		<div class='header-plus-minus d-flex justify-content-center align-items-center ' style='font-size:1.4rem;font-weight:700;top: 156px;height:52px;'>
 			<div id='header-pm' style='padding:0;'>
-			<input type='radio' class='btn-check' name='ZeiChange' value='10' autocomplete='off' v-model='ZeiChange' id='eatin'>
+			<input type='radio' class='btn-check' name='ZeiChange' value='0.1' autocomplete='off' v-model='ZeiChange' id='eatin'>
 				<label class='btn btn-outline-danger ' for='eatin' style='border-radius:0;'>イートイン</label>
-				<input type='radio' class='btn-check' name='ZeiChange' value='8' autocomplete='off' v-model='ZeiChange' id='takeout'>
+				<input type='radio' class='btn-check' name='ZeiChange' value='0.08' autocomplete='off' v-model='ZeiChange' id='takeout'>
 				<label class='btn btn-outline-danger ' for='takeout' style='border-radius:0;'>テイクアウト</label>
 				<input type='radio' class='btn-check' name='ZeiChange' value='0' autocomplete='off' v-model='ZeiChange' id='defo' >
 				<label class='btn btn-outline-primary ' for='defo' style='border-radius:0;'>戻る</label>
@@ -687,16 +687,23 @@
 				const pm = ref('1')
 				const ZeiChange = ref('0')
 				watch([ZeiChange],() => {
-					//console_log('watch now','lv3')
-          if(ZeiChange.value[0]==='0'){
+					console_log(`watch now:${ZeiChange.value}`,'lv3')
+          if(ZeiChange.value==='0'){
 						get_shouhinMS()
-					}else if(ZeiChange.value==='8' ||ZeiChange.value==='10'){
+					}else if(ZeiChange.value==='0.08' ||ZeiChange.value==='0.1'){
 						shouhinMS.value.forEach((list) =>{
+							/*
 							let tanka = new Decimal(list.tanka)
 							list.tanka_zei = Math.trunc(tanka.mul(Number(ZeiChange.value) / 100))
 							list.zeikomigaku = Math.trunc(tanka.mul((Number(ZeiChange.value) + 100) / 100))
 							list.zeiKBN = ZeiChange.value==='8' ? 1001 : 1101
 							list.hyoujimei = ZeiChange.value==='8' ? '8%' : '10%'
+							*/
+							let values = get_value(Number(list.tanka),Number(ZeiChange.value),'NOTIN')
+							list.tanka_zei = values[0].消費税
+							list.zeikomigaku = values[0].税込価格
+							list.zeiKBN = ZeiChange.value==='0.08' ? 1001 : 1101
+							list.hyoujimei = ZeiChange.value==='0.08' ? '8%' : '10%'
 						})
 					}else{
 						

@@ -26,9 +26,9 @@
 
     <script>
         var KANKYO = <?php echo "'".EXEC_MODE."'" ;?>;
-        var ZEIHASU = <?php echo $ZeiHasu ;?>;
+        var ZEIHASU = <?php echo $ZeiHasu+0 ;?>;
     </script>
-    <script src="script/function.js"></script>
+    <script src="script/function.js?<?php echo $time; ?>"></script>
 
 
     <link rel='manifest' href='manifest.webmanifest'>

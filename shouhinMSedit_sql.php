@@ -18,7 +18,7 @@ if($rtn !== true){
     redirect_to_login($rtn);
 }
 
-//税区分MSから税率の取得
+//税区分MSから税率の取得 
 try{
     $pdo_h->beginTransaction();
     $sqllog .= rtn_sqllog("START TRANSACTION",[]);
