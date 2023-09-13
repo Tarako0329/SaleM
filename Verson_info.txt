@@ -63,7 +63,7 @@ ver2.99.0-056:売上実績削除単位の変更(インボイス対応) -commited
 ver2.99.0-057:レジ画面改修・税計算機能の切り出し
 	イートイン・テイクアウト機能の追加 OK
 	商品の消費税計算をJS切り出しして共通関数にする OK
-	ユーザー情報で消費税の端数処理セット
+	ユーザー情報で消費税の端数処理セット OK
 	ALTER TABLE `users` CHANGE `kinouflg1` `ZeiHasu` TINYINT(1) NULL DEFAULT '0' COMMENT '消費税端数:0切捨/1四捨五入/2切上';
 
 【Issues】

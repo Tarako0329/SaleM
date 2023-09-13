@@ -5,9 +5,20 @@
 	if($rtn !== true){
 			redirect_to_login($rtn);
 	}
-	
+	//セッションのIDがクリアされた場合の再取得処理。
+	$rtn=check_session_userid($pdo_h);
+
 	$csrf_create = csrf_create();
-	$MSG = (empty($_SESSION["MSG"])?"":$_SESSION["MSG"]);
+	//$MSG = (empty($_SESSION["MSG"])?"":$_SESSION["MSG"]);
+	//ユーザ情報取得
+	$sql="select yuukoukigen,ZeiHasu from Users where uid=?";
+	$stmt = $pdo_h->prepare($sql);
+	$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+	$stmt->execute();
+	$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//端数処理設定
+$ZeiHasu = $row[0]["ZeiHasu"];
 
 	//税区分M取得.基本変動しないので残す
 	$ZEIsql="select * from ZeiMS order by zeiKBN;";
@@ -331,7 +342,8 @@
 				const set_new_value = (index,new_val_id) => {
 					//単価入力欄から本体と消費税を算出し、セットする
 					console_log(`set_new_value start (${index}:${new_val_id})`,'lv3')
-					const new_val = document.querySelector(new_val_id).value
+					const new_val = document.querySelector(new_val_id)
+					console_log(new_val,'lv3')
 					let values 
 					//console_log(`set_new_value start (${index}:${new_val_id} new_val = ${new_val})`,'lv3')
 
@@ -345,9 +357,13 @@
 							shouhinMS.value[index].tanka_zei = tax
 						}
 						*/
-						values = return_tax(new_val, shouhinMS.value[index].zeiKBN, upd_zei_kominuki.value)
+						values = return_tax(new_val.value, shouhinMS.value[index].zeiKBN, upd_zei_kominuki.value)
 						shouhinMS.value[index].tanka = values[0]["本体価格"]
 						shouhinMS.value[index].tanka_zei = values[0].消費税
+						if(values[0].E !== 'OK'){
+              alert('指定の税込額は税率計算で端数が発生するため実現できません')
+							new_val.value = values[0].税込価格
+            }
 					}else if(shouhinMS.value[index].zeiKBN !== shouhinMS_BK.value[index].zeiKBN){
 						//税率のみ変更した場合は現在の単価から算出する
 						//shouhinMS.value[index].tanka_zei = return_tax(shouhinMS.value[index].tanka, shouhinMS.value[index].zeiKBN.toString(), 'nuki')
@@ -359,6 +375,7 @@
 						shouhinMS.value[index].zeiKBN = shouhinMS_BK.value[index].zeiKBN
 					}
 				}
+
 				watch(upd_zei_kominuki,() => {
 					shouhinMS.value.forEach((row,index) => {
 						set_new_value(index,`#new_val_${index}`)

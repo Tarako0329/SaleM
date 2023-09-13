@@ -222,7 +222,7 @@ $_SESSION["MSG"]=null;
                     shouhizei.value = values[0].消費税
                     zkomitanka.value = values[0].税込価格
                     if(values[0].E !== 'OK'){
-                        alert('指定の税込額は本体価格に小数を設定しないと実現できません')
+                        alert('指定の税込額は税率計算で端数が発生するため実現できません')
                     }
                 })
 				onMounted(() => {
