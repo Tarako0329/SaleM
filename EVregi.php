@@ -283,7 +283,7 @@
 											</button>
 										</template>
 										<div v-if='pm==="-1"' class='btn-view btn--rezi-minus bg-warning'></div>
-										<div class='btn--rezi-tax bg-warning text-center'>{{list.hyoujimei}}</div>
+										<div class='btn--rezi-tax text-right'>{{list.hyoujimei}}</div>
 										<input type='hidden' :name ="`ORDERS[${index}][CD]`" :value = "list.shouhinCD">
 										<input type='hidden' :name ="`ORDERS[${index}][NM]`" :value = "list.shouhinNM">
 										<input type='hidden' :name ="`ORDERS[${index}][UTISU]`" :value = "list.utisu">
