@@ -369,12 +369,13 @@ INPUT.su{
 #header-pm>.minus::before {
     background-color: #ebee3f;
 }
-
-@media screen and (max-width:767px) {/*md以下*/
+/*md以下*//*
+@media screen and (max-width:767px) {
     .order_list{
         display:NONE;
     }
 }
+*/
 @media screen and (min-width:767px) {/*md以上*/
     .ordered{
         font-size:1.8rem;
@@ -389,7 +390,7 @@ INPUT.su{
     }
 }
 
-.container {
+.container,.container-fluid {
     animation: fadein 0.7s ease-out forwards;
     padding:0 5px;
 }

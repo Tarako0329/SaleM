@@ -24,7 +24,7 @@ const get_value=(value,zei,kbn) => {
   let temp,temp2
   let msg = 'OK'
 
-  console_log(`NewVal:${value}, %:${zei}, :${kbn}`,'lv3')
+  console_log(`NewVal:${value}, %:${zei}, :${kbn} ::端数${ZEIHASU}`,'lv3')
 
   if(ZEIHASU===0 || ZEIHASU===1 || ZEIHASU===2){
   }else{
