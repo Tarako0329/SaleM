@@ -202,12 +202,12 @@
 				<label class='btn btn-outline-primary ' for='defo' style='border-radius:0;'>戻る</label>
 			</div>
 		</div>
-		<div class=' accordion item_11 item_12' id="accordionExample" style=''><!--割引処理-->
+		<div class=' accordion item_11 item_12' id="accordionExample"><!--割引処理-->
 			<div v-if='chk_register_show==="register"' class='header-plus-minus' style='padding-top:5px;font-size:1.4rem;font-weight:700;top: 156px;height:52px;'>
 				<hr>
 				<div class='accordion-item'>
 					<h2 class='accordion-header' id='headingOne'>
-						<button type='button' class='accordion-button collapsed' style='font-size:2.2rem;' data-bs-toggle='collapse' data-bs-target='#collapseOne' aria-expanded='false' aria-controls='collapseOne'>
+						<button type='button' class='accordion-button collapsed' style='font-size:2.1rem;' data-bs-toggle='collapse' data-bs-target='#collapseOne' aria-expanded='false' aria-controls='collapseOne'>
 							割引・割増
 						</button>
 					</h2>
@@ -676,6 +676,10 @@
 				const auto_ajust = ref(true)
 				let auto_ajust_flg = false
 				const btn_changer = (args) => {	//確認ボタン・戻るボタンを押したとき
+					if(pay.value===0){
+						alert('商品が選択されてません')
+						return 
+					}
 					chk_register_show.value = args
 					if(args==='register'){	//登録モード
 						pay_bk = pay.value
