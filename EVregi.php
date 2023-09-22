@@ -962,12 +962,15 @@
 							sagaku_zan = sagaku_zan - (Number(row['本体額']) + Number(row['調整額']) + row["消費税"])
 						}
 						if(sagaku_zan !== 0){
+							alert("消費税で端数がでちゃうのでピッタリにできませんでした。")
+							/*
 							console_log(sagaku_zan,"lv3")
 							//hontai.value[0]["調整額"] += Number(sagaku_zan)
 
 							hontai.value[index]['調整額'] += Number(sagaku_zan)
 							hontai_val = new Decimal(Number(hontai.value[index]['本体額']) + Number(hontai.value[index]['調整額']))
 							hontai.value[index]['消費税'] = Math.round(hontai_val.mul(zeiritu))
+							*/
 						}
 						pay.value = 0
 						kaikei_zei.value = 0
