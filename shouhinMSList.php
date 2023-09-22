@@ -83,45 +83,52 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 				<input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
 				<table class='table result_table item_1' style='width:100%;max-width:630px;table-layout: fixed;'>
 					<thead>
-					
 						<tr style='height:30px;'>
 							<th class='th1' scope='col' colspan='2' style='width:auto;padding:0px 5px 0px 0px;'>ID:商品名</th>
-							<th class='th1' scope='col'>元税込価格</th>
 							<th class='th1' scope='col'>レジ</th>
+							<th class='th1' scope='col'>現税込価格</th>
 						</tr>
 						<tr style='height:30px;'>
 							<th scope='col' >単価変更</th>
 							<th scope='col' style='color:red;'>本体額</th>
-							<th scope='col' >税率(%)</th>
 							<th scope='col' style='color:red;'>消費税</th>
+							<th scope='col' >新税込価格</th>
 						</tr>
 						<tr>
-							<th class='th2' scope='col'>原価</th>
-							<th class='th2' scope='col' class=''>内容量</th><!--d-none d-sm-table-cell-->
-							<th class='th2' scope='col' class=''>単位</th>
-							<th class='th2' scope='col'>削除</th>
+							<th class='th2' scope='col'>税率(%)</th>
+							<th class='th2' scope='col' class=''>原価</th>
+							<th class='th2' scope='col' class=''>内容量(単位)</th>
+							<th class='th2 text-center' scope='col'>削除</th>
 						</tr>
 					
 					</thead>
 					<tbody v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
 						<tr>
 							<td style='font-size:1.7rem;font-weight:700;' colspan='2'>{{list.shouhinCD}}:{{list.shouhinNM}}</td><!--商品名-->
-							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' align='right'><!--変更前価格-->
-								￥{{Number(list.moto_kin).toLocaleString()}}
-							</td>
 							<td style='padding:10px 10px;'>
 								<div class="form-check form-switch">
 									<input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' class='form-check-input' v-model='list.disp_rezi' :id='`${list.shouhinCD}`'>
-									<label v-if='list.disp_rezi!==true' class='form-check-label' :for='`${list.shouhinCD}`'>非表示</label>
+									<label v-if='list.disp_rezi!==true' class='form-check-label' :for='`${list.shouhinCD}`' style='font-size:1.2rem;'>非表示</label>
 									<label v-if='list.disp_rezi===true' class='form-check-label' :for='`${list.shouhinCD}`'>表示</label>
 								</div>
 							</td>
+							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' align='right'><!--変更前価格-->
+								￥{{Number(list.moto_kin).toLocaleString()}}
+							</td>
 						</tr>
 						<tr>
-							<td><input @blur='set_new_value(index,`#new_val_${index}`)' :id='`new_val_${index}`' type='number' class='form-contral' style='width:100%;text-align:center' placeholder='新価格' ></td>   <!--単価修正欄 -->
+							<td><input @blur='set_new_value(index,`#new_val_${index}`)' :id='`new_val_${index}`' type='number' class='form-contral' style='width:100%;text-align:right' placeholder='新価格' ></td>   <!--単価修正欄 -->
 							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' align='right'>
 								￥{{Number(list.tanka).toLocaleString()}}
 							</td><!--登録単価-->
+							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' align='right'><!--list.tanka_zei-->
+								￥{{Number(list.tanka_zei).toLocaleString()}}
+							</td> 
+							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' align='right'><!--list.tanka_zei-->
+								￥{{(Number(list.tanka) + Number(list.tanka_zei)).toLocaleString()}}
+							</td> 
+						</tr>
+						<tr style='border-bottom:3px;'>
 							<td>
 								<select v-model='list.zeiKBN' @change='set_new_value(index,`#new_val_${index}`)' :name ='`ORDERS[${index}][zeikbn]`' class='form-select form-select-lg' 
 								style='font-size:1.7rem;width:100%;height:30px;'><!--税区分 -->
@@ -131,16 +138,15 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 									}
 									?>
 								</select>
+
 							</td>
-							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' align='right'><!--list.tanka_zei-->
-								￥{{Number(list.tanka_zei).toLocaleString()}}
-							</td> 
-						</tr>
-						<tr style='border-bottom:3px;'>
 							<td><input type='number' :name ='`ORDERS[${index}][genka]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.genka_tanka'></td>
-							<td class=''><input type='number' :name ='`ORDERS[${index}][utisu]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.utisu'></td>
-							<td class=''><input type='text'   :name ='`ORDERS[${index}][tani]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.tani'></td>
+							<!--<td class=''><input type='number' :name ='`ORDERS[${index}][utisu]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.utisu'></td>-->
 							<td class=''>
+								<input type='number' :name ='`ORDERS[${index}][utisu]`' class='form-contral' style='width:60%;text-align:right;padding-right:15px;' :value='list.utisu'>
+								<input type='text'   :name ='`ORDERS[${index}][tani]`' class='form-contral' style='width:20%;text-align:right;padding-right:15px;' :value='list.tani'>
+							</td>
+							<td class=' text-center'>
 								<a href='#' @click='delete_item(list.shouhinNM,`shouhinDEL_sql.php?cd=${list.shouhinCD}&nm=${list.shouhinNM}&csrf_token=<?php echo $csrf_create; ?>`)'>
 									<i class='fa-regular fa-trash-can fa-2x'></i>
 								</a>
@@ -343,21 +349,15 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 					//単価入力欄から本体と消費税を算出し、セットする
 					console_log(`set_new_value start (${index}:${new_val_id})`,'lv3')
 					const new_val = document.querySelector(new_val_id)
-					console_log(new_val,'lv3')
+					console_log(new_val.value,'lv3')
 					let values 
 					//console_log(`set_new_value start (${index}:${new_val_id} new_val = ${new_val})`,'lv3')
 
-					if(new_val !== ''){
-						/*
-						if(upd_zei_kominuki.value==='IN'){
-							shouhinMS.value[index].tanka = Number(new_val) - Number(tax)
-							shouhinMS.value[index].tanka_zei = tax
-						}else{
-							shouhinMS.value[index].tanka = new_val
-							shouhinMS.value[index].tanka_zei = tax
-						}
-						*/
+					if(new_val.value !== ''){
+						console_log(`新価格あり：${new_val.value}`,"lv3")
+						console_log(upd_zei_kominuki.value,"lv3")
 						values = return_tax(new_val.value, shouhinMS.value[index].zeiKBN, upd_zei_kominuki.value)
+						console_log(values,"lv3")
 						shouhinMS.value[index].tanka = values[0]["本体価格"]
 						shouhinMS.value[index].tanka_zei = values[0].消費税
 						if(values[0].E !== 'OK'){

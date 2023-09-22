@@ -16,7 +16,7 @@ const get_value=(value,zei,kbn) => {
   //value:入力値
   //zei:税率(0 ～ 1)
   //kbn:IN-税込 NOTIN-本体
-  //return [本体価格,消費税,税込価格]
+  //return [本体価格,消費税,税込価格,E:msg]
   let hontai
   let zeigaku
   let zeikomi

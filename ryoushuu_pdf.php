@@ -107,9 +107,16 @@ $inquiry = (!empty($userinfo["inquiry_tel"])?$userinfo["inquiry_tel"]:"")."/".$u
 			$insDT = (string)$row["insDatetime"];
 			$EvName = $row["Event"];
 			$TkName = $row["TokuisakiNM"];
-		}//
-		$meisai .= "<tr><td style='text-align:left;'>".($row["zeiKBN"]=="1001"?"※":"").$row["ShouhinNM"]."</td><td class='meisaival'>".number_format($row["su"]);
-		$meisai .= "</td><td class='meisaival'>".number_format($row["tanka"])."</td><td class='meisaival'>".number_format($row["UriageKin"])."</td></tr>\n";
+		}
+		if(substr($row["ShouhinCD"],0,1)!=="C"){
+			$meisai .= "<tr><td style='text-align:left;'>".($row["zeiKBN"]=="1001"?"※": ($row["zeiKBN"]=="0"?"(非課税)":"")).$row["ShouhinNM"]."</td><td class='meisaival'>".number_format($row["su"]);
+			$meisai .= "</td><td class='meisaival'>".number_format($row["tanka"])."</td><td class='meisaival'>".number_format($row["UriageKin"])."</td></tr>\n";
+	
+		}else{
+			$meisai .= "<tr><td style='text-align:left;'>".($row["zeiKBN"]=="1001"?"※": "").$row["ShouhinNM"]."</td><td class='meisaival'>".number_format($row["su"]);
+			$meisai .= "</td><td class='meisaival'>".number_format($row["tanka"])."</td><td class='meisaival'>".number_format($row["UriageKin"])."</td></tr>\n";
+	
+		}
 		$Goukei += $row["UriageKin"];
 		$i++;
 	}
@@ -188,7 +195,7 @@ $html = <<< EOM
 				padding:auto 5px;
 			}
 			.meisaival{
-				width:50px;
+				width:80px;
 				min-width:50px;
 				text-align: right;
 				padding:auto 5px;
