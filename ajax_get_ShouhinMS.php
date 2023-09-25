@@ -25,7 +25,14 @@ if(!empty($_POST)){
 	// DBとの接続
 	$pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 	//$sqlstr = "select *,tanka+tanka_zei as moto_kin from vw_shouhinms where uid = ? order by shouhinNM";
-	$sqlstr = "select SM.*,tanka+tanka_zei as moto_kin,ZM.hyoujimei,length(ShouhinNM) as nm_bite from vw_shouhinms SM inner join ZeiMS ZM on SM.zeiKBN = ZM.zeiKBN where uid = ? order by shouhinNM";
+	$sqlstr = "select SM.*
+		,tanka+tanka_zei as moto_kin
+		,ZM.hyoujimei,length(ShouhinNM) as nm_bite
+		,tanka_zei as bk_tanka_zei
+		,ZM.zeiritu as bk_zeiritu
+		,SM.zeiKBN as bk_zeiKBN
+		,ZM.hyoujimei as bk_hyoujimei 
+		from vw_shouhinms SM inner join ZeiMS ZM on SM.zeiKBN = ZM.zeiKBN where uid = ? order by shouhinNM";
 	//log_writer2("ajax_get_MSCategory_list.php ",$sqlstr,"lv3");
 
 	$stmt = $pdo_h->prepare($sqlstr);
