@@ -1,11 +1,14 @@
 //js 共通関数格納予定
 const console_log=(log,lv)=>{
-  //$kankyo:lv1=全環境 lv2=本番以外 lv3=テスト・ローカル環境のみ
-  if(lv==="lv1"){
+  //lv:all=全環境 undefined=本番以外
+  //console.log(lv)
+  if(lv==="all"){
     console.log(log)
-  }else if(lv==="lv2" && KANKYO!=="Product"){
+  }/*else if(lv==="lv2" && KANKYO!=="Product"){
     console.log(log)
-  }else if(lv==="lv3" && (KANKYO==="Test" || KANKYO==="Local")){
+  }else if((lv==="lv3" || lv===undefined) && (KANKYO==="Test" || KANKYO==="Local")){
+    console.log(log)
+  }*/else if(lv==="lv3" || lv===undefined){
     console.log(log)
   }else{
     return 0;
