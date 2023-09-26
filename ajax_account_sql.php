@@ -82,7 +82,7 @@ if($rtn !== true){
 				$sqllog .= rtn_sqllog("--execute():正常終了",[]);
 				//$count = 1;
 			}
-			log_writer2(basename(__FILE__)." [\$status]",$status,"lv3");
+			log_writer2(basename(__FILE__)." [\$status]",$status,"lv3"); 
 			log_writer2(basename(__FILE__)." [\$count]",$count,"lv3");
 			$pdo_h->commit();
 			$sqllog .= rtn_sqllog("commit",[]);
@@ -93,7 +93,7 @@ if($rtn !== true){
 			$reseve_status=true;
 		}catch(Exception $e){
 			$pdo_h->rollBack();
-			$sqllog .= rtn_sqllog("rollBack",null);
+			$sqllog .= rtn_sqllog("rollBack",[]);
 			sqllogger($sqllog,$e);
 			$msg = "システムエラーによる更新失敗。管理者へ通知しました。";
 			$alert_status = "alert-danger";

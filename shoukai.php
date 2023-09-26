@@ -36,7 +36,7 @@ try{
                 $flg="success";
             }else{
                 $pdo_h->rollBack();
-                $sqllog .= rtn_sqllog("rollBack",null);
+                $sqllog .= rtn_sqllog("rollBack",[]);
                 sqllogger($sqllog,null);
                 $msg="別の紹介者CDが登録されてます。";
                 $flg="failed";
@@ -61,7 +61,7 @@ try{
     
 }catch(Exception $e){
     $pdo_h->rollBack();
-    $sqllog .= rtn_sqllog("rollBack",null);
+    $sqllog .= rtn_sqllog("rollBack",[]);
     sqllogger($sqllog,$e);
 
     $msg="紹介者CDの登録に失敗しました。";

@@ -60,11 +60,11 @@ ver2.99.0-056:売上実績削除単位の変更(インボイス対応) -commited
 	課税売上の売上削除は売上番号単位とする
 	非課税売り上げの売上削除は商品単位とする
 	領収書が発行されている場合は売上削除不可とする
-ver2.99.0-057:レジ画面改修・税計算機能の切り出し
-	イートイン・テイクアウト機能の追加 
+ver2.99.0-057:レジ画面改修・税計算機能の切り出し-commited
+	イートイン・テイクアウト機能の追加 OK
 	商品の消費税計算をJS切り出しして共通関数にする OK
 	ユーザー情報で消費税の端数処理セット OK
-	ALTER TABLE `Users` CHANGE `kinouflg1` `ZeiHasu` TINYINT(1) NULL DEFAULT '0' COMMENT '消費税端数:0切捨/1四捨五入/2切上';--テスト環境のみ適用済み
+	ALTER TABLE `Users` CHANGE `kinouflg1` `ZeiHasu` TINYINT(1) NULL DEFAULT '0' COMMENT '消費税端数:0切捨/1四捨五入/2切上';--全環境適用済み
 	ALTER TABLE `uriagedata`--全環境適用済み
   DROP PRIMARY KEY,
    ADD PRIMARY KEY(
@@ -73,6 +73,7 @@ ver2.99.0-057:レジ画面改修・税計算機能の切り出し
      `ShouhinCD`,
      `zeiKBN`
    );
+ver2.99.0-058:bugfix-sqllogger error
 
 【Issues】
 売上実績の商品単価変更機能を削除（インボイス対応で複数商品の本体額合計に対して税率を算出するようにしたため、単価変更後の消費税再計算ができない）

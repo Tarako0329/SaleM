@@ -45,7 +45,7 @@ if($flg === true){
         $_SESSION["alert"] = "alert-success";
     }catch(Exception $e){
         $pdo_h->rollBack();
-        $sqllog .= rtn_sqllog("rollBack",null);
+        $sqllog .= rtn_sqllog("rollBack",[]);
         sqllogger($sqllog,$e);
         $_SESSION["MSG"] = "登録が失敗しました。";
         $_SESSION["alert"] = "alert-danger";
