@@ -216,6 +216,12 @@
 			</div>
 		</div><!--割引処理-->		
 		<main class='common_body'>
+			<?php 
+				if(!empty($emsg)){
+					echo $emsg;
+					exit;
+				}
+			?>
 			<div class="container-fluid">
 				<div class='row'>
 					<div class='col-lg-2 col-md-3 col-sm-12 col-12'><!--注文内容-->
@@ -295,7 +301,6 @@
 					</div><!--オーダーパネル部分-->
 				</div>
 			</div>
-			
 		</main>
 		<footer class='rezfooter'>
 			<div class="container-fluid" style='padding:0;text-align:center;'>
