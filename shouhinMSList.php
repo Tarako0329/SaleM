@@ -40,10 +40,16 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 <BODY>
 	<form method='post' action='shouhinMSList_sql.php' id='form1'>
 		<header class='header-color common_header' style='flex-wrap:wrap'>
-			<div class='title' style='width: 100%;'><a href='menu.php'><?php echo $title;?></a></div>
+			<div class='title' style='width: 60%;'>
+				<a href='menu.php'><?php echo $title;?></a>
+			</div>
+			<div class='right' style='width: 40%;padding-top:10px;'>
+				<i class="fa-solid fa-magnifying-glass fa-2x logoff-color"></i>
+				<input type='search' v-model='search_word' class='form-contral' style='margin-left:5px;width:78%;max-width:200px;' placeholder='Search'>
+			</div>
 			<p style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>  取扱商品 確認・編集 画面</p>
 			<?php if(empty($_SESSION["tour"])){?>
-			<a href="#" style='color:inherit;position:fixed;top:42px;right:5px;' onclick='help()'><i class="fa-regular fa-circle-question fa-lg logoff-color"></i></a>
+			<a href="#" style='color:inherit;position:fixed;top:50px;right:5px;' onclick='help()'><i class="fa-regular fa-circle-question fa-lg logoff-color"></i></a>
 			<?php }?>
 		</header>
 		<div class='header2'>
@@ -81,6 +87,7 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 					<div :class='alert_status' role='alert'>{{MSG}}</div>
 				</template>
 				<input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
+				
 				<table class='table result_table item_1' style='width:100%;max-width:630px;table-layout: fixed;'>
 					<thead>
 						<tr style='height:30px;'>
@@ -210,6 +217,7 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 				const chk_register_show = ref('all')	//フィルタ
 				const order_by = ref(['seq','▼'])			//ソート（項目・昇順降順）
 				const chk = ref('off')
+				const search_word = ref('')
 				const btn_name = ref('確　認')
 				const btn_type = ref('button')
 				const chk_onoff = () =>{
@@ -254,6 +262,7 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 					}else{//全件表示
 						order_panel = shouhinMS.value
 					}
+					
 					//checkbox にあわせて on -> true に変更
 					order_panel.forEach((list)=> {
 						if(list.hyoujiKBN1==='on'){
@@ -262,6 +271,13 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 							list['disp_rezi'] = false
 						}
 					})
+
+					if(search_word.value!=''){
+						return shouhinMS.value.filter((shouhin) => {
+							return (shouhin.shouhinNM.includes(search_word.value) );
+						});
+					}
+
 					//最後にソートして返す
 					if(order_by.value[0]==='name'){
 						return order_panel.sort((a,b) => {//フィルタ結果をソートして親に返す
@@ -415,6 +431,7 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 					btn_type,
 					delete_item,
 					chk,
+					search_word,
 				}
 			}
 		}).mount('#form1');
@@ -455,38 +472,6 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'> 登録した商品の「価格変更」やレジへの「表示/非表示」の切替はこの状態(縦画面表示)で行えます。
-			  </p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_12.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_12.next
-			}
-		]
-	});
-	tutorial_12.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'> その他の項目については画面を横にすると表示され、修正可能な状態となります。
-			  </p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_12.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_12.next
-			}
-		]
-	});
-	tutorial_12.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'> 画面を横にしてみてください。
-				<br>PCの場合、ブラウザの幅を拡大縮小すると表示が切り替わります。
-				<br>タブレットの場合は最初から全て表示されているかと思います。
 			  </p>`,
 		buttons: [
 			{
@@ -712,36 +697,6 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 	tutorial_13.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'><span style='color:red;'>ちなみに、削除しようとしている商品の「売上」が１件でも登録されていると削除する事は出来ません。</span>
-			  </p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_13.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_13.next
-			}
-		]
-	});
-	tutorial_13.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>画面を横にして頂くと右端に<i class='fa-regular fa-trash-can'></i>　マークが表示されます。
-			  </p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_13.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_13.next
-			}
-		]
-	});
-	tutorial_13.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'><i class='fa-regular fa-trash-can'></i>　マークをタップすると削除を確認する画面に移動します。
 			  </p>`,
 		buttons: [
 			{
@@ -1018,14 +973,6 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 		helpTour.start(tourFinish,'help','');
 	}
 
-</script>
-<script>
-	/*
-	function send(){
-		const form2 = document.getElementById('form2');
-		form2.submit();
-	}
-	*/
 </script>
 </html>
 <?php
