@@ -74,7 +74,7 @@ if(EXEC_MODE=="Test" || EXEC_MODE=="Local"){
     error_reporting( E_ALL );
 }else{
     //本番はリリースした日を指定
-    $time="20230907-01";
+    $time="20231003-01";
     //$time=date('Ymd');
     error_reporting( E_ALL & ~E_NOTICE );
 }
