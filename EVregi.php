@@ -769,8 +769,8 @@
 				}
 
 				const order_list_change_tax = (index,e) => {
-					//console.log(e)
-					console.log(e.target.value)
+					//console_log(e)
+					console_log(e.target.value)
 					let zmrec = ([])
           zmrec = zm.filter((list)=>{
 						return list.税区分 == e.target.value
@@ -1175,7 +1175,7 @@
 					console_log('order_list_area_set start','lv3')
 					let sizeH = window.innerHeight
 					let sizeW = window.innerWidth
-					//console.log(size)
+					//console_log(size)
 					//order_list_area.value.style=`height:${sizeH-350}px;`
 					if(sizeW<=767){
 						order_list_area.value.style =`height:${sizeH-355}px;display:NONE;`

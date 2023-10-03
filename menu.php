@@ -82,7 +82,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
                 .then(registrations => {
                     for(let registration of registrations) {
                         registration.unregister();
-                        console.log('Service Worker is delete');
+                        console_log('Service Worker is delete');
                     }
                 });
             }
@@ -350,6 +350,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             }
         ]
     });
+    /*
     tutorial_1.addStep({
         title: `<p class='tour_header'>チュートリアル</p>`,
         text: `<p class='tour_discription'>
@@ -365,11 +366,12 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             }
         ]
     });
+    */
     tutorial_1.addStep({
         title: `<p class='tour_header'>チュートリアル。</p>`,
         text: `<p class='tour_discription'> チュートリアルの流れは以下の通りです。
               <br>
-              <br>１．レジに表示する商品の登録
+              <br>１．取扱商品の登録
               <br>２．レジの使い方
               <br>３．売上実績の確認/修正/削除
               <br>４．商品情報の修正/削除

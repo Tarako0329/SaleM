@@ -36,7 +36,7 @@
         /*
         if('serviceWorker' in navigator){
         	navigator.serviceWorker.register('serviceworker.js').then(function(){
-        		console.log("Service Worker is registered!!");
+        		console_log("Service Worker is registered!!");
         	});
         }
         */
@@ -45,17 +45,17 @@
             navigator.serviceWorker.register('serviceworker.js')
                 .then(registration => {
                     // 登録成功
-                    console.log("Service Worker is registered!!");
+                    console_log("Service Worker is registered!!");
                     
                     //serviceworker.js　の更新確認(bit単位で比較し相違があったら更新する。らしい)
                     registration.onupdatefound = function() {
-                        console.log('Service Worker is Updated');
+                        console_log('Service Worker is Updated');
                         registration.update();
                     }
                 })
                 .catch(err => {
                     // 登録失敗
-                    console.log("Service Worker is Oops!!");
+                    console_log("Service Worker is Oops!!");
             });
         }
 

@@ -61,7 +61,7 @@ $_SESSION["MSG"]=null;
                     echo "<div class='alert alert-success' role='alert' style='width:80%;'>".$success_msg."</div>";
                 }
             ?>
-            <div class='row mb-3 item_1' 
+            <div class='row mb-3 item_1'
                 data-bs-placement='top' data-bs-trigger='click' data-bs-custom-class='custom-tooltip' data-bs-toggle='tooltip' title='１度登録すると商品名は変更できません。'>
                 <label for='shouhinNM' class='col-3 col-sm-2 col-form-label'>商品名</label>
                 <div class='col-8' >
@@ -86,7 +86,7 @@ $_SESSION["MSG"]=null;
                     </div>
                 </div>
             </div>
-            <div class='row mb-3 item_4'>
+            <div class='row mb-3 item_4' id='test99'>
                 <label for='zeikbn' class='col-3 col-sm-2 col-form-label'>税区分</label>
                 <div class='col-8'>
                     <select v-model='zeikbn' class='form-select form-select-lg' style='font-size:1.2rem;' id='zeikbn' name='zeikbn' required='required'>
@@ -98,23 +98,23 @@ $_SESSION["MSG"]=null;
                     </select>
                 </div>
             </div>
-            <div class='item_5'>
+            <div class='item_5' >
                 <div class='row mb-1'>
                     <label for='tanka' class='col-3 col-sm-2 col-form-label'>税抜単価</label>
                     <div class='col-8'>
-                        <input type='number' v-model='tanka' readonly class='form-control form-control-lg' id='tanka' name='tanka' >
+                        <input type='number' v-model='tanka' style='background-color:lightgray;' readonly class='form-control form-control-lg' id='tanka' name='tanka' >
                     </div>
                 </div>
                 <div class='row mb-1'>
                     <label for='shouhizei' class='col-3 col-sm-2 col-form-label'>消費税</label>
                     <div class='col-8'>
-                        <input type='number' v-model='shouhizei' readonly class='form-control form-control-lg' id='shouhizei' name='shouhizei' >
+                        <input type='number' v-model='shouhizei' style='background-color:lightgray;' readonly class='form-control form-control-lg' id='shouhizei' name='shouhizei' >
                     </div>
                 </div>                
                 <div class='row mb-3'>
                     <label for='zkomitanka' class='col-3 col-sm-2 col-form-label'>税込単価</label>
                     <div class='col-8'>
-                        <input type='number' v-model='zkomitanka' readonly class='form-control form-control-lg' id='zkomitanka' aria-describedby='zkomitankaHelp'>
+                        <input type='number' v-model='zkomitanka' style='background-color:lightgray;' readonly class='form-control form-control-lg' id='zkomitanka' aria-describedby='zkomitankaHelp'>
                         <small id='zkomitankaHelp' class='form-text text-muted'>レジ画面に表示される金額は税込価格です。</small>
                     </div>
                 </div>
@@ -180,9 +180,6 @@ $_SESSION["MSG"]=null;
         </footer>
     </form>
     <script>
-        //const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        //const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-
         document.getElementById("form1").onkeypress = (e) => {
             // form1に入力されたキーを取得
             const key = e.keyCode || e.charCode || 0;
@@ -198,7 +195,7 @@ $_SESSION["MSG"]=null;
 		createApp({
             setup(){
                 const tanka = ref(0)
-                const new_tanka = ref()
+                const new_tanka = ref('')
                 const shouhizei = ref(0)
                 const zkomitanka = ref(0)
                 const kominuki = ref('IN')
@@ -213,6 +210,11 @@ $_SESSION["MSG"]=null;
                 ]
 
                 watch([zeikbn,new_tanka,kominuki],() => {
+                    console_log(new_tanka.value,)
+                    if(new_tanka.value===''){
+                        console_log('watch skip')
+                        return
+                    }
                     let zmrec = ([])
                     zmrec = zm.filter((list)=>{
                         return list.税区分 == zeikbn.value
@@ -230,7 +232,10 @@ $_SESSION["MSG"]=null;
 					console_log('onMounted','lv3')
                     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
                     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-
+                    
+                    const exampleEl = document.getElementById('test99')
+                    const tooltip = new bootstrap.Tooltip(exampleEl,{boundary: document.body,title:'test99'})
+                    console_log(tooltip,)
 				})
 				return{
                     tanka,

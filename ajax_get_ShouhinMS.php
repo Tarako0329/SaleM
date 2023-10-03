@@ -32,6 +32,7 @@ if(!empty($_POST)){
 		,ZM.zeiritu as bk_zeiritu
 		,SM.zeiKBN as bk_zeiKBN
 		,ZM.hyoujimei as bk_hyoujimei 
+		,false as cate_chk
 		from vw_shouhinms SM inner join ZeiMS ZM on SM.zeiKBN = ZM.zeiKBN where uid = ? order by shouhinNM";
 	//log_writer2("ajax_get_MSCategory_list.php ",$sqlstr,"lv3");
 

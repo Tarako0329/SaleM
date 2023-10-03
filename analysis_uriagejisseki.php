@@ -240,9 +240,9 @@ log_writer2("test",$SLVresult,"lv3");
                             onClick: function (e, el,chart) {
                                     //円グラフタップ時の子分類データ取得処理を記述
                                     if (! el || el.length === 0) return;
-                                    console.log('onClick : label ' + chart.data.labels[el[0].index]);
-                                    console.log('onClick : category_lv ' + category_lv);
-                                    console.log('onClick : label ' + e);
+                                    console_log('onClick : label ' + chart.data.labels[el[0].index]);
+                                    console_log('onClick : category_lv ' + category_lv);
+                                    console_log('onClick : label ' + e);
                                     //send2(chart.data.labels[el[0].index],<?php //echo ($category_lv+1); ?>);
                                     if(category_lv>=2){
                                         category_lv = 0
@@ -250,6 +250,7 @@ log_writer2("test",$SLVresult,"lv3");
                                         category_lv += 1
                                     }
                                     over_category = chart.data.labels[el[0].index]
+                                    console_log('onClick : category_lv ' + category_lv);
                                     get_analysis_data()
                                 }
                         }
@@ -315,7 +316,7 @@ log_writer2("test",$SLVresult,"lv3");
 				const get_analysis_data = () => {//売上分析データ取得ajax
 					console_log("get_analysis_data start",'lv3')
 					let params = new URLSearchParams()
-                    if(analysis_type.value!==12){category_lv=0}
+                    if(analysis_type.value!=='12'){category_lv=0}
 					params.append('user_id', '<?php echo $_SESSION["user_id"];?>')
 					params.append('date_from', date_from.value)
 					params.append('date_to', date_to.value)
@@ -325,6 +326,7 @@ log_writer2("test",$SLVresult,"lv3");
 					params.append('csrf_token', CSRF.value)
                     params.append('category_lv', category_lv)
                     params.append('over_category', over_category)
+                    console_log(category_lv)
 
 					axios
 					.post('ajax_get_analysi_uridata.php',params)

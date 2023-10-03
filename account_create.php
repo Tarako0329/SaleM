@@ -208,7 +208,7 @@ $token=csrf_create();
 					},
 				})
 				const AllLock = () =>{
-					console.log('OnPress')
+					console_log('OnPress')
 					account.value['mail']['lock']['readonly']=true
 					account.value['question']['lock']['readonly']=true
 					account.value['answer']['lock']['readonly']=true
@@ -225,7 +225,7 @@ $token=csrf_create();
 					account.value['inquiry_mail']['lock']['readonly']=true
 				}
 				const AllUnLock = () =>{
-					console.log('OnPress')
+					console_log('OnPress')
 					if(mode.value==="update"){
 						step.value = 'check'
 						account.value['mail']['lock']['readonly']=false
@@ -259,11 +259,11 @@ $token=csrf_create();
 							}else{
 								AllLock()
 								step.value = 'register'
-								console.log(`on_submit SUCCESS`)
+								console_log(`on_submit SUCCESS`)
 							}
 						})
 						.catch((error) => {
-							console.log(`on_submit ERROR:${error}`)
+							console_log(`on_submit ERROR:${error}`)
 						})
 						.finally(()=>{
 						})
@@ -281,14 +281,14 @@ $token=csrf_create();
 								//alert_status.value[1] = response.data.status
 							}else{
 								alert(response.data.MSG)
-								console.log(`UpdateValue SUCCESS`)
+								console_log(`UpdateValue SUCCESS`)
 								if(mode.value==="insert"){
 									step.value="next"
 								}
 							}
 						})
 						.catch((error) => {
-							console.log(`UpdateValue ERROR:${error}`)
+							console_log(`UpdateValue ERROR:${error}`)
 						})
 						.finally(()=>{
 							AllUnLock()
@@ -303,8 +303,8 @@ $token=csrf_create();
 					}
         })
 				onMounted(() => {
-					console.log('mounted')
-					//console.log(account)
+					console_log('mounted')
+					//console_log(account)
 				})
 				return{
 					mode,

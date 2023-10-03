@@ -105,7 +105,7 @@
 						<tr v-if='(index===0) || (index!==0 && list.UriDate + list.Event !== UriageList_filter[index-1].UriDate + UriageList_filter[index-1].Event)' class='tr_stiky'>
 							<td :colspan='colspan' class='tr_stiky' style='white-space:nowrap;'>
 								<span role='button' class='link' @click='set_filter("UriDate",list.UriDate,"")'> 売上日：{{list.UriDate}}</span>
-								<span role='button' class='link' @click='set_filter("Event",list.Event+list.TokuisakiNM,"")'>『{{list.Event}}{{list.TokuisakiNM}}』</span>
+								<span style='margin-left:8px;' role='button' class='link' @click='set_filter("Event",list.Event+list.TokuisakiNM,"")'>『{{list.Event}}{{list.TokuisakiNM}}』</span>
 								<img v-if='(list.icon.length>=5) && (Type!=="rireki")' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>
 								<template v-if='(Type!=="rireki")'>（<span style='color:red;'>{{list.max_temp}}</span>/<span style='color:blue;'>{{list.min_temp}}</span>）</template>
 							</td>
@@ -703,7 +703,7 @@
 		//ヘッダとフッタ分をマイナスして縦幅を算出
 		var normal_vw = wh - 105 - 110;
 		var update_vw = wh - 105 - 300;
-		console.log('full:' + wh +' normal:' + normal_vw + ' update_vw:' + update_vw);
+		console_log('full:' + wh +' normal:' + normal_vw + ' update_vw:' + update_vw);
 		if(mode_switch.checked==true && mode_switch.readOnly == false){
 			update_areas[0].style.display='block';
 			common_footer[0].style.display='none';
