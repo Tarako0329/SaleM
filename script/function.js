@@ -6,9 +6,7 @@ const console_log=(log,lv)=>{
     console.log(log)
   }/*else if(lv==="lv2" && KANKYO!=="Product"){
     console.log(log)
-  }else if((lv==="lv3" || lv===undefined) && (KANKYO==="Test" || KANKYO==="Local")){
-    console.log(log)
-  }*/else if(lv==="lv3" || lv===undefined){
+  }*/else if((lv==="lv3" || lv===undefined) && (KANKYO==="Test" || KANKYO==="Local")){
     console.log(log)
   }else{
     return 0;
