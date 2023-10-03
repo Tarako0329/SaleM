@@ -7,6 +7,7 @@ const console_log=(log,lv)=>{
   }/*else if(lv==="lv2" && KANKYO!=="Product"){
     console.log(log)
   }*/else if((lv==="lv3" || lv===undefined) && (KANKYO!=="Product")){
+    console.log(KANKYO)
     console.log(log)
   }else{
     return 0;
