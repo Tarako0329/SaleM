@@ -276,8 +276,8 @@
 			</div><!--原価単価-->
 			<div class='row mb-2'><!--ボタン-->
 				<div class="col-12" style='padding-left:80px;' >
-					<button @click='btn_controler()' type='button' class='btn-lg btn-primary' style='padding-left:30px;padding-right:30px;'>{{btn_controle[0]}}</button>
-					<button v-if='btn_controle[1]' type='submit' class='btn-lg btn-warning' style='padding-left:30px;padding-right:30px;margin-left:10px;'>更　新</button>
+					<button @click='btn_controler()' type='button' class='btn btn-lg btn-primary' style='padding-left:30px;padding-right:30px;'>{{btn_controle[0]}}</button>
+					<button v-if='btn_controle[1]' type='submit' class='btn btn-lg btn-warning' style='padding-left:30px;padding-right:30px;margin-left:10px;'>更　新</button>
     		</div>
 			</div><!--ボタン-->
 		</form><!--修正エリア-->
@@ -362,7 +362,7 @@
 	</div><!--help1-->
 	</div><!--app-->
 	
-	<script>
+	<script>//vue3js
 		const { createApp, ref, onMounted, computed, VueCookies } = Vue;
 		createApp({
 			setup(){
@@ -718,54 +718,7 @@
 			uritable.style.height= normal_vw +'px';
 		}
 	}
-	//chang_mode();
-	
-	//チェックボックスのチェック有無で必須か否かを切り替え
-	/*
-	document.getElementById('chk_uridate').onclick = function(){
-		const a = document.getElementById('up_uridate');
-		if(a.required==true){
-			a.required=false;
-		}else{
-			a.required=true;
-		}
-	}
-	document.getElementById('chk_event').onclick = function(){
-		const a = document.getElementById('up_event');
-		if(a.required==true){
-			a.required=false;
-		}else{
-			a.required=true;
-		}
-	}
-	document.getElementById('chk_kokyaku').onclick = function(){
-		const a = document.getElementById('up_kokyaku');
-		if(a.required==true){
-			a.required=false;
-		}else{
-			a.required=true;
-		}
-	}
-	document.getElementById('chk_urikin').onclick = function(){
-		const a = document.getElementById('UpUriTanka');
-		const b = document.getElementById('zeikbn'); 
-		if(a.required==true){
-			a.required=false;
-			b.required=false;
-		}else{
-			a.required=true;
-			b.required=true;
-		}
-	}
-	document.getElementById('chk_genka').onclick = function(){
-		const a = document.getElementById('up_urigenka');
-		if(a.required==true){
-			a.required=false;
-		}else{
-			a.required=true;
-		}
-	}
-	*/
+
 	
 	//更新対象の有無を確認。無い場合はsubmitしない
 	function check_update(){
@@ -948,8 +901,10 @@
 	});
 	tutorial_9.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'><a href='#'><i class='fa-regular fa-trash-can'></i></a> マークをタップすることで売上を消す事が出来ます。
-			   </p>`,
+		text: `
+			<p class='tour_discription'><a href='#'><i class='fa-regular fa-trash-can'></i></a> マークをタップすることで売上を消す事が出来ます。
+	  	<br>なお、領収書を発行している場合は削除できません。
+			</p>`,
 		attachTo: {
 			element: '.item_0',
 			on: 'auto'
@@ -1112,7 +1067,7 @@
 				<br>その横の入力欄に本来のイベント名を入力します。
 			   </p>`,
 		attachTo: {
-			element: '.tour_uri3',
+			element: '.footer_update_area',
 			on: 'auto'
 		},
 		buttons: [
@@ -1128,12 +1083,12 @@
 	});
 	tutorial_UriageShusei.addStep({
 		title: `<p class='tour_header'>売上の修正</p>`,
-		text: `<p class='tour_discription'>最後に「確認」ボタンをタップすると
-				<br>修正対象のデータと修正内容を確認する画面に移動しますので、問題なければ「更新」ボタンをタップします。
-				<br><br>間違えていた場合は「キャンセル」ボタンをタップしてください。
+		text: `<p class='tour_discription'>最後に「確認」ボタンをタップすると「更新」ボタンが表示されます。
+				<br>更新対象の売上データのみ表示されていることを確認し、「更新」ボタンをタップしてください。
+				<br><br>間違えていた場合は「戻る」ボタンをタップしてください。
 			   </p>`,
 		attachTo: {
-			element: '.tour_uri4',
+			element: '.footer_update_area',
 			on: 'auto'
 		},
 		buttons: [

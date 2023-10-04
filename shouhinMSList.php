@@ -43,9 +43,10 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 			<div class='title' style='width: 60%;'>
 				<a href='menu.php'><?php echo $title;?></a>
 			</div>
-			<div class='right' style='width: 40%;padding-top:10px;'>
-				<i class="fa-solid fa-magnifying-glass fa-2x logoff-color"></i>
-				<input type='search' v-model='search_word' class='form-contral' style='margin-left:5px;width:78%;max-width:200px;' placeholder='Search'>
+			<div class='right' style='width: 40%;padding-top:10px;display:flex;'>
+				<div style='width: 20px;padding-top:5px;'><i class="fa-solid fa-magnifying-glass fa-2x logoff-color"></i></div>
+				<div style='width:200px' ><input type='search' v-model='search_word' class='form-contral' style='margin-left:5px;width:78%;max-width:200px;' placeholder='Search'></div>
+				
 			</div>
 			<p style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>  取扱商品 確認・編集 画面</p>
 			<?php if(empty($_SESSION["tour"])){?>
@@ -125,13 +126,13 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 						</tr>
 						<tr>
 							<td><input @blur='set_new_value(index,`#new_val_${index}`)' :id='`new_val_${index}`' type='number' class='form-contral' style='width:100%;text-align:right' placeholder='新価格' ></td>   <!--単価修正欄 -->
-							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' align='right'>
+							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;color:blue;' align='right'>
 								￥{{Number(list.tanka).toLocaleString()}}
 							</td><!--登録単価-->
-							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' align='right'><!--list.tanka_zei-->
+							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;color:blue;' align='right'><!--list.tanka_zei-->
 								￥{{Number(list.tanka_zei).toLocaleString()}}
 							</td> 
-							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' align='right'><!--list.tanka_zei-->
+							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;color:blue;' align='right'><!--list.tanka_zei-->
 								￥{{(Number(list.tanka) + Number(list.tanka_zei)).toLocaleString()}}
 							</td> 
 						</tr>
