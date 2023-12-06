@@ -227,6 +227,7 @@ log_writer2("test",$SLVresult,"lv3");
                                         //beginAtZero: true
                                     }
                                 },
+                                responsive: true,
                                 indexAxis: 'y'
                         }
                     }

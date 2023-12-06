@@ -24,7 +24,10 @@ register_shutdown_function('shutdown');
 //メモ：pdoはプログラムが予期せず終了した場合、自動的にロールバック処理を行うようになっている
 if(EXEC_MODE!=="Local")ini_set("max_execution_time",15);
 //ini_set("max_execution_time",1); 
-
+if(EXEC_MODE==="Trial"){
+	$emsg = print_r($_SERVER,true);
+	send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-INFO】トライアルユーザー is coming?",$emsg);
+}
 
 $time = date("Y/m/d H:i:s");
 $rtn=check_session_userid($pdo_h);
@@ -59,6 +62,7 @@ $msg = array(
 
 
 //入力画面の前回値を記録
+/*
 if(filter_input(INPUT_POST,"EV")<>""){
 	//イベント名
 	$_SESSION["EV"] = $_POST["EV"];
@@ -70,6 +74,7 @@ if(filter_input(INPUT_POST,"EV")<>""){
 	$stmt->bindValue(5, $_POST["EV"], PDO::PARAM_STR);
 	$stmt->execute();
 }
+*/
 
 //売上登録
 //$logfilename="sid_".$_SESSION['user_id'].".log";
@@ -140,8 +145,8 @@ try{
 	//インボイス対応（消費税レコードと調整レコードの追加）
 	$sqlstr_z = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,zei,zeiKBN)";
 	$sqlstr_z .= " values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:zei,:zeiKBN)";
-	$sqlstr_c = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,UriageKin,zeiKBN)";
-	$sqlstr_c .= " values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:UriageKin,:zeiKBN)";
+	$sqlstr_c = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,UriageKin,zeiKBN,zei)";
+	$sqlstr_c .= " values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:UriageKin,:zeiKBN,:zei)";
 
 	foreach($ZeiKbnSummary as $row){
 		if($row["SHOUHIZEI"]!=0){
@@ -176,6 +181,7 @@ try{
 			$params["ShouhinNM"] = $row["ZEIKBNMEI"]."本体調整額";
 			$params["UriageKin"] = $row["CHOUSEIGAKU"];
 			$params["zeiKBN"] = $row["ZEIKBN"];
+			$params["zei"] = $row["ZEICHOUSEIGAKU"];
 			
 			$stmt->bindValue("uid",  $params["uid"], PDO::PARAM_INT);
 			$stmt->bindValue("UriageNO",  $params["UriageNO"], PDO::PARAM_INT);
@@ -187,6 +193,7 @@ try{
 			$stmt->bindValue("ShouhinNM",  $params["ShouhinNM"], PDO::PARAM_STR);     //商品名
 			$stmt->bindValue("UriageKin", $params["UriageKin"], PDO::PARAM_INT);      //売上本体調整額
 			$stmt->bindValue("zeiKBN", $params["zeiKBN"], PDO::PARAM_INT);            //税区分
+			$stmt->bindValue("zei", $params["zei"], PDO::PARAM_INT);    			        //税調整額
 			
 			$sqllog .= rtn_sqllog($sqlstr_c,$params);
 			$stmt->execute();

@@ -20,7 +20,7 @@
 
 	if($status==="login_redirect"){
 		//ログイン画面から直通でアクセス
-		log_writer2("EVregi.php  $status ",$status,"lv3");
+		log_writer2("EVregi.php  \$status ",$status,"lv3");
 	}else{
 		$rtn = csrf_checker(["menu.php"],["G","C"]);
 		if($rtn !== true){
@@ -187,34 +187,75 @@
 				<label class='btn btn-outline-primary ' for='defo' style='border-radius:0;'>戻る</label>
 			</div>
 		</div>
-		<div class='accordion item_11 item_12' id="accordionExample"><!--割引処理-->
-			<div v-if='chk_register_show==="register"' class='header-plus-minus' style='padding-top:5px;font-size:1.4rem;font-weight:700;top: 156px;height:52px;'>
-				<hr>
-				<div class='accordion-item'>
+		<div v-if='chk_register_show==="register"' class='container header-plus-minus text-center' style='padding:10px;'>
+			<button type='button' style='width:80%;max-width:500px;' class='btn btn-outline-primary' data-bs-toggle='modal' data-bs-target='#waribiki'>割引・割増</button>
+		</div>
+		<!--割引処理
+		<div class='accordion item_11 item_12' id="accordionExample">
+			<div v-if='chk_register_show==="register"' class='header-plus-minus' style='padding-top:5px;font-size:1.4rem;font-weight:700;top: 156px;height:65px;'>
+				<div class='accordion-item' style='max-width:600px; margin: 0 auto;'>
 					<h2 class='accordion-header' id='headingOne'>
-						<button type='button' class='accordion-button collapsed' style='font-size:2.1rem;' data-bs-toggle='collapse' data-bs-target='#collapseOne' aria-expanded='false' aria-controls='collapseOne'>
+						<button type='button' class='accordion-button collapsed' style='font-size:2.1rem;padding-left:36%;border:blueviolet 1px;' data-bs-toggle='collapse' data-bs-target='#collapseOne' aria-expanded='false' aria-controls='collapseOne'>
 							割引・割増
 						</button>
 					</h2>
 					<div id='collapseOne' class='accordion-collapse collapse' data-bs-parent='#accordionExample'>
 			      <div class='accordion-body'>
 							<div class='row'>
-								<div class='col-1 col-md-0' ></div>
-								<div class='col-10 col-md-7' >
-									<p>お会計額：￥{{pay.toLocaleString()}}</p>
-									<label for='CHOUSEI_GAKU' class='form-label'>変更後お会計額</label>
-									<input type='number' v-model='Revised_pay' class='form-control order tanka' 
-									style='font-size:2.2rem;width:100%;border:solid;border-top:none;border-right:none;border-left:none;' name='CHOUSEI_GAKU' id='CHOUSEI_GAKU'>
-									<br>
-									<button class='btn btn-primary' type='button' @click='Revised()'>決　定</button>
+								<div class='col-1 col-md-2' ></div>
+								<div class='col-10 col-md-8' >
+									<input type='hidden' v-model='Revised_pay' name='CHOUSEI_GAKU' id='CHOUSEI_GAKU'>
+									<div style='display:flexbox;font-size:1.6rem'>
+										お会計額　￥{{Revised_pay.toLocaleString()}}
+										<template v-if="CHOUSEI_TYPE==='paroff'">({{par.toLocaleString()}}% OFF)</template>
+										<template v-if="CHOUSEI_TYPE==='paron'">({{par.toLocaleString()}}% ON)</template>
+										<template v-if="CHOUSEI_TYPE==='zou'">　(+{{par.toLocaleString()}})</template>
+										<template v-if="CHOUSEI_TYPE==='gen'">　(-{{par.toLocaleString()}})</template>
+										<template v-if="CHOUSEI_TYPE==='sougaku'"></template>
+									</div>
+									<div style='padding:5px;width:100%;'>
+										<input type='radio' class='btn-check' value='paroff' autocomplete='off' v-model='CHOUSEI_TYPE' id='paroff'>
+										<label class='btn btn-outline-danger ' for='paroff' style='border-radius:0;width:25%;padding:1px 0;'>％OFF</label>
+										<input type='radio' class='btn-check' value='paron' autocomplete='off' v-model='CHOUSEI_TYPE' id='paron'>
+										<label class='btn btn-outline-danger ' for='paron' style='border-radius:0;width:25%;padding:1px 0;'>％ON</label>
+										<input type='radio' class='btn-check' value='gen' autocomplete='off' v-model='CHOUSEI_TYPE' id='gen'>
+										<label class='btn btn-outline-danger ' for='gen' style='border-radius:0;width:25%;padding:1px 0;'>値引</label>
+										<input type='radio' class='btn-check' value='zou' autocomplete='off' v-model='CHOUSEI_TYPE' id='zou'>
+										<label class='btn btn-outline-danger ' for='zou' style='border-radius:0;width:25%;padding:1px 0;'>値増</label>
+										<input type='radio' class='btn-check' value='sougaku' autocomplete='off' v-model='CHOUSEI_TYPE' id='sougaku'>
+										<label class='btn btn-outline-danger ' for='sougaku' style='border-radius:0;width:25%;padding:1px 0;'>金額指定</label>
+									</div>
+									<table style='margin:auto;width:86%'>
+										<tbody>
+										<tr><td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>7</button></td>
+										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>8</button></td>
+										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>9</button></td></tr>
+										<tr><td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>4</button></td>
+										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>5</button></td>
+										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>6</button></td></tr>
+										<tr><td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>1</button></td>
+										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>2</button></td>
+										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>3</button></td></tr>
+										<tr><td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>0</button></td>
+										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>00</button></td>
+										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>C</button></td></tr>
+										<tr v-if="CHOUSEI_TYPE!=='sougaku'">
+											<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>＋</button></td>
+										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>－</button></td>
+										<td class='waribiki--cellsize'></td></tr>
+										</tbody>
+									</table>
+									<div class='text-center' style='margin-top:5px'>
+										<button class='btn btn-primary' type='button' @click='Revised()'>決　定</button>
+									</div>
 								</div>
-								<div class='col-1' ></div>
+								<div class='col-1 col-md-2' ></div>
 							</div>
     				</div>
     			</div>
 				</div>
 			</div>
-		</div><!--割引処理-->		
+		</div>割引処理-->		
 		<main class='common_body'>
 			<?php 
 				if(!empty($emsg)){
@@ -226,13 +267,13 @@
 				<div class='row'>
 					<div class='col-lg-2 col-md-3 col-sm-12 col-12'><!--注文内容-->
 						<div class='order_list' ref='order_list_area'>
-							<div class='text-center'> 税抜表示 </div>
+							<div class='text-center'> 税込み表示 </div>
 							<template v-for='(list,index) in order_list' :key='list.CD'>
 								<div class='container'>
 									<div class='order_item'>{{list.NM}}</div>
 									<div style='display:flex;'>
 										<div class='order_su' >{{list.SU}}点</div>
-										<div class='order_kin'>¥{{(list.SU * list.TANKA).toLocaleString()}}</div>
+										<div class='order_kin'>¥{{(list.SU * (list.TANKA + list.TANKA_ZEI)).toLocaleString()}}</div>
 									</div>
 									<div id='side-pm'style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;padding-bottom:3px;'>
 										<button type='button' class='order_list_area_btn plus' @click='order_list_pm(index,1)'></button>
@@ -255,6 +296,16 @@
 								<input type='hidden' :name ="`ORDERS[${index}][GENKA_TANKA]`" :value = "list.GENKA_TANKA">
 								<input type='hidden' :name ="`ORDERS[${index}][SU]`" :value = "list.SU">
 							</template>	
+							<template v-for='(list,index) in hontai' :key='list.CD'>
+								<div class='container'>
+									<div v-if='list.調整額<0' class='order_item'>値引({{list.税区分名}}分)</div>
+									<div v-if='list.調整額>0' class='order_item'>値増({{list.税区分名}}分)</div>
+									<div v-if='list.調整額!==0' style='display:flex;'>
+										<div class='order_su' >1点</div>
+										<div class='order_kin'>¥{{(list.調整額 + list.税調整額).toLocaleString()}}</div>
+									</div>
+								</div>
+							</template>
 						</div>
 					</div><!--注文内容-->
 					<div v-if='order_panel_show_flg' class='col-lg-10 col-md-9 col-sm-12 col-12'><!--オーダーパネル部分-->
@@ -342,6 +393,7 @@
 				<input type='hidden' :name ="`ZeiKbnSummary[${index}][CHOUSEIGAKU]`" :value = "list.調整額">
 				<input type='hidden' :name ="`ZeiKbnSummary[${index}][HONTAIGAKU]`" :value = "list.本体額">
 				<input type='hidden' :name ="`ZeiKbnSummary[${index}][SHOUHIZEI]`" :value = "list.消費税">
+				<input type='hidden' :name ="`ZeiKbnSummary[${index}][ZEICHOUSEIGAKU]`" :value = "list.税調整額">
 			</template>
 			<template v-for='(list,index) in order_list' :key='list.CD'>
 				<input type='hidden' :name ="`OrderList[${index}][CD]`" :value = "list.CD">
@@ -485,6 +537,66 @@
 			</div>
 		</div>
 	</div>
+	<!--割引画面-->
+	<div class='modal fade' id='waribiki' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
+		<div class='modal-dialog  modal-dialog-centered'>
+			<div class='modal-content' style='font-size: 2rem; font-weight: 600;'>
+				<div class='modal-header'>
+					<div class='modal-title' id='myModalLabel' style='text-align:center;width:100%;'>割引・割増</div>
+				</div>
+				<div class='modal-body'>
+					<div class='row'>
+						<input type='hidden' v-model='Revised_pay' name='CHOUSEI_GAKU' id='CHOUSEI_GAKU'>
+						<div style='display:flexbox;font-size:2rem'>
+							適用後 お会計額　￥{{Revised_pay.toLocaleString()}}
+							<template v-if="CHOUSEI_TYPE==='paroff'">({{par.toLocaleString()}}% OFF)</template>
+							<template v-if="CHOUSEI_TYPE==='paron'">({{par.toLocaleString()}}% ON)</template>
+							<template v-if="CHOUSEI_TYPE==='zou'">　(+{{par.toLocaleString()}})</template>
+							<template v-if="CHOUSEI_TYPE==='gen'">　(-{{par.toLocaleString()}})</template>
+							<template v-if="CHOUSEI_TYPE==='sougaku'"></template>
+						</div>
+						<div style='padding:5px;width:100%;'>
+							<input type='radio' class='btn-check' value='paroff' autocomplete='off' v-model='CHOUSEI_TYPE' id='paroff'>
+							<label class='btn btn-outline-danger ' for='paroff' style='border-radius:0;width:25%;padding:1px 0;'>％OFF</label>
+							<input type='radio' class='btn-check' value='paron' autocomplete='off' v-model='CHOUSEI_TYPE' id='paron'>
+							<label class='btn btn-outline-danger ' for='paron' style='border-radius:0;width:25%;padding:1px 0;'>％ON</label>
+							<input type='radio' class='btn-check' value='gen' autocomplete='off' v-model='CHOUSEI_TYPE' id='gen'>
+							<label class='btn btn-outline-danger ' for='gen' style='border-radius:0;width:25%;padding:1px 0;'>値引</label>
+							<input type='radio' class='btn-check' value='zou' autocomplete='off' v-model='CHOUSEI_TYPE' id='zou'>
+							<label class='btn btn-outline-danger ' for='zou' style='border-radius:0;width:25%;padding:1px 0;'>値増</label>
+							<input type='radio' class='btn-check' value='sougaku' autocomplete='off' v-model='CHOUSEI_TYPE' id='sougaku'>
+							<label class='btn btn-outline-danger ' for='sougaku' style='border-radius:0;width:25%;padding:1px 0;'>金額指定</label>
+						</div>
+						<table style='margin:auto;width:86%'>
+							<tbody>
+							<tr><td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>7</button></td>
+							<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>8</button></td>
+							<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>9</button></td></tr>
+							<tr><td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>4</button></td>
+							<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>5</button></td>
+							<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>6</button></td></tr>
+							<tr><td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>1</button></td>
+							<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>2</button></td>
+							<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>3</button></td></tr>
+							<tr><td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>0</button></td>
+							<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>00</button></td>
+							<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>C</button></td></tr>
+							<tr v-if="CHOUSEI_TYPE!=='sougaku'">
+								<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>＋</button></td>
+							<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>－</button></td>
+							<td class='waribiki--cellsize'></td></tr>
+							</tbody>
+						</table>
+
+
+					</div>
+				</div>
+				<div class='modal-footer'>
+					<button class='btn btn-primary' type='button' @click='Revised()'>決　定</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	</div><!-- <div  id='register'> -->
 	<script>
@@ -616,7 +728,7 @@
 				const auto_ajust = ref(true)	//税込単価の合計＝支払額になるように調整するか否かのフラグ
 				//let auto_ajust_flg = false
 				const btn_changer = (args) => {	//確認ボタン・戻るボタンを押したとき
-					console_log("*****【 btn_changer start 】*****","lv3")
+					console_log("*****【 btn_changer start 】*****")
 					if(Number(pay.value)===0){
 						alert('商品が選択されてません')
 						return 
@@ -627,10 +739,10 @@
 						kaikei_zei_bk = kaikei_zei.value
 						let rtn = chk_csrf()	//token紛失のチェック
 						if(auto_ajust.value===true){
-							console_log(`自動端数調整開始`,"lv3")
+							console_log(`自動端数調整開始`)
 							let zeiritu
 							let zeikomi
-							let hontai_val
+							//let hontai_val
 							let chouseigo
 							let zeikomisougaku = 0
 							let utizei = 0
@@ -640,16 +752,17 @@
 								index++
 								rtn_val = []
 								rtn_val = get_value(Number(row['本体額']) + Number(row['消費税']),Number(row['税率']),"IN")
-								console_log("税率ごとの税込額から本体額を算出","lv3")
-								console_log(rtn_val,"lv3")
-								console_log(`明細合計本体額：${row['本体額']}`,"lv3")
+								console_log("税率ごとの税込額から本体額を算出")
+								console_log(rtn_val)
+								console_log(`明細合計本体額：${row['本体額']}`)
 								row['調整額'] = rtn_val[0].本体価格 - row['本体額']
 								
-								row['消費税bk'] = row['消費税']
-								row['消費税'] = rtn_val[0].消費税
+								//row['消費税bk'] = row['消費税']
+								//row['消費税'] = rtn_val[0].消費税
+								row['税調整額'] = rtn_val[0].消費税 - row['消費税']
 
-								zeikomisougaku += Number(row['本体額']) + Number(row['調整額']) + Number(row['消費税'])
-								utizei += Number(row['消費税'])
+								zeikomisougaku += Number(row['本体額']) + Number(row['調整額']) + Number(row['消費税']) + Number(row['税調整額'])
+								utizei += Number(row['消費税']) + Number(row['税調整額'])
 							}
 							if(pay_bk !== zeikomisougaku){
 
@@ -663,14 +776,15 @@
 					}else if(args==='chk'){				//戻る時は調整額を０にクリアする
 						for(const row of hontai.value){
 							row['調整額'] = 0
-							row['消費税'] = row['消費税bk']
+							row['税調整額'] = 0
+							//row['消費税'] = row['消費税bk']
 						}
 						pay.value = pay_bk
 						kaikei_zei.value = kaikei_zei_bk
 						Revised_pay.value =''
 						order_panel_show("close")
 					}
-					console_log("*****【 btn_changer end 】*****","lv3")
+					console_log("*****【 btn_changer end 】*****")
 				}
 
 				//const pm = ref('1')
@@ -769,8 +883,7 @@
 				}
 
 				const order_list_change_tax = (index,e) => {
-					//console_log(e)
-					console_log(e.target.value)
+					console_log(`order_list_change_tax start [${index} ${e.target.value}]`)
 					let zmrec = ([])
           zmrec = zm.filter((list)=>{
 						return list.税区分 == e.target.value
@@ -780,24 +893,23 @@
 					
 					order_list.value[index].TANKA_ZEI = values[0].消費税
 					order_list.value[index].ZEIRITUNM = zmrec[0]["税区分名"]
+					order_list.value[index].ZEIRITU = zmrec[0]["税率"]*100
 					calculation()
 				}
 
 				const calculation = () =>{//税率ごとの本体額総合計から消費税を計算する(インボイス対応)・自動調整ONの場合はマスタの単価・税単価を合算する
-					console_log("*****【calculation start】*****","lv3")
-					//トータル金額の増減
-					
+					console_log("*****【calculation start】*****")
 					let hontai_index
 					hontai.value = []
 					order_list.value.forEach((row)=>{
-						console_log(row,"lv3")
-						console_log(`${row.NM} SU:${row.SU} 税区分:${row.ZEIKBN}`,"lv3")
+						console_log(row)
+						console_log(`${row.NM} SU:${row.SU} 税区分:${row.ZEIKBN}`)
 						hontai_index = hontai.value.findIndex(//同一商品・同一税率の注文があった場合、該当レコードのindexを取得。ない場合は[-1]を返す
 							item => Number(item.税区分) === Number(row.ZEIKBN)
 						)
-						console_log(hontai_index,"lv3")
+						console_log(hontai_index)
 						if(hontai_index===-1){
-							console_log("push","lv3")
+							console_log("push")
 							hontai.value.push({
 							'税区分':Number(row.ZEIKBN) 
 							,'税区分名':row.ZEIRITUNM 
@@ -805,15 +917,15 @@
 							,'本体額':Number(row.TANKA) * Number(row.SU)
 							,'調整額':0
 							,'消費税':Number(row.TANKA_ZEI) * Number(row.SU)
-							,'消費税bk':0
+							//,'消費税bk':0
+							,'税調整額':0
 							})
-							console_log(hontai.value,"lv3")
+							console_log(hontai.value)
 						}else{
-							console_log("add","lv3")
+							console_log("add")
 							hontai.value[hontai_index].本体額 = Number(hontai.value[hontai_index].本体額) + (Number(row.TANKA) * Number(row.SU))
 							hontai.value[hontai_index].消費税 = Number(hontai.value[hontai_index].消費税) + (Number(row.TANKA_ZEI) * Number(row.SU))
 						}
-
 					})
 					
 					pay.value=Number(0)
@@ -821,95 +933,116 @@
 					if(auto_ajust.value!==true){
 						let values
 						for(const row of hontai.value){
-							//row["消費税"] = Math.trunc((Number(row['本体額']) + Number(row['調整額'])) * (Number(row['税率']))/100)	
 							values = get_value(Number(row['本体額']) + Number(row['調整額']),(Number(row['税率'])),'NOTIN')
 							row["消費税"] = values[0].消費税
-							pay.value = Number(pay.value) + Number(row['本体額']) + Number(row['調整額']) + Number(row['消費税'])		//税込額
-							kaikei_zei.value = Number(kaikei_zei.value) + Number(row['消費税']) 	//内消費税
+							pay.value = Number(pay.value) + Number(row['本体額']) + Number(row['調整額']) + Number(row['消費税']) + Number(row['税調整額'])		//税込額
+							kaikei_zei.value = Number(kaikei_zei.value) + Number(row['消費税']) + Number(row['税調整額']) 	//内消費税
 							values = []
 						}
 					}else{
 						hontai.value.forEach((row)=>{
-							pay.value = Number(pay.value) + Number(row['本体額']) + Number(row['調整額']) + Number(row['消費税'])		//税込額
-							kaikei_zei.value = Number(kaikei_zei.value) + Number(row['消費税']) 	//内消費税
+							pay.value = Number(pay.value) + Number(row['本体額']) + Number(row['調整額']) + Number(row['消費税']) + Number(row['税調整額'])		//税込額
+							kaikei_zei.value = Number(kaikei_zei.value) + Number(row['消費税']) + Number(row['税調整額']) 	//内消費税
 						})
 					}
-					console_log("*****【calculation end】*****","lv3")
+					console_log("*****【calculation end】*****")
 				}
 
-				const Revised = () => {//値引き値増し処理
-					console_log("*****【 Revised start:値引き値増し処理 】*****","lv3")
+				const CHOUSEI_TYPE = ref('sougaku')
+				const par = ref(0)
+				const keydown_waribiki = (e) => {//電卓ボタンの処理
+					//console_log(e.target.innerHTML,'lv3')
+					if(e.target.innerHTML==="C"){
+						par.value = 0
+						Revised_pay.value=""
+						return
+					}
+					if(CHOUSEI_TYPE.value==='sougaku'){
+						Revised_pay.value = Number(Revised_pay.value.toString() + e.target.innerHTML.toString())
+						return
+					}
+					
+					par.value = Number(par.value.toString() + e.target.innerHTML.toString())
+					console_log(par.value)
+					if(CHOUSEI_TYPE.value==='zou' || CHOUSEI_TYPE.value==='gen'){
+						if(CHOUSEI_TYPE.value==='zou'){
+							Revised_pay.value = Number(pay.value) + Number(par.value)
+						}else if(CHOUSEI_TYPE.value==='gen'){
+							Revised_pay.value = Number(pay.value) - Number(par.value)
+						}
+						return
+					}
+
+					let motoseikyu = new Decimal(Number(pay.value))
+					let wariai = new Decimal(Number(par.value))
+					let zougen = motoseikyu.mul(wariai.div(100))
+					console_log(zougen)
+					if(CHOUSEI_TYPE.value==='paroff'){
+						Revised_pay.value = Number(pay.value) - Number(zougen)
+					}else if(CHOUSEI_TYPE.value==='paron'){
+						Revised_pay.value = Number(pay.value) + Number(zougen)
+					}else{
+						par.value = Number(par.value.toString() + e.target.innerHTML.toString())
+					}
+					
+				}
+
+				watch([CHOUSEI_TYPE],() => {
+					console_log('watch CHOUSEI_TYPE')
+					Revised_pay.value = ''
+					par.value=0
+				})
+
+				const Revised = () => {//総額からの値引き値増し処理
+					//１.税込支払総額の税率ごとの割合を算出する（8%=>3割 ,10%=>7割 等)
+					//２.税込値引額を１で出した割合に分割する（値引200円=> 8%分:60円, 10%分:140円)
+					//３.２で算出した税率ごとの値引額を本体額と消費税額に分解する
+					console_log("*****【 Revised start:値引き値増し処理 】*****")
 					if(Revised_pay.value!=="" && Revised_pay.value !== pay.value){//Revised_pay.value:修正後税込金額
 						let sagaku_zan = Revised_pay.value
 						let Revised_pay_val = new Decimal(Revised_pay.value)
-						let wariai
 						let pay_val = new Decimal(pay.value)
-						let hontai_val
-						let shouhizei_val
-						let target_val		//税区分ごとで目標となる増減後税込金額
-						let zeiritu
 						let index = -1
-						let rtn_val
+						let wariai,siharai,rtn_val,target_val //支払総額における税区分ごとの金額割合,税区分ごとの元支払額,get_valueの戻り値格納,割引後金額
+
+						console_log(`支払総額 ￥${pay_val} を ￥${Revised_pay_val} に変更します`)
 						for(const row of hontai.value){
 							//税区分ごとに請求額の割合を算出し、調整額に掛ける
 							index++
 							rtn_val = []
-							console_log(`pay_val:${pay_val}`,"lv3")
-							console_log(`本体額:${row['本体額']}`,"lv3")
-							console_log(`消費税:${row['消費税']}`,"lv3")
-							console_log(`税率:${row['税率']}`,"lv3")
+							siharai = new Decimal(Number(row['本体額']) + Number(row['消費税']))
+							wariai = siharai.div(pay_val)
+							console_log(`適用前⇒ ${pay.value} 内税率:${row['税率']*100}%分 [税込:${siharai} 本体:${row['本体額']}(税:${row['消費税']})] 割合:${Math.round(wariai*100)}%`)
 
-							wariai = new Decimal(Number(row['本体額']) + Number(row['消費税']))
-							wariai = wariai.div(pay_val)
-							//target_val = new Decimal((Revised_pay_val.mul(wariai)))
 							target_val = Math.round((Revised_pay_val.mul(wariai)))
-							rtn_val = get_value(target_val,Number(row['税率']),'IN')
-							console_log(rtn_val,"lv3")
+							rtn_val = get_value(target_val,Number(row['税率']),'IN') ;//console_log(rtn_val)
+
 							row["調整額"] = (rtn_val[0].本体価格 - Number(row['本体額']))	//割引税抜本体
-							row['消費税bk'] = row['消費税']
-							row["消費税"] = rtn_val[0].消費税
-							//zeiritu = new Decimal((100 + Number(row['税率'])))
+							row["税調整額"] = (rtn_val[0].消費税 - Number(row['消費税']))	//割引税抜本体
 							
-							console_log(`割合:${wariai}`,"lv3")
-							console_log(`目標額:${Math.round(target_val)}`,"lv3")
-							console_log(`現在額:${Number(row['本体額'])}`,"lv3")
+							console_log(`現在額:${Number(row['本体額'])+ Number(row["消費税"])} - 目標額:${Math.round(target_val)} = ${Number(row['本体額'])+ Number(row["消費税"]) - Math.round(target_val)}`)
 							
 							//調整額＝変更後税込額/税率-変更前本体額
-							//row["調整額"] = Math.trunc(target_val.div(zeiritu)-Number(row['本体額']))	//割引税抜本体
-							console_log(`調整額:${row["調整額"]}`,"lv3")
-
-							//zeiritu = new Decimal((Number(row['税率']))/100)
-							/*
-							zeiritu = new Decimal((Number(row['税率'])))
-							row['消費税bk'] = row['消費税']
-							row["消費税"] = Math.trunc(zeiritu.mul(Number(row['本体額']) + Number(row['調整額'])))
-							//sagaku_zan = sagaku_zan - (Math.trunc(zeiritu.mul(Number(row['本体額']) + Number(row['調整額']))))
-							*/
-							sagaku_zan = sagaku_zan - (Number(row['本体額']) + Number(row['調整額']) + row["消費税"])
+							console_log(`調整額:${Number(row["調整額"])+Number(row['税調整額'])} = 本体(${row["調整額"]}) + 税(${(row['税調整額'])})`)
+							sagaku_zan = sagaku_zan - (Number(row['本体額']) + Number(row['調整額']) + Number(row["消費税"]) + Number(row['税調整額']))
 						}
 						if(sagaku_zan !== 0){
-							alert("消費税で端数がでちゃうのでピッタリにできませんでした。")
-							/*
-							console_log(sagaku_zan,"lv3")
-							//hontai.value[0]["調整額"] += Number(sagaku_zan)
-
-							hontai.value[index]['調整額'] += Number(sagaku_zan)
-							hontai_val = new Decimal(Number(hontai.value[index]['本体額']) + Number(hontai.value[index]['調整額']))
-							hontai.value[index]['消費税'] = Math.round(hontai_val.mul(zeiritu))
-							*/
+							if(CHOUSEI_TYPE.value !== 'paroff' && CHOUSEI_TYPE.value !== 'paron'){
+								alert(`消費税端数の関係で指定した額に変更できませんでした。差額(${sagaku_zan}円)`)
+							}
 						}
 						pay.value = 0
 						kaikei_zei.value = 0
 						for(const row of hontai.value){
-							pay.value += Number(row['本体額']) + Number(row['消費税']) + Number(row['調整額'])
-							kaikei_zei.value += Number(row['消費税'])
+							pay.value += Number(row['本体額']) + Number(row['消費税']) + Number(row['調整額']) + Number(row['税調整額'])
+							kaikei_zei.value += Number(row['消費税']) + Number(row['税調整額'])
 						}
 						//calculation()
 						//auto_ajust_flg = true
 					}else{
-						console_log("調整スキップ","lv3")
+						console_log("調整スキップ")
 					}
-          console_log("*****【 Revised end:値引き値増し処理 】*****","lv3")
+          console_log("*****【 Revised end:値引き値増し処理 】*****")
         }
 				
 				const reset_order = () => {//オーダーリセット
@@ -926,8 +1059,8 @@
 				
 				const total_area = ref()
 				const resize = () =>{//fontsizeの調整
-					//console_log(total_area.value.style["fontSize"],"lv3")
-					//console_log(total_area.value.style,"lv3")
+					//console_log(total_area.value.style["fontSize"])
+					//console_log(total_area.value.style)
 
 					let size = total_area.value.style["fontSize"].slice(0,-3)
 
@@ -1018,7 +1151,6 @@
 					}else{
 						return Number(deposit.value) - Number(pay.value)
 					}
-					
 				})
 				const keydown = (e) => {//電卓ボタンの処理
 					//console_log(e.target.innerHTML,'lv3')
@@ -1030,7 +1162,6 @@
 						}else{
 							deposit.value = pay.value
 						}
-						
 					}else{
 						deposit.value = Number(deposit.value.toString() + e.target.innerHTML.toString())
 					}
@@ -1312,6 +1443,9 @@
 					cartbtn_show,
 					//order_item_fade_switch,
 					//order_item_fade_switch_changer,
+					CHOUSEI_TYPE,
+					keydown_waribiki,
+					par,
 				}
 			}
 		}).mount('#register');

@@ -35,6 +35,16 @@ INPUT.ev{
     width:25%;
     height:60px;
 }
+/*割引電卓ボタン*/
+.btn--waribiki{
+    font-size: 1.5rem;
+    width:100%;
+    height:100%;
+}
+.waribiki--cellsize{
+    width:25%;
+    height:40px;
+}
 /*レジボタン*/
 .btn--rezi{
     height:70%;

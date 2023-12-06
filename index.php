@@ -2,8 +2,8 @@
 require "php_header.php";
 //log_writer2("index.php > \$_SESSION",$_SESSION,"lv3");
 if(EXEC_MODE==="Trial" && !empty($_SERVER["REQUEST_URI"])){
-    $emsg = print_r($_SERVER,true);
-    send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-INFO】トライアルユーザーが来たよ！",$emsg);
+    //$emsg = print_r($_SERVER,true);
+    //send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-INFO】トライアルユーザーが来たよ！",$emsg);
     header("HTTP/1.1 301 Moved Permanently");
     header("Location: menu.php");
     exit();
@@ -27,7 +27,7 @@ $mail="";
 if(!empty($_SESSION["MAIL"])){
     $mail=$_SESSION["MAIL"];
 }elseif(EXEC_MODE==="Local"){
-    $mail="green.green.midori@green-island.mixh.jp";
+    $mail="cafe.present@gmail.com";
 }
 
 ?>
@@ -54,7 +54,7 @@ if(!empty($_SESSION["MAIL"])){
             <form class="form-signin" id="form1" method="post" action="logincheck.php">
                 <span id="reauth-email" class="reauth-email"></span>
                 <input type="email" id="inputEmail" class="form-control" placeholder="Email address" name="LOGIN_EMAIL" required autofocus value='<?php echo $mail;?>'>
-                <input type="password" id="inputPassword" class="form-control" name="LOGIN_PASS" placeholder="Password" required value='<?php echo (EXEC_MODE=="Local"?"123456":""); ?>'>
+                <input type="password" id="inputPassword" class="form-control" name="LOGIN_PASS" placeholder="Password" required value='<?php echo (EXEC_MODE=="Local"?"Farufaru53":""); ?>'>
                 <div id="remember" class="checkbox">
                     <label>
                         <input type="checkbox" name="AUTOLOGIN" checked> AUTOLOGIN 

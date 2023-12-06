@@ -15,6 +15,7 @@ const console_log=(log,lv)=>{
 }
 
 const get_value=(value,zei,kbn) => {
+  //値段、税率、値段が税込か税抜か をパラメータで渡すとreturnを配列で返す
   //value:入力値
   //zei:税率(0 ～ 1)
   //kbn:IN-税込 NOTIN-本体
@@ -26,7 +27,7 @@ const get_value=(value,zei,kbn) => {
   let temp,temp2
   let msg = 'OK'
 
-  console_log(`NewVal:${value}, %:${zei}, :${kbn} ::端数${ZEIHASU}`,'lv3')
+  console_log(`[function.js@get_value] params[${value}, %:${zei}, :${kbn}] ::端数${ZEIHASU}`,'lv3')
 
   if(ZEIHASU===0 || ZEIHASU===1 || ZEIHASU===2){
   }else{

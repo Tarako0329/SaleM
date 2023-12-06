@@ -76,6 +76,7 @@ ver2.99.0-057:レジ画面改修・税計算機能の切り出し-commited
 ver2.99.0-058:bugfix-sqllogger error-commited
 ver2.99.0-059:商品一覧の検索機能追加-commited
 ver2.99.0-060:細かな修正・操作性向上・分析画面のレイアウト調整-commited
+ver2.99.0-061:割引割増処理UPDATE-commited
 
 
 【Issues】
