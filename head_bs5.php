@@ -13,7 +13,7 @@
     <!-- オリジナル CSS -->
     <!--サイト共通-->
     <link rel='stylesheet' href='css/style.css?<?php echo $time; ?>' >
-    <link rel='stylesheet' href='css/style_color_<?php echo $color_No;?>.css?<?php echo $time; ?>' >
+    <link id='style_color' rel='stylesheet' href='css/style_color_0.css?<?php echo $time; ?>' >
 
     <!--Vue.js-->
     <script src="https://unpkg.com/vue@next"></script>
@@ -27,12 +27,14 @@
     <script>
         var KANKYO = <?php echo "'".EXEC_MODE."'" ;?>;
         var ZEIHASU = <?php echo $ZeiHasu+0 ;?>;
+        var COLOR_NO 
     </script>
     <script src="script/function.js?<?php echo $time; ?>"></script>
+    <script src="script/indexeddb.js?<?php echo $time; ?>"></script>
 
 
     <link rel='manifest' href='manifest.webmanifest'>
-    <script>
+    <script>/*serviceWorker*/
         /*
         if('serviceWorker' in navigator){
         	navigator.serviceWorker.register('serviceworker.js').then(function(){
@@ -64,4 +66,17 @@
         }
         //スマフォで:active :hover を有効に
         document.getElementsByTagName('html')[0].setAttribute('ontouchstart', '');
+    </script>
+    <script>/*indexedDb*/
+        //配色のCSSをセット
+        const set_color = (jsonobj) =>{
+            console_log('set_color start')
+            
+            if(jsonobj===undefined){return}
+            document.getElementById('style_color').href=`css/style_color_${jsonobj.No}.css?<?php echo $time; ?>`
+            COLOR_NO = jsonobj
+            console_log(COLOR_NO)
+        }
+
+        IDD_Read('LocalParameters','menu_color',set_color)
     </script>

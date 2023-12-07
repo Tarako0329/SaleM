@@ -77,6 +77,8 @@ ver2.99.0-058:bugfix-sqllogger error-commited
 ver2.99.0-059:商品一覧の検索機能追加-commited
 ver2.99.0-060:細かな修正・操作性向上・分析画面のレイアウト調整-commited
 ver2.99.0-061:割引割増処理UPDATE-commited
+ver2.99.0-062:端末別の設定をindexedDbに移行
+	端末別の設定をMySQL[PageDefVal]table から indexedDbに移行
 
 
 【Issues】

@@ -62,6 +62,7 @@
 	//イベント名の取得
 	//セッション -> DB
 	$event = (!empty($_SESSION["EV"])?$_SESSION["EV"]:"");
+	/*
 	if(empty($event)){
 		$sql = "select value,updatetime from PageDefVal where uid=? and machin=? and page=? and item=?";
 		$stmt = $pdo_h->prepare($sql);
@@ -88,7 +89,7 @@
 			}
 		}
 	}
-
+	*/
 	//税区分MSリスト取得
 	$sqlstr="select * from ZeiMS order by zeiKBN;";
 	$stmt = $pdo_h->query($sqlstr);
@@ -1139,6 +1140,7 @@
 						})
 						.finally(()=>{
 							get_UriageList()
+							IDD_Write('LocalParameters',[{id:'EventName',EventName:labels.value["EV_input_value"]}])
 							loader.value = false
 						})
 				}
@@ -1336,6 +1338,18 @@
 				}
 
 				//細かな表示設定など
+				let EventName=''
+        const set_EventName = (jsonobj) =>{
+            console_log('set_EventName start')
+            //console_log(jsonobj)
+            if(jsonobj===undefined){return}
+            EventName = jsonobj
+						console_log(EventName)
+						labels.value["EV_input_value"] = EventName.EventName
+        }
+
+        //IDD_Read('LocalParameters','EventName',set_EventName)
+
 				const labels_address_check = ref()
 				const labels = computed(() =>{
 					//let labels = []
@@ -1354,7 +1368,8 @@
 						rtn_labels.EV_input_name='EV'
 						rtn_labels.EV_input_hidden='KOKYAKU'
 						rtn_labels.EV_input_placeholder='イベント名等'
-						rtn_labels.EV_input_value='<?php echo $event; ?>'
+						//rtn_labels.EV_input_value='<?php //echo $event; ?>'
+						rtn_labels.EV_input_value=EventName.EventName
 					}
 					if(rg_mode.value !== 'evrez'){
 						rtn_labels.address='display:none'
@@ -1382,6 +1397,7 @@
 					get_UriageList()
 					v_get_gio()
 					order_list_area_set()
+					IDD_Read('LocalParameters','EventName',set_EventName)
 					window.addEventListener('resize', order_list_area_set)
 				})
 				return{

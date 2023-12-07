@@ -26,7 +26,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     if(!empty($_GET["action"])){
         $action = $_GET["action"];
     }
-    
+    /*
     if($action=="color_change"){
         //配色の変更・保存
         $color_No = $_GET["color"]+1;
@@ -41,7 +41,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         $stmt->bindValue(5, $color_No, PDO::PARAM_STR);
         $stmt->execute();
     }
-    
+    */
     if($action=="logout"){
         delete_old_token($_COOKIE["webrez_token"],$pdo_h);
         redirect_to_login("ログオフしました");
@@ -172,7 +172,10 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             </a>
         </div>
     </header>
-    <div style='position:fixed;top:70px;right:0;' class='rainbow-color'><b><a href='menu.php?action=color_change&color=<?php echo $color_No; ?>'>COLOR<i class='fa-solid fa-rotate-right fa-lg rainbow-color'></i></a></b></div>
+    <div style='position:fixed;top:70px;right:0;' class='rainbow-color'>
+        <!--<b><a href='menu.php?action=color_change&color=<?php echo $color_No; ?>'>COLOR<i class='fa-solid fa-rotate-right fa-lg rainbow-color'></i></a></b>-->
+        <b><a href='#' onclick='ColorChange()'>COLOR<i class='fa-solid fa-rotate-right fa-lg rainbow-color'></i></a></b>
+    </div>
     <div class='container-fluid' style='padding-top:15px;'>
 
 <?php
@@ -665,7 +668,17 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     
         form.submit();
     
-    }    
+    }
+    const ColorChange = () =>{
+        console_log('ColorChange start')
+        COLOR_NO.No = Number(COLOR_NO.No) + Number(1)
+        if(Number(COLOR_NO.No)>=3){
+            COLOR_NO.No = Number(0)
+        }
+        console_log(COLOR_NO)
+        IDD_Write('LocalParameters',[COLOR_NO])
+        set_color(COLOR_NO)
+    }
 </script>
 </html>
 <?php

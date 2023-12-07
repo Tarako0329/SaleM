@@ -106,6 +106,7 @@ if(!isset($_COOKIE['machin_id'])){
 define("MACHIN_ID", $machin_id);
 
 //スキンの取得
+/*indexeddbに変更
 $sql = "select value from PageDefVal where machin=? and page=? and item=?";
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, MACHIN_ID, PDO::PARAM_STR);
@@ -119,8 +120,9 @@ if($stmt->rowCount()==0){
     log_writer2("php_header.php","php_header.php@Cannot Get skin_color_cd：MACHIN_ID=[".MACHIN_ID."]\n","lv3");
 }else{
     $buf = $stmt->fetch();
-    $color_No = $buf["value"];
+    $color_No = $buf["value"]; 
 } 
+*/
 //log_writer("php_header.php _SERVER values ",$_SERVER);
 //log_writer("php_header.php end > \$_SESSION values ",$_SESSION);
 
