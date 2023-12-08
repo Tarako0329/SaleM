@@ -101,7 +101,7 @@ $params["UriDate"] = filter_input(INPUT_POST,'KEIJOUBI');
 $params["insDatetime"] = date("Y/m/d H:i:s");
 $params["Event"] = filter_input(INPUT_POST,'EV');
 $params["TokuisakiNM"] = filter_input(INPUT_POST,'KOKYAKU');
-
+$sqllog="";
 try{
 	$pdo_h->beginTransaction();
 	$sqllog .= rtn_sqllog("START TRANSACTION",[]);

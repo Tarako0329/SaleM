@@ -7,6 +7,7 @@ $msg = "";                          //ユーザー向け処理結果メッセー
 $alert_status = "alert-warning";    //bootstrap alert class
 $reseve_status=false;               //処理結果セット済みフラグ。
 $timeout=false;                     //セッション切れ。ログイン画面に飛ばすフラグ
+$sqllog="";
 
 $rtn = csrf_checker(["xxx.php","xxx.php"],["P","C","S"]);
 if($rtn !== true){

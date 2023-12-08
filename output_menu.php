@@ -45,18 +45,18 @@ if(!empty($_POST)){
 </script>
 
 <header class="header-color common_header">
-    
+    <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div></a></div>
     <?php
-    if($logoff==false){
+    //if($logoff==false){
     ?>
-        <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div></a></div>
-        <span style="font-size:1.5rem;"><a href="menu.php?action=logout"><i class="fa-solid fa-right-from-bracket"></i></a></span>
+        <!--<div class="yagou title"><a href="menu.php"><?php //echo $title;?></a></div></a></div>
+        <span style="font-size:1.5rem;"><a href="menu.php?action=logout"><i class="fa-solid fa-right-from-bracket"></i></a></span>-->
     <?php
-    }else{
+    //}else{
     ?>
-        <div class="yagou title"><a href="index.php"><?php echo $title;?></a></div></a></div>
+        <!--<div class="yagou title"><a href="index.php"><?php //echo $title;?></a></div></a></div>-->
     <?php
-    }
+    //}
     ?>
 </header>
 

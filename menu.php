@@ -173,7 +173,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         </div>
     </header>
     <div style='position:fixed;top:70px;right:0;' class='rainbow-color'>
-        <!--<b><a href='menu.php?action=color_change&color=<?php echo $color_No; ?>'>COLOR<i class='fa-solid fa-rotate-right fa-lg rainbow-color'></i></a></b>-->
+        <!--<b><a href='menu.php?action=color_change&color=<?php //echo $color_No; ?>'>COLOR<i class='fa-solid fa-rotate-right fa-lg rainbow-color'></i></a></b>-->
         <b><a href='#' onclick='ColorChange()'>COLOR<i class='fa-solid fa-rotate-right fa-lg rainbow-color'></i></a></b>
     </div>
     <div class='container-fluid' style='padding-top:15px;'>

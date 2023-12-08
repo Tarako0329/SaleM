@@ -2,7 +2,8 @@
 require "php_header.php";
 $rtn=check_session_userid($pdo_h);
 $token = csrf_create();
-
+$msg="";
+$sqllog="";
 try{
     
     $sqlstr="select * from Users where uid=?";

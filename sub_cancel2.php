@@ -3,6 +3,7 @@ require "php_header.php";
 $rtn=check_session_userid($pdo_h);
 
 $msg="";
+$sqllog="";
 
 if($_SESSION["flg"]=="succsess"){
     try{

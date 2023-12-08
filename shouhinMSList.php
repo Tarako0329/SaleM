@@ -978,7 +978,7 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 </html>
 <?php
 $_SESSION["MSG"] = "";
-$_SESSION["alert"]="";
+//$_SESSION["alert"]="";
 $stmt  = null;
 $stmt2 = null;
 $pdo_h = null;

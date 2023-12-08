@@ -10,6 +10,7 @@ if($rtn !== true){
 check_session_userid($pdo_h);
 $csrf_token = csrf_create();
 $flg=true;
+$sqllog="";
 //実績有無の確認
 $sqlstr="select count(*) as cnt from UriageData where ShouhinCD=? and uid=?";
 $stmt = $pdo_h->prepare($sqlstr);

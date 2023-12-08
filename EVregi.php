@@ -61,7 +61,7 @@
 
 	//イベント名の取得
 	//セッション -> DB
-	$event = (!empty($_SESSION["EV"])?$_SESSION["EV"]:"");
+	//$event = (!empty($_SESSION["EV"])?$_SESSION["EV"]:"");
 	/*
 	if(empty($event)){
 		$sql = "select value,updatetime from PageDefVal where uid=? and machin=? and page=? and item=?";
@@ -276,7 +276,7 @@
 										<div class='order_su' >{{list.SU}}点</div>
 										<div class='order_kin'>¥{{(list.SU * (list.TANKA + list.TANKA_ZEI)).toLocaleString()}}</div>
 									</div>
-									<div id='side-pm'style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;padding-bottom:3px;'>
+									<div id='side-pm' style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;padding-bottom:3px;'>
 										<button type='button' class='order_list_area_btn plus' @click='order_list_pm(index,1)'></button>
 										<button type='button' class='order_list_area_btn minus' @click='order_list_pm(index,-1)'></button>
 										<select v-model='list.ZEIKBN' @change='order_list_change_tax(index,$event)' class="form-select form-select-lg " style='margin-left:10px;padding-left:10px;'>
@@ -299,12 +299,20 @@
 							</template>	
 							<template v-for='(list,index) in hontai' :key='list.CD'>
 								<div class='container'>
-									<div v-if='list.調整額<0' class='order_item'>値引({{list.税区分名}}分)</div>
-									<div v-if='list.調整額>0' class='order_item'>値増({{list.税区分名}}分)</div>
-									<div v-if='list.調整額!==0' style='display:flex;'>
-										<div class='order_su' >1点</div>
-										<div class='order_kin'>¥{{(list.調整額 + list.税調整額).toLocaleString()}}</div>
-									</div>
+									<template v-if='list.調整額<0'>
+										<div class='order_item'>値引({{list.税区分名}}分)</div>
+										<div style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;padding-bottom:3px;'>
+											<div class='order_su' >1点</div>
+											<div class='order_kin text-danger'>¥{{(list.調整額 + list.税調整額).toLocaleString()}}</div>
+										</div>
+									</template>
+									<template v-if='list.調整額>0'>
+										<div class='order_item'>値増({{list.税区分名}}分)</div>text-danger
+										<div style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;padding-bottom:3px;'>
+											<div class='order_su' >1点</div>
+											<div class='order_kin'>¥{{(list.調整額 + list.税調整額).toLocaleString()}}</div>
+										</div>
+									</template>
 								</div>
 							</template>
 						</div>
@@ -593,7 +601,7 @@
 					</div>
 				</div>
 				<div class='modal-footer'>
-					<button class='btn btn-primary' type='button' @click='Revised()'>決　定</button>
+					<button class='btn btn-primary' type='button' data-bs-dismiss='modal' @click='Revised()'>決　定</button>
 				</div>
 			</div>
 		</div>

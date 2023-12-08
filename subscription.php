@@ -11,6 +11,7 @@ if(!empty($_GET)){
 $paid_status=(!empty($_GET["status"])?$_GET["status"]:"");
 
 $msg="";
+$sqllog="";
 
 try{
     if($paid_status=="paid"){
