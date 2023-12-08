@@ -10,6 +10,7 @@ if($rtn !== true){
 check_session_userid($pdo_h);
 $_SESSION["MSG"]= "更新対象がありませんでした。";
 $_SESSION["alert"] = "alert-warning";
+$sqllog="";
 
 //log_writer2("shouhinMSList_sql.php > \$_POST",$_POST,"lv3");
 $array = $_POST["ORDERS"];

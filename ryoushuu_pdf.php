@@ -266,6 +266,7 @@ $html = <<< EOM
 EOM;
 $html = str_replace(["\r","\n","\t"],"",$html);//改行・タブの削除
 try{
+	$sqllog="";
 	if($saiban==="on"){
 		$pdo_h->beginTransaction();
 		$sqllog .= rtn_sqllog("START TRANSACTION",[]);

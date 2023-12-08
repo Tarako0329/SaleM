@@ -17,6 +17,7 @@ $rtn = csrf_checker(["shouhinMSedit.php"],["P","C","S"]);
 if($rtn !== true){
     redirect_to_login($rtn);
 }
+$sqllog="";
 
 //税区分MSから税率の取得 
 try{

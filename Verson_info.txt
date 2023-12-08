@@ -79,6 +79,7 @@ ver2.99.0-060:細かな修正・操作性向上・分析画面のレイアウト
 ver2.99.0-061:割引割増処理UPDATE-commited
 ver2.99.0-062:端末別の設定をindexedDbに移行
 	端末別の設定をMySQL[PageDefVal]table から indexedDbに移行
+ver2.99.0-062:php Warningつぶし
 
 
 【Issues】

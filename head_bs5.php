@@ -26,7 +26,7 @@
 
     <script>
         var KANKYO = <?php echo "'".EXEC_MODE."'" ;?>;
-        var ZEIHASU = <?php echo $ZeiHasu+0 ;?>;
+        var ZEIHASU = <?php echo empty($ZeiHasu)?0:$ZeiHasu ;?>;
         var COLOR_NO 
     </script>
     <script src="script/function.js?<?php echo $time; ?>"></script>

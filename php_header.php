@@ -97,6 +97,7 @@ $_SESSION["tour"]=(empty($_SESSION["tour"])?"":$_SESSION["tour"]);
 $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
 //端末IDを発行し、10年の有効期限でCookieにセット
+/*
 if(!isset($_COOKIE['machin_id'])){
     $machin_id = getGUID();
     setCookie("machin_id", $machin_id, time()+60*60*24*365*10, "/", "", TRUE, TRUE); 
@@ -104,7 +105,7 @@ if(!isset($_COOKIE['machin_id'])){
     $machin_id = $_COOKIE['machin_id'];
 }
 define("MACHIN_ID", $machin_id);
-
+*/
 //スキンの取得
 /*indexeddbに変更
 $sql = "select value from PageDefVal where machin=? and page=? and item=?";

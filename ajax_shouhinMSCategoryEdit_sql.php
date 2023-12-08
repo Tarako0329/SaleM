@@ -1,5 +1,6 @@
 <?php
 require "php_header.php";
+$sqllog="";
 
 $msg[0] = array(
     "EMSG" => "更新処理が実行されませんでした。"
@@ -18,7 +19,7 @@ if($rtn !== true){
 
 $array = $_POST["ORDERS"];
 $sqlstr = "";
-
+//log_writer2(basename(__FILE__),$array,"lv3");
 try{
     $pdo_h->beginTransaction();
     $sqllog .= rtn_sqllog("START TRANSACTION",[]);
@@ -33,7 +34,7 @@ try{
     }
     
     foreach($array as $row){
-        if($row["chk"]!="on"){
+        if(empty($row["chk"])?"off":$row["chk"]!="on"){ 
             continue;
         }
         $sqlstr = "update ShouhinMS set ".$col."=? where shouhinCD=? and uid=?";
