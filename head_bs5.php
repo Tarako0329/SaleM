@@ -13,7 +13,7 @@
     <!-- オリジナル CSS -->
     <!--サイト共通-->
     <link rel='stylesheet' href='css/style.css?<?php echo $time; ?>' >
-    <link id='style_color' rel='stylesheet' href='' >
+    <link id='style_color' rel='stylesheet' href='<?php echo empty($_SESSION["ColorCSS"])?"":$_SESSION["ColorCSS"] ;?>' >
 
     <!--Vue.js-->
     <script src="https://unpkg.com/vue@next"></script>
@@ -79,6 +79,15 @@
                 document.getElementById('style_color').href=`css/style_color_${jsonobj.No}.css?<?php echo $time; ?>`
                 COLOR_NO = jsonobj
             }
+
+            axios
+			.get(`ajax_set_session_param.php?ColorCSS=css/style_color_${jsonobj.No}.css?<?php echo $time; ?>`)
+			.then((response) => {
+			})
+			.catch((error)=>{
+				//console_log(`ajax_set_session_param ERROR:${error}`)
+			})
+
             console_log(COLOR_NO)
         }
         IDD_Read('LocalParameters','menu_color',set_color)

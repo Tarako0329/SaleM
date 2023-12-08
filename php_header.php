@@ -2,6 +2,8 @@
 date_default_timezone_set('Asia/Tokyo');
 require "./vendor/autoload.php";
 require_once "functions.php";
+//本番はリリースした日を指定
+$time="20231208-01";
 
 //.envの取得
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
@@ -74,7 +76,7 @@ if(EXEC_MODE=="Test" || EXEC_MODE=="Local"){
     error_reporting( E_ALL );
 }else{
     //本番はリリースした日を指定
-    $time="20231003-01";
+    //$time="20231003-01";
     //$time=date('Ymd');
     error_reporting( E_ALL & ~E_NOTICE );
 }
