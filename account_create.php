@@ -10,7 +10,7 @@ if($_GET["mode"]==="0" && !empty($_GET["acc"])){
 	$mode="insert";
 	//同一端末の前回ログイン情報をクリアする
 	//Cookie のトークンを削除
-	setCookie("webrez_token", '', -1, "/", null, TRUE, TRUE); // secure, httponly
+	setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly
 	//古くなったトークンを削除
 	delete_old_token($cookie_token, $pdo_h);
 	//セッション変数のクリア

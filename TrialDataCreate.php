@@ -10,7 +10,7 @@ $stmt->bindValue(1, 'hoge', PDO::PARAM_STR);
 $stmt->bindValue(2, '', PDO::PARAM_STR);
 $stmt->bindValue(3, 'hoge', PDO::PARAM_STR);
 $stmt->bindValue(4, 'hoge', PDO::PARAM_STR);
-$stmt->bindValue(5, $_SESSION["LOGINREZ"], PDO::PARAM_STR);
+$stmt->bindValue(5, null, PDO::PARAM_STR);
 $stmt->bindValue(6, date("Y-m-d"), PDO::PARAM_STR);
 $stmt->bindValue(7, $kigen, PDO::PARAM_STR);
 $stmt->bindValue(8, '', PDO::PARAM_STR);

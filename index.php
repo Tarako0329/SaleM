@@ -6,8 +6,8 @@ if(substr(EXEC_MODE,0,5)==="Trial" && !empty($_SERVER["REQUEST_URI"])){
     //send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-INFO】トライアルユーザーが来たよ！",$emsg);
     if(substr(EXEC_MODE,-1)==="L"){
         $_SESSION=[];
-        setCookie("webrez_token", '', -1, "/", null, TRUE, TRUE); // secure, httponly
-        setCookie("user_id", '', -1, "/", null, TRUE, TRUE); // secure, httponly
+        setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly
+        setCookie("user_id", '', -1, "/", "", TRUE, TRUE); // secure, httponly
         echo EXEC_MODE;
     }
     //echo substr(EXEC_MODE,-1);
