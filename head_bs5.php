@@ -13,7 +13,7 @@
     <!-- オリジナル CSS -->
     <!--サイト共通-->
     <link rel='stylesheet' href='css/style.css?<?php echo $time; ?>' >
-    <link id='style_color' rel='stylesheet' href='css/style_color_0.css?<?php echo $time; ?>' >
+    <link id='style_color' rel='stylesheet' href='' >
 
     <!--Vue.js-->
     <script src="https://unpkg.com/vue@next"></script>
@@ -72,11 +72,18 @@
         const set_color = (jsonobj) =>{
             console_log('set_color start')
             
-            if(jsonobj===undefined){return}
-            document.getElementById('style_color').href=`css/style_color_${jsonobj.No}.css?<?php echo $time; ?>`
-            COLOR_NO = jsonobj
+            if(jsonobj===undefined){
+                document.getElementById('style_color').href=`css/style_color_0.css?<?php echo $time; ?>`
+                COLOR_NO = {id:'menu_color',No:'0'}
+            }else{
+                document.getElementById('style_color').href=`css/style_color_${jsonobj.No}.css?<?php echo $time; ?>`
+                COLOR_NO = jsonobj
+            }
             console_log(COLOR_NO)
         }
-
         IDD_Read('LocalParameters','menu_color',set_color)
+        window.addEventListener('DOMContentLoaded', () => {
+            
+        })
+        
     </script>

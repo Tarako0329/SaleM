@@ -8,7 +8,7 @@ openReq.onupgradeneeded = function(event){
 //onupgradeneededは、DBのバージョン更新(DBの新規作成も含む)時のみ実行
   let db = event.target.result;
   db.createObjectStore('LocalParameters', {keyPath : 'id'})
-  IDD_Write('LocalParameters',[{id:'menu_color',No:'1'}])
+  IDD_Write('LocalParameters',[{id:'menu_color',No:'0'}])
   console_log('db upgrade');
 }
 
