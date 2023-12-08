@@ -10,6 +10,7 @@
 
 	$csrf_create = csrf_create();
 	//$MSG = (empty($_SESSION["MSG"])?"":$_SESSION["MSG"]);
+	//$ALERT = (empty($_SESSION["alert"])?"":$_SESSION["alert"]);
 	//ユーザ情報取得
 	$sql="select yuukoukigen,ZeiHasu from Users where uid=?";
 	$stmt = $pdo_h->prepare($sql);
@@ -17,13 +18,15 @@
 	$stmt->execute();
 	$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-//端数処理設定
-$ZeiHasu = $row[0]["ZeiHasu"];
+	//端数処理設定
+	$ZeiHasu = $row[0]["ZeiHasu"];
 
 	//税区分M取得.基本変動しないので残す
 	$ZEIsql="select * from ZeiMS order by zeiKBN;";
 	$stmt = $pdo_h->query($ZEIsql);
 	$ZEIresult = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
 
 ?>
 <!DOCTYPE html>
@@ -407,8 +410,8 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 					
 				}
 
-				const MSG = ref('<?php echo $_SESSION["MSG"]; ?>')
-				const alert_status = ref(['alert','<?php echo $_SESSION["alert"]; ?>'])
+				const MSG = ref('<?php echo $MSG; ?>')
+				const alert_status = ref(['alert','<?php echo $ALERT; ?>'])
 
 				onMounted(() => {
 					console_log('onMounted','lv3')
@@ -978,7 +981,7 @@ $ZeiHasu = $row[0]["ZeiHasu"];
 </html>
 <?php
 $_SESSION["MSG"] = "";
-//$_SESSION["alert"]="";
+$_SESSION["alert"]="";
 $stmt  = null;
 $stmt2 = null;
 $pdo_h = null;

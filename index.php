@@ -29,7 +29,7 @@ if(!empty($_SESSION["MAIL"])){
 }elseif(EXEC_MODE==="Local"){
     $mail="cafe.present@gmail.com";
 }
-
+$csrf = csrf_create();
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -62,7 +62,7 @@ if(!empty($_SESSION["MAIL"])){
                 </div>
 
                 <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit"  >ロ グ イ ン</button>
-                <input type="hidden" name="csrf_token" value="<?php echo csrf_create() ?>">
+                <input type="hidden" name="csrf_token" value="<?php echo $csrf; ?>">
             </form><!-- /form -->
             <a href="forget_pass_sendurl.php" class="forgot-password">
                 ﾊﾟｽﾜｰﾄﾞを忘れたらｸﾘｯｸ
