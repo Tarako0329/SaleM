@@ -102,12 +102,12 @@ function check_auto_login($cookie_token, $pdo) {
 // $_SESSION[user_id]の存在チェック
 // =========================================================
 function check_session_userid($pdo_h){
-    if(EXEC_MODE==="Trial"){
+    if(substr(EXEC_MODE,0,5)==="Trial"){
         if(empty($_COOKIE["user_id"]) && empty($_SESSION["user_id"])){
             //セッション・クッキーのどちらにもIDが無い場合、ID発行を行う
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: TrialDataCreate.php");
-            exit();
+            exit(); 
         }else if((!empty($_SESSION["user_id"]) && empty($_COOKIE["user_id"])) || (!empty($_SESSION["user_id"]) && $_COOKIE["user_id"] != $_SESSION["user_id"])){
             //クッキーが空　もしくは　セッションありかつセッション＜＞クッキーの場合
             //クッキーにセッションの値をセットする
