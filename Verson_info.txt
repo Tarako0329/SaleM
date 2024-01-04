@@ -81,6 +81,8 @@ ver2.99.0-062:端末別の設定をindexedDbに移行-commited
 	端末別の設定をMySQL[PageDefVal]table から indexedDbに移行
 ver2.99.0-062:php Warningつぶし-commited
 ver2.99.0-063:トライアルモード修正
+ver2.99.0-064:vue3cdn修正
+
 
 
 【Issues】
