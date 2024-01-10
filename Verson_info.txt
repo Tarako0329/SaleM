@@ -92,21 +92,21 @@ ver2.99.0-064:vue3cdn修正
 
 
 ローカルからテスト環境へ
-cd /home/ifduktdo/public_html/SaleM/TEST
+cd /home/pcntfsrg/public_html/SaleM/TEST
 git fetch --all
 git reset --hard origin/master
 php load_font.php ipag css/ipag.ttf
 php load_font.php ipagp css/ipagp.ttf
 php load_font.php Kranky css/Kranky-Regular.ttf
 
-cd /home/ifduktdo/public_html/SaleM/WebRez
+cd /home/pcntfsrg/public_html/SaleM/WebRez
 git fetch --all
 git reset --hard origin/master
 php load_font.php ipag css/ipag.ttf
 php load_font.php ipagp css/ipagp.ttf
 php load_font.php Kranky css/Kranky-Regular.ttf
 
-cd /home/ifduktdo/public_html/SaleM/WebRez_Trial
+cd /home/pcntfsrg/public_html/SaleM/WebRez_Trial
 git fetch --all
 git reset --hard origin/master
 php load_font.php ipag css/ipag.ttf

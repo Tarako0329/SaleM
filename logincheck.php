@@ -94,7 +94,7 @@ try{
     }
 
     if(EXEC_MODE!=="Local"){
-        session_regenerate_id(true);
+        //session_regenerate_id(true);
     }
     redirect_to_welcome($id, $pdo);
     
