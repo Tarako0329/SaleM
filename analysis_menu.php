@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="ja">
 <?php
 /*関数メモ
 check_session_userid：セッションのユーザIDが消えた場合、自動ログインがオフならログイン画面へ、オンなら自動ログインテーブルからユーザIDを取得
@@ -21,6 +19,9 @@ $rtn=check_session_userid($pdo_h);
 $token = csrf_create();
 
 ?>
+<!DOCTYPE html>
+<html lang="ja">
+
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等

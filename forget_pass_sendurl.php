@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="ja">
 <?php
 
 require "php_header.php";
@@ -45,6 +43,8 @@ if(filter_input(INPUT_POST,"BTN") == "send"){
 }
 
 ?>
+<!DOCTYPE html>
+<html lang="ja">
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
