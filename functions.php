@@ -513,7 +513,7 @@ function redirect_to_login($message) {
 	session_destroy();
 	session_start();
     if(EXEC_MODE!=="Local"){
-        session_regenerate_id(true);
+        //session_regenerate_id(true);
     }
     setCookie("login_type", "", -1, "/", "", TRUE, TRUE);
     setCookie("webrez_token", "", -1, "/", "", TRUE, TRUE);
