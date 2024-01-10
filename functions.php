@@ -674,7 +674,7 @@ function csrf_chk_redirect($csrf_token){
 // =========================================================
 // 天気取得（無効・jsに移植）
 // =========================================================
-function get_weather( $type = null,$lat,$lon ){
+//function get_weather( $type = null,$lat,$lon ){
     /* openweathermap で &amp;が受け付けられなくなったため、廃止
     if(EXEC_MODE==="Local"){
         return ["",0,0,0,0];
@@ -711,7 +711,7 @@ function get_weather( $type = null,$lat,$lon ){
 
     return $out;
     */
-}
+//}
 
 // =========================================================
 // 表(table)の出力(Vueの適用で廃止)

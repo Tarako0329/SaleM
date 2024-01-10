@@ -17,7 +17,6 @@ if(EXEC_MODE==="Local" || EXEC_MODE==="TrialL"){
     //define("HTTP","https://");
 }
 
-
 define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
 if(!empty($_SERVER['SCRIPT_URI'])){
     define("ROOT_URL",substr($_SERVER['SCRIPT_URI'],0,mb_strrpos($_SERVER['SCRIPT_URI'],"/")+1));
@@ -130,7 +129,3 @@ if($stmt->rowCount()==0){
 //log_writer("php_header.php end > \$_SESSION values ",$_SESSION);
 
 ?>
-
-
-
-
