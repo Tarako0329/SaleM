@@ -82,7 +82,8 @@ if(EXEC_MODE=="Test" || EXEC_MODE=="Local"){
 
 $pass=dirname(__FILE__);
 
-$rtn=session_set_cookie_params(24*60*60*24*3,'/','.'.MAIN_DOMAIN,true);
+ini_set('session.cookie_domain', '.'.MAIN_DOMAIN);
+$rtn=session_set_cookie_params(24*60*60*24*3,'/','.'.MAIN_DOMAIN,true,true);
 if($rtn==false){
     //echo "ERROR:session_set_cookie_params";
     log_writer2("php_header.php","ERROR:[session_set_cookie_params] が FALSE を返しました。","lv0");

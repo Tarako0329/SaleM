@@ -11,7 +11,8 @@ $dotenv->load();
 define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
 define("EXEC_MODE",$_ENV["EXEC_MODE"]);
 
-$rtn=session_set_cookie_params(24*60*60*24*3,'/','.'.MAIN_DOMAIN,true);
+ini_set('session.cookie_domain', '.'.MAIN_DOMAIN);
+$rtn=session_set_cookie_params(24*60*60*24*3,'/','.'.MAIN_DOMAIN,true,true);
 if($rtn==false){
     echo "ERROR:session_set_cookie_params";
     exit();
