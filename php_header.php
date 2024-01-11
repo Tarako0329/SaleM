@@ -98,34 +98,7 @@ $_SESSION["tour"]=(empty($_SESSION["tour"])?"":$_SESSION["tour"]);
 // DBとの接続
 $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
-//端末IDを発行し、10年の有効期限でCookieにセット
-/*
-if(!isset($_COOKIE['machin_id'])){
-    $machin_id = getGUID();
-    setCookie("machin_id", $machin_id, time()+60*60*24*365*10, "/", "", TRUE, TRUE); 
-}else{
-    $machin_id = $_COOKIE['machin_id'];
-}
-define("MACHIN_ID", $machin_id);
-*/
-//スキンの取得
-/*indexeddbに変更
-$sql = "select value from PageDefVal where machin=? and page=? and item=?";
-$stmt = $pdo_h->prepare($sql);
-$stmt->bindValue(1, MACHIN_ID, PDO::PARAM_STR);
-$stmt->bindValue(2, "menu.php", PDO::PARAM_STR);
-$stmt->bindValue(3, "COLOR", PDO::PARAM_STR);//name属性を指定
-$stmt->execute();
-$log_time=date("Y/m/d H:i:s");
 
-if($stmt->rowCount()==0){
-    $color_No = 0;
-    log_writer2("php_header.php","php_header.php@Cannot Get skin_color_cd：MACHIN_ID=[".MACHIN_ID."]\n","lv3");
-}else{
-    $buf = $stmt->fetch();
-    $color_No = $buf["value"]; 
-} 
-*/
 //log_writer("php_header.php _SERVER values ",$_SERVER);
 //log_writer("php_header.php end > \$_SESSION values ",$_SESSION);
 
