@@ -10,6 +10,7 @@ $timeout=false;                     //セッション切れ。ログイン画面
 
 //$rtn = csrf_checker(["xxx.php","xxx.php"],["P","C","S"]);
 $rtn=true;
+log_writer2("ajax_chk_email.php [\$_GET] =>",$_GET,"lv3");
 if($rtn !== true){
     /*
     $msg=$rtn;
@@ -32,10 +33,10 @@ if($rtn !== true){
             $status = $stmt->execute();
             $count = $stmt->rowCount();
             $row = $stmt->fetchAll();
-            
+            log_writer2("ajax_chk_email.php [\$row] =>",$_GET,"lv3");
             if($status===true){
                 if($row[0]["cnt"]>=1){
-                    //$msg = "メールアドレスは登録済みになります。";
+                    //$msg = "メールアドレスは登録済みになります。"; 
                     //$alert_status = "alert-warning";
                     $msg="Registered";
                     $alert_status = "alert-success";

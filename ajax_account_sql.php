@@ -54,8 +54,8 @@ if($rtn !== true){
 				}
 			}elseif($_POST["mode"] === "update"){
 			
-				if($_SESSION["chk_pass"]==="on"){
-					$sqlstr="update Users set mail=:mail,password=:password,question=:question,answer=:answer,loginrez=:loginrez,zeihasu=:zeihasu,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3,invoice_no=:invoice_no where uid=:uid";
+				if($_SESSION["P"]["chk_pass"]==="on"){
+					$sqlstr="update Users set mail=:mail,password=:password,question=:question,answer=:answer,loginrez=:loginrez,zeihasu=:zeihasu,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3,invoice_no=:invoice_no,inquiry_tel=:inquiry_tel ,inquiry_mail=:inquiry_mail where uid=:uid";
 					$stmt = $pdo_h->prepare($sqlstr);
 					$stmt->bindValue("password", $_SESSION["P"]["password"], PDO::PARAM_STR);
 				}else{

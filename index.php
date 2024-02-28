@@ -47,7 +47,7 @@ $csrf = csrf_create();
     ?>
     <!--ページ専用CSS-->
     <link rel="stylesheet" href="css/style_index.css?<?php echo $time; ?>" >
-    <script src="script/index.js"></script>
+    <!--<script src="script/index.js"></script>-->
     <TITLE><?php echo secho($title)." ようこそ";?></TITLE>
 </head>
 <header  class="header-color common_header" style="flex-wrap:wrap">
@@ -61,7 +61,7 @@ $csrf = csrf_create();
             <form class="form-signin" id="form1" method="post" action="logincheck.php">
                 <span id="reauth-email" class="reauth-email"></span>
                 <input type="email" id="inputEmail" class="form-control" placeholder="Email address" name="LOGIN_EMAIL" required autofocus value='<?php echo $mail;?>'>
-                <input type="password" id="inputPassword" class="form-control" name="LOGIN_PASS" placeholder="Password" required value='<?php echo (EXEC_MODE=="Local"?"Farufaru53":""); ?>'>
+                <input type="password" id="inputPassword" class="form-control" name="LOGIN_PASS" placeholder="Password" required value='<?php echo (EXEC_MODE=="Local"?"farfaru":""); ?>'>
                 <div id="remember" class="checkbox">
                     <label>
                         <input type="checkbox" name="AUTOLOGIN" checked> AUTOLOGIN 

@@ -116,7 +116,6 @@
 		}
 	</style>
 </head>
-
 <body>
 	<div  id='register'>
 	<form method = 'post' id='form1' @submit.prevent='on_submit'>
@@ -180,7 +179,7 @@
 		</div>
 		<div v-if='chk_register_show==="chk"' class='header-plus-minus d-flex justify-content-center align-items-center ' style='font-size:1.4rem;font-weight:700;top: 156px;height:52px;'>
 			<div style='padding:0;'>
-			<input type='radio' class='btn-check' name='ZeiChange' value='10' autocomplete='off' v-model='ZeiChange' id='eatin'>
+				<input type='radio' class='btn-check' name='ZeiChange' value='10' autocomplete='off' v-model='ZeiChange' id='eatin'>
 				<label class='btn btn-outline-danger ' for='eatin' style='border-radius:0;'>イートイン</label>
 				<input type='radio' class='btn-check' name='ZeiChange' value='8' autocomplete='off' v-model='ZeiChange' id='takeout'>
 				<label class='btn btn-outline-danger ' for='takeout' style='border-radius:0;'>テイクアウト</label>

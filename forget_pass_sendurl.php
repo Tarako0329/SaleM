@@ -31,7 +31,9 @@ if(filter_input(INPUT_POST,"BTN") == "send"){
             
             $url
             EOM;
-        if(FROM==""){
+        if(EXEC_MODE==="Local"){
+            echo $body;
+        }else if(FROM==""){
             //.env にメールアカウント情報が設定されてない場合、phpのsendmailで送付
             define("FROM", "information@WEBREZ.jp");
             $okflg=touroku_mail($to,$subject,$body);
