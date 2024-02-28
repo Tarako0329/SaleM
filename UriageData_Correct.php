@@ -100,7 +100,7 @@
 						<th v-if='Type==="rireki"' scope='col' style='width:20px;'></th>
 					</tr>
 					</thead>
-					<tbody v-for='(list,index) in UriageList_filter' :key='list.uid + list.UriDate + list.UriageNO + list.ShouhinCD + list.zeiKBN'>
+					<tbody v-for='(list,index) in UriageList_filter' :key='list.uid + list.UriDate + list.Event + list.UriageNO + list.ShouhinCD + list.zeiKBN'>
 						<!--売上日+Event行-->
 						<tr v-if='(index===0) || (index!==0 && list.UriDate + list.Event !== UriageList_filter[index-1].UriDate + UriageList_filter[index-1].Event)' class='tr_stiky'>
 							<td :colspan='colspan' class='tr_stiky' style='white-space:nowrap;'>
