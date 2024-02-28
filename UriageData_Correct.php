@@ -106,7 +106,7 @@
 							<td :colspan='colspan' class='tr_stiky' style='white-space:nowrap;'>
 								<span role='button' class='link' @click='set_filter("UriDate",list.UriDate,"")'> 売上日：{{list.UriDate}}</span>
 								<span style='margin-left:8px;' role='button' class='link' @click='set_filter("Event",list.Event+list.TokuisakiNM,"")'>『{{list.Event}}{{list.TokuisakiNM}}』</span>
-								<img v-if='(list.icon.length>=5) && (Type!=="rireki")' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>
+								<img v-if='(String(list.icon).length>=5) && (Type!=="rireki")' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>
 								<template v-if='(Type!=="rireki")'>（<span style='color:red;'>{{list.max_temp}}</span>/<span style='color:blue;'>{{list.min_temp}}</span>）</template>
 							</td>
 							<td class='text-right d-none d-md-table-cell'></td>
