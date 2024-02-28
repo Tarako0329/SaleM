@@ -376,23 +376,23 @@
 					if(new_val.value !== ''){
 						console_log(`新価格あり：${new_val.value}`,"lv3")
 						console_log(upd_zei_kominuki.value,"lv3")
-						values = return_tax(new_val.value, shouhinMS.value[index].zeiKBN, upd_zei_kominuki.value)
+						values = return_tax(new_val.value, shouhinMS_filter.value[index].zeiKBN, upd_zei_kominuki.value)
 						console_log(values,"lv3")
-						shouhinMS.value[index].tanka = values[0]["本体価格"]
-						shouhinMS.value[index].tanka_zei = values[0].消費税
+						shouhinMS_filter.value[index].tanka = values[0]["本体価格"]
+						shouhinMS_filter.value[index].tanka_zei = values[0].消費税
 						if(values[0].E !== 'OK'){
               alert('指定の税込額は税率計算で端数が発生するため実現できません')
 							new_val.value = values[0].税込価格
             }
-					}else if(shouhinMS.value[index].zeiKBN !== shouhinMS_BK.value[index].zeiKBN){
+					}else if(shouhinMS_filter.value[index].zeiKBN !== shouhinMS_BK_filter.value[index].zeiKBN){
 						//税率のみ変更した場合は現在の単価から算出する
 						//shouhinMS.value[index].tanka_zei = return_tax(shouhinMS.value[index].tanka, shouhinMS.value[index].zeiKBN.toString(), 'nuki')
-						values = return_tax(shouhinMS.value[index].tanka, shouhinMS.value[index].zeiKBN, 'NOTIN')
-						shouhinMS.value[index].tanka_zei = values[0].消費税
+						values = return_tax(shouhinMS_filter.value[index].tanka, shouhinMS_filter.value[index].zeiKBN, 'NOTIN')
+						shouhinMS_filter.value[index].tanka_zei = values[0].消費税
 					}else{//新価格が空白の場合、本体・税額・税区分を元に戻す
-						shouhinMS.value[index].tanka = shouhinMS_BK.value[index].tanka
-						shouhinMS.value[index].tanka_zei = shouhinMS_BK.value[index].tanka_zei
-						shouhinMS.value[index].zeiKBN = shouhinMS_BK.value[index].zeiKBN
+						shouhinMS_filter.value[index].tanka = shouhinMS_BK_filter.value[index].tanka
+						shouhinMS_filter.value[index].tanka_zei = shouhinMS_BK_filter.value[index].tanka_zei
+						shouhinMS_filter.value[index].zeiKBN = shouhinMS_BK_filter.value[index].zeiKBN
 					}
 				}
 
