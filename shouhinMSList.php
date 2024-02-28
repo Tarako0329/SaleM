@@ -367,11 +367,11 @@
 				}
 				const set_new_value = (index,new_val_id) => {
 					//単価入力欄から本体と消費税を算出し、セットする
-					console_log(`set_new_value start (${index}:${new_val_id})`,'lv3')
+					//console_log(`set_new_value start (${index}:${new_val_id})`,'lv3')
 					const new_val = document.querySelector(new_val_id)
-					console_log(new_val.value,'lv3')
+					//console_log(new_val.value,'lv3')
 					let values 
-					//console_log(`set_new_value start (${index}:${new_val_id} new_val = ${new_val})`,'lv3')
+					console_log(`set_new_value start (index => ${index} new_val_id => ${new_val_id} new_val => ${new_val})`,'lv3')
 
 					if(new_val.value !== ''){
 						console_log(`新価格あり：${new_val.value}`,"lv3")
