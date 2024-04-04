@@ -14,6 +14,7 @@ function log_writer2($pgname,$msg,$kankyo){
         $log = print_r($msg,true);
         
         send_mail(SYSTEM_NOTICE_MAIL,"【重要】".TITLE."でシステムエラー発生",$log);
+        
     }else if($kankyo==="lv1"){
         log_writer($pgname,$msg);
     }else if($kankyo==="lv2" && EXEC_MODE!=="Product"){
@@ -360,6 +361,7 @@ function send_mail($to,$subject,$body){
 
 	//SMTP送信
     if(EXEC_MODE==="Local"){
+        log_writer2("\$body",$body,"lv3");
         return true;
     }
 
