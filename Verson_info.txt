@@ -88,6 +88,7 @@ ver3.00.2-000:商品マスタ修正bugfix
 ver3.00.3-000:商品一覧修正bugfix
 ver3.00.4-000:売上実績bugfix
 ver3.01.0-000:Usersマスタの分割
+	登録URLを飛ばすとこまで
 	UsersテーブルをUsers_webrezとして複製し
   ALTER TABLE `Users_webrez`
   DROP `password`,
