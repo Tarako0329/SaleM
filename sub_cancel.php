@@ -3,7 +3,8 @@ require "php_header.php";
 $rtn=check_session_userid($pdo_h);
 
 //有効期限の取得
-$sql="select *,DATE_ADD(keiyakudate, INTERVAL -1 DAY) as syuryoudate from Users where uid=?";
+//$sql="select *,DATE_ADD(keiyakudate, INTERVAL -1 DAY) as syuryoudate from Users where uid=?";
+$sql="select *,DATE_ADD(keiyakudate, INTERVAL -1 DAY) as syuryoudate from Users_webrez where uid=?";
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
 $stmt->execute();

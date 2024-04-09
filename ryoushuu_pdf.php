@@ -77,7 +77,8 @@ if(!empty($qr_GUID)){
 
 $sysname="WEBREZ+";
 
-$sql="select * from Users where uid = ?";
+//$sql="select * from Users where uid = ?";
+$sql="select * from Users_webrez where uid = ?";
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $id, PDO::PARAM_INT);
 $stmt->execute();

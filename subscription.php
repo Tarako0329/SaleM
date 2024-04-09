@@ -18,7 +18,8 @@ try{
         $pdo_h->beginTransaction();
         $sqllog .= rtn_sqllog("START TRANSACTION",[]);
     
-        $sql="select DATE_ADD(yuukoukigen, INTERVAL 1 DAY) as keiyakudate from Users where uid=?";
+        //$sql="select DATE_ADD(yuukoukigen, INTERVAL 1 DAY) as keiyakudate from Users where uid=?";
+        $sql="select DATE_ADD(yuukoukigen, INTERVAL 1 DAY) as keiyakudate from Users_webrez where uid=?";
         $stmt = $pdo_h->prepare($sql);
         $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
         $stmt->execute();

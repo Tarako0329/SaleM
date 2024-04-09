@@ -12,7 +12,8 @@
 	//$MSG = (empty($_SESSION["MSG"])?"":$_SESSION["MSG"]);
 	//$ALERT = (empty($_SESSION["alert"])?"":$_SESSION["alert"]);
 	//ユーザ情報取得
-	$sql="select yuukoukigen,ZeiHasu from Users where uid=?";
+	//$sql="select yuukoukigen,ZeiHasu from Users where uid=?";
+	$sql="select yuukoukigen,ZeiHasu from Users_webrez where uid=?";
 	$stmt = $pdo_h->prepare($sql);
 	$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 	$stmt->execute();

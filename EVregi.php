@@ -32,7 +32,8 @@
 	$rtn=check_session_userid($pdo_h);
 	
 	//ユーザ情報取得
-	$sql="select yuukoukigen,ZeiHasu from Users where uid=?";
+	//$sql="select yuukoukigen,ZeiHasu from Users where uid=?";
+	$sql="select yuukoukigen,ZeiHasu from Users_webrez where uid=?";
 	$stmt = $pdo_h->prepare($sql);
 	$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 	$stmt->execute();

@@ -4,12 +4,17 @@ require "php_header.php";
  
 //ユーザデータの登録
 $kigen=date('Y-m-d', strtotime(date("Y-m-d") . "+1 day"));
-$sqlstr="insert into Users(uid,mail,password,question,answer,loginrez,insdate,yuukoukigen,introducer_id,name,yagou,yubin,address1,address2,ForcedLogout,invoice_no,inquiry_tel,inquiry_mail,address3) values(0,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+$sqlstr="insert into Users(uid,mail,password,question,answer) values(0,?,?,?,?)";
 $stmt = $pdo_h->prepare($sqlstr);
 $stmt->bindValue(1, 'hoge', PDO::PARAM_STR);
 $stmt->bindValue(2, '', PDO::PARAM_STR);
 $stmt->bindValue(3, 'hoge', PDO::PARAM_STR);
 $stmt->bindValue(4, 'hoge', PDO::PARAM_STR);
+$flg=$stmt->execute();
+
+$sqlstr="insert into Users_webrez(uid,loginrez,insdate,yuukoukigen,introducer_id,name,yagou,yubin,address1,address2,ForcedLogout,invoice_no,inquiry_tel,inquiry_mail,address3) values(0,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+$stmt = $pdo_h->prepare($sqlstr);
+$stmt->bindValue(1, 'hoge', PDO::PARAM_STR);
 $stmt->bindValue(5, null, PDO::PARAM_STR);
 $stmt->bindValue(6, date("Y-m-d"), PDO::PARAM_STR);
 $stmt->bindValue(7, $kigen, PDO::PARAM_STR);
