@@ -32,7 +32,8 @@ try{
         }
         
          
-        $sqlstr="update Users set yuukoukigen=?,stripe_id=?,keiyakudate=?,plan=? where uid=?";
+        //$sqlstr="update Users set yuukoukigen=?,stripe_id=?,keiyakudate=?,plan=? where uid=?";
+        $sqlstr="update Users_webrez set yuukoukigen=?,stripe_id=?,keiyakudate=?,plan=? where uid=?";
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, NULL, PDO::PARAM_STR);
         $stmt->bindValue(2, $_GET["sid"], PDO::PARAM_STR);
