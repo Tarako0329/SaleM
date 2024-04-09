@@ -10,7 +10,8 @@ if($_SESSION["flg"]=="succsess"){
         $pdo_h->beginTransaction();
         $sqllog .= rtn_sqllog("START TRANSACTION",[]);
     
-        $sqlstr="update Users set yuukoukigen=?,keiyakudate=?,plan=?,kaiyakudate=? where uid=?";
+        //$sqlstr="update Users set yuukoukigen=?,keiyakudate=?,plan=?,kaiyakudate=? where uid=?";
+        $sqlstr="update Users_webrez set yuukoukigen=?,keiyakudate=?,plan=?,kaiyakudate=? where uid=?";
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $_SESSION["yuukoukigen"], PDO::PARAM_STR);
         $stmt->bindValue(2, NULL, PDO::PARAM_STR);
