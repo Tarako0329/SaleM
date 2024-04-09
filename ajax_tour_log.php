@@ -45,7 +45,8 @@ if(!empty($status)){
     */
     
     //指定のKeyValueが登録済みかを確認
-    $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.".$tourName."') as KeyValue FROM Users WHERE uid=?";
+    //$sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.".$tourName."') as KeyValue FROM Users WHERE uid=?";
+    $sqlstr="select uid,JSON_VALUE(ToursLog,'$.".$tourName."') as KeyValue FROM Users_webrez WHERE uid=?";
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $user_id, PDO::PARAM_INT);
     $stmt->execute();
@@ -55,7 +56,8 @@ if(!empty($status)){
         //KeyValueの追加
         //$sqlstr = "update Users set ToursLog=json_merge(ToursLog, json_object(?, ?)) where uid=?";
         $sql_upd="json_merge(ToursLog, json_object(?, ?))";
-        $sqlstr = "update Users set ToursLog=".$sql_upd." where uid=?";
+        //$sqlstr = "update Users set ToursLog=".$sql_upd." where uid=?";
+        $sqlstr = "update Users_webrez set ToursLog=".$sql_upd." where uid=?";
     
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $tourName, PDO::PARAM_STR);
@@ -66,7 +68,8 @@ if(!empty($status)){
         //KeyValueの更新
         //UPDATE Users SET ToursLog = JSON_SET(ToursLog, "$.tutorial", "finish") WHERE id = 2; //keyvalueを更新する場合はこれ
         $sql_upd="JSON_SET(ToursLog, '$.".$tourName."', ?)";
-        $sqlstr = "update Users set ToursLog=".$sql_upd." where uid=?";
+        //$sqlstr = "update Users set ToursLog=".$sql_upd." where uid=?";
+        $sqlstr = "update Users_webrez set ToursLog=".$sql_upd." where uid=?";
 
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $step, PDO::PARAM_STR);
