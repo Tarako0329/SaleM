@@ -61,20 +61,6 @@ $msg = array(
 );
 
 
-//入力画面の前回値を記録
-/*
-if(filter_input(INPUT_POST,"EV")<>""){
-	//イベント名
-	$_SESSION["EV"] = $_POST["EV"];
-	$stmt = $pdo_h->prepare ( 'call PageDefVal_update(?,?,?,?,?)' );
-	$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-	$stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
-	$stmt->bindValue(3, "EVregi.php", PDO::PARAM_STR);
-	$stmt->bindValue(4, "EV", PDO::PARAM_STR);
-	$stmt->bindValue(5, $_POST["EV"], PDO::PARAM_STR);
-	$stmt->execute();
-}
-*/
 
 //売上登録
 //$logfilename="sid_".$_SESSION['user_id'].".log";

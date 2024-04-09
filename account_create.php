@@ -1,6 +1,7 @@
 <?php
 //ユーザ登録、登録情報の修正画面
 //$mode 0:新規　1:更新
+//acc:mailaddress
 require "php_header.php";
 $myname = basename(__FILE__);           //ログファイルに出力する自身のファイル名
 //log_writer2($myname." \$row[NAME] =>",$row["NAME"],"lv3");
@@ -9,15 +10,12 @@ $shoukai=(!empty($_GET["shoukai"])?$_GET["shoukai"]:"");
 if($_GET["mode"]==="0" && !empty($_GET["acc"])){
 	$mode="insert";
 	//同一端末の前回ログイン情報をクリアする
-	//Cookie のトークンを削除
-	setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly
-	//古くなったトークンを削除
 	delete_old_token($cookie_token, $pdo_h);
-	//セッション変数のクリア
-	$_SESSION = array();
 
 	//GETからメールアドレスを復元
-	$row[0]["mail"]=rot13decrypt2($_GET["acc"]);
+	//$row[0]["mail"]=rot13decrypt2($_GET["acc"]);
+	$new_mail=rot13decrypt2($_GET["acc"]);
+
 }else if($_GET["mode"]==="1"){
 	$rtn=csrf_checker(["menu.php","forget_pass.php"],["G","C","S"]);
 	if($rtn!==true){
@@ -27,13 +25,6 @@ if($_GET["mode"]==="0" && !empty($_GET["acc"])){
 	//更新モードの場合、session[usr_id]のチェック
 	$rtn=check_session_userid($pdo_h);
 	$mode="update";
-	//更新モード：ユーザ情報取得
-	$sqlstr="select * from Users where uid=?";
-	$stmt = $pdo_h->prepare($sqlstr);
-	$stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
-	$stmt->execute();
-	$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-	
 }else{
 	//モード指定なしはNG
 	redirect_to_login("想定外のアクセスルートです。");
@@ -73,13 +64,13 @@ $token=csrf_create();
 					<input type='hidden' name='csrf_token' :value='csrf'>
 					<input type='hidden' name='mode' :value='mode'>
 					<input type='hidden' name='shoukai' value=<?php echo $shoukai; ?>>
-					<input type='hidden' name='moto_mail' :value='account["moto_mail"]'>
+					<input type='hidden' name='moto_mail' :value='moto_mail'>
 					
 					<label for='mail' >メールアドレス</label>
-					<input v-model='account["mail"]["val"]' :='account["mail"]["lock"]' type='email' maxlength='40' class='form-control' id='mail' name='MAIL' required='required' placeholder='必須' >
+					<input v-model='account_u.mail' :='locker' type='email' maxlength='40' class='form-control' id='mail' name='MAIL' required='required' placeholder='必須' >
 					<hr>
 					<template v-if='mode==="update"'>
-						<input type='checkbox' id='chk_pass' name='chk_pass'>
+						<input type='checkbox' id='chk_pass' name='chk_pass' v-model='pass_change'>
 						<label for='chk_pass' >パスワードを変更する</label><br>
 					</template>
 					<label for='pass'>パスワード(6桁以上)</label>
@@ -88,16 +79,16 @@ $token=csrf_create();
 					<input type='password' minlength='6' class='form-control' id='pass2' oninput='Checkpass(this)' name='PASS' :='pass_lock'>
 					<hr>
 					<label for='question' >秘密の質問(パスワードを忘れたときに使用します)</label>
-					<input v-model='account["question"]["val"]' :='account["question"]["lock"]' type='text' maxlength='20' class='form-control' id='question' name='QUESTION' required='required' placeholder='例：初恋の人の名前' >
+					<input v-model='account_u.question' :='locker' type='text' maxlength='20' class='form-control' id='question' name='QUESTION' required='required' placeholder='例：初恋の人の名前' >
 					<label for='answer' >答え</label>
-					<input v-model='account["answer"]["val"]' :='account["answer"]["lock"]' type='text' maxlength='20' class='form-control' id='answer' name='ANSWER' required='required' placeholder='例：ささき' >
+					<input v-model='account_u.answer' :='locker' type='text' maxlength='20' class='form-control' id='answer' name='ANSWER' required='required' placeholder='例：ささき' >
 					<small id='answer' class='form-text text-muted'>ひらがな・半角英数・スペース不使用を推奨</small>
 					<br>
 					<template v-if='mode==="update"'>
-						<input v-model='account["loginrez"]["val"]' :='account["loginrez"]["lock"]' type='checkbox'  id='loginrez' name='LOGINREZ' >
+						<input v-model='account_r.loginrez' :='locker' type='checkbox'  id='loginrez' name='LOGINREZ' >
 						<label for='loginrez' >ログイン後レジ画面表示</label><br>
 						<label for='hasushori' >消費税の端数処理</label>
-						<select v-model='account["ZeiHasu"]["val"]' :='account["ZeiHasu"]["lock"]' class="form-select form-select-lg" style='font-size:1.5rem' id='hasushori' name='ZEIHASU'>
+						<select v-model='account_r.ZeiHasu' :='locker' class="form-select form-select-lg" style='font-size:1.5rem' id='hasushori' name='ZEIHASU'>
 							<option value=0>切り捨て</option>
 							<option value=1>四捨五入</option>
 							<option value=2>切り上げ</option>
@@ -108,24 +99,23 @@ $token=csrf_create();
 						<div>ここから下は請求書・納品書・自動送信メールに使用します。<br>使用しない方は入力不要です。</div>
 						<hr>
 						<label for='name' >姓名</label>
-						<input v-model='account["name"]["val"]' :='account["name"]["lock"]' type='text' class='form-control' id='name' name='NAME'  >
+						<input v-model='account_r.name' :='locker' type='text' class='form-control' id='name' name='NAME'  >
 						<label for='yagou' >屋号</label>
-						<input v-model='account["yagou"]["val"]' :='account["yagou"]["lock"]' type='text' class='form-control' id='yagou' name='YAGOU'  >
+						<input v-model='account_r.yagou' :='locker' type='text' class='form-control' id='yagou' name='YAGOU'  >
 						<label for='invoice' >インボイス登録番号</label>
-						<input v-model='account["invoice"]["val"]' :='account["invoice"]["lock"]' type='text' class='form-control' id='invoice' name='invoice'  >
-						<!--<small id='invoice' class='form-text text-muted'>未登録だと税区分は<span style='color:red'>すべて非課税</span>となります。</small><br><br>-->
+						<input v-model='account_r.invoice_no' :='locker' type='text' class='form-control' id='invoice' name='invoice'  >
 						<label for='yubin' >郵便番号('-'抜き)</label>
-						<input v-model='account["yubin"]["val"]' :='account["yubin"]["lock"]' type='text' class='form-control' id='yubin' name='zip11' onKeyUp='AjaxZip3.zip2addr(this,"","addr11","addr11");' >
+						<input v-model='account_r.yubin' :='locker' type='text' class='form-control' id='yubin' name='zip11' onKeyUp='AjaxZip3.zip2addr(this,"","addr11","addr11");' >
 						<label for='add1' >住所１行目</label>
-						<input value='<?php echo $row[0]["address1"];?>' :readonly='account["address1"]["lock"]["readonly"]' type='text' maxlength='20' class='form-control' id='add1' name='addr11' placeholder='住所1行目' >
+						<input v-model='account_r.address1' :='locker' type='text' maxlength='20' class='form-control' id='add1' name='addr11' placeholder='住所1行目' >
 						<label for='add2' >住所２行目</label>
-						<input v-model='account["address2"]["val"]' :='account["address2"]["lock"]' type='text' maxlength='20' class='form-control' id='add2' name='ADD2' placeholder='住所2行目' >
+						<input v-model='account_r.address2' :='locker' type='text' maxlength='20' class='form-control' id='add2' name='ADD2' placeholder='住所2行目' >
 						<label for='add3' >住所３行目</label>
-						<input v-model='account["address3"]["val"]' :='account["address3"]["lock"]' type='text' maxlength='20' class='form-control' id='add3' name='ADD3' placeholder='住所3行目' >
+						<input v-model='account_r.address3' :='locker' type='text' maxlength='20' class='form-control' id='add3' name='ADD3' placeholder='住所3行目' >
 						<label for='inquiry_tel' >問合せ先TEL</label>
-						<input v-model='account["inquiry_tel"]["val"]' :='account["inquiry_tel"]["lock"]' type='tel' pattern="[0-9]{3,}-[0-9]{3,}-[0-9]{3,}" maxlength='20' class='form-control' id='inquiry_tel' name='inquiry_tel' placeholder='例：000-0000-0000' >
+						<input v-model='account_r.inquiry_tel' :='locker' type='tel' pattern="[0-9]{3,}-[0-9]{3,}-[0-9]{3,}" maxlength='20' class='form-control' id='inquiry_tel' name='inquiry_tel' placeholder='例：000-0000-0000' >
 						<label for='inquiry_mail' >問合せ先MAIL</label>
-						<input v-model='account["inquiry_mail"]["val"]' :='account["inquiry_mail"]["lock"]' type='email' maxlength='20' class='form-control' id='inquiry_mail' name='inquiry_mail' placeholder='メールアドレス' >
+						<input v-model='account_r.inquiry_mail' :='locker' type='email' maxlength='20' class='form-control' id='inquiry_mail' name='inquiry_mail' placeholder='メールアドレス' >
 					</template>
 					<div class='col-12' style=' padding:5px; margin-top:10px;display:flexbox;'>
 						<button v-if='step==="check"' type='submit' class='btn btn-primary' style='width:150px;height:40px;font-size:1.5rem'>確 認</button>
@@ -138,110 +128,30 @@ $token=csrf_create();
 		</div>
 	</div><!--accountform-->
 	<script>
-		const { createApp, ref, onMounted, computed, VueCookies } = Vue;
-		createApp({
+		const { createApp, ref, onMounted, onBeforeMount, computed, VueCookies } = Vue;
+		const account_create = (p_mode,p_token) => createApp({
 			setup(){
-				const mode = ref('<?php echo $mode; ?>')
+				const mode = ref(p_mode)
 				const alert_status = ref(['alert'])
 				const MSG = ref('')
 				const loader = ref(false)
-				const csrf = ref('<?php echo $token; ?>') 
+				const csrf = ref(p_token) 
 				const step = ref('check')
-				
-				const account = ref({
-					'mail':{
-						'val':'<?php echo $row[0]["mail"];?>'
-						,'lock':{'readonly':false}
-					},
-					'moto_mail':'<?php echo $row[0]["mail"];?>',
-					'question':{
-						'val':'<?php echo $row[0]["question"];?>'
-						,'lock':{'readonly':false}
-					},
-					'answer':{
-						'val':'<?php echo $row[0]["answer"];?>'
-						,'lock':{'readonly':false}
-					},
-					'loginrez':{
-						'val':'<?php echo $row[0]["loginrez"];?>'
-						,'lock':{'readonly':false}
-					},
-					'ZeiHasu':{
-						'val':'<?php echo $row[0]["ZeiHasu"];?>'
-						,'lock':{'readonly':false}
-					},
-					'name':{
-						'val':'<?php echo $row[0]["name"];?>'
-						,'lock':{'readonly':false}
-					},
-					'yagou':{
-						'val':'<?php echo $row[0]["yagou"];?>'
-						,'lock':{'readonly':false}
-					},
-					'yubin':{
-						'val':'<?php echo $row[0]["yubin"];?>'
-						,'lock':{'readonly':false}
-					},
-					'address1':{
-						'val':'<?php echo $row[0]["address1"];?>'
-						,'lock':{'readonly':false}
-					},
-					'address2':{
-						'val':'<?php echo $row[0]["address2"];?>'
-						,'lock':{'readonly':false}
-					},
-					'address3':{
-						'val':'<?php echo $row[0]["address3"];?>'
-						,'lock':{'readonly':false}
-					},
-					'invoice':{
-						'val':'<?php echo $row[0]["invoice_no"];?>'
-						,'lock':{'readonly':false}
-					},
-					'inquiry_tel':{
-						'val':'<?php echo $row[0]["inquiry_tel"];?>'
-						,'lock':{'readonly':false}
-					},
-					'inquiry_mail':{
-						'val':'<?php echo $row[0]["inquiry_mail"];?>'
-						,'lock':{'readonly':false}
-					},
-				})
+
+				const account_u = ref([])
+				const account_r = ref([])
+				const moto_mail = ref('')
+				const locker = ref({'disabled':false})
+				const pass_change = ref(false)
 				const AllLock = () =>{
 					console_log('OnPress')
-					account.value['mail']['lock']['readonly']=true
-					account.value['question']['lock']['readonly']=true
-					account.value['answer']['lock']['readonly']=true
-					account.value['loginrez']['lock']['readonly']=true
-					account.value['ZeiHasu']['lock']['readonly']=true
-					account.value['name']['lock']['readonly']=true
-					account.value['yagou']['lock']['readonly']=true
-					account.value['yubin']['lock']['readonly']=true
-					account.value['invoice']['lock']['readonly']=true
-					account.value['address1']['lock']['readonly']=true
-					account.value['address2']['lock']['readonly']=true
-					account.value['address3']['lock']['readonly']=true
-					account.value['inquiry_tel']['lock']['readonly']=true
-					account.value['inquiry_mail']['lock']['readonly']=true
+					locker.value.disabled=true
 				}
 				const AllUnLock = () =>{
 					console_log('OnPress')
 					if(mode.value==="update"){
 						step.value = 'check'
-						account.value['mail']['lock']['readonly']=false
-						account.value['question']['lock']['readonly']=false
-						account.value['answer']['lock']['readonly']=false
-						account.value['loginrez']['lock']['readonly']=false
-						account.value['ZeiHasu']['lock']['readonly']=false
-						account.value['name']['lock']['readonly']=false
-						account.value['yagou']['lock']['readonly']=false
-						account.value['yubin']['lock']['readonly']=false
-						account.value['invoice']['lock']['readonly']=false
-						account.value['address1']['lock']['readonly']=false
-						account.value['address2']['lock']['readonly']=false
-						account.value['address3']['lock']['readonly']=false
-						account.value['inquiry_tel']['lock']['readonly']=false
-						account.value['inquiry_mail']['lock']['readonly']=false
+						locker.value.disabled=false
 					}else if(mode.value==="insert"){
 						//step.value="next"
 					}
@@ -252,10 +162,12 @@ $token=csrf_create();
 					axios
 						.post('ajax_account_Temporarily_saved.php',params) 
 						.then((response) => {
+							console_log(response.data)
 							csrf.value = response.data.csrf_create
 							if(response.data.status !== "alert-success"){
 								MSG.value = response.data.MSG
 								alert_status.value[1] = response.data.status
+								console_log(`on_submit NOT SUCCESS`)
 							}else{
 								AllLock()
 								step.value = 'register'
@@ -297,18 +209,44 @@ $token=csrf_create();
 				}
 				const pass_lock = computed(() =>{
 					if(mode.value==='insert'){
-						return {'readonly':false}
+						return {'disabled':false}
 					}else if(mode.value==='update'){
-						return  {'readonly':true}
+						if(pass_change.value){
+							return {'disabled':false}
+						}else{
+							return  {'disabled':true}
+						}
 					}
         })
+
+				onBeforeMount(()=>{
+      		console_log("onBeforeMount")
+					if(mode.value==='insert'){
+						account_u.value.mail = '<?php echo $new_mail;?>'
+					}else{
+						GET_USER()
+						.then((response)=>{
+							console_log(response)
+							account_u.value = response.Users[0]
+							account_r.value = response.Users_webrez[0]
+							moto_mail.value = response.Users[0].mail
+							csrf.value = response.token
+						})
+					}
+	    	})
+
 				onMounted(() => {
 					console_log('mounted')
 					//console_log(account)
 				})
 				return{
 					mode,
-					account,
+					//account,
+					account_u,
+					account_r,
+					moto_mail,
+					locker,
+					pass_change,
 					on_submit,
 					AllUnLock,
 					UpdateValue,
@@ -319,9 +257,9 @@ $token=csrf_create();
 					alert_status,
 				}
 			}
-		}).mount('#accountform');
+		})
+		account_create(<?php echo "'".$mode."','".$token."'";?>).mount('#accountform');
 	</script><!--vue.js-->
-
 </body>
 <script>
 	function Checkpass(input){
@@ -349,26 +287,6 @@ $token=csrf_create();
 			e.preventDefault();
 		}
 	}
-	document.getElementById('chk_pass').onclick = function(){
-		const a = document.getElementById('pass');
-		const b = document.getElementById('pass2');
-		if(a.required==true){
-			a.required=false;
-			b.required=false;
-			a.placeholder='';
-			b.placeholder='';
-			a.readOnly='readonly';
-			b.readOnly='readonly';
-		}else{
-			a.required=true;
-			b.required=true;
-			a.placeholder='必須';
-			b.placeholder='必須';
-			a.readOnly='';
-			b.readOnly='';
-		}
-	}
-	
 </script><!--js-->
 </html>
 <?php

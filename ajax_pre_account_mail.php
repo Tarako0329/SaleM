@@ -1,5 +1,5 @@
 <?php
-//ユーザ登録、登録情報の修正画面
+//ユーザ登録URL送信処理
 require "php_header.php";
 $shoukai="";
 $url="";

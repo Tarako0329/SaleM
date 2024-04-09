@@ -78,3 +78,25 @@ const get_value=(value,zei,kbn) => {
   }
   return [{本体価格:hontai,消費税:zeigaku,税込価格:zeikomi,E:msg}]
 }
+
+const GET_USER = ()=>{//サイト設定情報取得
+	return new Promise((resolve, reject) => {
+		GET_USER_SHORI(resolve);
+	});
+}
+const GET_USER_SHORI = (resolve) =>{
+  let obj
+  axios
+  .get(`ajax_get_userms.php`)
+  .then((response) => {
+    obj = response.data
+    console_log('ajax_get_userms.php succsess')
+  })
+  .catch((error)=>{
+    console_log('ajax_get_userms.php ERROR')
+    console_log(error)
+  })
+  .finally(()=>{
+    resolve(obj)
+  })
+}

@@ -69,6 +69,8 @@ function delete_old_token($token, $pdo) {
     $stmt->bindValue(1, $token, PDO::PARAM_STR);
     $stmt->bindValue(2, $date->format('Y-m-d H:i:s'), PDO::PARAM_STR);
     $stmt->execute();
+    setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly
+    $_SESSION = array();
 }
 
 // =========================================================

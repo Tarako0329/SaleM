@@ -113,7 +113,8 @@ exit();
 */
 function check_user($mail_id, $password, $pdo,$key) {
     
-    $sql = "select uid,loginrez from Users where mail=? and password=?;";
+    //$sql = "select uid,loginrez from Users where mail=? and password=?;";
+    $sql = "select uid from Users where mail=? and password=?;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(1, $mail_id, PDO::PARAM_STR);
     $stmt->bindValue(2, passEX($password,$mail_id,$key), PDO::PARAM_STR);
@@ -154,7 +155,8 @@ function register_token($id, $token, $pdo) {
 */
 function redirect_to_welcome($id, $pdo) {
     //topメニュー or レジ画面へ
-    $sql = "select uid,loginrez from Users where uid=?;";
+    //$sql = "select uid,loginrez from Users where uid=?;";
+    $sql = "select uid,loginrez from Users_webrez where uid=?;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(1, $id, PDO::PARAM_STR);
     $stmt->execute();

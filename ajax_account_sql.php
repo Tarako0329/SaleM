@@ -30,20 +30,42 @@ if($rtn !== true){
 		$_SESSION["EMSG"]="長時間操作されていないため、自動ﾛｸﾞｱｳﾄしました。再度ログインし、もう一度操作し直して下さい。";
 		$timeout=true;
 	}else{
-		$logfilename="sid_".$_SESSION['user_id'].".log";
+		
 		try{
 			$pdo_h->beginTransaction();
 			$sqllog .= rtn_sqllog("START TRANSACTION",[]);
 
 			if($_POST["mode"] === "insert"){
-				$sqlstr="insert into Users(uid,mail,password,question,answer,yuukoukigen,introducer_id) values(0,?,?,?,?,?,?)";
+				//オーダー番号作成
+				$stmt = $pdo_h->prepare("select uid from Users where uid = :uid FOR UPDATE");
+				while(true){
+					//乱数からオーダーナンバーを発行し、受注ヘッダで重複してなければ使用する
+					$_SESSION["P"]["uid"] = rand(0,99999);
+					log_writer2("\$uid",$_SESSION["P"]["uid"],"lv3");
+					$stmt->bindValue("uid", $_SESSION["P"]["uid"], PDO::PARAM_INT);
+					$stmt->execute();
+					$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+					if(empty($row["uid"])){
+						break;
+					}
+				}
+				
+				$sqlstr="insert into Users(uid,mail,password,question,answer) values(:uid,:mail,:password,:question,:answer)";
 				$stmt = $pdo_h->prepare($sqlstr);
-				$stmt->bindValue(1, $_SESSION["P"][0], PDO::PARAM_STR);
-				$stmt->bindValue(2, $_SESSION["P"][1], PDO::PARAM_STR);
-				$stmt->bindValue(3, $_SESSION["P"][2], PDO::PARAM_STR);
-				$stmt->bindValue(4, $_SESSION["P"][3], PDO::PARAM_STR);
-				$stmt->bindValue(5, $_SESSION["P"][4], PDO::PARAM_STR);
-				$stmt->bindValue(6, $_SESSION["P"][5], PDO::PARAM_STR);
+				$stmt->bindValue("uid", $_SESSION["P"]["uid"], PDO::PARAM_INT);
+				$stmt->bindValue("mail", $_SESSION["P"]["mail"], PDO::PARAM_STR);
+				$stmt->bindValue("password", $_SESSION["P"]["password"], PDO::PARAM_STR);
+				$stmt->bindValue("question", $_SESSION["P"]["question"], PDO::PARAM_STR);
+				$stmt->bindValue("answer", $_SESSION["P"]["answer"], PDO::PARAM_STR);
+				$sqllog .= rtn_sqllog($sqlstr,$_SESSION["P"]);
+				$status=$stmt->execute();
+				$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+
+				$sqlstr="insert into Users_webrez(uid,yuukoukigen,introducer_id) values(:uid,:yuukoukigen,:introducer_id)";
+				$stmt = $pdo_h->prepare($sqlstr);
+				$stmt->bindValue("uid", $_SESSION["P"]["uid"], PDO::PARAM_INT);
+				$stmt->bindValue("yuukoukigen", $_SESSION["P"]["yuukoukigen"], PDO::PARAM_STR);
+				$stmt->bindValue("introducer_id", $_SESSION["P"]["introducer_id"], PDO::PARAM_STR);
 				$sqllog .= rtn_sqllog($sqlstr,$_SESSION["P"]);
 				$status=$stmt->execute();
 				$sqllog .= rtn_sqllog("--execute():正常終了",[]);
@@ -55,16 +77,30 @@ if($rtn !== true){
 			}elseif($_POST["mode"] === "update"){
 			
 				if($_SESSION["P"]["chk_pass"]==="on"){
-					$sqlstr="update Users set mail=:mail,password=:password,question=:question,answer=:answer,loginrez=:loginrez,zeihasu=:zeihasu,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3,invoice_no=:invoice_no,inquiry_tel=:inquiry_tel ,inquiry_mail=:inquiry_mail where uid=:uid";
+					//$sqlstr="update Users set mail=:mail,password=:password,question=:question,answer=:answer,loginrez=:loginrez,zeihasu=:zeihasu,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3,invoice_no=:invoice_no,inquiry_tel=:inquiry_tel ,inquiry_mail=:inquiry_mail where uid=:uid";
+					$sqlstr = "update Users set password = :password where uid=:uid";
 					$stmt = $pdo_h->prepare($sqlstr);
 					$stmt->bindValue("password", $_SESSION["P"]["password"], PDO::PARAM_STR);
+					$stmt->bindValue("uid", $_SESSION["P"]["uid"], PDO::PARAM_INT);
+					$sqllog .= rtn_sqllog($sqlstr,$_SESSION["P"]);
+					$status=$stmt->execute();
+					$sqllog .= rtn_sqllog("--execute():正常終了",[]);
 				}else{
-					$sqlstr="update Users set mail=:mail,question=:question,answer=:answer,loginrez=:loginrez,zeihasu=:zeihasu,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3,invoice_no=:invoice_no ,inquiry_tel=:inquiry_tel ,inquiry_mail=:inquiry_mail where uid=:uid";
-					$stmt = $pdo_h->prepare($sqlstr);
 				}
+				//Users の更新
+				$sqlstr_u="update Users set mail=:mail,question=:question,answer=:answer where uid=:uid";
+				$stmt = $pdo_h->prepare($sqlstr_u);
 				$stmt->bindValue("mail", $_SESSION["P"]["mail"], PDO::PARAM_STR);
 				$stmt->bindValue("question", $_SESSION["P"]["question"], PDO::PARAM_STR);
 				$stmt->bindValue("answer", $_SESSION["P"]["answer"], PDO::PARAM_STR);
+				$stmt->bindValue("uid", $_SESSION["P"]["uid"], PDO::PARAM_INT);
+				$sqllog .= rtn_sqllog($sqlstr_u,$_SESSION["P"]);
+				$status=$stmt->execute();
+				$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+
+				//Users_webrez の更新
+				$sqlstr_r="update Users_webrez set loginrez=:loginrez,zeihasu=:zeihasu,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3,invoice_no=:invoice_no ,inquiry_tel=:inquiry_tel ,inquiry_mail=:inquiry_mail where uid=:uid";
+				$stmt = $pdo_h->prepare($sqlstr_r);
 				$stmt->bindValue("loginrez", $_SESSION["P"]["loginrez"], PDO::PARAM_STR);
 				$stmt->bindValue("zeihasu", $_SESSION["P"]["zeihasu"], PDO::PARAM_STR);
 				$stmt->bindValue("name", $_SESSION["P"]["name"], PDO::PARAM_STR);
@@ -73,17 +109,16 @@ if($rtn !== true){
 				$stmt->bindValue("address1", $_SESSION["P"]["address1"], PDO::PARAM_STR);
 				$stmt->bindValue("address2", $_SESSION["P"]["address2"], PDO::PARAM_STR);
 				$stmt->bindValue("address3", $_SESSION["P"]["address3"], PDO::PARAM_STR);
-				$stmt->bindValue("uid", $_SESSION["P"]["uid"], PDO::PARAM_INT);
 				$stmt->bindValue("invoice_no", $_SESSION["P"]["invoice_no"], PDO::PARAM_INT);
 				$stmt->bindValue("inquiry_tel", $_SESSION["P"]["inquiry_tel"], PDO::PARAM_STR);
 				$stmt->bindValue("inquiry_mail", $_SESSION["P"]["inquiry_mail"], PDO::PARAM_STR);
-				$sqllog .= rtn_sqllog($sqlstr,$_SESSION["P"]);
+				$stmt->bindValue("uid", $_SESSION["P"]["uid"], PDO::PARAM_INT);
+				$sqllog .= rtn_sqllog($sqlstr_r,$_SESSION["P"]);
 				$status=$stmt->execute();
 				$sqllog .= rtn_sqllog("--execute():正常終了",[]);
 				//$count = 1;
 			}
-			log_writer2(basename(__FILE__)." [\$status]",$status,"lv3"); 
-			log_writer2(basename(__FILE__)." [\$count]",$count,"lv3");
+
 			$pdo_h->commit();
 			$sqllog .= rtn_sqllog("commit",[]);
 			sqllogger($sqllog,0);
@@ -97,7 +132,7 @@ if($rtn !== true){
 			sqllogger($sqllog,$e);
 			$msg = "システムエラーによる更新失敗。管理者へ通知しました。";
 			$alert_status = "alert-danger";
-			//log_writer2(basename(__FILE__)." [Exception \$e] =>",$e,"lv0");
+			log_writer2(basename(__FILE__)." [Exception \$e] =>",$e,"lv0");
 			$reseve_status=true;
 		}
 	}

@@ -89,6 +89,8 @@ ver3.00.3-000:商品一覧修正bugfix
 ver3.00.4-000:売上実績bugfix
 ver3.01.0-000:Usersマスタの分割
 	登録URLを飛ばすとこまで
+ver3.01.1-000:Usersマスタの分割
+  新規登録・ユーザ情報更新まで
 	UsersテーブルをUsers_webrezとして複製し
   ALTER TABLE `Users_webrez`
   DROP `password`,
@@ -103,6 +105,29 @@ ver3.01.0-000:Usersマスタの分割
   DROP `kinouflg8`,
   DROP `kinouflg9`;
 
+	ALTER TABLE `Users`
+  DROP `loginrez`,
+  DROP `name`,
+  DROP `yagou`,
+  DROP `yubin`,
+  DROP `address1`,
+  DROP `address2`,
+  DROP `address3`,
+  DROP `ToursLog`,
+  DROP `ForcedLogout`,
+  DROP `ZeiHasu`,
+  DROP `keiyakudate`,
+  DROP `plan`,
+  DROP `kaiyakudate`,
+  DROP `yuukoukigen`,
+  DROP `stripe_id`,
+  DROP `introducer_id`,
+  DROP `invoice_no`,
+  DROP `inquiry_tel`,
+  DROP `inquiry_mail`;
+  ALTER TABLE `Users` CHANGE `uid` `uid` INT(11) NOT NULL;
+  ALTER TABLE `Users_webrez` CHANGE `uid` `uid` INT(11) NOT NULL;
+  ALTER TABLE `Users_webrez` DROP PRIMARY KEY, ADD PRIMARY KEY(`uid`);
 
 
 【Issues】

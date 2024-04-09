@@ -9,4 +9,5 @@ backup
 xxx*
 *copy.php
 .ini
+.htaccess
 /vendor/dompdf/dompdf/lib/fonts/installed-fonts.json

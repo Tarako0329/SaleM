@@ -73,13 +73,13 @@ if($rtn !== true){
 	}
 }else if($_POST["mode"]==="insert"){
 	$_SESSION["P"]=[];
-	$_SESSION["P"][0] = $_POST["MAIL"];
-	$_SESSION["P"][1] = passEX($_POST["PASS"],$_POST["MAIL"],$key);
-	$_SESSION["P"][2] = $_POST["QUESTION"];
-	$_SESSION["P"][3] = $_POST["ANSWER"];
+	$_SESSION["P"]["mail"] = $_POST["MAIL"];
+	$_SESSION["P"]["password"] = passEX($_POST["PASS"],$_POST["MAIL"],$key);
+	$_SESSION["P"]["question"] = $_POST["QUESTION"];
+	$_SESSION["P"]["answer"] = $_POST["ANSWER"];
 	//試用期間は２ヶ月に変更。
-	$_SESSION["P"][4] = date('Y-m-d', strtotime(date("Y-m-d") . "+2 month"));	
-	$_SESSION["P"][5] = sort_hash($_POST["shoukai"],"dec"); 
+	$_SESSION["P"]["yuukoukigen"] = date('Y-m-d', strtotime(date("Y-m-d") . "+2 month"));	
+	$_SESSION["P"]["introducer_id"] = sort_hash($_POST["shoukai"],"dec"); 
 	$msg = "更新成功。";
 	$alert_status = "alert-success";
 	$reseve_status=true;

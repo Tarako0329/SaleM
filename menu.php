@@ -55,7 +55,8 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         $_SESSION["SUBID"]="";      //strip subscription idをクリア
         
         //ユーザ情報の取得
-        $sql="select * from Users where uid=?";
+        //$sql="select * from Users where uid=?";
+        $sql="select * from Users_webrez where uid=?";
         $stmt = $pdo_h->prepare($sql);
         $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
         $stmt->execute();
@@ -118,7 +119,8 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     
         
         //新機能リリース通知
-        $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.new_releace_002') as ToursLog FROM Users WHERE uid=?";
+        //$sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.new_releace_002') as ToursLog FROM Users WHERE uid=?";
+        $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.new_releace_002') as ToursLog FROM Users_webrez WHERE uid=?";
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
         $stmt->execute();
@@ -257,7 +259,8 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     if(empty($_SESSION["tour"])){
         //ツアー中でない場合、チュートリアルが終わっているか確認する
         //$sqlstr="SELECT * FROM Users WHERE JSON_CONTAINS(ToursLog, '\"finish\"', '$.tutorial') and uid=?";
-        $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.tutorial') as tutorial FROM Users WHERE uid=?";
+        //$sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.tutorial') as tutorial FROM Users WHERE uid=?";
+        $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.tutorial') as tutorial FROM Users_webrez WHERE uid=?";
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
         $stmt->execute();
