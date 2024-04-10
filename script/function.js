@@ -14,7 +14,7 @@ const console_log=(log,lv)=>{
   }
 }
 
-const get_value=(value,zei,kbn) => {
+const get_value = (value,zei,kbn) => {
   //値段、税率、値段が税込か税抜か をパラメータで渡すとreturnを配列で返す
   //value:入力値
   //zei:税率(0 ～ 1)
@@ -79,7 +79,7 @@ const get_value=(value,zei,kbn) => {
   return [{本体価格:hontai,消費税:zeigaku,税込価格:zeikomi,E:msg}]
 }
 
-const GET_USER = ()=>{//サイト設定情報取得
+const GET_USER = ()=>{//ユーザマスタ取得
 	return new Promise((resolve, reject) => {
 		GET_USER_SHORI(resolve);
 	});
@@ -94,6 +94,28 @@ const GET_USER_SHORI = (resolve) =>{
   })
   .catch((error)=>{
     console_log('ajax_get_userms.php ERROR')
+    console_log(error)
+  })
+  .finally(()=>{
+    resolve(obj)
+  })
+}
+
+const GET_SHOUHINMS = ()=>{//商品マスタ取得
+	return new Promise((resolve, reject) => {
+		GET_SHOUHINMS_SHORI(resolve);
+	});
+}
+const GET_SHOUHINMS_SHORI = (resolve) =>{
+  let obj
+  axios
+  .get(`ajax_get_ShouhinMS.php`)
+  .then((response) => {
+    obj = response.data
+    console_log('ajax_get_ShouhinMS.php succsess')
+  })
+  .catch((error)=>{
+    console_log('ajax_get_ShouhinMS.php ERROR')
     console_log(error)
   })
   .finally(()=>{

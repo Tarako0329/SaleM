@@ -112,12 +112,21 @@
 
 			onMounted(() => {
 				console_log('onMounted')
-				get_shouhinMS()
+				//get_shouhinMS()
+				GET_SHOUHINMS()
+					.then((response)=>{
+						shouhinMS.value = response
+						console_log('get_shouhinMS succsess')
+					})
+					.catch((error) => {
+						console_log(`get_shouhinMS ERROR:${error}`)
+					})
+
 				get_categorys()
 				
 			})
 
-			const get_shouhinMS = () => {
+			/*const get_shouhinMS = () => {
 				console_log("get_shouhinMS start");
 				let params = new URLSearchParams();
 				params.append('user_id', '<?php echo $_SESSION["user_id"];?>');
@@ -127,7 +136,7 @@
 									,console_log('get_shouhinMS succsess')
 									))
 				.catch((error) => console_log(`get_shouhinMS ERROR:${error}`));
-			}
+			}*/
 			const shouhinMS_filter = computed(() => {
 				let searchWord = over_cate.value.toString().trim();
 
@@ -159,11 +168,12 @@
 					
 					axios
 					.post('ajax_get_MSCategory_list.php',params)
-					.then((response) => (categorys.value = [...response.data]
-										,over_cate.value = categorys.value[0].LIST
-										,console_log('get_categorys succsess')
-										//,console_log(response.data))
-										))
+					.then((response) => {
+						categorys.value = [...response.data]
+						over_cate.value = categorys.value[0].LIST
+						console_log('get_categorys succsess')
+						//,console_log(response.data))
+					})
 					.catch((error) => console_log(`get_categorys ERROR:${error}`));
 				}
 				
@@ -178,10 +188,11 @@
 				params.append('serch_word', over_cate.value);
 				axios
 				.post('ajax_get_MSCategory_list.php',params)
-				.then((response) => (sujest_list.value = [...response.data]
-									,console_log('get_sujest_list succsess')
-									//,console_log(response.data)
-									))
+				.then((response) => {
+					sujest_list.value = [...response.data]
+					console_log('get_sujest_list succsess')
+					//,console_log(response.data)
+				})
 				.catch((error) => console_log(`get_sujest_list ERROR:${error}`));
 			}
 			
@@ -227,7 +238,16 @@
 										))
 					.catch((error) => console_log(`on_submit ERROR:${error}`))
 					.finally(()=>{
-						get_shouhinMS()
+						//get_shouhinMS()
+						GET_SHOUHINMS()
+						.then((response)=>{
+							shouhinMS.value = response
+							console_log('get_shouhinMS succsess')
+						})
+						.catch((error) => {
+							console_log(`get_shouhinMS ERROR:${error}`)
+						})
+
 					})
 			}
 			return{

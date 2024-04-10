@@ -93,6 +93,7 @@ ver3.01.1-000:Usersマスタの分割
   新規登録・ユーザ情報更新まで
 ver3.01.2-000:Usersマスタの分割
   その他、細かい修正
+ver3.02.0-000:リファクタリング
 	UsersテーブルをUsers_webrezとして複製し
   ALTER TABLE `Users_webrez`
   DROP `password`,

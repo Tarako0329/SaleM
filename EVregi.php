@@ -60,37 +60,6 @@
 		redirect_to_login("error rezi mode nothing!");
 	}
 
-	//イベント名の取得
-	//セッション -> DB
-	//$event = (!empty($_SESSION["EV"])?$_SESSION["EV"]:"");
-	/*
-	if(empty($event)){
-		$sql = "select value,updatetime from PageDefVal where uid=? and machin=? and page=? and item=?";
-		$stmt = $pdo_h->prepare($sql);
-		$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-		$stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
-		$stmt->bindValue(3, "EVregi.php", PDO::PARAM_STR);
-		$stmt->bindValue(4, "EV", PDO::PARAM_STR);
-		$stmt->execute();
-
-		if($stmt->rowCount()==0){
-			$event = "";
-		}else{
-			$buf = $stmt->fetch();
-			$date = new DateTime($buf["updatetime"]);
-
-			//指定した書式で日時を取得する
-			//echo $date->format('Y-m-d');
-			if($date->format('Y-m-d')!=date("Y-m-d")){
-				//イベントの日付が前日以前の場合はクリア
-				$event = "";
-			}else{
-				$_SESSION["EV"] = $buf["value"];
-				$event = $buf["value"];
-			}
-		}
-	}
-	*/
 	//税区分MSリスト取得
 	$sqlstr="select * from ZeiMS order by zeiKBN;";
 	$stmt = $pdo_h->query($sqlstr);
@@ -110,10 +79,10 @@
 	<TITLE><?php echo TITLE.' レジ';?></TITLE>
 	<style>
 		#qrOutput {
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-around;
-    padding: 20px;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-around;
+		padding: 20px;
 		}
 	</style>
 </head>
@@ -191,72 +160,6 @@
 		<div v-if='chk_register_show==="register"' class='container header-plus-minus text-center' style='padding:10px;'>
 			<button type='button' style='width:80%;max-width:500px;' class='btn btn-outline-primary' data-bs-toggle='modal' data-bs-target='#waribiki'>割引・割増</button>
 		</div>
-		<!--割引処理
-		<div class='accordion item_11 item_12' id="accordionExample">
-			<div v-if='chk_register_show==="register"' class='header-plus-minus' style='padding-top:5px;font-size:1.4rem;font-weight:700;top: 156px;height:65px;'>
-				<div class='accordion-item' style='max-width:600px; margin: 0 auto;'>
-					<h2 class='accordion-header' id='headingOne'>
-						<button type='button' class='accordion-button collapsed' style='font-size:2.1rem;padding-left:36%;border:blueviolet 1px;' data-bs-toggle='collapse' data-bs-target='#collapseOne' aria-expanded='false' aria-controls='collapseOne'>
-							割引・割増
-						</button>
-					</h2>
-					<div id='collapseOne' class='accordion-collapse collapse' data-bs-parent='#accordionExample'>
-			      <div class='accordion-body'>
-							<div class='row'>
-								<div class='col-1 col-md-2' ></div>
-								<div class='col-10 col-md-8' >
-									<input type='hidden' v-model='Revised_pay' name='CHOUSEI_GAKU' id='CHOUSEI_GAKU'>
-									<div style='display:flexbox;font-size:1.6rem'>
-										お会計額　￥{{Revised_pay.toLocaleString()}}
-										<template v-if="CHOUSEI_TYPE==='paroff'">({{par.toLocaleString()}}% OFF)</template>
-										<template v-if="CHOUSEI_TYPE==='paron'">({{par.toLocaleString()}}% ON)</template>
-										<template v-if="CHOUSEI_TYPE==='zou'">　(+{{par.toLocaleString()}})</template>
-										<template v-if="CHOUSEI_TYPE==='gen'">　(-{{par.toLocaleString()}})</template>
-										<template v-if="CHOUSEI_TYPE==='sougaku'"></template>
-									</div>
-									<div style='padding:5px;width:100%;'>
-										<input type='radio' class='btn-check' value='paroff' autocomplete='off' v-model='CHOUSEI_TYPE' id='paroff'>
-										<label class='btn btn-outline-danger ' for='paroff' style='border-radius:0;width:25%;padding:1px 0;'>％OFF</label>
-										<input type='radio' class='btn-check' value='paron' autocomplete='off' v-model='CHOUSEI_TYPE' id='paron'>
-										<label class='btn btn-outline-danger ' for='paron' style='border-radius:0;width:25%;padding:1px 0;'>％ON</label>
-										<input type='radio' class='btn-check' value='gen' autocomplete='off' v-model='CHOUSEI_TYPE' id='gen'>
-										<label class='btn btn-outline-danger ' for='gen' style='border-radius:0;width:25%;padding:1px 0;'>値引</label>
-										<input type='radio' class='btn-check' value='zou' autocomplete='off' v-model='CHOUSEI_TYPE' id='zou'>
-										<label class='btn btn-outline-danger ' for='zou' style='border-radius:0;width:25%;padding:1px 0;'>値増</label>
-										<input type='radio' class='btn-check' value='sougaku' autocomplete='off' v-model='CHOUSEI_TYPE' id='sougaku'>
-										<label class='btn btn-outline-danger ' for='sougaku' style='border-radius:0;width:25%;padding:1px 0;'>金額指定</label>
-									</div>
-									<table style='margin:auto;width:86%'>
-										<tbody>
-										<tr><td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>7</button></td>
-										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>8</button></td>
-										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>9</button></td></tr>
-										<tr><td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>4</button></td>
-										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>5</button></td>
-										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>6</button></td></tr>
-										<tr><td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>1</button></td>
-										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>2</button></td>
-										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>3</button></td></tr>
-										<tr><td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>0</button></td>
-										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>00</button></td>
-										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>C</button></td></tr>
-										<tr v-if="CHOUSEI_TYPE!=='sougaku'">
-											<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>＋</button></td>
-										<td class='waribiki--cellsize'><button type='button' class='btn btn-primary btn--waribiki' @click='keydown_waribiki'>－</button></td>
-										<td class='waribiki--cellsize'></td></tr>
-										</tbody>
-									</table>
-									<div class='text-center' style='margin-top:5px'>
-										<button class='btn btn-primary' type='button' @click='Revised()'>決　定</button>
-									</div>
-								</div>
-								<div class='col-1 col-md-2' ></div>
-							</div>
-    				</div>
-    			</div>
-				</div>
-			</div>
-		</div>割引処理-->		
 		<main class='common_body'>
 			<?php 
 				if(!empty($emsg)){
@@ -281,10 +184,10 @@
 										<button type='button' class='order_list_area_btn minus' @click='order_list_pm(index,-1)'></button>
 										<select v-model='list.ZEIKBN' @change='order_list_change_tax(index,$event)' class="form-select form-select-lg " style='margin-left:10px;padding-left:10px;'>
 											<?php
-  	            	      foreach($zeimaster as $row){
-                	        echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
-    	          	      }
-                	    ?> 
+												foreach($zeimaster as $row){
+													echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
+												}
+											?> 
 										</select>
 									</div>
 								</div>
@@ -536,7 +439,7 @@
 						<label class='btn btn-outline-warning' for='sama' style='border-radius:0;font-size: 2rem;'>様</label>
 					</div>
 					<div id="qrOutput">
-					  <canvas id="qr"></canvas>
+						<canvas id="qr"></canvas>
 					</div>
 				</div>
 				<div class='modal-footer'>
@@ -613,13 +516,13 @@
 		createApp({
 			setup(){
 				const zm = [//税区分マスタ
-          <?php
-          	reset($zeimaster);
-          	foreach($zeimaster as $row2){
-          	    echo "{税区分:".$row2["zeiKBN"].",税区分名:'".$row2["hyoujimei"]."',税率:".($row2["zeiritu"]/100)."},\n";
-          	}
-          ?> 
-        ]
+					<?php
+						reset($zeimaster);
+						foreach($zeimaster as $row2){
+								echo "{税区分:".$row2["zeiKBN"].",税区分名:'".$row2["hyoujimei"]."',税率:".($row2["zeiritu"]/100)."},\n";
+						}
+					?> 
+				]
 
 				//スクロールスムース
 				const get_scroll_target = ref('description')
@@ -639,6 +542,7 @@
 					console_log(`*****【 get_UriageList start 】*****`,'lv3');
 					let params = new URLSearchParams();
 					params.append('user_id', '<?php echo $_SESSION["user_id"];?>');
+
 					axios
 					.post('ajax_get_Uriage.php',params)
 					.then((response) => {
@@ -658,6 +562,7 @@
 				const shouhinMS = ref([])			//商品マスタ
 				const disp_category = ref(4)		//パネルの分類別表示設定変更用
 
+				/*
 				const get_shouhinMS = () => {//商品マスタ取得ajax
 					console_log(`*****【 get_shouhinMS start 】*****`,);
 					let params = new URLSearchParams();
@@ -676,7 +581,7 @@
 					});
 					
 				}//商品マスタ取得ajax
-
+				*/
 				const total_uriage = computed(() =>{//売上リストの合計売上額
 					let sum_uriage = 0
 					UriageList.value.forEach((list) => {
@@ -735,7 +640,7 @@
 				const chk_register_show = ref('chk')		//確認・登録ボタンの表示
 				const hontai = ref([])	//注文明細を税区分単位に集計し、連想配列で保存(消費税額を本体額合計から算出するため)
 				const auto_ajust = ref(true)	//税込単価の合計＝支払額になるように調整するか否かのフラグ
-				//let auto_ajust_flg = false
+				
 				const btn_changer = (args) => {	//確認ボタン・戻るボタンを押したとき
 					console_log("*****【 btn_changer start 】*****")
 					if(Number(pay.value)===0){
@@ -751,7 +656,7 @@
 							console_log(`自動端数調整開始`)
 							let zeiritu
 							let zeikomi
-							//let hontai_val
+							
 							let chouseigo
 							let zeikomisougaku = 0
 							let utizei = 0
@@ -765,9 +670,6 @@
 								console_log(rtn_val)
 								console_log(`明細合計本体額：${row['本体額']}`)
 								row['調整額'] = rtn_val[0].本体価格 - row['本体額']
-								
-								//row['消費税bk'] = row['消費税']
-								//row['消費税'] = rtn_val[0].消費税
 								row['税調整額'] = rtn_val[0].消費税 - row['消費税']
 
 								zeikomisougaku += Number(row['本体額']) + Number(row['調整額']) + Number(row['消費税']) + Number(row['税調整額'])
@@ -796,12 +698,10 @@
 					console_log("*****【 btn_changer end 】*****")
 				}
 
-				//const pm = ref('1')
 				const ZeiChange = ref('0')	//商品マスタの税率変更スイッチ（0：商品マスタ初期値 8:テイクアウト 8% 10:イートイン10%）
 				watch([ZeiChange],() => {		//商品マスタの税率変更スイッチ
 					console_log(`*****【 watch ZeiChange(${ZeiChange.value}) start 】*****`,'lv3')
-          if(ZeiChange.value==='0'){//商品マスタの状態に戻す
-						//get_shouhinMS()
+					if(ZeiChange.value==='0'){//商品マスタの状態に戻す
 						shouhinMS.value.forEach((list) =>{
 							list.tanka_zei = Number(list.bk_tanka_zei)
 							list.zeikomigaku = Number(list.tanka) + Number(list.bk_tanka_zei)
@@ -822,7 +722,7 @@
 						
 					}
 					console_log(`*****【 watch ZeiChange(${ZeiChange.value}) end 】*****`,'lv3')
-        })//商品マスタの税率変更スイッチ
+				})//商品マスタの税率変更スイッチ
 
 				const ordercounter = (e) => {//注文増減ボタン
 					//console_log(e.target.disabled,'lv3')
@@ -866,7 +766,7 @@
 					
 					nextTick (() => {//DOMが更新された後に処理を行う
 						resize()
-        	})
+					})
 					return 0
 				}
 				const order_list_pm = (index,value) =>{
@@ -894,9 +794,9 @@
 				const order_list_change_tax = (index,e) => {
 					console_log(`order_list_change_tax start [${index} ${e.target.value}]`)
 					let zmrec = ([])
-          zmrec = zm.filter((list)=>{
+					zmrec = zm.filter((list)=>{
 						return list.税区分 == e.target.value
-          })
+					})
 
 					const values = get_value(Number(order_list.value[index].TANKA),Number(zmrec[0]["税率"]),'NOTIN')
 					
@@ -926,7 +826,6 @@
 							,'本体額':Number(row.TANKA) * Number(row.SU)
 							,'調整額':0
 							,'消費税':Number(row.TANKA_ZEI) * Number(row.SU)
-							//,'消費税bk':0
 							,'税調整額':0
 							})
 							console_log(hontai.value)
@@ -1046,13 +945,11 @@
 							pay.value += Number(row['本体額']) + Number(row['消費税']) + Number(row['調整額']) + Number(row['税調整額'])
 							kaikei_zei.value += Number(row['消費税']) + Number(row['税調整額'])
 						}
-						//calculation()
-						//auto_ajust_flg = true
 					}else{
 						console_log("調整スキップ")
 					}
-          console_log("*****【 Revised end:値引き値増し処理 】*****")
-        }
+					console_log("*****【 Revised end:値引き値増し処理 】*****")
+				}
 				
 				const reset_order = () => {//オーダーリセット
 					shouhinMS_filter.value.forEach((list)=>list.ordercounter=0)
@@ -1062,7 +959,6 @@
 					kaikei_zei.value = 0
 					kaikei_zei_bk = 0
 					hontai.value = []
-					//auto_ajust_flg = false
 					Revised_pay.value = ''
 				}
 				
@@ -1261,36 +1157,36 @@
 				const oaite = ref('上')
 				const URL = ref('')
 				const getGUID = () =>{
-    			let dt = new Date().getTime();
-    			let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    			    let r = (dt + Math.random()*16)%16 | 0;
-    			    dt = Math.floor(dt/16);
-    			    return (c=='x' ? r :(r&0x3|0x8)).toString(16);
-    			});
-    			return uuid;
+					let dt = new Date().getTime();
+					let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+							let r = (dt + Math.random()*16)%16 | 0;
+							dt = Math.floor(dt/16);
+							return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+					});
+					return uuid;
 				}
 				const QRout = () =>{
-  				// 入力された文字列を取得
+					// 入力された文字列を取得
 					let guid = getGUID()
-  				let userInput = URL.value + '&qr=' + guid + '&tp=1&k=' + keishou.value + '&s=' + oaite.value
+					let userInput = URL.value + '&qr=' + guid + '&tp=1&k=' + keishou.value + '&s=' + oaite.value
 					console_log(userInput,'lv3')
-  				var query = userInput.split(' ').join('+');
-  				// QRコードの生成
-  				(function() {
-  				  var qr = new QRious({
-  				    element: document.getElementById('qr'),
-  				    // 入力した文字列でQRコード生成
-  				    value: query
-  					});
-  					qr.background = '#FFF'; //背景色
-  					qr.backgroundAlpha = 1; // 背景の透過率
-  					qr.foreground = '#1c1c1c'; //QRコード自体の色
-  					qr.foregroundAlpha = 1.0; //QRコード自体の透過率
-  					qr.level = 'L'; // QRコードの誤り訂正レベル
-  					qr.size = 240; // QRコードのサイズ
-    				// QRコードをflexboxで表示
-    				document.getElementById('qrOutput').style.display = 'flex';
-  				})();
+					var query = userInput.split(' ').join('+');
+					// QRコードの生成
+					(function() {
+						var qr = new QRious({
+							element: document.getElementById('qr'),
+							// 入力した文字列でQRコード生成
+							value: query
+						});
+						qr.background = '#FFF'; //背景色
+						qr.backgroundAlpha = 1; // 背景の透過率
+						qr.foreground = '#1c1c1c'; //QRコード自体の色
+						qr.foregroundAlpha = 1.0; //QRコード自体の透過率
+						qr.level = 'L'; // QRコードの誤り訂正レベル
+						qr.size = 240; // QRコードのサイズ
+						// QRコードをflexboxで表示
+						document.getElementById('qrOutput').style.display = 'flex';
+					})();
 					// png出力用コード
 					var cvs = document.getElementById("qr");
 				}
@@ -1347,16 +1243,16 @@
 
 				//細かな表示設定など
 				let EventName=''
-        const set_EventName = (jsonobj) =>{
-            console_log('set_EventName start')
-            //console_log(jsonobj)
-            if(jsonobj===undefined){return}
-            EventName = jsonobj
+				const set_EventName = (jsonobj) =>{
+						console_log('set_EventName start')
+						//console_log(jsonobj)
+						if(jsonobj===undefined){return}
+						EventName = jsonobj
 						console_log(EventName)
 						labels.value["EV_input_value"] = EventName.EventName
-        }
+				}
 
-        //IDD_Read('LocalParameters','EventName',set_EventName)
+				//IDD_Read('LocalParameters','EventName',set_EventName)
 
 				const labels_address_check = ref()
 				const labels = computed(() =>{
@@ -1376,7 +1272,6 @@
 						rtn_labels.EV_input_name='EV'
 						rtn_labels.EV_input_hidden='KOKYAKU'
 						rtn_labels.EV_input_placeholder='イベント名等'
-						//rtn_labels.EV_input_value='<?php //echo $event; ?>'
 						rtn_labels.EV_input_value=EventName.EventName
 					}
 					if(rg_mode.value !== 'evrez'){
@@ -1401,15 +1296,24 @@
 					//console_log(get_value(1000,0.1,'IN'),'lv3')
 					console_log('onMounted','lv3')
 					total_area.value.style["fontSize"]="3.3rem"
-					get_shouhinMS()
+					//get_shouhinMS()
+					GET_SHOUHINMS()
+					.then((response)=>{
+						shouhinMS.value = response
+						console_log('get_shouhinMS succsess')
+					})
+					.catch((error) => {
+						console_log(`get_shouhinMS ERROR:${error}`)
+					})
+
 					get_UriageList()
 					v_get_gio()
 					order_list_area_set()
-					IDD_Read('LocalParameters','EventName',set_EventName)
+					//IDD_Read('LocalParameters','EventName',set_EventName)
 					window.addEventListener('resize', order_list_area_set)
 				})
 				return{
-					get_shouhinMS,
+					//get_shouhinMS,
 					shouhinMS_filter,
 					ordercounter,
 					pay,
@@ -1456,7 +1360,6 @@
 					open_R,
 					total_area,
 					auto_ajust,
-					//shouhinMS_Order,
 					order_list_area,
 					order_list,
 					order_list_pm,
@@ -1465,8 +1368,6 @@
 					order_list_change_tax,
 					order_panel_show,
 					cartbtn_show,
-					//order_item_fade_switch,
-					//order_item_fade_switch_changer,
 					CHOUSEI_TYPE,
 					keydown_waribiki,
 					par,
@@ -2250,14 +2151,14 @@
 		]
 	});
 	let gio_onoff = () => {
-    if(address_disp.style.textDecoration=='line-through'){
-      address_disp.style.textDecoration='';
-      gio_on.start(tourFinish,'','');
-    }else{
-      address_disp.style.textDecoration='line-through';
-      gio_off.start(tourFinish,'','');
-    }
-  }
+		if(address_disp.style.textDecoration=='line-through'){
+			address_disp.style.textDecoration='';
+			gio_on.start(tourFinish,'','');
+		}else{
+			address_disp.style.textDecoration='line-through';
+			gio_off.start(tourFinish,'','');
+		}
+	}
 
 
 </script><!--ジオコーディング-->

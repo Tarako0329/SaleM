@@ -201,7 +201,8 @@
 				//商品マスタ取得関連
 				const shouhinMS = ref([])			//商品マスタ
 				const shouhinMS_BK = ref([])	//商品マスタ修正前バックアップ
-				const get_shouhinMS = () => {//商品マスタ取得ajax
+
+				/*const get_shouhinMS = () => {//商品マスタ取得ajax
 					console_log("get_shouhinMS start",'lv3')
 					let params = new URLSearchParams()
 					params.append('user_id', '<?php echo $_SESSION["user_id"];?>')
@@ -216,7 +217,7 @@
 						console_log(`get_shouhinMS ERROR:${error}`,'lv3')
 					})
 					return 0;
-				};//商品マスタ取得ajax
+				};//商品マスタ取得ajax*/
 				
 				//商品マスタのソート・フィルタ関連
 				const chk_register_show = ref('all')	//フィルタ
@@ -329,65 +330,39 @@
 				//更新関連
 				const upd_zei_kominuki = ref('IN')
 				const zm = [
-                    <?php
-                    reset($ZEIresult);
-                    foreach($ZEIresult as $row2){
-                        echo "{税区分:".$row2["zeiKBN"].",税率:".($row2["zeiritu"]/100)."},\n";
-                    }
-                    ?> 
-                ]
+										<?php
+										reset($ZEIresult);
+										foreach($ZEIresult as $row2){
+												echo "{税区分:".$row2["zeiKBN"].",税率:".($row2["zeiritu"]/100)."},\n";
+										}
+										?> 
+								]
 				const return_tax = (kingaku,zeikbn,kominuki) => {
 					console_log('return_tax start','lv3')
 					console_log(zm,'lv3')
-					/*
-					let zeiritu
-					if(zeikbn==='0'){
-						zeiritu=0
-					}else if(zeikbn==='1001'){
-						zeiritu=8
-					}else if(zeikbn==='1101'){
-						zeiritu=10
-					}else{
-						return 0
-					}
-
-					if(kominuki==='komi'){
-						//return Math.floor(kingaku - (kingaku / (1 + zeiritu / 100)))
-						return Math.trunc(kingaku - (kingaku / (1 + zeiritu / 100)))
-					}else{
-						//return Math.floor(kingaku * (zeiritu / 100));
-						return Math.trunc(kingaku * (zeiritu / 100));
-					}
-					*/
 					let zmrec = ([])
-          zmrec = zm.filter((list)=>{
-              return list.税区分 == zeikbn
-          })
+					zmrec = zm.filter((list)=>{
+							return list.税区分 == zeikbn
+					})
 					const values = get_value(Number(kingaku),Number(zmrec[0]["税率"]),kominuki)
 					return values;
 				}
 				const set_new_value = (index,new_val_id) => {
 					//単価入力欄から本体と消費税を算出し、セットする
-					//console_log(`set_new_value start (${index}:${new_val_id})`,'lv3')
 					const new_val = document.querySelector(new_val_id)
-					//console_log(new_val.value,'lv3')
 					let values 
 					console_log(`set_new_value start (index => ${index} new_val_id => ${new_val_id} new_val => ${new_val})`,'lv3')
 
 					if(new_val.value !== ''){
-						console_log(`新価格あり：${new_val.value}`,"lv3")
-						console_log(upd_zei_kominuki.value,"lv3")
 						values = return_tax(new_val.value, shouhinMS_filter.value[index].zeiKBN, upd_zei_kominuki.value)
-						console_log(values,"lv3")
 						shouhinMS_filter.value[index].tanka = values[0]["本体価格"]
 						shouhinMS_filter.value[index].tanka_zei = values[0].消費税
 						if(values[0].E !== 'OK'){
-              alert('指定の税込額は税率計算で端数が発生するため実現できません')
+							alert('指定の税込額は税率計算で端数が発生するため実現できません')
 							new_val.value = values[0].税込価格
-            }
+						}
 					}else if(shouhinMS_filter.value[index].zeiKBN !== shouhinMS_BK_filter.value[index].zeiKBN){
 						//税率のみ変更した場合は現在の単価から算出する
-						//shouhinMS.value[index].tanka_zei = return_tax(shouhinMS.value[index].tanka, shouhinMS.value[index].zeiKBN.toString(), 'nuki')
 						values = return_tax(shouhinMS_filter.value[index].tanka, shouhinMS_filter.value[index].zeiKBN, 'NOTIN')
 						shouhinMS_filter.value[index].tanka_zei = values[0].消費税
 					}else{//新価格が空白の場合、本体・税額・税区分を元に戻す
@@ -416,7 +391,17 @@
 
 				onMounted(() => {
 					console_log('onMounted','lv3')
-					get_shouhinMS()
+					//get_shouhinMS()
+					GET_SHOUHINMS()
+						.then((response)=>{
+							shouhinMS.value = response
+							shouhinMS_BK.value = JSON.parse(JSON.stringify(shouhinMS.value))
+							console_log('GET_SHOUHINMS succsess')
+						})
+						.catch((error) => {
+							console_log(`GET_SHOUHINMS ERROR:${error}`)
+						})
+
 				})
 
 				return{
@@ -466,7 +451,7 @@
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'> 商品一覧の修正画面になります。
-			  </p>`,
+				</p>`,
 		buttons: [
 			{
 				text: 'Next',
@@ -477,7 +462,7 @@
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'> 登録した商品の「価格変更」やレジへの「表示/非表示」の切替はこの状態(縦画面表示)で行えます。
-			  </p>`,
+				</p>`,
 		buttons: [
 			{
 				text: 'Back',
@@ -492,7 +477,7 @@
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'> 右上のリストボックスをタップすると、レジ画面の表示対象チェックが入っているもの、いないもの、全件表示と切り替える事が可能です。
-			  </p>`,
+				</p>`,
 		attachTo: {
 			element: '.item_0',
 			on: 'bottom'
@@ -531,7 +516,7 @@
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>試しにタップして変更してみてください。
-			  </p>`,
+				</p>`,
 		attachTo: {
 			element: '.item_0',
 			on: 'auto'
@@ -550,7 +535,7 @@
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>商品の価格を変更する際は「新価格」欄をタップして変更後の価格を入力して下さい。
-			  </p>`,
+				</p>`,
 		attachTo: {
 			element: '.item_1',
 			on: 'auto'
@@ -569,7 +554,7 @@
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>入力した「新価格」が「税込か税抜」かは、こちらで選択して下さい。
-			  </p>`,
+				</p>`,
 		attachTo: {
 			element: '.item_2',
 			on: 'auto'
@@ -588,7 +573,7 @@
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>レジへの「表示/非表示」の切替は「レジ」行のチェック有無で切り替えます。
-			  </p>`,
+				</p>`,
 		attachTo: {
 			element: '.item_1',
 			on: 'auto'
@@ -607,7 +592,7 @@
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>その他の項目についても、コチラの画面で修正したい部分をタップして打ち変えることで修正が可能です。
-			  </p>`,
+				</p>`,
 		attachTo: {
 			element: '.item_1',
 			on: 'auto'
@@ -626,7 +611,7 @@
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>修正が完了したら「登録」ボタンをタップすると、変更内容が登録されます。
-			  </p>`,
+				</p>`,
 		attachTo: {
 			element: '.item_3',
 			on: 'auto'
@@ -645,7 +630,7 @@
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>なお、こちらで商品の価格等を修正しても過去の売上が変更されることはありません。
-			  </p>`,
+				</p>`,
 		buttons: [
 			{
 				text: 'Back',
@@ -660,7 +645,7 @@
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>試しに項目を修正し、「登録」してみてください。
-			  </p>`,
+				</p>`,
 		buttons: [
 			{
 				text: 'Back',
@@ -687,7 +672,7 @@
 	tutorial_13.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>最後に、登録した商品情報の削除について説明します。
-			  </p>`,
+				</p>`,
 		buttons: [
 			{
 				text: 'Back',
@@ -702,7 +687,7 @@
 	tutorial_13.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'><span style='color:red;'>ちなみに、削除しようとしている商品の「売上」が１件でも登録されていると削除する事は出来ません。</span>
-			  </p>`,
+				</p>`,
 		buttons: [
 			{
 				text: 'Back',
@@ -717,7 +702,7 @@
 	tutorial_13.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>今回登録した商品が不要な商品でしたら<i class='fa-regular fa-trash-can'></i>　マークをタップして削除して下さい。
-			  </p>`,
+				</p>`,
 		buttons: [
 			{
 				text: 'Back',
@@ -733,7 +718,7 @@
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>以上でチュートリアルは終了となります。
 				<br>お疲れ様でした。
-			  </p>`,
+				</p>`,
 		buttons: [
 			{
 				text: 'Back',
@@ -760,7 +745,7 @@
 	helpTour.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'> 登録した商品の「価格変更」やレジへの「表示/非表示」の切替はこの状態(縦画面表示)で行えます。
-			  </p>`,
+				</p>`,
 		buttons: [
 			{
 				text: 'Back',
@@ -775,7 +760,7 @@
 	helpTour.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'> 画面を横にすると他の項目も表示され、修正可能な状態となります。
-			  </p>`,
+				</p>`,
 		buttons: [
 			{
 				text: 'Back',
@@ -792,7 +777,7 @@
 		text: `<p class='tour_discription'> 画面を横にしてみてください。
 				<br>PCの場合、ブラウザの幅を拡大縮小すると表示が切り替わります。
 				<br>タブレットの場合は最初から全て表示されているかと思います。
-			  </p>`,
+				</p>`,
 		buttons: [
 			{
 				text: 'Back',
@@ -807,7 +792,7 @@
 	helpTour.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'><i class='fa-regular fa-trash-can'></i>　マークをタップすると削除を確認する画面に移動します。
-			  </p>`,
+				</p>`,
 		buttons: [
 			{
 				text: 'Back',
@@ -822,7 +807,7 @@
 	helpTour.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'> 右上のリストボックスをタップすると、レジ画面の表示対象チェックが入っているもの、いないもの、全件表示と切り替える事が可能です。
-			  </p>`,
+				</p>`,
 		attachTo: {
 			element: '.item_0',
 			on: 'bottom'
@@ -860,7 +845,7 @@
 	});    helpTour.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>商品の価格を変更する際は「新価格」欄をタップして変更後の価格を入力して下さい。
-			  </p>`,
+				</p>`,
 		attachTo: {
 			element: '.item_1',
 			on: 'auto'
@@ -879,7 +864,7 @@
 	helpTour.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>入力した「新価格」が「税込か税抜」かは、こちらで選択して下さい。
-			  </p>`,
+				</p>`,
 		attachTo: {
 			element: '.item_2',
 			on: 'auto'
@@ -898,7 +883,7 @@
 	helpTour.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>レジへの「表示/非表示」の切替は「レジ」行のチェック有無で切り替えます。
-			  </p>`,
+				</p>`,
 		attachTo: {
 			element: '.item_1',
 			on: 'auto'
@@ -917,7 +902,7 @@
 	helpTour.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>その他の項目についても、コチラの画面で修正したい部分をタップして打ち変えることで修正が可能です。
-			  </p>`,
+				</p>`,
 		attachTo: {
 			element: '.item_1',
 			on: 'auto'
@@ -936,7 +921,7 @@
 	helpTour.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>修正が完了したら「登録」ボタンをタップすると、変更内容が登録されます。
-			  </p>`,
+				</p>`,
 		attachTo: {
 			element: '.item_3',
 			on: 'auto'
@@ -955,7 +940,7 @@
 	helpTour.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>なお、こちらで商品の価格等を修正しても過去の売上が変更されることはありません。
-			  </p>`,
+				</p>`,
 		buttons: [
 			{
 				text: 'Back',
