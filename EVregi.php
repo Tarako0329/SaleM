@@ -562,26 +562,6 @@
 				const shouhinMS = ref([])			//商品マスタ
 				const disp_category = ref(4)		//パネルの分類別表示設定変更用
 
-				/*
-				const get_shouhinMS = () => {//商品マスタ取得ajax
-					console_log(`*****【 get_shouhinMS start 】*****`,);
-					let params = new URLSearchParams();
-					params.append('user_id', '<?php echo $_SESSION["user_id"];?>');
-					axios
-					.post('ajax_get_ShouhinMS.php',params)
-					.then((response) => {
-						shouhinMS.value = [...response.data]
-						console_log('get_shouhinMS succsess','lv3')
-					})
-					.catch((error) => {
-						console_log(`get_shouhinMS ERROR:${error}`,'lv3')
-					})
-					.finally(()=>{
-						console_log(`*****【 get_shouhinMS end 】*****`,'lv3');
-					});
-					
-				}//商品マスタ取得ajax
-				*/
 				const total_uriage = computed(() =>{//売上リストの合計売上額
 					let sum_uriage = 0
 					UriageList.value.forEach((list) => {

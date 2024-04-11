@@ -95,7 +95,7 @@ $inquiry = (!empty($userinfo["inquiry_tel"])?$userinfo["inquiry_tel"]:"")."/".$u
 	$stmt->bindValue(1, $id, PDO::PARAM_INT);
 	$stmt->bindValue(2, $UriNo, PDO::PARAM_STR);
 	$stmt->execute();
-	$result = $stmt->fetchAll();
+	$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 	$i=0;
 	$Goukei=0;
@@ -130,7 +130,7 @@ $inquiry = (!empty($userinfo["inquiry_tel"])?$userinfo["inquiry_tel"]:"")."/".$u
 	$stmt->bindValue(1, $id, PDO::PARAM_INT);
 	$stmt->bindValue(2, $UriNo, PDO::PARAM_STR);
 	$stmt->execute();
-	$result = $stmt->fetchAll();
+	$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	$ZeiGoukei = 0;
 	foreach($result as $row){
 		$zeigaku = $row["消費税額"] ;
@@ -148,7 +148,7 @@ if($saiban==="on"){//領収書Noの取得
 	$stmt = $pdo_h->prepare($sql);
 	$stmt->bindValue(1, $id, PDO::PARAM_INT);
 	$stmt->execute();
-	$result = $stmt->fetchAll();
+	$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	$count = $stmt->rowCount();
 
 	if(empty($result[0]["R_NO"])){

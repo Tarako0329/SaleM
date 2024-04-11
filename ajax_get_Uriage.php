@@ -16,7 +16,7 @@ if(!empty($_POST)){
 	$stmt->bindValue(1, $_POST['user_id'], PDO::PARAM_INT);
 	$stmt->bindValue(2, (string)date("Y-m-d"), PDO::PARAM_STR);
 	$stmt->execute();
-	$UriageList = $stmt->fetchAll();
+	$UriageList = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	
 	$i=0;
 	foreach($UriageList as $row){

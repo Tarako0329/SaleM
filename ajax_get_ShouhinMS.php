@@ -24,7 +24,7 @@ if(!empty($_SESSION["user_id"])){
 	$stmt = $pdo_h->prepare($sqlstr);
 	$stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
 	$stmt->execute();
-	$shouhihMS = $stmt->fetchAll();
+	$shouhihMS = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }else{
 	echo "不正アクセス";
 	exit;

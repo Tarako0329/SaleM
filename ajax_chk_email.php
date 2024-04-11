@@ -32,7 +32,7 @@ if($rtn !== true){
             $stmt->bindValue(1, $_GET["MAIL"], PDO::PARAM_STR);
             $status = $stmt->execute();
             $count = $stmt->rowCount();
-            $row = $stmt->fetchAll();
+            $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
             log_writer2("ajax_chk_email.php [\$row] =>",$_GET,"lv3");
             if($status===true){
                 if($row[0]["cnt"]>=1){

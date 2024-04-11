@@ -52,7 +52,7 @@ $rtn=$stmt->execute();
 if($rtn==false){
 	deb_echo("失敗した場合は不正値が渡されたとみなし、wheresqlを破棄<br>");
 }
-$UriageList = $stmt->fetchAll();
+$UriageList = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $rowcnt = $stmt->rowCount();
 if($rowcnt!==0){
 }else{

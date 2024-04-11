@@ -37,7 +37,7 @@ log_writer2("test",$SLVresult,"lv3");
     $stmt = $pdo_h->prepare($SLVsql);
     $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
     $stmt->execute();
-    $SLVresult = $stmt->fetchAll();
+    $SLVresult = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $next_ymd = date('Y-m-d',strtotime($SLVresult[0]["min_uridate"]."-01"));
     $next_ym = date('Ym',strtotime($next_ymd));

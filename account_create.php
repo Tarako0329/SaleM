@@ -29,9 +29,6 @@ if($_GET["mode"]==="0" && !empty($_GET["acc"])){
 	//モード指定なしはNG
 	redirect_to_login("想定外のアクセスルートです。");
 }
-//log_writer2($myname." \$session[id] =>",$_SESSION["user_id"],"lv3");
-
-
 $token=csrf_create();
 
 ?>

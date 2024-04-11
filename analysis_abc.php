@@ -32,46 +32,13 @@
         $list = "%";
         $analysis_type=$_GET["sum_tani"];
     }
-    //get_getsumatsu($ymfrom);
-    //deb_echo($list);
-    /*
-    $cols=0;
-    if($analysis_type==1 ){//全商品（金額）
-        $sqlstr = "select tmp.* ,sum(税抜売上) over() as 総売上 from (select ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ";
-        $gp_sqlstr = "group by ShouhinNM) tmp order by 税抜売上 desc";
-        $aryColumn = ["商品名","税抜売上"];
-        $cols=2;
-    }elseif($analysis_type==2 ){//イベントごと
-        $sqlstr = "select tmp.* ,sum(税抜売上) over(PARTITION BY Event) as 総売上 from (select Event,ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ";
-        $gp_sqlstr = "group by Event,ShouhinNM) tmp order by Event,税抜売上 desc";
-        $aryColumn = ["商品名","税抜売上"];
-        $cols=3;
-    }
-    $sqlstr = $sqlstr." where ShouhinCD<9900 and DATE_FORMAT(UriDate, '%Y%m') between :ymfrom and :ymto AND uid = :user_id ";
-    $sqlstr = $sqlstr." and (Event like :event OR TokuisakiNM like :tokui )";
-    $sqlstr = $sqlstr." ".$gp_sqlstr;
 
-    //deb_echo($sqlstr);
-    $_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
-    
-    $stmt = $pdo_h->prepare( $sqlstr );
-    $stmt->bindValue("ymfrom", $ymfrom, PDO::PARAM_INT);
-    $stmt->bindValue("ymto", $ymto, PDO::PARAM_INT);
-    $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
-    $stmt->bindValue("event", $list, PDO::PARAM_STR);
-    $stmt->bindValue("tokui", $list, PDO::PARAM_STR);
-    $rtn=$stmt->execute();
-    if($rtn==false){
-        deb_echo("失敗<br>");
-    }
-    $result=$stmt->fetchAll();
-    */
     //検索年月リスト ユーザの最初の売上年月～今年12月までのリストを作成する
     $SLVsql = "select DATE_FORMAT(min(UriDate), '%Y-%m') as min_uridate from UriageData where uid = :user_id";
     $stmt = $pdo_h->prepare($SLVsql);
     $stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
     $stmt->execute();
-    $SLVresult = $stmt->fetchAll();
+    $SLVresult = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $next_ymd = date('Y-m-d',strtotime($SLVresult[0]["min_uridate"]."-01"));
     $next_ym = date('Ym',strtotime($next_ymd));

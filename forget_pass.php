@@ -29,7 +29,7 @@ $sqlstr = "select * from Users where mail=?";
 $stmt = $pdo_h->prepare( $sqlstr );
 $stmt->bindValue(1, $mail, PDO::PARAM_STR);
 $rtn=$stmt->execute();
-$result=$stmt->fetchAll();
+$result=$stmt->fetchAll(PDO::FETCH_ASSOC);
 
 //if($_POST["answer"]<>""){
 if(filter_input(INPUT_POST,"answer")){
@@ -42,7 +42,7 @@ if(filter_input(INPUT_POST,"answer")){
     $stmt->bindValue(2, $_POST["answer"], PDO::PARAM_STR);
     $rtn=$stmt->execute();
     $cnt=$stmt->rowCount();
-    $result2=$stmt->fetchAll();
+    $result2=$stmt->fetchAll(PDO::FETCH_ASSOC);
     if($cnt==1){
         $_SESSION["user_id"]=$result2[0]["uid"];
         echo $_SESSION["user_id"]."<br>";
