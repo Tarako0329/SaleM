@@ -11,3 +11,4 @@ xxx*
 .ini
 .htaccess
 /vendor/dompdf/dompdf/lib/fonts/installed-fonts.json
+*.mm
