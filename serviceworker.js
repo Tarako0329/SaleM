@@ -1,25 +1,25 @@
 // キャッシュするリソース(css、jsがあれば個別で追加)
 //キャッシュ利用部分を止める
-const CACHE_VERSION = 'v39_';
+const CACHE_VERSION = 'v40_';
 const CACHE_NAME = `${CACHE_VERSION}!${registration.scope}`;
 
 // キャッシュするファイルをセットする
 const urlsToCache = [
   '/css'
-  ,'/css/bootstrap/4.1.3/css/bootstrap.min.css'
-  ,'/css/bootstrap/4.1.3/js/bootstrap.min.js'
+  //,'/css/bootstrap/4.1.3/css/bootstrap.min.css'
+  //,'/css/bootstrap/4.1.3/js/bootstrap.min.js'
   ,'/css/Kranky-Regular.ttf'
   ,'/css/ZenKurenaido-Regular.ttf'
-  ,'/css/jQuery-UI-1.12.1.min.css'
+  //,'/css/jQuery-UI-1.12.1.min.css'
   ,'/shepherd/shepherd.min.js'
   ,'/shepherd/shepherd.css'
   ,'/img'
   ,'/favicon.ico'
   ,'/script'
   ,'/script/index.js'
-  ,'/script/jquery-3.6.0.min.js'
+  //,'/script/jquery-3.6.0.min.js'
   ,'/script/popper.min.js'
-  ,'/script/jquery-ui-1.12.1.min.js'
+  //,'/script/jquery-ui-1.12.1.min.js'
 ];
 
 //サービスワーカーインストール

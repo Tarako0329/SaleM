@@ -443,8 +443,14 @@
 					</div>
 				</div>
 				<div class='modal-footer'>
-					<button type='button' style='font-size: 2rem;' class='btn btn-primary' @click='QRout()'>QR表示</button>
-					<button type='button' style='font-size: 2rem;' class='btn btn-primary' @click='prv()'>領収書表示</button>
+					<button type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1' @click='QRout()'><i class="bi bi-qr-code"></i></button>
+					<button type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1' @click='prv()'><i class="bi bi-display"></i></button>
+					<a :href='`https://line.me/R/share?text=${rtn_send_msg}`' type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1'>
+						<i class="bi bi-line line-green"></i>
+					</a>
+					<a :href='DL_URL' download='RyoushuuSho.pdf' type='button' style='font-size: 2rem;' class='btn btn-outline-primary'>
+						<i class="bi bi-download"></i>
+					</a>
 				</div>
 			</div>
 		</div>
@@ -511,16 +517,19 @@
 	</div>
 
 	</div><!-- <div  id='register'> -->
+	<script src="EVregi_vue.js?<?php echo $time; ?>"></script>-
 	<script>
+		REZ_APP('<?php echo $_SESSION["user_id"]."','".$timeout."','".$RG_MODE; ?>').mount('#register');
+		/*
 		const { createApp, ref, onMounted, computed, VueCookies, watch,nextTick  } = Vue;
 		createApp({
 			setup(){
 				const zm = [//税区分マスタ
 					<?php
-						reset($zeimaster);
+						/*reset($zeimaster);
 						foreach($zeimaster as $row2){
 								echo "{税区分:".$row2["zeiKBN"].",税区分名:'".$row2["hyoujimei"]."',税率:".($row2["zeiritu"]/100)."},\n";
-						}
+						}*/
 					?> 
 				]
 
@@ -541,7 +550,7 @@
 				const get_UriageList = () => {//売上リスト取得ajax
 					console_log(`*****【 get_UriageList start 】*****`,'lv3');
 					let params = new URLSearchParams();
-					params.append('user_id', '<?php echo $_SESSION["user_id"];?>');
+					params.append('user_id', '<?php //echo $_SESSION["user_id"];?>');
 
 					axios
 					.post('ajax_get_Uriage.php',params)
@@ -961,7 +970,7 @@
 				const alert_status = ref(['alert'])
 				const MSG = ref('')
 				const loader = ref(false)
-				const csrf = ref('<?php echo $token; ?>') 
+				const csrf = ref('<?php //echo $token; ?>') 
 				const rtURL = ref('')
 
 				const chk_csrf = () =>{
@@ -981,7 +990,7 @@
 					}
 					return 0
 				} 
-				const rg_mode = ref('<?php echo $RG_MODE; ?>')	//レジモード
+				const rg_mode = ref('<?php //echo $RG_MODE; ?>')	//レジモード
 
 				const on_submit = async(e) => {//登録・submit/
 					console_log('on_submit start','lv3')
@@ -1000,7 +1009,7 @@
 					}
 					
 					await axios
-						.post(php_name,params,{timeout: <?php echo $timeout; ?>}) //php側は15秒でタイムアウト
+						.post(php_name,params,{timeout: <?php //echo $timeout; ?>}) //php側は15秒でタイムアウト
 						.then((response) => {
 							console_log(`on_submit SUCCESS`,'lv3')
 							//console_log(response.data,'lv3')
@@ -1080,7 +1089,7 @@
 									const res_add = axios.get('https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress',{params:{lat:geoLoc.coords.latitude,lon:geoLoc.coords.longitude}})
 									//GioCodeから天気を取得
 									const res_weat = axios.get('https://api.openweathermap.org/data/2.5/weather',{
-										params:{lat:geoLoc.coords.latitude,lon:geoLoc.coords.longitude,units:'metric',APPID:'<?php echo WEATHER_ID; ?>'}
+										params:{lat:geoLoc.coords.latitude,lon:geoLoc.coords.longitude,units:'metric',APPID:'<?php //echo WEATHER_ID; ?>'}
 										,timeout: 5000
 									})
 
@@ -1239,7 +1248,7 @@
 					//let labels = []
 					let rtn_labels = {}
 					if(rg_mode.value !== 'shuppin_zaiko'){
-						rtn_labels={date_type:"売上日",date_ini:'<?php echo (string)date("Y-m-d");?>',btn_name:'釣　銭'}
+						rtn_labels={date_type:"売上日",date_ini:'<?php //echo (string)date("Y-m-d");?>',btn_name:'釣　銭'}
 					}else{
 						rtn_labels={date_type:"出店日",date_ini:'',btn_name:''}
 					}
@@ -1354,7 +1363,7 @@
 				}
 			}
 		}).mount('#register');
-
+		*/
 	</script><!--Vue3-->
 	<script>
 		var GSI = {};

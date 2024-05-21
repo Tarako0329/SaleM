@@ -34,7 +34,7 @@ $mail="";
 if(!empty($_SESSION["MAIL"])){
     $mail=$_SESSION["MAIL"];
 }elseif(EXEC_MODE==="Local"){
-    $mail="cafe.present@gmail.com";
+    $mail="green.green.midori@greeen-sys.com";
 }
 $csrf = csrf_create();
 ?>
@@ -61,7 +61,7 @@ $csrf = csrf_create();
             <form class="form-signin" id="form1" method="post" action="logincheck.php">
                 <span id="reauth-email" class="reauth-email"></span>
                 <input type="email" id="inputEmail" class="form-control" placeholder="Email address" name="LOGIN_EMAIL" required autofocus value='<?php echo $mail;?>'>
-                <input type="password" id="inputPassword" class="form-control" name="LOGIN_PASS" placeholder="Password" required value='<?php echo (EXEC_MODE=="Local"?"farfaru":""); ?>'>
+                <input type="password" id="inputPassword" class="form-control" name="LOGIN_PASS" placeholder="Password" required value='<?php echo (EXEC_MODE=="Local"?"000000":""); ?>'>
                 <div id="remember" class="checkbox">
                     <label>
                         <input type="checkbox" name="AUTOLOGIN" checked> AUTOLOGIN 

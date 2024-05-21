@@ -6,6 +6,7 @@
 
     <!-- Bootstrap5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <!-- Bootstrap Javascript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
     <!-- fontawesome -->
@@ -28,6 +29,7 @@
     <script>
         var KANKYO = <?php echo "'".EXEC_MODE."'" ;?>;
         var ZEIHASU = <?php echo empty($ZeiHasu)?0:$ZeiHasu ;?>;
+        var WEATHER_ID = '<?php echo WEATHER_ID; ?>'
         var COLOR_NO 
     </script>
     <script src="script/function.js?<?php echo $time; ?>"></script>
@@ -51,10 +53,12 @@
                     console_log("Service Worker is registered!!");
                     
                     //serviceworker.js　の更新確認(bit単位で比較し相違があったら更新する。らしい)
+                    /*
                     registration.onupdatefound = function() {
                         console_log('Service Worker is Updated');
                         registration.update();
                     }
+                    */
                 })
                 .catch(err => {
                     // 登録失敗

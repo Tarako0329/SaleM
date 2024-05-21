@@ -248,7 +248,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     <footer class='common_footer' style='padding:5px;'>
         <p style='padding:5px;'>お問い合わせはコチラ</p>
         <a href='https://lin.ee/HLSLl23' style='padding:5px;'><i class="fa-brands fa-line fa-2x line-green"></i></a>
-        <a href='https://green-island.mixh.jp/wdps/%e3%81%8a%e5%95%8f%e3%81%84%e5%90%88%e3%82%8f%e3%81%9b/' style='padding:5px;' target='_blank' rel='noopener noreferrer'><i class="fa-solid fa-square-envelope fa-2x"></i></a>
+        <!--<a href='https://green-island.mixh.jp/wdps/%e3%81%8a%e5%95%8f%e3%81%84%e5%90%88%e3%82%8f%e3%81%9b/' style='padding:5px;' target='_blank' rel='noopener noreferrer'><i class="fa-solid fa-square-envelope fa-2x"></i></a>-->
     </footer>
 </body>
 <!--シェパードナビshepherd
@@ -258,8 +258,6 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
 <?php
     if(empty($_SESSION["tour"])){
         //ツアー中でない場合、チュートリアルが終わっているか確認する
-        //$sqlstr="SELECT * FROM Users WHERE JSON_CONTAINS(ToursLog, '\"finish\"', '$.tutorial') and uid=?";
-        //$sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.tutorial') as tutorial FROM Users WHERE uid=?";
         $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.tutorial') as tutorial FROM Users_webrez WHERE uid=?";
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);

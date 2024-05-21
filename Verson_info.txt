@@ -80,20 +80,20 @@ ver2.99.0-061:割引割増処理UPDATE-commited
 ver2.99.0-062:端末別の設定をindexedDbに移行-commited
 	端末別の設定をMySQL[PageDefVal]table から indexedDbに移行
 ver2.99.0-062:php Warningつぶし-commited
-ver2.99.0-063:トライアルモード修正
-ver2.99.0-064:vue3cdn修正
-ver3.00.0-000:サーバー移行に伴う修正
-ver3.00.1-000:パスワード変更bugfix
-ver3.00.2-000:商品マスタ修正bugfix
-ver3.00.3-000:商品一覧修正bugfix
-ver3.00.4-000:売上実績bugfix
-ver3.01.0-000:Usersマスタの分割
+ver2.99.0-063:トライアルモード修正-commited
+ver2.99.0-064:vue3cdn修正-commited
+ver3.00.0-000:サーバー移行に伴う修正-commited
+ver3.00.1-000:パスワード変更bugfix-commited
+ver3.00.2-000:商品マスタ修正bugfix-commited
+ver3.00.3-000:商品一覧修正bugfix-commited
+ver3.00.4-000:売上実績bugfix-commited
+ver3.01.0-000:Usersマスタの分割-commited
 	登録URLを飛ばすとこまで
-ver3.01.1-000:Usersマスタの分割
+ver3.01.1-000:Usersマスタの分割-commited
 	新規登録・ユーザ情報更新まで
-ver3.01.2-000:Usersマスタの分割
+ver3.01.2-000:Usersマスタの分割-commited
 	その他、細かい修正
-ver3.02.0-000:リファクタリング
+ver3.02.0-000:リファクタリング-commited 2024/05/21
 	UsersテーブルをUsers_webrezとして複製し
 	ALTER TABLE `Users_webrez`
 	DROP `password`,
@@ -133,6 +133,7 @@ ver3.02.0-000:リファクタリング
 	ALTER TABLE `Users_webrez` DROP PRIMARY KEY, ADD PRIMARY KEY(`uid`);
 	Usersテーブルの項目名を変更
 	ALTER TABLE `Users` CHANGE `kinouflg2` `webrez` VARCHAR(6) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL, CHANGE `kinouflg3` `onlineshop` VARCHAR(6) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL;
+ver3.03.0-000:領収書の改善
 
 【Issues】
 売上修正の領収書再発行機能を考える
