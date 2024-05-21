@@ -50,8 +50,10 @@
 		echo "想定外アクセス。";
 		exit();
 	}
-	$id=rot13decrypt2($_GET["i"]);
-	$UriNo=rot13decrypt2($_GET["u"]);
+	//$id=rot13decrypt2($_GET["i"]);
+	$id=($_GET["i"]);
+	//$UriNo=rot13decrypt2($_GET["u"]);
+	$UriNo=($_GET["u"]);
 	$Atena = (!empty($_GET["s"])?$_GET["s"] . "　　" . $_GET["k"]:"");
 	$type = ($_GET["tp"]==="1"?"領　収　書":"請　求　書");
 	$filename = ($_GET["tp"]==="1"?"Ryoushusho":"Seikyusho");
