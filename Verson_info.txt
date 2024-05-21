@@ -26,13 +26,13 @@ ver2.99.0-038:to[bs5&Vue3CompApi]インボイス対応・・・履歴からの�
 	ALTER TABLE `UriageData` CHANGE `tanka` `tanka` INT(11) NOT NULL DEFAULT '0' COMMENT '単価', CHANGE `UriageKin` `UriageKin` INT(11) NOT NULL DEFAULT '0' COMMENT '売上金額', CHANGE `zei` `zei` INT(11) NOT NULL DEFAULT '0' COMMENT '消費税';
 	ALTER TABLE `UriageData` CHANGE `ShouhinCD` `ShouhinCD` VARCHAR(7) NOT NULL COMMENT '商品CD';
 	CREATE TABLE `ryoushu` (
-	  `uid` int(5) NOT NULL,
-	  `R_NO` int(11) NOT NULL COMMENT '領収書No',
-	  `UriNo` int(11) NOT NULL COMMENT '売上No',
-	  `Atena` varchar(40) NOT NULL COMMENT '宛名',
-	  `html` longtext NOT NULL COMMENT 'pdf_html',
-	  `QR_GUID` varchar(40) DEFAULT NULL,
-	  `LastHakkouDate` datetime DEFAULT current_timestamp() COMMENT '最終発行日時'
+		`uid` int(5) NOT NULL,
+		`R_NO` int(11) NOT NULL COMMENT '領収書No',
+		`UriNo` int(11) NOT NULL COMMENT '売上No',
+		`Atena` varchar(40) NOT NULL COMMENT '宛名',
+		`html` longtext NOT NULL COMMENT 'pdf_html',
+		`QR_GUID` varchar(40) DEFAULT NULL,
+		`LastHakkouDate` datetime DEFAULT current_timestamp() COMMENT '最終発行日時'
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 	ALTER TABLE `Users` ADD `inquiry_tel` VARCHAR(20) NULL DEFAULT NULL COMMENT '問合TEL' AFTER `invoice_no`, ADD `inquiry_mail` VARCHAR(100) NULL DEFAULT NULL COMMENT '問合MAIL' AFTER `inquiry_tel`;
 	php load_font.php ipag css/ipag.ttf
@@ -66,13 +66,13 @@ ver2.99.0-057:レジ画面改修・税計算機能の切り出し-commited
 	ユーザー情報で消費税の端数処理セット OK
 	ALTER TABLE `Users` CHANGE `kinouflg1` `ZeiHasu` TINYINT(1) NULL DEFAULT '0' COMMENT '消費税端数:0切捨/1四捨五入/2切上';--全環境適用済み
 	ALTER TABLE `uriagedata`--全環境適用済み
-  DROP PRIMARY KEY,
-   ADD PRIMARY KEY(
-     `uid`,
-     `UriageNO`,
-     `ShouhinCD`,
-     `zeiKBN`
-   );
+	DROP PRIMARY KEY,
+	 ADD PRIMARY KEY(
+		 `uid`,
+		 `UriageNO`,
+		 `ShouhinCD`,
+		 `zeiKBN`
+	 );
 ver2.99.0-058:bugfix-sqllogger error-commited
 ver2.99.0-059:商品一覧の検索機能追加-commited
 ver2.99.0-060:細かな修正・操作性向上・分析画面のレイアウト調整-commited
@@ -90,48 +90,49 @@ ver3.00.4-000:売上実績bugfix
 ver3.01.0-000:Usersマスタの分割
 	登録URLを飛ばすとこまで
 ver3.01.1-000:Usersマスタの分割
-  新規登録・ユーザ情報更新まで
+	新規登録・ユーザ情報更新まで
 ver3.01.2-000:Usersマスタの分割
-  その他、細かい修正
+	その他、細かい修正
 ver3.02.0-000:リファクタリング
 	UsersテーブルをUsers_webrezとして複製し
-  ALTER TABLE `Users_webrez`
-  DROP `password`,
-  DROP `question`,
-  DROP `answer`,
-  DROP `kinouflg2`,
-  DROP `kinouflg3`,
-  DROP `kinouflg4`,
-  DROP `kinouflg5`,
-  DROP `kinouflg6`,
-  DROP `kinouflg7`,
-  DROP `kinouflg8`,
-  DROP `kinouflg9`;
+	ALTER TABLE `Users_webrez`
+	DROP `password`,
+	DROP `question`,
+	DROP `answer`,
+	DROP `kinouflg2`,
+	DROP `kinouflg3`,
+	DROP `kinouflg4`,
+	DROP `kinouflg5`,
+	DROP `kinouflg6`,
+	DROP `kinouflg7`,
+	DROP `kinouflg8`,
+	DROP `kinouflg9`;
 
 	ALTER TABLE `Users`
-  DROP `loginrez`,
-  DROP `name`,
-  DROP `yagou`,
-  DROP `yubin`,
-  DROP `address1`,
-  DROP `address2`,
-  DROP `address3`,
-  DROP `ToursLog`,
-  DROP `ForcedLogout`,
-  DROP `ZeiHasu`,
-  DROP `keiyakudate`,
-  DROP `plan`,
-  DROP `kaiyakudate`,
-  DROP `yuukoukigen`,
-  DROP `stripe_id`,
-  DROP `introducer_id`,
-  DROP `invoice_no`,
-  DROP `inquiry_tel`,
-  DROP `inquiry_mail`;
-  ALTER TABLE `Users` CHANGE `uid` `uid` INT(11) NOT NULL;
-  ALTER TABLE `Users_webrez` CHANGE `uid` `uid` INT(11) NOT NULL;
-  ALTER TABLE `Users_webrez` DROP PRIMARY KEY, ADD PRIMARY KEY(`uid`);
-
+	DROP `loginrez`,
+	DROP `name`,
+	DROP `yagou`,
+	DROP `yubin`,
+	DROP `address1`,
+	DROP `address2`,
+	DROP `address3`,
+	DROP `ToursLog`,
+	DROP `ForcedLogout`,
+	DROP `ZeiHasu`,
+	DROP `keiyakudate`,
+	DROP `plan`,
+	DROP `kaiyakudate`,
+	DROP `yuukoukigen`,
+	DROP `stripe_id`,
+	DROP `introducer_id`,
+	DROP `invoice_no`,
+	DROP `inquiry_tel`,
+	DROP `inquiry_mail`;
+	ALTER TABLE `Users` CHANGE `uid` `uid` INT(11) NOT NULL;
+	ALTER TABLE `Users_webrez` CHANGE `uid` `uid` INT(11) NOT NULL;
+	ALTER TABLE `Users_webrez` DROP PRIMARY KEY, ADD PRIMARY KEY(`uid`);
+	Usersテーブルの項目名を変更
+	ALTER TABLE `Users` CHANGE `kinouflg2` `webrez` VARCHAR(6) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL, CHANGE `kinouflg3` `onlineshop` VARCHAR(6) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL;
 
 【Issues】
 売上修正の領収書再発行機能を考える

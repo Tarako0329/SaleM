@@ -110,9 +110,9 @@ $token=csrf_create();
 						<label for='add3' >住所３行目</label>
 						<input v-model='account_r.address3' :='locker' type='text' maxlength='20' class='form-control' id='add3' name='ADD3' placeholder='住所3行目' >
 						<label for='inquiry_tel' >問合せ先TEL</label>
-						<input v-model='account_r.inquiry_tel' :='locker' type='tel' pattern="[0-9]{3,}-[0-9]{3,}-[0-9]{3,}" maxlength='20' class='form-control' id='inquiry_tel' name='inquiry_tel' placeholder='例：000-0000-0000' >
+						<input v-model='account_r.inquiry_tel' :='locker' type='text' pattern="[0-9]{3,}-[0-9]{3,}-[0-9]{3,}" maxlength='20' class='form-control' id='inquiry_tel' name='inquiry_tel' placeholder='例：000-0000-0000' >
 						<label for='inquiry_mail' >問合せ先MAIL</label>
-						<input v-model='account_r.inquiry_mail' :='locker' type='email' maxlength='20' class='form-control' id='inquiry_mail' name='inquiry_mail' placeholder='メールアドレス' >
+						<input v-model='account_r.inquiry_mail' :='locker' type='email' maxlength='300' class='form-control' id='inquiry_mail' name='inquiry_mail' placeholder='メールアドレス' >
 					</template>
 					<div class='col-12' style=' padding:5px; margin-top:10px;display:flexbox;'>
 						<button v-if='step==="check"' type='submit' class='btn btn-primary' style='width:150px;height:40px;font-size:1.5rem'>確 認</button>

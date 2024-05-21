@@ -50,7 +50,7 @@ if($rtn !== true){
 					}
 				}
 				
-				$sqlstr="insert into Users(uid,mail,password,question,answer) values(:uid,:mail,:password,:question,:answer)";
+				$sqlstr="insert into Users(uid,mail,password,question,answer,webrez) values(:uid,:mail,:password,:question,:answer,'use')";
 				$stmt = $pdo_h->prepare($sqlstr);
 				$stmt->bindValue("uid", $_SESSION["P"]["uid"], PDO::PARAM_INT);
 				$stmt->bindValue("mail", $_SESSION["P"]["mail"], PDO::PARAM_STR);
