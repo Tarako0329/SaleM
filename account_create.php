@@ -76,14 +76,14 @@ $token=csrf_create();
 					<input type='password' minlength='6' class='form-control' id='pass2' oninput='Checkpass(this)' name='PASS' :='pass_lock'>
 					<hr>
 					<label for='question' >秘密の質問(パスワードを忘れたときに使用します)</label>
-					<input v-model='account_u.question' :='locker' type='text' maxlength='20' class='form-control' id='question' name='QUESTION' required='required' placeholder='例：初恋の人の名前' >
+					<input v-model='account_u.question' :='locker' type='text' maxlength='20' class='form-control mb-3' id='question' name='QUESTION' required='required' placeholder='例：初恋の人の名前' >
 					<label for='answer' >答え</label>
 					<input v-model='account_u.answer' :='locker' type='text' maxlength='20' class='form-control' id='answer' name='ANSWER' required='required' placeholder='例：ささき' >
 					<small id='answer' class='form-text text-muted'>ひらがな・半角英数・スペース不使用を推奨</small>
 					<br>
 					<template v-if='mode==="update"'>
-						<input v-model='account_r.loginrez' :='locker' type='checkbox'  id='loginrez' name='LOGINREZ' >
-						<label for='loginrez' >ログイン後レジ画面表示</label><br>
+						<input v-model='account_r.loginrez' :='locker' type='checkbox' class='form-check-input mb-3' id='loginrez' name='LOGINREZ' >
+						<label class="form-check-label" for='loginrez' >ログイン後レジ画面表示</label><br>
 						<label for='hasushori' >消費税の端数処理</label>
 						<select v-model='account_r.ZeiHasu' :='locker' class="form-select form-select-lg" style='font-size:1.5rem' id='hasushori' name='ZEIHASU'>
 							<option value=0>切り捨て</option>
@@ -96,23 +96,23 @@ $token=csrf_create();
 						<div>ここから下は請求書・納品書・自動送信メールに使用します。<br>使用しない方は入力不要です。</div>
 						<hr>
 						<label for='name' >姓名</label>
-						<input v-model='account_r.name' :='locker' type='text' class='form-control' id='name' name='NAME'  >
+						<input v-model='account_r.name' :='locker' type='text' class='form-control mb-3' id='name' name='NAME'  >
 						<label for='yagou' >屋号</label>
-						<input v-model='account_r.yagou' :='locker' type='text' class='form-control' id='yagou' name='YAGOU'  >
+						<input v-model='account_r.yagou' :='locker' type='text' class='form-control mb-3' id='yagou' name='YAGOU'  >
 						<label for='invoice' >インボイス登録番号</label>
-						<input v-model='account_r.invoice_no' :='locker' type='text' class='form-control' id='invoice' name='invoice'  >
+						<input v-model='account_r.invoice_no' :='locker' type='text' class='form-control mb-3' id='invoice' name='invoice'  >
 						<label for='yubin' >郵便番号('-'抜き)</label>
-						<input v-model='account_r.yubin' :='locker' type='text' class='form-control' id='yubin' name='zip11' onKeyUp='AjaxZip3.zip2addr(this,"","addr11","addr11");' >
+						<input v-model='account_r.yubin' :='locker' type='text' class='form-control mb-3' id='yubin' name='zip11' onKeyUp='AjaxZip3.zip2addr(this,"","addr11","addr11");' >
 						<label for='add1' >住所１行目</label>
-						<input v-model='account_r.address1' :='locker' type='text' maxlength='20' class='form-control' id='add1' name='addr11' placeholder='住所1行目' >
+						<input v-model='account_r.address1' :='locker' type='text' maxlength='20' class='form-control mb-3' id='add1' name='addr11' placeholder='住所1行目' >
 						<label for='add2' >住所２行目</label>
-						<input v-model='account_r.address2' :='locker' type='text' maxlength='20' class='form-control' id='add2' name='ADD2' placeholder='住所2行目' >
+						<input v-model='account_r.address2' :='locker' type='text' maxlength='20' class='form-control mb-3' id='add2' name='ADD2' placeholder='住所2行目' >
 						<label for='add3' >住所３行目</label>
-						<input v-model='account_r.address3' :='locker' type='text' maxlength='20' class='form-control' id='add3' name='ADD3' placeholder='住所3行目' >
+						<input v-model='account_r.address3' :='locker' type='text' maxlength='20' class='form-control mb-3' id='add3' name='ADD3' placeholder='住所3行目' >
 						<label for='inquiry_tel' >問合せ先TEL</label>
-						<input v-model='account_r.inquiry_tel' :='locker' type='text' pattern="[0-9]{3,}-[0-9]{3,}-[0-9]{3,}" maxlength='20' class='form-control' id='inquiry_tel' name='inquiry_tel' placeholder='例：000-0000-0000' >
+						<input v-model='account_r.inquiry_tel' :='locker' type='text' pattern="[0-9]{3,}-[0-9]{3,}-[0-9]{3,}" maxlength='20' class='form-control mb-3' id='inquiry_tel' name='inquiry_tel' placeholder='例：000-0000-0000' >
 						<label for='inquiry_mail' >問合せ先MAIL</label>
-						<input v-model='account_r.inquiry_mail' :='locker' type='email' maxlength='300' class='form-control' id='inquiry_mail' name='inquiry_mail' placeholder='メールアドレス' >
+						<input v-model='account_r.inquiry_mail' :='locker' type='email' maxlength='300' class='form-control mb-3' id='inquiry_mail' name='inquiry_mail' placeholder='メールアドレス' >
 					</template>
 					<div class='col-12' style=' padding:5px; margin-top:10px;display:flexbox;'>
 						<button v-if='step==="check"' type='submit' class='btn btn-primary' style='width:150px;height:40px;font-size:1.5rem'>確 認</button>
