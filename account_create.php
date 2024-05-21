@@ -226,6 +226,7 @@ $token=csrf_create();
 							console_log(response)
 							account_u.value = response.Users[0]
 							account_r.value = response.Users_webrez[0]
+							account_r.value["loginrez"] = (account_r.value["loginrez"]==="on")?true:false
 							moto_mail.value = response.Users[0].mail
 							csrf.value = response.token
 						})

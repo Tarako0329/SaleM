@@ -682,11 +682,18 @@
 					}else{
 						URL.value = rtURL.value
 					}
-					send_msg.value = `お買い上げ、ありがとうございます。\r\n領収書はこちらからダウンロードしてください。\r\n${URL.value + '&sb=on&tp=1&k=' + keishou.value + '&s=' + oaite.value}`
 					DL_URL.value = URL.value + '&sb=on&tp=1&k=' + keishou.value + '&s=' + oaite.value
+					send_msg.value = `お買い上げ、ありがとうございます。\r\n領収書はこちらからダウンロードしてください。\r\n${DL_URL.value}`
 					const myModal = new bootstrap.Modal(document.getElementById('ryoushuu'), {})
 					myModal.show()
 				}
+
+				watch([oaite,keishou],()=>{
+					DL_URL.value = URL.value + '&sb=on&tp=1&k=' + keishou.value + '&s=' + oaite.value
+					send_msg.value = `お買い上げ、ありがとうございます。\r\n領収書はこちらからダウンロードしてください。\r\n${DL_URL.value}`
+				})
+
+
 				const order_list_area = ref()
 				const cartbtn_show = ref()
 				const order_list_area_set = () => {
@@ -793,7 +800,7 @@
 					get_UriageList()
 					v_get_gio()
 					order_list_area_set()
-					//IDD_Read('LocalParameters','EventName',set_EventName)
+					IDD_Read('LocalParameters','EventName',set_EventName)
 					window.addEventListener('resize', order_list_area_set)
 				})
 				return{
