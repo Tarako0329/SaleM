@@ -445,7 +445,7 @@
 				<div class='modal-footer'>
 					<button type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1' @click='QRout()'><i class="bi bi-qr-code"></i></button>
 					<button type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1' @click='prv()'><i class="bi bi-display"></i></button>
-					<a :href='`https://line.me/R/share?text=${rtn_send_msg}`' type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1'>
+					<a :href='`https://line.me/R/share?text=${send_msg}`' type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1'>
 						<i class="bi bi-line line-green"></i>
 					</a>
 					<a :href='DL_URL' download='RyoushuuSho.pdf' type='button' style='font-size: 2rem;' class='btn btn-outline-primary'>
