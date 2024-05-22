@@ -228,8 +228,7 @@ try{
 		,"status" => "alert-success"
 		,"csrf_create" => $token
 		//,"RyoushuURL" => ROOT_URL."ryoushuu_pdf.php?u=".rot13encrypt2($UriageNO)."&i=".rot13encrypt2($_SESSION["user_id"])
-		,"RyoushuURL" => ROOT_URL."ryoushuu_pdf.php"
-		,"UriageNO" => $UriageNO
+		,"RyoushuURL" => ROOT_URL."ryoushuu_pdf.php?u=".($UriageNO)."&i=".($_SESSION["user_id"])
 	);
 	header('Content-type: application/json');
 	echo json_encode($msg, JSON_UNESCAPED_UNICODE);

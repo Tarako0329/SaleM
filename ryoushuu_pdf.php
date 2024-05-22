@@ -11,9 +11,10 @@
 	$dotenv->load();
 
 	define("EXEC_MODE",$_ENV["EXEC_MODE"]);
-	if(EXEC_MODE==="Local"){
+	/*if(EXEC_MODE==="Local"){
 			ini_set('error_log', 'C:\xampp\htdocs\SaleM\php_error.log');
-	}
+	}*/
+	log_writer2("\$GET",$_GET,"lv3");
 
 	define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
 	//DB接続関連

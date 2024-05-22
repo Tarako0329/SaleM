@@ -671,6 +671,7 @@
 					var cvs = document.getElementById("qr");
 				}
 				const prv = () =>{
+					//プレビュー印刷
 					if(confirm("表示する領収書をお客様に発行しますか？")===true){
 						window.open(URL.value + '&sb=on&tp=1&k=' + keishou.value + '&s=' + oaite.value, '_blank')
 					}else{
@@ -684,15 +685,25 @@
 					}else{
 						URL.value = rtURL.value
 					}
-					DL_URL.value = URL.value + encodeURIComponent(`?u=${rtUriageNO}&i=${p_uid}&sb=on&tp=1&k=${keishou.value}&s=${oaite.value}`)
-					send_msg.value = `お買い上げ、ありがとうございます。\r\n領収書はこちらからダウンロードしてください。\r\n${encodeURI(DL_URL.value)}`
-					const myModal = new bootstrap.Modal(document.getElementById('ryoushuu'), {})
-					myModal.show()
+					DL_URL.value = URL.value + (`&sb=on&tp=1&k=${keishou.value}&s=${oaite.value}`)
+					send_msg.value = `お買い上げ、ありがとうございます。\n領収書はこちらからダウンロードしてください。\n${(DL_URL.value)}`
+					axios.get(`ajax_rtn_urlencode.php?url="${encodeURIComponent(send_msg.value)}"`)
+					.then((response)=>{
+						console_log(response.data)
+						send_msg.value = response.data
+						const myModal = new bootstrap.Modal(document.getElementById('ryoushuu'), {})
+						myModal.show()
+					})
 				}
 
 				watch([oaite,keishou],()=>{
-					DL_URL.value = URL.value + encodeURIComponent(`?u=${rtUriageNO}&i=${p_uid}&sb=on&tp=1&k=${keishou.value}&s=${oaite.value}`)
-					send_msg.value = `お買い上げ、ありがとうございます。\r\n領収書はこちらからダウンロードしてください。\r\n${(DL_URL.value)}`
+					DL_URL.value = URL.value + (`&sb=on&tp=1&k=${keishou.value}&s=${oaite.value}`)
+					send_msg.value = `お買い上げ、ありがとうございます。\n領収書はこちらからダウンロードしてください。\n${(DL_URL.value)}`
+					axios.get(`ajax_rtn_urlencode.php?url="${encodeURIComponent(send_msg.value)}"`)
+					.then((response)=>{
+						console_log(response.data)
+						send_msg.value = response.data
+					})
 				})
 
 
