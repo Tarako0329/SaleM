@@ -456,6 +456,7 @@
 				//const csrf = ref('<?php echo $token; ?>') 
 				const csrf = ref('') 
 				const rtURL = ref('')
+				const rtUriageNO = ref('')
 
 				const chk_csrf = () =>{
 					console_log(`ajax_getset_token start`,'lv3')
@@ -503,6 +504,7 @@
 							alert_status.value[1]=response.data.status
 							csrf.value = response.data.csrf_create
 							rtURL.value = response.data.RyoushuURL
+							rtUriageNO.value = response.data.UriageNO
 							if(response.data.status==='alert-success'){
 								reset_order()
 								order_panel_show("close")
@@ -682,15 +684,15 @@
 					}else{
 						URL.value = rtURL.value
 					}
-					DL_URL.value = URL.value + '&sb=on&tp=1&k=' + keishou.value + '&s=' + oaite.value
+					DL_URL.value = URL.value + encodeURIComponent(`?u=${rtUriageNO}&i=${p_uid}&sb=on&tp=1&k=${keishou.value}&s=${oaite.value}`)
 					send_msg.value = `お買い上げ、ありがとうございます。\r\n領収書はこちらからダウンロードしてください。\r\n${encodeURI(DL_URL.value)}`
 					const myModal = new bootstrap.Modal(document.getElementById('ryoushuu'), {})
 					myModal.show()
 				}
 
 				watch([oaite,keishou],()=>{
-					DL_URL.value = URL.value + '&sb=on&tp=1&k=' + keishou.value + '&s=' + oaite.value
-					send_msg.value = `お買い上げ、ありがとうございます。\r\n領収書はこちらからダウンロードしてください。\r\n${encodeURI(DL_URL.value)}`
+					DL_URL.value = URL.value + encodeURIComponent(`?u=${rtUriageNO}&i=${p_uid}&sb=on&tp=1&k=${keishou.value}&s=${oaite.value}`)
+					send_msg.value = `お買い上げ、ありがとうございます。\r\n領収書はこちらからダウンロードしてください。\r\n${(DL_URL.value)}`
 				})
 
 
