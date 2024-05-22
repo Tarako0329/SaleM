@@ -683,14 +683,14 @@
 						URL.value = rtURL.value
 					}
 					DL_URL.value = URL.value + '&sb=on&tp=1&k=' + keishou.value + '&s=' + oaite.value
-					send_msg.value = `お買い上げ、ありがとうございます。\r\n領収書はこちらからダウンロードしてください。\r\n${DL_URL.value}`
+					send_msg.value = `お買い上げ、ありがとうございます。\r\n領収書はこちらからダウンロードしてください。\r\n${encodeURI(DL_URL.value)}`
 					const myModal = new bootstrap.Modal(document.getElementById('ryoushuu'), {})
 					myModal.show()
 				}
 
 				watch([oaite,keishou],()=>{
 					DL_URL.value = URL.value + '&sb=on&tp=1&k=' + keishou.value + '&s=' + oaite.value
-					send_msg.value = `お買い上げ、ありがとうございます。\r\n領収書はこちらからダウンロードしてください。\r\n${DL_URL.value}`
+					send_msg.value = `お買い上げ、ありがとうございます。\r\n領収書はこちらからダウンロードしてください。\r\n${encodeURI(DL_URL.value)}`
 				})
 
 
