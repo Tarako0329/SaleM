@@ -21,7 +21,7 @@ if(!empty($_POST)){
 	$i=0;
 	foreach($UriageList as $row){
 		//$UriageList[$i]["URL"] = ROOT_URL."ryoushuu_pdf.php?u=".rot13encrypt2($row["UriageNO"])."&i=".rot13encrypt2($_POST["user_id"]);//領収書リンク
-		$UriageList[$i]["URL"] = ROOT_URL."ryoushuu_pdf.php?u=".($row["UriageNO"])."&i=".($_POST["user_id"]);//領収書リンク
+		$UriageList[$i]["URL"] = "ryoushuu_pdf.php?u=".($row["UriageNO"])."&i=".($_POST["user_id"]);//領収書リンク
 		$i++;
 	}
 }else{

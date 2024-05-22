@@ -31,6 +31,18 @@
         var ZEIHASU = <?php echo empty($ZeiHasu)?0:$ZeiHasu ;?>;
         var WEATHER_ID = '<?php echo WEATHER_ID; ?>'
         var COLOR_NO 
+
+        var D_ROOT_URL = '<?php echo ROOT_URL; ?>'  //サブドメインURL
+        var P_ROOT_URL   //ダイレクトパスURL
+        if (KANKYO==="Local"){
+            P_ROOT_URL = '<?php echo ROOT_URL; ?>' 
+        }else if (KANKYO==="Test"){
+            P_ROOT_URL = 'https://greeen-sys.com/SaleM/TEST/' 
+        }else if (KANKYO==="Trial"){
+            P_ROOT_URL = 'https://greeen-sys.com/SaleM/WebRez_Trial/' 
+        }else if (KANKYO==="Product"){
+            P_ROOT_URL = 'https://greeen-sys.com/SaleM/WebRez/' 
+        }
     </script>
     <script src="script/function.js?<?php echo $time; ?>"></script>
     <script src="script/indexeddb.js?<?php echo $time; ?>"></script>

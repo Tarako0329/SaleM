@@ -679,7 +679,7 @@
 						DL_URL.value = URL.value + (`&sb=off&tp=1&k=${keishou.value}&s=${oaite.value}`)
 						//window.open(URL.value + '&sb=off&tp=1&k=' + keishou.value + '&s=' + oaite.value, '_blank')
 					}
-					window.open(DL_URL.value, '_blank')
+					window.open(P_ROOT_URL + DL_URL.value, '_blank')
 				}
 
 				const open_R = (setURL) =>{
@@ -689,7 +689,7 @@
 						URL.value = rtURL.value
 					}
 					DL_URL.value = URL.value + (`&sb=on&tp=1&k=${keishou.value}&s=${oaite.value}`)
-					send_msg.value = `お買い上げ、ありがとうございます。\n領収書はこちらからダウンロードしてください。\n${(DL_URL.value)}`
+					send_msg.value = `${oaite.value} ${keishou.value}\n\nお買い上げ、ありがとうございます。\n領収書はこちらからダウンロードしてください。\n${(D_ROOT_URL+DL_URL.value)}`
 					axios.get(`ajax_rtn_urlencode.php?url="${encodeURIComponent(send_msg.value)}"`)
 					.then((response)=>{
 						console_log(response.data)
@@ -701,7 +701,7 @@
 
 				watch([oaite,keishou],()=>{
 					DL_URL.value = URL.value + (`&sb=on&tp=1&k=${keishou.value}&s=${oaite.value}`)
-					send_msg.value = `お買い上げ、ありがとうございます。\n領収書はこちらからダウンロードしてください。\n${(DL_URL.value)}`
+					send_msg.value = `${oaite.value} ${keishou.value}\n\nお買い上げ、ありがとうございます。\n領収書はこちらからダウンロードしてください。\n${(D_ROOT_URL+DL_URL.value)}`
 					axios.get(`ajax_rtn_urlencode.php?url="${encodeURIComponent(send_msg.value)}"`)
 					.then((response)=>{
 						console_log(response.data)
