@@ -673,10 +673,13 @@
 				const prv = () =>{
 					//プレビュー印刷
 					if(confirm("表示する領収書をお客様に発行しますか？")===true){
-						window.open(URL.value + '&sb=on&tp=1&k=' + keishou.value + '&s=' + oaite.value, '_blank')
+						DL_URL.value = URL.value + (`&sb=on&tp=1&k=${keishou.value}&s=${oaite.value}`)
+						//window.open(URL.value + '&sb=on&tp=1&k=' + keishou.value + '&s=' + oaite.value, '_blank')
 					}else{
-						window.open(URL.value + '&sb=off&tp=1&k=' + keishou.value + '&s=' + oaite.value, '_blank')
+						DL_URL.value = URL.value + (`&sb=off&tp=1&k=${keishou.value}&s=${oaite.value}`)
+						//window.open(URL.value + '&sb=off&tp=1&k=' + keishou.value + '&s=' + oaite.value, '_blank')
 					}
+					window.open(DL_URL.value, '_blank')
 				}
 
 				const open_R = (setURL) =>{
