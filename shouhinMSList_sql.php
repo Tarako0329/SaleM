@@ -1,18 +1,23 @@
 <?php
 //POST ONLY
 require "php_header.php";
+log_writer2("shouhinMSList_sql.php > \$_POST","test","lv3");
+log_writer2("shouhinMSList_sql.php > \$_POST",$_POST,"lv3");
 
-$rtn = csrf_checker(["shouhinMSList.php"],["P","C","S"]);
+//$rtn = csrf_checker(["shouhinMSList.php"],["P","C","S"]);
+$rtn = csrf_checker(["shouhinMSList.php"],["P","S"]);
 if($rtn !== true){
     redirect_to_login($rtn);
 }
 
 check_session_userid($pdo_h);
-$_SESSION["MSG"]= "更新対象がありませんでした。";
-$_SESSION["alert"] = "alert-warning";
+//$_SESSION["MSG"]= "更新対象がありませんでした。";
+//$_SESSION["alert"] = "alert-warning";
+$MSG= "更新対象がありませんでした。";
+$alert = "alert-warning";
 $sqllog="";
 
-//log_writer2("shouhinMSList_sql.php > \$_POST",$_POST,"lv3");
+
 $array = $_POST["ORDERS"];
 $sqlstr = "";
 try{
@@ -63,8 +68,10 @@ try{
     $sqllog .= rtn_sqllog("commit",[]);
     sqllogger($sqllog,0);
 
-    $_SESSION["MSG"]= "更新されました。";
-    $_SESSION["alert"] = "alert-success";
+    //$_SESSION["MSG"]= "更新されました。";
+    //$_SESSION["alert"] = "alert-success";
+    $MSG = "更新されました。";
+    $alert = "alert-success";
     
 }catch(Exception $e){
     $result="failed";
@@ -72,8 +79,10 @@ try{
     $sqllog .= rtn_sqllog("rollBack",[]);
     sqllogger($sqllog,$e);
     
-    $_SESSION["MSG"]= "更新が失敗しました。";
-    $_SESSION["alert"] = "alert-danger";
+    //$_SESSION["MSG"]= "更新が失敗しました。";
+    //$_SESSION["alert"] = "alert-danger";
+    $MSG = "更新が失敗しました。";
+    $alert = "alert-danger";
 
 }
     
@@ -82,8 +91,16 @@ $csrf_create = csrf_create();
 $stmt  = null;
 $pdo_h = null;
 //log_writer2("shouhinMSList_sql.php > \$_SESSION",$_SESSION,"lv3");
-header("HTTP/1.1 301 Moved Permanently");
-header("Location: shouhinMSList.php?csrf_token=".$csrf_create);
+//header("HTTP/1.1 301 Moved Permanently");
+//header("Location: shouhinMSList.php?csrf_token=".$csrf_create);
+
+$msg = array(
+    "MSG" => $MSG
+    ,"status" => $alert
+    ,"csrf_create" => $csrf_create
+);
+header('Content-type: application/json');
+echo json_encode($msg, JSON_UNESCAPED_UNICODE);
 
 exit();
 

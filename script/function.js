@@ -12,7 +12,7 @@ const console_log=(log,lv)=>{
   }else{
     return 0;
   }
-}
+} 
 
 const get_value = (value,zei,kbn) => {
   //値段、税率、値段が税込か税抜か をパラメータで渡すとreturnを配列で返す

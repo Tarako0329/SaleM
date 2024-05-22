@@ -87,7 +87,7 @@
 	</style>
 </head>
 <body>
-	<div  id='register'>
+	<div id='register'>
 	<form method = 'post' id='form1' @submit.prevent='on_submit'>
 		<input v-model='csrf' type='hidden' name='csrf_token' >
 		<input v-model='rg_mode' type='hidden' name='mode'> <!--レジor個別売上or在庫登録-->
@@ -517,7 +517,7 @@
 	</div>
 
 	</div><!-- <div  id='register'> -->
-	<script src="EVregi_vue.js?<?php echo $time; ?>"></script>-
+	<script src="EVregi_vue.js?<?php echo $time; ?>"></script>
 	<script>
 		REZ_APP('<?php echo $_SESSION["user_id"]."','".$timeout."','".$RG_MODE; ?>').mount('#register');
 		/*

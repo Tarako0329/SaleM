@@ -18,19 +18,19 @@
 				//スクロールスムース
 				const get_scroll_target = ref('description')
 				const scroller = (target_id) => {//ヘッダー部のメニュージャンルを選択時に対象のジャンルまでスクロールする機能
-					console_log(`*****【 scroller start 】*****`,'lv3') 
+					console_log(`*****【 scroller start 】*****`) 
 					let itemHeight
 					const target_elem = document.querySelector(get_scroll_target.value)
 					itemHeight = target_elem.getBoundingClientRect().top + window.pageYOffset - 220
 					
 					scrollTo(0, itemHeight);
-					console_log(`*****【 scroller end 】*****`,'lv3') 
+					console_log(`*****【 scroller end 】*****`) 
 				}
 
 				//売上取得関連
 				const UriageList = ref([])		//売上リスト
 				const get_UriageList = () => {//売上リスト取得ajax
-					console_log(`*****【 get_UriageList start 】*****`,'lv3');
+					console_log(`*****【 get_UriageList start 】*****`);
 					let params = new URLSearchParams();
 					//params.append('user_id', '<?php echo $_SESSION["user_id"];?>');
 					params.append('user_id', p_uid);
@@ -39,13 +39,13 @@
 					.post('ajax_get_Uriage.php',params)
 					.then((response) => {
 						UriageList.value = [...response.data]
-						console_log('get_UriageList succsess','lv3')
+						console_log('get_UriageList succsess')
 					})
 					.catch((error) => {
-						console_log(`get_UriageList ERROR:${error}`,'lv3')
+						console_log(`get_UriageList ERROR:${error}`)
 					})
 					.finally(()=>{
-						console_log(`*****【 get_UriageList end 】*****`,'lv3');
+						console_log(`*****【 get_UriageList end 】*****`);
 					});
 					
 				}//売上リスト取得ajax
@@ -152,7 +152,7 @@
 							}
 							if(pay_bk !== zeikomisougaku){
 								alert("調整失敗")
-								console_log(`それでもだめなのか！：${Number(pay_bk) - Number(zeikomisougaku)}`,'lv3')
+								console_log(`それでもだめなのか！：${Number(pay_bk) - Number(zeikomisougaku)}`)
 							}
 							order_panel_show("show")
 						}
@@ -172,7 +172,7 @@
 
 				const ZeiChange = ref('0')	//商品マスタの税率変更スイッチ（0：商品マスタ初期値 8:テイクアウト 8% 10:イートイン10%）
 				watch([ZeiChange],() => {		//商品マスタの税率変更スイッチ
-					console_log(`*****【 watch ZeiChange(${ZeiChange.value}) start 】*****`,'lv3')
+					console_log(`*****【 watch ZeiChange(${ZeiChange.value}) start 】*****`)
 					if(ZeiChange.value==='0'){//商品マスタの状態に戻す
 						shouhinMS.value.forEach((list) =>{
 							list.tanka_zei = Number(list.bk_tanka_zei)
@@ -193,12 +193,12 @@
 					}else{
 						
 					}
-					console_log(`*****【 watch ZeiChange(${ZeiChange.value}) end 】*****`,'lv3')
+					console_log(`*****【 watch ZeiChange(${ZeiChange.value}) end 】*****`)
 				})//商品マスタの税率変更スイッチ
 
 				const ordercounter = (e) => {//注文増減ボタン
-					//console_log(e.target.disabled,'lv3')
-					//console_log(shouhinMS_filter.value[e.target.value],'lv3')
+					//console_log(e.target.disabled)
+					//console_log(shouhinMS_filter.value[e.target.value])
 
 					if(chk_register_show.value==="register"){
 						alert('『戻る』ボタンをタップしてから増減してください。')
@@ -211,7 +211,7 @@
 					shouhinMS_filter.value[index].ordercounter = Number(shouhinMS_filter.value[index].ordercounter) + Number(1)
 
 					//オーダーリストの数増減
-					//console_log(`${shouhinMS_filter.value[index].shouhinCD}:${shouhinMS_filter.value[index].hyoujimei}`,'lv3')
+					//console_log(`${shouhinMS_filter.value[index].shouhinCD}:${shouhinMS_filter.value[index].hyoujimei}`)
 					const order_list_index = order_list.value.findIndex(//同一商品・同一税率の注文があった場合、該当レコードのindexを取得。ない場合は[-1]を返す
 						item => item.CD == shouhinMS_filter.value[index].shouhinCD && item.ZEIKBN == shouhinMS_filter.value[index].zeiKBN
 					)
@@ -244,7 +244,7 @@
 				const order_list_pm = (index,value) =>{
 					//同一パネルでイートインとテイクアウトが混在した場合にパネルからのマイナスカウント操作が
 					//煩雑になるため、マイナスはオーダーリストからのみとする
-					//console_log(index,'lv3')
+					//console_log(index)
 					//オーダーリストの増減
 					if(chk_register_show.value==="register"){
 						alert('『戻る』ボタンをタップしてから増減してください。')
@@ -331,7 +331,7 @@
 				const CHOUSEI_TYPE = ref('sougaku')
 				const par = ref(0)
 				const keydown_waribiki = (e) => {//電卓ボタンの処理
-					//console_log(e.target.innerHTML,'lv3')
+					//console_log(e.target.innerHTML)
 					if(e.target.innerHTML==="C"){
 						par.value = 0
 						Revised_pay.value=""
@@ -445,7 +445,7 @@
 						while(total_area.value.offsetHeight < total_area.value.scrollHeight){
 							size = size - 0.1
 							total_area.value.style = `font-size:${size}rem;`
-							//console_log(`${total_area.value.offsetHeight}:${total_area.value.scrollHeight}(${size})`,'lv3') 
+							//console_log(`${total_area.value.offsetHeight}:${total_area.value.scrollHeight}(${size})`) 
 						}
 					}
 				}
@@ -456,22 +456,21 @@
 				//const csrf = ref('<?php echo $token; ?>') 
 				const csrf = ref('') 
 				const rtURL = ref('')
-				const rtUriageNO = ref('')
 
 				const chk_csrf = () =>{
-					console_log(`ajax_getset_token start`,'lv3')
+					console_log(`ajax_getset_token start`)
 					if(csrf.value==null || csrf.value==''){
 						axios
 						.get('ajax_getset_token.php')
 						.then((response) => {
 							csrf.value = response.data
-							console_log(response.data,'lv3')
+							console_log(response.data)
 						})
 						.catch((error)=>{
-							console_log(`ajax_getset_token ERROR:${error}`,'lv3')
+							console_log(`ajax_getset_token ERROR:${error}`)
 						})
 					}else{
-						console_log(`ajax_getset_token OK:${csrf.value}`,'lv3')
+						console_log(`ajax_getset_token OK:${csrf.value}`)
 					}
 					return 0
 				} 
@@ -479,10 +478,10 @@
 				const rg_mode = ref(p_mode)	//レジモード
 
 				const on_submit = async(e) => {//登録・submit/
-					console_log('on_submit start','lv3')
+					console_log('on_submit start')
 					loader.value = true
 					rtn = await v_get_gio()	//住所再取得
-					console_log('after v_get_gio?','lv3')
+					console_log('after v_get_gio?')
 
 					let form_data = new FormData(e.target)
 					let params = new URLSearchParams (form_data)
@@ -498,13 +497,12 @@
 						//.post(php_name,params,{timeout: <?php echo $timeout; ?>}) //php側は15秒でタイムアウト
 						.post(php_name,params,{timeout:p_timeout }) //php側は15秒でタイムアウト
 						.then((response) => {
-							console_log(`on_submit SUCCESS`,'lv3')
-							//console_log(response.data,'lv3')
+							console_log(`on_submit SUCCESS`)
+							//console_log(response.data)
 							MSG.value = response.data.MSG
 							alert_status.value[1]=response.data.status
 							csrf.value = response.data.csrf_create
 							rtURL.value = response.data.RyoushuURL
-							rtUriageNO.value = response.data.UriageNO
 							if(response.data.status==='alert-success'){
 								reset_order()
 								order_panel_show("close")
@@ -514,7 +512,7 @@
 							}
 						})
 						.catch((error) => {
-							console_log(`on_submit ERROR:${error}`,'lv3')
+							console_log(`on_submit ERROR:${error}`)
 							MSG.value = error.response.data.MSG
 							csrf.value = error.response.data.csrf_create
 							alert_status.value[1]='alert-danger'
@@ -536,7 +534,7 @@
 					}
 				})
 				const keydown = (e) => {//電卓ボタンの処理
-					//console_log(e.target.innerHTML,'lv3')
+					//console_log(e.target.innerHTML)
 					if(e.target.innerHTML==="C"){
 						deposit.value = 0
 					}else if(e.target.innerHTML==="ちょうど"){
@@ -562,9 +560,9 @@
 				const vjusho = ref('')
 				const v_get_gio = () =>{//緯度経度,天気情報取得
 					return new Promise(resolve => {
-						console_log('v_get_gio start','lv3')
+						console_log('v_get_gio start')
 						if(labels_address_check.value===true){
-							console_log('v_get_gio no_exec','lv3')
+							console_log('v_get_gio no_exec')
 							resolve(false)	//位置情報なし
 						}else{
 							navigator.geolocation.getCurrentPosition(
@@ -584,7 +582,7 @@
 
 									await res_add
 									.then((response) => (
-										//console_log(response.data,'lv3')
+										//console_log(response.data)
 										address = response.data.results
 										// 変換表から都道府県などを取得
 										,muniData = GSI.MUNI_ARRAY[address.muniCd]
@@ -595,13 +593,13 @@
 										//,jusho_es = escape(jusho.replace(/\s+/g, ""))								
 									))
 									.catch((error) => {
-										console_log(`v_get_gio[address] ERROR:${error}`,'lv3')
+										console_log(`v_get_gio[address] ERROR:${error}`)
 										rtn_val = false
 									})
 
 									await res_weat
 									.then((response) => {
-										//console_log(response.data,'lv3')
+										//console_log(response.data)
 										weather.value = response.data.weather[0].main
 										description.value = response.data.weather[0].description
 										temp.value = response.data.main.temp
@@ -609,11 +607,11 @@
 										icon.value = response.data.weather[0].icon + '.png'
 									})
 									.catch((error) => {
-										console_log(`v_get_gio[weather] ERROR:${error}`,'lv3')
+										console_log(`v_get_gio[weather] ERROR:${error}`)
 										rtn_val = false
 									})
 
-									console_log('v_get_gio finish','lv3')
+									console_log('v_get_gio finish')
 									if(rtn_val===false){
 										resolve(false) //axiosでエラー
 										labels_address_check.value=true //住所対象外のチェックを入れる
@@ -649,7 +647,7 @@
 					// 入力された文字列を取得
 					let guid = getGUID()
 					let userInput = URL.value + '&qr=' + guid + '&tp=1&k=' + keishou.value + '&s=' + oaite.value
-					console_log(userInput,'lv3')
+					console_log(userInput)
 					var query = userInput.split(' ').join('+');
 					// QRコードの生成
 					(function() {
@@ -713,7 +711,7 @@
 				const order_list_area = ref()
 				const cartbtn_show = ref()
 				const order_list_area_set = () => {
-					console_log('order_list_area_set start','lv3')
+					console_log('order_list_area_set start')
 					let sizeH = window.innerHeight
 					let sizeW = window.innerWidth
 					//console_log(size)
@@ -729,7 +727,7 @@
 				const order_list = ref([])
 				const order_panel_show_flg = ref(true)
 				const order_panel_show = (status) => {
-					console_log(`order_panel_show now:`,'lv3')
+					console_log(`order_panel_show now:`)
 					let sizeW = window.innerWidth
 					let sizeH = window.innerHeight
 					
@@ -799,8 +797,8 @@
 				})
 
 				onMounted(() => {
-					//console_log(get_value(1000,0.1,'IN'),'lv3')
-					console_log('onMounted','lv3')
+					//console_log(get_value(1000,0.1,'IN'))
+					console_log('onMounted')
 					chk_csrf()
 					total_area.value.style["fontSize"]="3.3rem"
 					//get_shouhinMS()

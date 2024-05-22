@@ -42,7 +42,9 @@
 	<TITLE><?php echo $title." 取扱商品 確認・編集";?></TITLE>
 </head>
 <BODY>
-	<form method='post' action='shouhinMSList_sql.php' id='form1'>
+	<div id='app'>
+	<!--<form method='post' action='shouhinMSList_sql.php' id='form1'>-->
+	<form method='post' @submit.prevent='on_submit'>
 		<header class='header-color common_header' style='flex-wrap:wrap'>
 			<div class='title' style='width: 60%;'>
 				<a href='menu.php'><?php echo $title;?></a>
@@ -91,7 +93,8 @@
 				<template v-if='MSG!==""'>
 					<div :class='alert_status' role='alert'>{{MSG}}</div>
 				</template>
-				<input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
+				<!--<input type='hidden' name='csrf_token' value='<?php //echo $csrf_create; ?>'>-->
+				<input type='hidden' name='csrf_token' :value='csrf'>
 				
 				<table class='table result_table item_1' style='width:100%;max-width:630px;table-layout: fixed;'>
 					<thead>
@@ -114,7 +117,9 @@
 						</tr>
 					
 					</thead>
-					<tbody v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
+					<!--<tbody v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>-->
+					<tbody>
+						<template v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
 						<tr>
 							<td style='font-size:1.7rem;font-weight:700;' colspan='2'>{{list.shouhinCD}}:{{list.shouhinNM}}</td><!--商品名-->
 							<td style='padding:10px 10px;'>
@@ -124,19 +129,19 @@
 									<label v-if='list.disp_rezi===true' class='form-check-label' :for='`${list.shouhinCD}`'>表示</label>
 								</div>
 							</td>
-							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' align='right'><!--変更前価格-->
+							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' class='text-end'><!--変更前価格-->
 								￥{{Number(list.moto_kin).toLocaleString()}}
 							</td>
 						</tr>
 						<tr>
 							<td><input @blur='set_new_value(index,`#new_val_${index}`)' :id='`new_val_${index}`' type='number' class='form-contral' style='width:100%;text-align:right' placeholder='新価格' ></td>   <!--単価修正欄 -->
-							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;color:blue;' align='right'>
+							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;color:blue;' class='text-end'>
 								￥{{Number(list.tanka).toLocaleString()}}
 							</td><!--登録単価-->
-							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;color:blue;' align='right'><!--list.tanka_zei-->
+							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;color:blue;' class='text-end'><!--list.tanka_zei-->
 								￥{{Number(list.tanka_zei).toLocaleString()}}
 							</td> 
-							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;color:blue;' align='right'><!--list.tanka_zei-->
+							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;color:blue;' class='text-end'><!--list.tanka_zei-->
 								￥{{(Number(list.tanka) + Number(list.tanka_zei)).toLocaleString()}}
 							</td> 
 						</tr>
@@ -167,6 +172,7 @@
 							<input type='hidden' :name ='`ORDERS[${index}][tanka]`' :value='list.tanka'>
 							<input type='hidden' :name ='`ORDERS[${index}][shouhizei]`' :value='list.tanka_zei'>
 						</tr>
+						</template>
 					</tbody>
 				</table>
 			</div>
@@ -179,22 +185,20 @@
 			<button v-if='chk==="on"' type='submit' class='btn--chk item_3' style='border-radius:0;border-left: thick double #32a1ce;' name='commit_btn' >登　録</button>
 		</footer>
 	</form>
+	<div class="loader-wrap" v-show='loader'>
+		<div class="loader">Loading...</div>
+	</div>
+	</div>
 	<script>
 		window.onload = function() {
 			// Enterキーが押された時にSubmitされるのを抑制する
-			document.getElementById("form1").onkeypress = (e) => {
-				// form1に入力されたキーを取得
-				const key = e.keyCode || e.charCode || 0;
-				// 13はEnterキーのキーコード
-				if (key == 13) {
-					// アクションを行わない
-					e.preventDefault();
-				}
-			}
+			document.getElementById("app").onkeypress = (e) => {const key = e.keyCode || e.charCode || 0;}
 		};
 	</script><!--js-->
-
+	<script src="shouhinMSList_vue.js?<?php echo $time; ?>"></script>
 	<script>
+		REZ_APP().mount('#app');
+		/*
 		const { createApp, ref, onMounted, computed, VueCookies, watch } = Vue
 		createApp({
 			setup(){
@@ -202,23 +206,6 @@
 				const shouhinMS = ref([])			//商品マスタ
 				const shouhinMS_BK = ref([])	//商品マスタ修正前バックアップ
 
-				/*const get_shouhinMS = () => {//商品マスタ取得ajax
-					console_log("get_shouhinMS start",'lv3')
-					let params = new URLSearchParams()
-					params.append('user_id', '<?php echo $_SESSION["user_id"];?>')
-					axios
-					.post('ajax_get_ShouhinMS.php',params)
-					.then((response) => {
-						//console_log(response.data,'lv3')
-						shouhinMS.value = [...response.data]
-						shouhinMS_BK.value = JSON.parse(JSON.stringify(shouhinMS.value))
-					})
-					.catch((error) => {
-						console_log(`get_shouhinMS ERROR:${error}`,'lv3')
-					})
-					return 0;
-				};//商品マスタ取得ajax*/
-				
 				//商品マスタのソート・フィルタ関連
 				const chk_register_show = ref('all')	//フィルタ
 				const order_by = ref(['seq','▼'])			//ソート（項目・昇順降順）
@@ -331,15 +318,15 @@
 				const upd_zei_kominuki = ref('IN')
 				const zm = [
 										<?php
-										reset($ZEIresult);
-										foreach($ZEIresult as $row2){
-												echo "{税区分:".$row2["zeiKBN"].",税率:".($row2["zeiritu"]/100)."},\n";
-										}
+										//reset($ZEIresult);
+										//foreach($ZEIresult as $row2){
+										//		echo "{税区分:".$row2["zeiKBN"].",税率:".($row2["zeiritu"]/100)."},\n";
+										//}
 										?> 
 								]
 				const return_tax = (kingaku,zeikbn,kominuki) => {
-					console_log('return_tax start','lv3')
-					console_log(zm,'lv3')
+					console_log('return_tax start')
+					console_log(zm)
 					let zmrec = ([])
 					zmrec = zm.filter((list)=>{
 							return list.税区分 == zeikbn
@@ -351,7 +338,7 @@
 					//単価入力欄から本体と消費税を算出し、セットする
 					const new_val = document.querySelector(new_val_id)
 					let values 
-					console_log(`set_new_value start (index => ${index} new_val_id => ${new_val_id} new_val => ${new_val})`,'lv3')
+					console_log(`set_new_value start (index => ${index} new_val_id => ${new_val_id} new_val => ${new_val})`)
 
 					if(new_val.value !== ''){
 						values = return_tax(new_val.value, shouhinMS_filter.value[index].zeiKBN, upd_zei_kominuki.value)
@@ -373,24 +360,25 @@
 				}
 
 				watch(upd_zei_kominuki,() => {
-					shouhinMS.value.forEach((row,index) => {
+					//shouhinMS.value.forEach((row,index) => {
+					shouhinMS_filter.value.forEach((row,index) => {
 						set_new_value(index,`#new_val_${index}`)
 					})
 				})
 				const delete_item = (item,link) =>{
-					console_log(item,'lv3')
-					console_log(link,'lv3')
+					console_log(item)
+					console_log(link)
 					if(confirm(`${item} を削除します。よろしいですか？`)===true){
 						window.location.href = link
 					}
 					
 				}
 
-				const MSG = ref('<?php echo $MSG; ?>')
-				const alert_status = ref(['alert','<?php echo $ALERT; ?>'])
+				const MSG = ref('<?php //echo $MSG; ?>')
+				const alert_status = ref(['alert','<?php //echo $ALERT; ?>'])
 
 				onMounted(() => {
-					console_log('onMounted','lv3')
+					console_log('onMounted')
 					//get_shouhinMS()
 					GET_SHOUHINMS()
 						.then((response)=>{
@@ -425,6 +413,7 @@
 				}
 			}
 		}).mount('#form1');
+		*/
 	</script><!--Vue3js-->
 </BODY>
 <!--シェパードナビshepherd

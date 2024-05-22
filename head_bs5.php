@@ -26,7 +26,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.js"></script><!--QRコードライブラリ-->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/9.0.0/decimal.min.js"></script><!--小数演算ライブラリ-->
 
-    <script>
+    <script>//グローバル変数
         var KANKYO = <?php echo "'".EXEC_MODE."'" ;?>;
         var ZEIHASU = <?php echo empty($ZeiHasu)?0:$ZeiHasu ;?>;
         var WEATHER_ID = '<?php echo WEATHER_ID; ?>'
@@ -43,6 +43,12 @@
         }else if (KANKYO==="Product"){
             P_ROOT_URL = 'https://greeen-sys.com/SaleM/WebRez/' 
         }
+        const ZEIM = [//税区分マスタ
+					{税区分:0,税区分名:'非課税',税率:0},
+					{税区分:1001,税区分名:'8%',税率:0.08},
+					{税区分:1101,税区分名:'10%',税率:0.1},
+				]
+
     </script>
     <script src="script/function.js?<?php echo $time; ?>"></script>
     <script src="script/indexeddb.js?<?php echo $time; ?>"></script>
