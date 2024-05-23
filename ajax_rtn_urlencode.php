@@ -12,7 +12,6 @@ $dotenv->load();
 define("EXEC_MODE",$_ENV["EXEC_MODE"]);
 
 log_writer2("\$GET[url]",($_GET["url"]),"lv3");
-log_writer2("\$GET[url] decode",rawurldecode($_GET["url"]),"lv3");
 
 if(!empty($_GET["url"])){
   $url = urlencode(rawurldecode($_GET["url"]));
