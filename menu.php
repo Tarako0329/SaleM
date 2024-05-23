@@ -25,22 +25,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     if(!empty($_GET["action"])){
         $action = $_GET["action"];
     }
-    /*
-    if($action=="color_change"){
-        //配色の変更・保存
-        $color_No = $_GET["color"]+1;
-        if($color_No>$Max_color_No){
-            $color_No=0;
-        }
-        $stmt = $pdo_h->prepare ( 'call PageDefVal_update(?,?,?,?,?)' );
-        $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-        $stmt->bindValue(2, MACHIN_ID, PDO::PARAM_STR);
-        $stmt->bindValue(3, "menu.php", PDO::PARAM_STR);
-        $stmt->bindValue(4, "COLOR", PDO::PARAM_STR);
-        $stmt->bindValue(5, $color_No, PDO::PARAM_STR);
-        $stmt->execute();
-    }
-    */
+
     if($action=="logout"){
         delete_old_token($_COOKIE["webrez_token"],$pdo_h);
         redirect_to_login("ログオフしました");
@@ -55,7 +40,6 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         $_SESSION["SUBID"]="";      //strip subscription idをクリア
         
         //ユーザ情報の取得
-        //$sql="select * from Users where uid=?";
         $sql="select * from Users_webrez where uid=?";
         $stmt = $pdo_h->prepare($sql);
         $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
@@ -69,10 +53,6 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             $stmt = $pdo_h->prepare($sql);
             $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
             $stmt->execute();
-            /*
-            header("HTTP/1.1 301 Moved Permanently");
-            header("Location: menu.php?action=logout&ForcedLogout=true");
-            */
             ?>
             <!DOCTYPE html>
             <html lang='ja'>
@@ -119,7 +99,6 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     
         
         //新機能リリース通知
-        //$sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.new_releace_002') as ToursLog FROM Users WHERE uid=?";
         $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.new_releace_002') as ToursLog FROM Users_webrez WHERE uid=?";
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
@@ -174,7 +153,6 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         </div>
     </header>
     <div style='position:fixed;top:70px;right:0;' class='rainbow-color'>
-        <!--<b><a href='menu.php?action=color_change&color=<?php //echo $color_No; ?>'>COLOR<i class='fa-solid fa-rotate-right fa-lg rainbow-color'></i></a></b>-->
         <b><a href='#' onclick='ColorChange()'>COLOR<i class='fa-solid fa-rotate-right fa-lg rainbow-color'></i></a></b>
     </div>
     <div class='container-fluid' style='padding-top:15px;'>
@@ -302,11 +280,10 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         text: `<p class='tour_discription'> 
               <?php echo $hello; ?>
               <br>
-              <br>これから簡単にWEBREZの使い方(チュートリアル)を説明します。
+              <br>これから簡単にWEBREZの使い方を説明します。
               <br>10～20分ほどの操作になります。
               <br>
-              <br>時間的に後にしたい方は「後で見る」タップして下さい。
-              <br>「後で見る」をタップすると、次回トップ画面にアクセスした際に再度チュートリアルが開始されます。</p>`,
+              <br>「後で見る」をタップすると、この画面への再アクセス時に再開されます。</p>`,
         buttons: [
             {
                 text: '後で見る',
@@ -321,9 +298,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     tutorial_1.addStep({
         title: `<p class='tour_header'>チュートリアル</p>`,
         text: `<p class='tour_discription'>＜WebRez+の基本的な使い方＞
-                <br>所々に<a href="#" ><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>マークがあり、タップするとヘルプが表示されます。
-                <br>
-                <br>「登録/削除」ボタンをタップしない限り、売上等の登録済みのデータが変更される事ありません。
+                <br><a href="#" ><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>マークをタップするとヘルプが表示されます。
                 <br>
                 <br>色々試しながら使い方を覚えたい方は「不要」をタップすると、以降のチュートリアルは表示されません。
                 </p>`,
@@ -354,23 +329,6 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             }
         ]
     });
-    /*
-    tutorial_1.addStep({
-        title: `<p class='tour_header'>チュートリアル</p>`,
-        text: `<p class='tour_discription'>
-                チュートリアルを進めていくと途中で
-                <br><br><span style='color:green;'>※進捗を保存しました。</span>
-                <br>と表示されます。
-                <br>以降は「ｘ」で終了しても、次回ログイン時にチュートリアルの続きから開始されます。
-               </p>`,
-        buttons: [
-            {
-                text: 'Next',
-                action: tutorial_1.next
-            }
-        ]
-    });
-    */
     tutorial_1.addStep({
         title: `<p class='tour_header'>チュートリアル。</p>`,
         text: `<p class='tour_discription'> チュートリアルの流れは以下の通りです。
