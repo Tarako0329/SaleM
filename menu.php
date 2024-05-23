@@ -249,6 +249,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         <p style='padding:5px;'>お問い合わせはコチラ</p>
         <a href='https://lin.ee/HLSLl23' style='padding:5px;'><i class="fa-brands fa-line fa-2x line-green"></i></a>
         <!--<a href='https://green-island.mixh.jp/wdps/%e3%81%8a%e5%95%8f%e3%81%84%e5%90%88%e3%82%8f%e3%81%9b/' style='padding:5px;' target='_blank' rel='noopener noreferrer'><i class="fa-solid fa-square-envelope fa-2x"></i></a>-->
+        <p style='position:fixed;right:10px;bottom:0;'><?php echo VERSION;?></p>
     </footer>
 </body>
 <!--シェパードナビshepherd
