@@ -735,7 +735,7 @@
 					console_log(`order_panel_show now:`)
 					let sizeW = window.innerWidth
 					let sizeH = window.innerHeight
-					let H_minus = Number(355)
+					let H_minus = Number(360)
 					let W_minus = Number(31)
 					
 					if(sizeW<=767){
@@ -745,7 +745,7 @@
 							if(chk_register_show.value==="chk"){
 								order_list_area.value.style =`width:${sizeW-W_minus}px;height:${sizeH-H_minus}px;display:BLOCK;margin-left:10px;margin-right:17px;`
 							}else{
-								order_list_area.value.style =`width:${sizeW-W_minus}px;height:${sizeH-H_minus+50}px;display:BLOCK;margin-left:10px;margin-right:17px;`
+								order_list_area.value.style =`width:${sizeW-W_minus}px;height:${sizeH-H_minus+45}px;display:BLOCK;margin-left:10px;margin-right:17px;`
 							}
 						}else{
 							order_panel_show_flg.value=true

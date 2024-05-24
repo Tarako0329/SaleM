@@ -178,7 +178,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         ,'売上分析'=>['analysis_menu.php?csrf_token='.$token,'bunseki']
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token,'user']
         ,'会計連携'=>['output_menu.php?csrf_token='.$token,'kaikei']
-        ,'紹介者ID'=>['shoukai.php?csrf_token='.$token,'shoukai']
+        ,'ｱﾌﾟﾘを紹介する'=>['shoukai.php?csrf_token='.$token,'shoukai']
         //,'機能テスト'=>['sample.php']
     ];
     
