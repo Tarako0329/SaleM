@@ -132,7 +132,7 @@
 				<i class='fa-solid fa-arrow-rotate-right fa-lg logoff-color'></i>
 			</a>
 		</div>
-		<div class='header-plus-minus d-flex justify-content-center align-items-center item_4' style='font-size:1.4rem;font-weight:700;'>
+		<div class='header-plus-minus d-flex justify-content-center align-items-center item_4' style='font-size:1.4rem;font-weight:700;'><!--カート編集など-->
 			<div class="form-check form-switch" style='position:fixed;top:105px;left:10px;padding:0;'>
 				<p style='margin-bottom:2px;'>端数自動調整</p>
 				<input type='checkbox' style='margin:0;' v-model='auto_ajust' class='form-check-input'  id='chousei'><!---->
@@ -140,14 +140,14 @@
 				<label v-if='auto_ajust===true' style='margin-left:3px;' class='form-check-label' for='chousei'>ON</label><!-- -->
 			</div>
 			<div v-if="cartbtn_show" style='padding:0;'>
-				<button v-if='order_panel_show_flg===true' type='button' class='btn btn-primary' @click='order_panel_show("show")'>カート確認・編集</button>
+				<button v-if='order_panel_show_flg===true' type='button' class='btn btn-primary' @click='order_panel_show("show")'>カート編集</button>
 				<button v-if='order_panel_show_flg===false' type='button' class='btn btn-primary' @click='order_panel_show("close")'>戻る</button>
 			</div>
 			<a href="#" style='color:inherit;position:fixed;top:110px;right:10px;' data-bs-toggle='modal' data-bs-target='#modal_uriagelist'>
 				<i class="fa-solid fa-cash-register fa-2x awesome-color-panel-border-same"></i>
 			</a>
-		</div>
-		<div v-if='chk_register_show==="chk"' class='header-plus-minus d-flex justify-content-center align-items-center ' style='font-size:1.4rem;font-weight:700;top: 156px;height:52px;'>
+		</div><!--カート編集など-->
+		<div v-if='chk_register_show==="chk"' class='header-plus-minus d-flex justify-content-center align-items-center ' style='font-size:1.4rem;font-weight:700;top: 156px;height:52px;'><!--イートイン/テイクアウト-->
 			<div style='padding:0;'>
 				<input type='radio' class='btn-check' name='ZeiChange' value='10' autocomplete='off' v-model='ZeiChange' id='eatin'>
 				<label class='btn btn-outline-danger ' for='eatin' style='border-radius:0;'>イートイン</label>
@@ -155,12 +155,12 @@
 				<label class='btn btn-outline-danger ' for='takeout' style='border-radius:0;'>テイクアウト</label>
 				<input type='radio' class='btn-check' name='ZeiChange' value='0' autocomplete='off' v-model='ZeiChange' id='defo' >
 				<label class='btn btn-outline-primary ' for='defo' style='border-radius:0;'>戻る</label>
-			</div>
+			</div><!--イートイン/テイクアウト-->
 		</div>
-		<div v-if='chk_register_show==="register"' class='container header-plus-minus text-center' style='padding:10px;'>
+		<div v-if='chk_register_show==="register"' class='container header-plus-minus text-center' style='padding:10px;'><!--割引・割増-->
 			<button type='button' style='width:80%;max-width:500px;' class='btn btn-outline-primary' data-bs-toggle='modal' data-bs-target='#waribiki'>割引・割増</button>
-		</div>
-		<main class='common_body'>
+		</div><!--割引・割増-->
+		<main class='common_body' id='main_area'>
 			<?php 
 				if(!empty($emsg)){
 					echo $emsg;
@@ -169,9 +169,10 @@
 			?>
 			<div class="container-fluid">
 				<div class='row'>
-					<div class='col-lg-2 col-md-3 col-sm-12 col-12'><!--注文内容-->
+
+					<div class='col-lg-3 col-md-4 col-sm-12 col-12'><!--注文内容-->
 						<div class='order_list' ref='order_list_area'>
-							<div class='text-center'> 税込み表示 </div>
+							<div class='text-center'> 税込表示 </div>
 							<template v-for='(list,index) in order_list' :key='list.CD'>
 								<div class='container'>
 									<div class='order_item'>{{list.NM}}</div>
@@ -179,10 +180,10 @@
 										<div class='order_su' >{{list.SU}}点</div>
 										<div class='order_kin'>¥{{(list.SU * (list.TANKA + list.TANKA_ZEI)).toLocaleString()}}</div>
 									</div>
-									<div id='side-pm' style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;padding-bottom:3px;'>
+									<div id='side-pm' style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;padding-bottom:3px;position:relative;'>
 										<button type='button' class='order_list_area_btn plus' @click='order_list_pm(index,1)'></button>
 										<button type='button' class='order_list_area_btn minus' @click='order_list_pm(index,-1)'></button>
-										<select v-model='list.ZEIKBN' @change='order_list_change_tax(index,$event)' class="form-select form-select-lg " style='margin-left:10px;padding-left:10px;'>
+										<select v-model='list.ZEIKBN' @change='order_list_change_tax(index,$event)' class="form-select form-select-lg " style='margin-left:10px;padding-left:10px;position:absolute;right:3px;max-width:90px;'>
 											<?php
 												foreach($zeimaster as $row){
 													echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
@@ -220,7 +221,8 @@
 							</template>
 						</div>
 					</div><!--注文内容-->
-					<div v-if='order_panel_show_flg' class='col-lg-10 col-md-9 col-sm-12 col-12'><!--オーダーパネル部分-->
+
+					<div v-show='order_panel_show_flg' class='col-lg-9 col-md-8 col-sm-12 col-12'><!--オーダーパネル部分-->
 						<div class="container-fluid">
 							<template v-if='MSG!==""'><!--登録結果ステータス表示+領収書ボタン-->
 								<div v-bind:class='alert_status' role='alert' >
@@ -262,6 +264,7 @@
 							</div>
 						</div>
 					</div><!--オーダーパネル部分-->
+
 				</div>
 			</div>
 		</main>
@@ -1471,6 +1474,7 @@
 			}
 		]
 	});
+	/*
 	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `
@@ -1513,9 +1517,10 @@
 			}
 		]
 	});
+	*/
 	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>お釣り計算機が表示されます。<!--<br><br>釣銭ボタンを押して表示してみてください。--></p>`,
+		text: `<p class='tour_discription'>お釣り計算機が表示されます。<!--<br><br>釣銭ボタンを押してください。--></p>`,
 		attachTo: {
 			element: '.item_5',
 			on: 'top'
@@ -1583,7 +1588,7 @@
 	});
 	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>「確認」ボタンを押すと、注文したメニューのみが表示されます。<br><br>この状態で注文結果の最終確認を行います。<br><br>ボタン名が「確認」から「登録」に変更されます。</p>`,
+		text: `<p class='tour_discription'>「確認」ボタンを押すと、注文内容が表示され、「確認」ボタンが「登録」ボタンに変更されます。</p>`,
 		buttons: [
 			{
 				text: 'Back',

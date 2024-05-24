@@ -260,8 +260,9 @@ INPUT.su{
     border-bottom:solid var(--panel-bd-color) 0.3px;
 }
 .common_body {
-    padding-top: 210px; /* ヘッダーの後ろに要素が隠れないようにするため  160*/
+    padding-top: 200px; /* ヘッダーの後ろに要素が隠れないようにするため  160*/
     padding-bottom:145px;  /*フッターーの後ろに要素が隠れないようにするため */
+    height:auto;
 }
 
 .rezfooter{
@@ -327,11 +328,11 @@ INPUT.su{
 
 .order_list{
     border:solid var(--panel-bd-color) 0.5px;
-    width: 23.7%;
-    position: fixed;
+    /*width: 23.7%;*/
+    /*position: fixed;*/
     overflow: auto;
     margin-top:26px;
-    margin-right:3px;
+    /*margin-right:3px;*/
 }
 .order_item{
     font-size:1.6rem;
@@ -341,20 +342,20 @@ INPUT.su{
 .order_su{
     width: 25%;
     margin:5px;
-    font-size:1.6rem;
+    font-size:1.8rem;
     text-align:right;
 }
 .order_kin{
     width: 75%;
     margin:5px 10px;
-    font-size:1.6rem;
+    font-size:2rem;
     text-align:right;
     font-weight: 700;
 }
 .order_list_area_btn{
     padding:0px;
-    height:24px;
-    width:120px;
+    height:30px;
+    width:60px;
     border:solid var(--panel-bd-color) 0.3px;
     color: var(--panel-bd-color);
     background-color: var(--panel-bk-color);
@@ -363,15 +364,15 @@ INPUT.su{
 #side-pm>.plus::before,#side-pm>.plus::after,#side-pm>.minus::before {
     height: 15px;
     width: 5px;
-    top:3.5px;
-    left:19px;
+    top:6.5px;
+    left:27px;
     background-color: var(--panel-bd-color);
 }
 #header-pm>.plus::before,#header-pm>.plus::after,#header-pm>.minus::before {
     height: 17px;
     width: 3.5px;
-    top:5px;
-    left:23px;
+    top:8px;
+    left:31px;
 }
 #header-pm>.plus::before,#header-pm>.plus::after{
     background-color: #7bf2f7;
@@ -392,12 +393,6 @@ INPUT.su{
     }
     .btn--rezi{
         font-size: 1.6rem;
-    }
-}
-@media screen and (min-width:992px) {/*lg以上*/
-    .order_list{
-        width: 15.7%;
-    }
 }
 
 .container,.container-fluid {

@@ -242,6 +242,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
         $stmt->execute();
         $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        log_writer2("JSON_VALUE",$row,"lv3");
         if(empty($row[0]["tutorial"])){
             //チュートリアル未実施
             $_SESSION["tour"]="tutorial_1";
@@ -252,6 +253,8 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             //チュートリアル実施中（再開）
             $_SESSION["tour"]=$row[0]["tutorial"];
         }
+    }else{
+        log_writer2("\$_SESSION['tour']",$_SESSION["tour"],"lv3");
     }
     
 ?>
@@ -482,7 +485,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
 
     if(TourMilestone=="tutorial_1"){
         tutorial_1.start(tourFinish,'tutorial','');
-    }else　if(TourMilestone=="tutorial_3"){
+    }else　if(TourMilestone=="tutorial_3" || TourMilestone=="tutorial_4"){
         tutorial_4.start(tourFinish,'tutorial','');    
     }else　if(TourMilestone=="tutorial_7"){
         tutorial_8.start(tourFinish,'tutorial','');    

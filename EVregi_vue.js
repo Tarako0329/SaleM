@@ -125,6 +125,7 @@
 						kaikei_zei_bk = kaikei_zei.value
 						let rtn = chk_csrf()	//token紛失のチェック
 						if(auto_ajust.value===true){
+							document.getElementById('main_area').style.paddingTop = '140px'
 							console_log(`自動端数調整開始`)
 							let zeiritu
 							let zeikomi
@@ -157,6 +158,7 @@
 							order_panel_show("show")
 						}
 					}else if(args==='chk'){				//戻る時は調整額を０にクリアする
+						document.getElementById('main_area').style.paddingTop = '200px'
 						for(const row of hontai.value){
 							row['調整額'] = 0
 							row['税調整額'] = 0
@@ -711,16 +713,19 @@
 				const order_list_area = ref()
 				const cartbtn_show = ref()
 				const order_list_area_set = () => {
+					//レジ画面を最初に表示したタイミングで実行
+					//画面サイズに応じてカートの表示・非表示を制御
 					console_log('order_list_area_set start')
 					let sizeH = window.innerHeight
 					let sizeW = window.innerWidth
-					//console_log(size)
+
 					//order_list_area.value.style=`height:${sizeH-350}px;`
 					if(sizeW<=767){
-						order_list_area.value.style =`height:${sizeH-355}px;display:NONE;`
+						//order_list_area.value.style =`height:${sizeH-355}px;display:NONE;`
+						order_list_area.value.style =`display:NONE;`
 						cartbtn_show.value = true
 					}else{
-						order_list_area.value.style =`height:${sizeH-355}px;display:BLOCK;`
+						order_list_area.value.style =`width:100%;height:${sizeH-355}px;display:BLOCK;`
 						cartbtn_show.value = false
 					}
 				}
@@ -730,14 +735,21 @@
 					console_log(`order_panel_show now:`)
 					let sizeW = window.innerWidth
 					let sizeH = window.innerHeight
+					let H_minus = Number(355)
+					let W_minus = Number(31)
 					
 					if(sizeW<=767){
 						if(status==='show'){
 							order_panel_show_flg.value=false
-							order_list_area.value.style =`width:250px;height:${sizeH-355}px;display:BLOCK;`
+							//order_list_area.value.style =`width:90%;height:${sizeH-H_minus}px;display:BLOCK;`
+							if(chk_register_show.value==="chk"){
+								order_list_area.value.style =`width:${sizeW-W_minus}px;height:${sizeH-H_minus}px;display:BLOCK;margin-left:10px;margin-right:17px;`
+							}else{
+								order_list_area.value.style =`width:${sizeW-W_minus}px;height:${sizeH-H_minus+50}px;display:BLOCK;margin-left:10px;margin-right:17px;`
+							}
 						}else{
 							order_panel_show_flg.value=true
-							order_list_area.value.style =`height:${sizeH-355}px;display:NONE;`
+							order_list_area.value.style =`display:NONE;`
 						}
 					}
 
