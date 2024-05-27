@@ -522,7 +522,14 @@
 						.finally(()=>{
 							get_UriageList()
 							IDD_Write('LocalParameters',[{id:'EventName',EventName:labels.value["EV_input_value"]}])
+							document.getElementById('main_area').style.paddingTop = '215px'
 							loader.value = false
+
+							if(TourMilestone=="tutorial_7" || TourMilestone=="tutorial_4"){
+								TourMilestone = "tutorial_7"
+								tutorial_7_1.start(tourFinish,'tutorial','save');
+							}
+						
 						})
 				}
 

@@ -7,7 +7,7 @@
             type        : 'POST',
             url         : 'ajax_tour_log.php',
             data        :{
-                            user_id     :'<?php echo $_SESSION["user_id"];?>',
+                            user_id     :'<?php //echo $_SESSION["user_id"];?>',
                             tourName    :tourName,
                             step        :step,
                             status      :status//ツアー完了："finish"　途中："save" ブランク：$_SESSION["tour"]にstepを代入
