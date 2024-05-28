@@ -61,7 +61,7 @@
 		</header>
 		<div class='header2'>
 			<div class='container-fluid'>
-				<div style='padding:0 5px;'>
+				<div style='padding:0 5px;' id='tax_inout'>
 					<input type='radio' class='btn-check' name='options' value='IN' autocomplete='off' v-model='upd_zei_kominuki' id='plus_mode'>
 					<label class='btn btn-outline-primary' style='font-size:1.2rem;border-radius:0;' for='plus_mode'>税込入力</label>
 					<input type='radio' class='btn-check' name='options' value='NOTIN' autocomplete='off' v-model='upd_zei_kominuki' id='minus_mode'>
@@ -80,7 +80,7 @@
 							<option value='seq'>登録順</option>
 							<option value='name'>名称順</option>
 						</select>
-						<button @click='up_or_down' class='btn btn-primary' style='height:25px;padding:0px 10px;font-size:1.2rem;margin-top:0px;margin-left:5px;' type='button'>
+						<button @click='up_or_down' class='btn btn-primary' style='height:25px;padding:0px 10px;font-size:1.2rem;margin-top:0px;margin-left:5px;' type='button' id='order_by'>
 							{{order_by[1]}}
 						</button>
 					</div>
@@ -198,222 +198,6 @@
 	<script src="shouhinMSList_vue.js?<?php echo $time; ?>"></script>
 	<script>
 		REZ_APP().mount('#app');
-		/*
-		const { createApp, ref, onMounted, computed, VueCookies, watch } = Vue
-		createApp({
-			setup(){
-				//商品マスタ取得関連
-				const shouhinMS = ref([])			//商品マスタ
-				const shouhinMS_BK = ref([])	//商品マスタ修正前バックアップ
-
-				//商品マスタのソート・フィルタ関連
-				const chk_register_show = ref('all')	//フィルタ
-				const order_by = ref(['seq','▼'])			//ソート（項目・昇順降順）
-				const chk = ref('off')
-				const search_word = ref('')
-				const btn_name = ref('確　認')
-				const btn_type = ref('button')
-				const chk_onoff = () =>{
-					if(chk.value==='off'){
-						chk.value='on'
-						btn_name.value='戻　る'
-						//alert('表示されてる内容でよろしければ「登録」してください。')
-					}else{
-						chk.value='off'
-						btn_name.value='確　認'
-					}
-				}
-				const up_or_down = () =>{
-					if(order_by.value[1]==='▼'){
-						order_by.value[1]='▲'
-					}else{
-						order_by.value[1]='▼'
-					}
-				}
-				const shouhinMS_filter = computed(() => {//商品マスタのソート・フィルタ
-					let order_panel = ([])
-					if(chk.value==='on'){
-						let j=0 
-						for (let i = 0; i < shouhinMS.value.length; ++i) {
-							if(JSON.stringify(shouhinMS.value[i]) !== JSON.stringify(shouhinMS_BK.value[i])){
-								console_log(`chk on ${i} UNmatch`,"lv3")
-								order_panel[j] = shouhinMS.value[i]
-								j++
-							}else{
-								console_log(`chk on ${i} match`,"lv3")
-							}
-						}
-						return order_panel
-					}else if (chk_register_show.value === "on"){//表示対象のみを返す
-						order_panel = shouhinMS.value.filter((shouhin) => {
-							return (shouhin.hyoujiKBN1 && shouhin.hyoujiKBN1.includes('on') );
-						});
-					}else if (chk_register_show.value === "off"){//表示対象外のみを返す
-						order_panel = shouhinMS.value.filter((shouhin) => {
-							return (shouhin.hyoujiKBN1===null || !shouhin.hyoujiKBN1.includes('on') );
-						});
-					}else{//全件表示
-						order_panel = shouhinMS.value
-					}
-					
-					//checkbox にあわせて on -> true に変更
-					order_panel.forEach((list)=> {
-						if(list.hyoujiKBN1==='on'){
-							list['disp_rezi'] = true
-						}else{
-							list['disp_rezi'] = false
-						}
-					})
-
-					if(search_word.value!=''){
-						return shouhinMS.value.filter((shouhin) => {
-							return (shouhin.shouhinNM.includes(search_word.value) );
-						});
-					}
-
-					//最後にソートして返す
-					if(order_by.value[0]==='name'){
-						return order_panel.sort((a,b) => {//フィルタ結果をソートして親に返す
-							return (order_by.value[1]==='▼'?(a.shouhinNM < b.shouhinNM?1:-1):(a.shouhinNM > b.shouhinNM?1:-1))
-						})
-					}else if(order_by.value[0]==='seq'){
-						return order_panel.sort((a,b) => {//フィルタ結果をソートして親に返す
-							return (order_by.value[1]==='▼'?(a.shouhinCD < b.shouhinCD?1:-1):(a.shouhinCD > b.shouhinCD?1:-1))
-						})
-					}else{}
-				})//商品マスタのソート・フィルタ
-
-				const shouhinMS_BK_filter = computed(() => {//商品マスタバックアップもソート・フィルタ
-					let order_panel = ([])
-					if (chk_register_show.value === "on"){//表示対象のみを返す
-						order_panel = shouhinMS_BK.value.filter((shouhin) => {
-							return (shouhin.hyoujiKBN1 && shouhin.hyoujiKBN1.includes('on') );
-						});
-					}else if (chk_register_show.value === "off"){//表示対象外のみを返す
-						order_panel = shouhinMS_BK.value.filter((shouhin) => {
-							return (shouhin.hyoujiKBN1===null || !shouhin.hyoujiKBN1.includes('on') );
-						});
-					}else{
-						order_panel = shouhinMS_BK.value
-					}
-					order_panel.forEach((list)=> {
-						if(list.hyoujiKBN1==='on'){
-							list['disp_rezi'] = true
-						}else{
-							list['disp_rezi'] = false
-						}
-					})
-					if(order_by.value[0]==='name'){
-						return order_panel.sort((a,b) => {//フィルタ結果をソートして親に返す
-							return (order_by.value[1]==='▼'?(a.shouhinNM < b.shouhinNM?1:-1):(a.shouhinNM > b.shouhinNM?1:-1))
-						})
-					}else if(order_by.value[0]==='seq'){
-						return order_panel.sort((a,b) => {//フィルタ結果をソートして親に返す
-							return (order_by.value[1]==='▼'?(a.shouhinCD < b.shouhinCD?1:-1):(a.shouhinCD > b.shouhinCD?1:-1))
-						})
-					}else{}
-				})//商品マスタバックアップもソート・フィルタ
-
-				//更新関連
-				const upd_zei_kominuki = ref('IN')
-				const zm = [
-										<?php
-										//reset($ZEIresult);
-										//foreach($ZEIresult as $row2){
-										//		echo "{税区分:".$row2["zeiKBN"].",税率:".($row2["zeiritu"]/100)."},\n";
-										//}
-										?> 
-								]
-				const return_tax = (kingaku,zeikbn,kominuki) => {
-					console_log('return_tax start')
-					console_log(zm)
-					let zmrec = ([])
-					zmrec = zm.filter((list)=>{
-							return list.税区分 == zeikbn
-					})
-					const values = get_value(Number(kingaku),Number(zmrec[0]["税率"]),kominuki)
-					return values;
-				}
-				const set_new_value = (index,new_val_id) => {
-					//単価入力欄から本体と消費税を算出し、セットする
-					const new_val = document.querySelector(new_val_id)
-					let values 
-					console_log(`set_new_value start (index => ${index} new_val_id => ${new_val_id} new_val => ${new_val})`)
-
-					if(new_val.value !== ''){
-						values = return_tax(new_val.value, shouhinMS_filter.value[index].zeiKBN, upd_zei_kominuki.value)
-						shouhinMS_filter.value[index].tanka = values[0]["本体価格"]
-						shouhinMS_filter.value[index].tanka_zei = values[0].消費税
-						if(values[0].E !== 'OK'){
-							alert('指定の税込額は税率計算で端数が発生するため実現できません')
-							new_val.value = values[0].税込価格
-						}
-					}else if(shouhinMS_filter.value[index].zeiKBN !== shouhinMS_BK_filter.value[index].zeiKBN){
-						//税率のみ変更した場合は現在の単価から算出する
-						values = return_tax(shouhinMS_filter.value[index].tanka, shouhinMS_filter.value[index].zeiKBN, 'NOTIN')
-						shouhinMS_filter.value[index].tanka_zei = values[0].消費税
-					}else{//新価格が空白の場合、本体・税額・税区分を元に戻す
-						shouhinMS_filter.value[index].tanka = shouhinMS_BK_filter.value[index].tanka
-						shouhinMS_filter.value[index].tanka_zei = shouhinMS_BK_filter.value[index].tanka_zei
-						shouhinMS_filter.value[index].zeiKBN = shouhinMS_BK_filter.value[index].zeiKBN
-					}
-				}
-
-				watch(upd_zei_kominuki,() => {
-					//shouhinMS.value.forEach((row,index) => {
-					shouhinMS_filter.value.forEach((row,index) => {
-						set_new_value(index,`#new_val_${index}`)
-					})
-				})
-				const delete_item = (item,link) =>{
-					console_log(item)
-					console_log(link)
-					if(confirm(`${item} を削除します。よろしいですか？`)===true){
-						window.location.href = link
-					}
-					
-				}
-
-				const MSG = ref('<?php //echo $MSG; ?>')
-				const alert_status = ref(['alert','<?php //echo $ALERT; ?>'])
-
-				onMounted(() => {
-					console_log('onMounted')
-					//get_shouhinMS()
-					GET_SHOUHINMS()
-						.then((response)=>{
-							shouhinMS.value = response
-							shouhinMS_BK.value = JSON.parse(JSON.stringify(shouhinMS.value))
-							console_log('GET_SHOUHINMS succsess')
-						})
-						.catch((error) => {
-							console_log(`GET_SHOUHINMS ERROR:${error}`)
-						})
-
-				})
-
-				return{
-					shouhinMS,
-					shouhinMS_BK,
-					set_new_value,
-					upd_zei_kominuki,
-					chk_register_show,
-					shouhinMS_filter,
-					shouhinMS_BK_filter,
-					order_by,
-					up_or_down,
-					chk_onoff,
-					MSG,
-					alert_status,
-					btn_name,
-					btn_type,
-					delete_item,
-					chk,
-					search_word,
-				}
-			}
-		}).mount('#form1');
-		*/
 	</script><!--Vue3js-->
 </BODY>
 <!--シェパードナビshepherd
@@ -488,7 +272,7 @@
 				<br>三角マークは昇順・降順の切り替えに使います。
 				</p>`,
 		attachTo: {
-			element: '.item_01',
+			element: '#order_by',
 			on: 'bottom'
 		},
 		buttons: [
@@ -507,7 +291,7 @@
 		text: `<p class='tour_discription'>試しにタップして変更してみてください。
 				</p>`,
 		attachTo: {
-			element: '.item_0',
+			element: '#order_by',
 			on: 'auto'
 		},
 		buttons: [
@@ -523,7 +307,7 @@
 	});
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>商品の価格を変更する際は「新価格」欄をタップして変更後の価格を入力して下さい。
+		text: `<p class='tour_discription'>商品の価格を変更する際は「新価格」欄に変更後の価格を入力して下さい。
 				</p>`,
 		attachTo: {
 			element: '.item_1',
@@ -542,10 +326,10 @@
 	});
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>入力した「新価格」が「税込か税抜」かは、こちらで選択して下さい。
+		text: `<p class='tour_discription'>「新価格」の「税込/税抜」設定は、こちらで選択して下さい。
 				</p>`,
 		attachTo: {
-			element: '.item_2',
+			element: '#tax_inout',
 			on: 'auto'
 		},
 		buttons: [
@@ -580,7 +364,7 @@
 	});
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>その他の項目についても、コチラの画面で修正したい部分をタップして打ち変えることで修正が可能です。
+		text: `<p class='tour_discription'>その他の項目についても、コチラの画面で修正したい部分を打ち変えることで修正が可能です。
 				</p>`,
 		attachTo: {
 			element: '.item_1',
@@ -618,7 +402,7 @@
 	});
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>なお、こちらで商品の価格等を修正しても過去の売上が変更されることはありません。
+		text: `<p class='tour_discription'>なお、こちらで商品の価格等を修正しても<span style='color:red;'>過去の売上が変更されることはありません。</span>
 				</p>`,
 		buttons: [
 			{
@@ -675,7 +459,7 @@
 	});
 	tutorial_13.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'><span style='color:red;'>ちなみに、削除しようとしている商品の「売上」が１件でも登録されていると削除する事は出来ません。</span>
+		text: `<p class='tour_discription'><span style='color:red;'>なお、「売上」実績のある商品は削除出来ません。</span>
 				</p>`,
 		buttons: [
 			{
@@ -944,9 +728,9 @@
 
 	if(TourMilestone=="tutorial_11"){
 		tutorial_12.start(tourFinish,'tutorial','');
-	}else if(TourMilestone=="tutorial_12"){
+	}/*else if(TourMilestone=="tutorial_12"){
 		tutorial_13.start(tourFinish,'tutorial','finish');
-	}
+	}*/
 
 	function help(){
 		helpTour.start(tourFinish,'help','');

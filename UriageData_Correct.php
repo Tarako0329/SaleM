@@ -765,10 +765,54 @@
 	});
 	tutorial_9.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>レジで売上を入力した当日に「売上実績」を開くと当日の売上明細が表示されます。
+		text: `<p class='tour_discription'>「売上実績」を開くと今年の１月１日から１２月３１日までの売上明細が表示されます。
 			   </p>`,
 		attachTo: {
 			element: '.item_0',
+			on: 'auto'
+		},
+		buttons: [
+			{
+				text: 'Back',
+				action: tutorial_9.back
+			},
+			{
+				text: 'Next',
+				action: tutorial_9.next
+			}
+		]
+	});
+	tutorial_9.addStep({
+		title: `<p class='tour_header'>チュートリアル</p>`,
+		text: `<p class='tour_discription'>
+					売上日、イベント名、商品名など、下線が引いてある項目をタップすると同じ値でフィルタがかかります。
+					<br>
+					<br>例：イベント名をタップすると、同じイベントの明細のみが表示されます。
+			   </p>`,
+		attachTo: {
+			element: '.item_0',
+			on: 'auto'
+		},
+		buttons: [
+			{
+				text: 'Back',
+				action: tutorial_9.back
+			},
+			{
+				text: 'Next',
+				action: tutorial_9.next
+			}
+		]
+	});
+	tutorial_9.addStep({
+		title: `<p class='tour_header'>チュートリアル</p>`,
+		text: `<p class='tour_discription'>
+					フィルターを解除するには、このエリアに表示される
+					<button type='button' class='btn-view' style='padding:1px 3px;font-size:1rem;background-color: var(--panel-bk-color);margin-right:5px;'><i class="fa-solid fa-filter fa-lg "></i>解除</button>
+					をタップしてください。（フィルター表示になっているときに表示されます）
+			   </p>`,
+		attachTo: {
+			element: 'header',
 			on: 'auto'
 		},
 		buttons: [
@@ -935,11 +979,23 @@
 			},
 			{
 				text: 'Next',
+				action: tutorial_9.next
+			}
+		]
+	});
+	tutorial_9.addStep({
+		title: `<p class='tour_header'>チュートリアル</p>`,
+		text: `<p class='tour_discription'>全ての売上を削除したら「WebRez+」をタップしてトップメニューに移動して下さい。
+				<br>
+				<br><span style='font-size:1rem;color:green;'>※進捗を保存しました。</span></p>`,
+		buttons: [
+			{
+				text: 'Next',
 				action: tutorial_9.complete
 			}
 		]
 	});
-
+/*
 	const tutorial_10 = new Shepherd.Tour({
 		useModalOverlay: true,
 		defaultStepOptions: {
@@ -963,13 +1019,14 @@
 			}
 		]
 	});
-
+*/
 
 	if(TourMilestone=="tutorial_8"){
-		tutorial_9.start(tourFinish,'tutorial','');
-	}else if(TourMilestone=="tutorial_9"){
+		//tutorial_9.start(tourFinish,'tutorial','');
+		tutorial_9.start(tourFinish,'tutorial','save');
+	}/*else if(TourMilestone=="tutorial_9"){
 		tutorial_10.start(tourFinish,'tutorial','save');
-	}
+	}*/
 
 
 	const tutorial_UriageShusei = new Shepherd.Tour({

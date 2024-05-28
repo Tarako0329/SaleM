@@ -489,7 +489,8 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         tutorial_4.start(tourFinish,'tutorial','');    
     }else　if(TourMilestone=="tutorial_7_1"){
         tutorial_8.start(tourFinish,'tutorial','');    
-    }else　if(TourMilestone=="tutorial_10"){
+    //}else　if(TourMilestone=="tutorial_10"){
+    }else　if(TourMilestone=="tutorial_9"){
         tutorial_11.start(tourFinish,'tutorial','');    
     }
     
