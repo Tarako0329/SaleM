@@ -72,7 +72,7 @@
 						<tr style='height:30px;'>
 							<th class='th1' scope='col' style='width:auto;padding:0px 5px 0px 0px;'>レ</th>
 							<th class='th1' scope='col' style='width:auto;padding:0px 5px 0px 0px;' > ID:商品名</th>
-							<th class='th1' scope='col' style='width:auto;padding:0px 5px 0px 0px;' > カテゴリー(1>2>3)</th>
+							<th class='th1' scope='col' style='width:auto;padding:0px 5px 0px 0px;' > カテゴリー(大>中>小)</th>
 						</tr>
 					</thead>
 					<tbody>

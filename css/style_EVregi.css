@@ -1,5 +1,9 @@
 html{
     scroll-behavior:smooth;
+    height:100%;
+}
+body,#register,#form1{
+    height:100%;
 }
 .yagou{
     width: 60%;
@@ -262,7 +266,7 @@ INPUT.su{
 .common_body {
     padding-top: 200px; /* ヘッダーの後ろに要素が隠れないようにするため  160*/
     padding-bottom:145px;  /*フッターーの後ろに要素が隠れないようにするため */
-    height:auto;
+    height:100%;
 }
 
 .rezfooter{
@@ -387,14 +391,15 @@ INPUT.su{
     }
 }
 */
-@media screen and (min-width:767px) {/*md以上*/
+@media screen and (min-width:767px) {
+    /*md以上*/
     .ordered{
         font-size:1.8rem;
     }
     .btn--rezi{
         font-size: 1.6rem;
+    }
 }
-
 .container,.container-fluid {
     animation: fadein 0.7s ease-out forwards;
     padding:0 5px;

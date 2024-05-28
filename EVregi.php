@@ -233,7 +233,7 @@
 								</div>
 							</template><!--登録結果ステータス表示+領収書ボタン-->
 							<div id='jump_0'><hr></div> 
-							<div class='row item_3' id=''>
+							<div class='row' id=''>
 								<template v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
 									<template v-if='(index===0) || (index!==0 && list.disp_category !== shouhinMS_filter[index-1].disp_category)'><!--カテゴリーバー-->
 										<div class='row' style='background:var(--jumpbar-color);margin-top:5px;' >
@@ -617,7 +617,7 @@
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>お会計はメニューをタップした数だけカウントされます。</p>`,
 		attachTo: {
-			element: '.item_3',
+			element: '#main_area',
 			on: 'top'
 		},
 		buttons: [
@@ -635,7 +635,7 @@
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>試しに何回かタップしてみてください。</p>`,
 		attachTo: {
-			element: '.item_3',
+			element: '#main_area',
 			on: 'top'
 		},
 		buttons: [
@@ -790,7 +790,7 @@
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>受取金額を入力して「計算」ボタンをタップするとお釣りが表示されます。<br><br>ここでは計算するだけで、何も登録されません。</p>`,
 		attachTo: {
-			element: '.item_3',
+			element: '#main_area',
 			on: 'top'
 		},
 		buttons: [
@@ -808,7 +808,7 @@
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>閉じるボタン、もしくは計算機のエリア外をタップすると計算機は非表示になります。</p>`,
 		attachTo: {
-			element: '.item_3',
+			element: '#main_area',
 			on: 'top'
 		},
 		buttons: [

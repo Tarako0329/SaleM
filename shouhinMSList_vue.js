@@ -225,6 +225,7 @@ const REZ_APP = () => createApp({
 							console_log(`GET_SHOUHINMS ERROR:${error}`)
 						})
 						chk_onoff()
+						window.scroll({top: 0,behavior: "smooth",});
 						if(TourMilestone=="tutorial_11"){
 							tutorial_13.start(tourFinish,'tutorial','finish');
 						}
