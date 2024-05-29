@@ -127,7 +127,7 @@
 			<!--<a href="#" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:0px;' data-bs-toggle='modal' data-bs-target='#modal_help1'>
 				<i class="bi bi-question-square logoff-color fs-1 fw-bold"></i>
 			</a>-->
-			<div class='fs-5 fw-bold' style='position:absolute;right:5px;width:110px;'>
+			<div class='fs-5 fw-bold' style='position:absolute;right:5px;width:130px;'>
 				<a class='btn-view ps-1 pt-0 pb-0 pe-1 me-2 item_15' href='javascript:void(0)' @Click='panel_changer()' >
 					<i class="bi bi-sort-down fs-1 me-1"></i>切換
 				</a>
@@ -145,8 +145,9 @@
 				<button v-if='order_panel_show_flg===true' type='button' class='btn btn-primary' @click='order_panel_show("show")'>カート編集</button>
 				<button v-if='order_panel_show_flg===false' type='button' class='btn btn-primary' @click='order_panel_show("close")'>戻る</button>
 			</div>
-			<a href="#" style='color:inherit;position:fixed;top:110px;right:10px;' data-bs-toggle='modal' data-bs-target='#modal_uriagelist' id='UriToday'>
-				<i class="fa-solid fa-cash-register fa-2x awesome-color-panel-border-same"></i>
+			<a href="#" class='' style='font-size:32px;color:inherit;position:fixed;top:110px;right:20px;' data-bs-toggle='modal' data-bs-target='#modal_uriagelist' id='UriToday'>
+				<!--<i class="fa-solid fa-cash-register fa-2x awesome-color-panel-border-same"></i>-->
+				<i class="bi bi-cash-coin awesome-color-panel-border-same"></i>
 			</a>
 		</div><!--カート編集など-->
 		<div v-if='chk_register_show==="chk"' class='header-plus-minus d-flex justify-content-center align-items-center ' style='font-size:1.4rem;font-weight:700;top: 156px;height:52px;' id='tax_changer'><!--イートイン/テイクアウト-->
@@ -1243,7 +1244,11 @@
 	});
 	tutorial_7_1.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'><i class="fa-solid fa-arrow-rotate-right fa-lg  awesome-color-panel-border-same"></i>をタップするごとにカテゴリーの粒度が「大→中→小→分別なし」の順で切り替わるので、ご自由に設定して下さい。</p>`,
+		text: `<p class='tour_discription'>
+				<a class='btn-view ps-1 pt-0 pb-0 pe-1 me-2' href='javascript:void(0)'>
+					<i class="bi bi-sort-down fs-1 me-1"></i>切換
+				</a>
+				をタップするごとにカテゴリーの粒度が「大→中→小→分別なし」の順で切り替わるので、ご自由に設定して下さい。</p>`,
 		buttons: [
 			{
 				text: 'Back',
