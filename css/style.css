@@ -84,6 +84,7 @@ body{
 .header-color{
 		background-image:linear-gradient(to left top, var(--title-from), var(--title-to));
 }
+.logoff-color,
 .logoff-color:before{
 	color: var(--user-disp-color);
 }

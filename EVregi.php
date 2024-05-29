@@ -102,14 +102,14 @@
 				<input type='date' class='date' style='height:20%' name='KEIJOUBI' required='required' v-model='labels["date_ini"]'>
 			</span>
 			<input type='text' class='ev item_2' :name='labels["EV_input_name"]' v-model='labels["EV_input_value"]' required='required' :placeholder='labels["EV_input_placeholder"]'>
-			<div class='address_disp' :style='`${labels["address"]}; position:fixed;top:55px;right:5px;color:var(--user-disp-color);max-width:50%;height:15px;`'>
-				<input type='checkbox' name='nonadd' id='nonadd' v-model='labels_address_check'>
-				<label for='nonadd' id='address_disp' class='item_101' :style='labels_address_style' onclick='gio_onoff()'>{{vjusho}}</label>
+			<div class='address_disp fs-4' :style='`${labels["address"]}; `'>
+				<input class="form-check-input" type='checkbox' name='nonadd' id='nonadd' v-model='labels_address_check'>
+				<label class="form-check-label ms-1 item_101" for='nonadd' id='address_disp' :style='labels_address_style' onclick='gio_onoff()'>{{vjusho}}</label>
 			</div>
 		</header>
-		<div class='header-select header-color' >
-			<select v-model='get_scroll_target' @change='scroller(this)' class='form-control item_16' style='font-size:1.2rem;padding:0;'> 
-				<option value='description'>カテゴリートップへ移動できます</option>
+		<div class='header-select header-color'>
+			<select v-model='get_scroll_target' @change='scroller(this)' class='form-control-sm item_16' style='font-size:1.2rem;padding:0;width:50%;height:31px;'> 
+				<option value='description'>カテゴリートップへ移動</option>
 				<option value='#jump_0'>TOP</option>
 				<template v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
 					<template v-if='index===0 && list.disp_category!==""'>
@@ -124,13 +124,15 @@
 					</template>
 				</template>
 			</select>
-			<a href="#" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;' data-bs-toggle='modal' data-bs-target='#modal_help1'>
-				<i class="fa-regular fa-circle-question fa-lg logoff-color"></i>
-			</a>
-			
-			<a class='item_15' href='javascript:void(0)' @Click='panel_changer()' style='color:inherit;margin-left:10px;margin-right:10px;margin-top:5px;'>
-				<i class='fa-solid fa-arrow-rotate-right fa-lg logoff-color'></i>
-			</a>
+			<!--<a href="#" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:0px;' data-bs-toggle='modal' data-bs-target='#modal_help1'>
+				<i class="bi bi-question-square logoff-color fs-1 fw-bold"></i>
+			</a>-->
+			<div class='fs-5 fw-bold' style='position:absolute;right:5px;width:110px;'>
+				<a class='btn-view ps-1 pt-0 pb-0 pe-1 me-2 item_15' href='javascript:void(0)' @Click='panel_changer()' >
+					<i class="bi bi-sort-down fs-1 me-1"></i>切換
+				</a>
+				<span class='logoff-color'>{{category}}</span>
+			</div>
 		</div>
 		<div class='header-plus-minus d-flex justify-content-center align-items-center item_4' style='font-size:1.4rem;font-weight:700;'><!--カート編集など-->
 			<div class="form-check form-switch" style='position:fixed;top:105px;left:10px;padding:0;'>
@@ -408,11 +410,10 @@
 		</div>
 	</div>
 	<!--分類表示切替のヘルプ(modal_help1)-->
-	<div class='modal fade' id='modal_help1' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
+	<!--<div class='modal fade' id='modal_help1' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
 		<div class='modal-dialog  modal-dialog-centered'>
 			<div class='modal-content' style='font-size: 1.5rem; font-weight: 600;'>
 				<div class='modal-header'>
-					<!--<div class='modal-title' id='myModalLabel'>電　卓</div>-->
 				</div>
 				<div class='modal-body text-center'>
 					<i class="fa-solid fa-arrow-rotate-right fa-lg"></i> をタップすると、商品登録時に設定した分類ごとにパネルが表示されます。<br>
@@ -423,7 +424,7 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</div>-->
 	<!--領収書-->
 	<div class='modal fade' id='ryoushuu' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
 		<div class='modal-dialog  modal-dialog-centered'>
@@ -651,7 +652,7 @@
 	});
 	tutorial_7.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>数量減は「カート編集」ボタンでカートを表示し、「＋－」ボタンで調整します。</p>`,
+		text: `<p class='tour_discription'>数量減は「カート編集」ボタンでカートを表示し、「＋－」ボタンで調整します。<br>タブレット端末等では画面左に常に表示されてます。</p>`,
 		attachTo: {
 			element: '#main_area',
 			on: 'top'

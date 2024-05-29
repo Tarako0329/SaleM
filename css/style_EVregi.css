@@ -23,11 +23,11 @@ INPUT.ev{
     position: fixed;    /* ウィンドウを基準に画面に固定 */
     top: 0;             /* 上下の固定位置を上から0pxにする */
     right: 0;           /* 左右の固定位置を左から0pxにする */
-    height:50px;
+    height:40px;
     width:16rem;
     /*background: #ff838b;*/
     background:transparent;
-    padding:0;
+    /*padding:0;*/
 }
 /*電卓ボタン*/
 .btn--dentaku{
@@ -239,7 +239,7 @@ INPUT.su{
     font-weight: 600;
 }
 .header-select{
-    height: 30px; /* 高さを指定 */
+    height: 36px; /* 高さを指定 */
     padding: 2px 2px; /* ヘッダーに上下左右それぞれ余白を指定 */
     box-sizing: border-box; /* padding分を含んで幅を100%にするため */
     position: fixed; /* ウィンドウを基準に画面に固定 */
@@ -255,7 +255,7 @@ INPUT.su{
     padding-bottom: 5px; /* ヘッダーに余白を指定 */
     box-sizing: border-box; /* padding分を含んで幅を100%にするため */
     position: fixed; /* ウィンドウを基準に画面に固定 */
-    top: 100px; /* 上下の固定位置を上から0pxにする */
+    top: 110px; /* 上下の固定位置を上から0pxにする */
     left: 0; /* 左右の固定位置を左から0pxにする */
     width: 100%;
     z-index: 99;
@@ -265,8 +265,8 @@ INPUT.su{
 }
 .common_body {
     padding-top: 200px; /* ヘッダーの後ろに要素が隠れないようにするため  160*/
-    padding-bottom:145px;  /*フッターーの後ろに要素が隠れないようにするため */
-    height:100%;
+    padding-bottom:200px;  /*フッターーの後ろに要素が隠れないようにするため */
+    min-height:100%;
 }
 
 .rezfooter{
@@ -317,12 +317,13 @@ INPUT.su{
 }
 }
 .address_disp{
-    font-size:12px;
-    /*
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    */
+    /*font-size:12px;*/
+    position:fixed;
+    top:45px;
+    right:5px;
+    color:var(--user-disp-color);
+    max-width:50%;
+    height:15px;
 }
 @media screen and (max-width:400px) {
     .address_disp{

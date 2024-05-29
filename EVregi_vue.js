@@ -52,7 +52,7 @@
 
 				//商品マスタ取得関連
 				const shouhinMS = ref([])			//商品マスタ
-				const disp_category = ref(4)		//パネルの分類別表示設定変更用
+				const disp_category = ref(0)		//パネルの分類別表示設定変更用
 
 				const total_uriage = computed(() =>{//売上リストの合計売上額
 					let sum_uriage = 0
@@ -95,13 +95,38 @@
 					})
 				})//商品パネルのソート・フィルタ
 
+				const category = ref('')
 				const panel_changer = () => {//商品パネルのカテゴリー表示切替
 					if(disp_category.value >= 4){
 						disp_category.value=1
 					}else{
 						disp_category.value ++
 					}
+					IDD_Write('LocalParameters',[{id:'category',category:disp_category.value}])
 				}//商品パネルのカテゴリー表示切替
+				watch([disp_category],()=>{
+					if(disp_category.value==1){
+						category.value = '大'
+					}else if(disp_category.value==2){
+						category.value = '大>中'
+					}else if(disp_category.value==3){
+						category.value = '大>中>小'
+					}else if(disp_category.value==4){
+						category.value = 'OFF'
+					}
+				})
+				const set_category = (jsonobj) =>{
+					console_log('set_category start')
+					console_log(jsonobj)
+					if(jsonobj===undefined){
+						disp_category.value=1
+						return
+					}
+					//category = jsonobj
+					//console_log(category)
+					disp_category.value = Number(jsonobj.category)
+			}
+
 
 				//オーダー処理関連
 				const pay = ref(0)		//会計税込金額
@@ -834,6 +859,7 @@
 					v_get_gio()
 					order_list_area_set()
 					IDD_Read('LocalParameters','EventName',set_EventName)
+					IDD_Read('LocalParameters','category',set_category)
 					window.addEventListener('resize', order_list_area_set)
 				})
 				return{
@@ -857,6 +883,7 @@
 					get_UriageList,
 					UriageList,
 					disp_category,
+					category,
 					panel_changer,
 					total_uriage,
 					vlat,
