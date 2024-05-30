@@ -72,12 +72,14 @@ if($rtn !== true){
         }elseif($analysis_type==4){//製品名ごと売上金額ランキング
             //$sqlstr = "select ShouhinNM as Labels ,sum(UriageKin) as datasets,sum(zei) as 税,sum(UriageKin+zei) as datasets_withTax from UriageData ";
             $sqlstr = "select ShouhinNM as Labels ,sum(UriageKin) as datasets from UriageData ";
+            //$sqlstr = "select if(LENGTH(ShouhinNM)<=7,ShouhinNM,CONCAT(LEFT(ShouhinNM,7),'…')) as Labels ,sum(UriageKin) as datasets from UriageData ";
             $gp_sqlstr = "group by ShouhinNM order by sum(UriageKin) desc";
             $aryColumn = ["商品名","売上(税抜)"];
             $chart_type="bar";
             $top15="on";
         }elseif($analysis_type==5){//製品名ごと売上数量ランキング
             $sqlstr = "select ShouhinNM as Labels ,sum(Su) as datasets from UriageData ";
+            //$sqlstr = "select if(LENGTH(ShouhinNM)<=7,ShouhinNM,CONCAT(LEFT(ShouhinNM,7),'…')) as Labels ,sum(Su) as datasets from UriageData ";
             $gp_sqlstr = "group by ShouhinNM order by sum(Su) desc";
             $aryColumn = ["商品名","売上数"];
             $chart_type="bar";
@@ -86,7 +88,7 @@ if($rtn !== true){
             //客単価一覧
             $sqlstr = "select 計上日,Event as Labels,ROUND(avg(税抜売上)) as datasets from ";
             $sqlstr = $sqlstr." (select UriDate as 計上日 ,concat(Event,TokuisakiNM) as Event ,UriageNO ,sum(UriageKin) as 税抜売上 from UriageData ";
-            $gp_sqlstr = "group by UriDate,UriageNO ) as UriageData group by 計上日 order by 計上日";
+            $gp_sqlstr = "group by UriDate,UriageNO ) as UriageData group by 計上日 order by 計上日 desc";
             $aryColumn = ["計上日","Event/店舗","客単価"];
             $chart_type="bar";
         }elseif($analysis_type==7){//イベント・店舗別客単価ランキング
@@ -97,10 +99,10 @@ if($rtn !== true){
             $chart_type="bar";
             $top15="on";
         }elseif($analysis_type==8){//イベント・店舗別来客数推移
-            $sqlstr = "select UriDate as Labels,Event,sum(来客カウント) as datasets from ";
+            $sqlstr = "select UriDate as 計上日,Event as Labels,sum(来客カウント) as datasets from ";
             $sqlstr = $sqlstr." (select uid, UriDate, Event, TokuisakiNM, UriageNO,0 as ShouhinCD, 1 as 来客カウント from UriageData where Event <>'' ";
             $sqlstr = $sqlstr." group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriageData ";
-            $gp_sqlstr = "group by UriDate,Event order by UriDate";
+            $gp_sqlstr = "group by UriDate,Event order by UriDate desc";
             $aryColumn = ["計上日","Event/店舗","来客数"];
             $chart_type="bar";
             
@@ -189,10 +191,18 @@ if($rtn !== true){
             $xlabels=[];
             if($chart_type==="bar" || $chart_type==="doughnut"){
                 $i=0;
-                foreach($result as $row){
-                    $labels[$i] = $row["Labels"];
-                    $data[$i] = $row["datasets"];
-                    $i++;
+                if($analysis_type==6 ||$analysis_type==8){
+                    foreach($result as $row){
+                        $labels[$i] = [$row["計上日"],(mb_strwidth($row["Labels"])<=12)?$row["Labels"]:mb_strimwidth($row["Labels"],0,12)."…"];
+                        $data[$i] = $row["datasets"];
+                        $i++;
+                    }
+                }else{
+                    foreach($result as $row){
+                        $labels[$i] = (mb_strwidth($row["Labels"])<=12)?$row["Labels"]:mb_strimwidth($row["Labels"],0,12)."…";
+                        $data[$i] = $row["datasets"];
+                        $i++;
+                    }
                 }
             }else if($chart_type==="line"){
                 $i=0;

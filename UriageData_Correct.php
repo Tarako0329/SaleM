@@ -199,6 +199,9 @@
 			<div class='row mb-2'>
 				<p style='color:red;margin-bottom: 2px;font-size: large;'>※上記データが更新対象となります。</p>
 				<p style='color:red;margin-bottom: 2px;font-size: large;'>※<span style='color:blue;'>青字の項目</span>のタップで絞込みできます。</p>
+				<a href="#" style='font-size: large;' onclick='urihelp()'>
+						<i class="bi bi-question-square Qicon awesome-color-panel-border-same me-1"></i>詳細help
+					</a>
 			</div>
 			<div class='row mb-2'><!--売上日/help icon-->
 				<div class="col-11" style='display:flex;'>
@@ -208,11 +211,11 @@
       		</div>
 					<input type='date' style='font-size:1.5rem;width:250px;background-color:#999999;' name='up_uridate' id='up_uridate' maxlength='10'  class='form-control'>
     		</div>
-				<div class="col-1">
+				<!--<div class="col-1">
 					<a href="#" style='color:inherit;' onclick='urihelp()'>
 						<i class="fa-regular fa-circle-question fa-2x awesome-color-panel-border-same"></i>
 					</a>
-				</div>
+				</div>-->
 			</div><!--売上日/help icon-->
 			<div class='row mb-2'><!--イベント名-->
 				<div class="col-11" style='display:flex;'>
@@ -220,7 +223,7 @@
     	    	<input class="form-check-input" type="checkbox" id="chk_event" name='chk_event' onchange='chk_visible(this,"#up_event")' >
       	  	<label class="form-check-label" for="chk_event">ｲﾍﾞﾝﾄ名</label>
       		</div>
-					<input type='text' style='font-size:1.5rem;width:250px;background-color:#999999;' name='up_event' id='up_event' maxlength='10'  class='form-control'>
+					<input type='text' style='font-size:1.5rem;width:250px;background-color:#999999;' name='up_event' id='up_event' maxlength='30'  class='form-control'>
     		</div>
 			</div><!--イベント名-->
 			<div class='row mb-2'><!--顧客名-->
@@ -229,7 +232,7 @@
     	    	<input class="form-check-input" type="checkbox" id="chk_kokyaku" name='chk_kokyaku' onchange='chk_visible(this,"#up_kokyaku")' >
       	  	<label class="form-check-label" for="chk_kokyaku">顧客名</label>
       		</div>
-					<input type='text' style='font-size:1.5rem;width:250px;background-color:#999999;' name='up_kokyaku' id='up_kokyaku' maxlength='10'  class='form-control'>
+					<input type='text' style='font-size:1.5rem;width:250px;background-color:#999999;' name='up_kokyaku' id='up_kokyaku' maxlength='30'  class='form-control'>
     		</div>
 			</div><!--顧客名-->
 			<template v-if='false'>
@@ -1100,6 +1103,23 @@
 	});
 	tutorial_UriageShusei.addStep({
 		title: `<p class='tour_header'>売上の修正</p>`,
+		text: `<p class='tour_discription'><span style='color:red;'>売上数量、商品単価については修正できません。</span>
+					<br>
+					<br>売上を削除し、再度レジ画面で打ち直しして下さい。
+			   </p>`,
+		buttons: [
+			{
+				text: 'Back',
+				action: tutorial_UriageShusei.back
+			},
+			{
+				text: 'Next',
+				action: tutorial_UriageShusei.next
+			}
+		]
+	});
+	tutorial_UriageShusei.addStep({
+		title: `<p class='tour_header'>売上の修正</p>`,
 		text: `<p class='tour_discription'>例えば、X月X日のイベント名が間違えてた！
 				<br>といった場合、上の売上データで日付のみを選択した状態にします。
 			   </p>`,
@@ -1161,7 +1181,7 @@
 	});
 	tutorial_UriageShusei.addStep({
 		title: `<p class='tour_header'>売上の修正</p>`,
-		text: `<p class='tour_discription'>売上げの修正方法については以上となります。
+		text: `<p class='tour_discription'>売上の修正方法については以上となります。
 				<br>
 				<br>わからない事がありましたらトップ画面下の「お問い合わせ」よりお願いします。
 			   </p>`,

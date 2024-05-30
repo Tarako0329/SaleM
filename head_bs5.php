@@ -49,6 +49,20 @@
 					{税区分:1101,税区分名:'10%',税率:0.1},
 				]
 
+        const BUNSEKI_MENU = [
+            {sort:1,val:1,  name:"売上実績(日計)"},
+            {sort:2,val:2,  name:"売上実績(月計)"},
+            {sort:3,val:3,  name:"売上実績(年計)"},
+            {sort:4,val:12, name:"ジャンル別売上比"},
+            {sort:5,val:4,  name:"売上ランキング(金額)"},
+            {sort:6,val:5,  name:"売上ランキング(個数)"},
+            {sort:7,val:6,  name:"客単価実績(イベントごと)"},
+            {sort:8,val:7,  name:"平均客単価ランキング"},
+            {sort:9,val:8,  name:"来客数実績(イベントごと)"},
+            {sort:10,val:9, name:"平均来客数ランキング"},
+            {sort:11,val:10,name:"売れる勢い"},
+            {sort:12,val:11,name:"来客数推移"},
+        ]
     </script>
     <script src="script/function.js?<?php echo $time; ?>"></script>
     <script src="script/indexeddb.js?<?php echo $time; ?>"></script>
