@@ -50,18 +50,19 @@
 				]
 
         const BUNSEKI_MENU = [
-            {sort:1,val:1,  name:"売上実績(日計)"},
-            {sort:2,val:2,  name:"売上実績(月計)"},
-            {sort:3,val:3,  name:"売上実績(年計)"},
-            {sort:4,val:12, name:"ジャンル別売上比"},
-            {sort:5,val:4,  name:"売上ランキング(金額)"},
-            {sort:6,val:5,  name:"売上ランキング(個数)"},
-            {sort:7,val:6,  name:"客単価実績(イベントごと)"},
-            {sort:8,val:7,  name:"平均客単価ランキング"},
-            {sort:9,val:8,  name:"来客数実績(イベントごと)"},
-            {sort:10,val:9, name:"平均来客数ランキング"},
-            {sort:11,val:10,name:"売れる勢い"},
-            {sort:12,val:11,name:"来客数推移"},
+            {sort:10,val:1,  name:"売上実績(日計)"},
+            {sort:20,val:2,  name:"売上実績(月計)"},
+            {sort:30,val:3,  name:"売上実績(年計)"},
+            {sort:40,val:12, name:"ジャンル別売上比"},
+            {sort:50,val:4,  name:"売上ランキング(金額)"},
+            {sort:60,val:5,  name:"売上ランキング(個数)"},
+            {sort:65,val:'Ev_Avr_uri_rank',  name:"ｲﾍﾞﾝﾄ別平均総売上ﾗﾝｷﾝｸﾞ"},
+            {sort:70,val:6,  name:"客単価実績(ｲﾍﾞﾝﾄ開催ごと)"},
+            {sort:80,val:7,  name:"ｲﾍﾞﾝﾄ別平均客単価ﾗﾝｷﾝｸﾞ"},
+            {sort:90,val:8,  name:"来客数実績(ｲﾍﾞﾝﾄ開催ごと)"},
+            {sort:100,val:9, name:"ｲﾍﾞﾝﾄ別平均来客数ﾗﾝｷﾝｸﾞ"},
+            {sort:110,val:10,name:"売れる勢い"},
+            {sort:120,val:11,name:"来客数推移"},
         ]
     </script>
     <script src="script/function.js?<?php echo $time; ?>"></script>

@@ -76,7 +76,7 @@ log_writer2("test",$SLVresult,"lv3");
 		<div class='title' style='width: 100%;'><a :href='url'><?php echo $title;?></a></div>
 	</header>
 	<main class='common_body' style='padding-top:55px;width:100%;'>
-		<div class='container'>
+		<div class='container-fluid'>
 		<div class='row'>
 		<div class='col-md-12' style='padding:5px;background:white'>
 			<input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
@@ -99,6 +99,7 @@ log_writer2("test",$SLVresult,"lv3");
 							<input type='radio' class='btn-check' name='options' autocomplete='off' id='ymd'> 
 							<label @click='change_mode_ymd()' class='btn btn-outline-primary' for='ymd' style='font-size:1.2rem;height:25px;border-radius:0;padding-top:2px;'>年月日</label>
 						</div>
+					</div>
 				</div>
 				<div v-if='serch_ym===true' class='row'>
 					<div class='col-5'>
@@ -157,6 +158,8 @@ log_writer2("test",$SLVresult,"lv3");
 				</div>
 			</div>
 		</div>
+		</div>
+		<div class='row'>
 		<div class='col-md-9'>
 			<div id='chart_area' style='width:95%;'> <canvas id='ChartCanvas'></canvas></div>
 		</div>
@@ -209,7 +212,7 @@ log_writer2("test",$SLVresult,"lv3");
 		createApp({
 			setup(){
 				//chart_type(bar or doughnut)
-				const analysis_type = ref(<?php echo $analysis_type; ?>)
+				const analysis_type = ref('<?php echo $analysis_type; ?>')
 				const bunseki_menu = ref(BUNSEKI_MENU)
 				var category_lv = 0 //商品分類ごとの売上円グラフで使用。0：大分類　1：中分類　2：小分類
 				var over_category   //商品分類ごとの売上円グラフで使用。クリックした分類の下分類の円グラフを表示する際に使用
@@ -359,11 +362,19 @@ log_writer2("test",$SLVresult,"lv3");
 								chart_color.value[i]='rgba('+(~~(256 * Math.random()))+','+(~~(256 * Math.random()))+','+ (~~(256 * Math.random()))+', 0.8)'
 							}
 						}
+						//グラフエリアのサイズ設定
 						if(response.data.chart_type==='bar'){
-							document.getElementById("chart_area").style.height='750px'
+							//document.getElementById("chart_area").style.height='750px'
+							if(Number(chart_datasets.value.length) * 30 < 150){
+								document.getElementById("chart_area").style.height='150px'
+							}else{
+								document.getElementById("chart_area").style.height=`${Number(chart_datasets.value.length) * 30}px`
+							}
 						}else{
 							document.getElementById("chart_area").style.height='100%'
 						}
+						console_log(document.getElementById("chart_area").style.height)
+						
 						if(response.data.chart_type==='line'){
 							let hour = response.data.xStart
 							for(let i=0;hour<=response.data.xEnd;i++){

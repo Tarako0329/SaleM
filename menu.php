@@ -99,7 +99,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     
         
         //新機能リリース通知
-        $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.new_releace_002') as ToursLog FROM Users_webrez WHERE uid=?";
+        $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.new_releace_003') as ToursLog FROM Users_webrez WHERE uid=?";
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
         $stmt->execute();
@@ -109,7 +109,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             //新機能リリース通知 未確認
             $bell_action="blink";
             $bell_size="fa-2x";
-            $bell_msg="tap here！";
+            $bell_msg="お知らせ";
         }else{
             //新機能リリース通知 確認済み
         }
@@ -542,6 +542,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     }
 </script>
 <script>
+/*
     const new_releace_002 = new Shepherd.Tour({
         useModalOverlay: true,
         defaultStepOptions: {
@@ -582,10 +583,38 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             enabled:false
         }
     });
+*/
+    const new_releace_003 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'new_releace_003'
+    });
+    new_releace_003.addStep({
+        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+        text: `<p class='tour_discription'>売上分析メニューに<span style='color:blue'>「イベント別平均総売上ランキング」</span>を追加しました。
+            <br>
+            <br>出店イベントの取捨選択の参考にしてください。</p>`,
+        buttons: [
+			{
+				text: 'OK',
+				action: new_releace_003.next
+			}
+        ],
+        cancelIcon:{
+            enabled:false
+        }
+    });
     function new_releace_start(){
         //新機能のリリース通知はこの関数で呼び出すツアーを更新する
         //shuppin_zaiko_help1.start(tourFinish,'new_releace_001','');
-        new_releace_002.start(tourFinish,'new_releace_002',''); 
+        //new_releace_002.start(tourFinish,'new_releace_002',''); 
+        new_releace_003.start(tourFinish,'new_releace_003','finish'); 
     }
 </script>
 <!--pwa対応部-->
