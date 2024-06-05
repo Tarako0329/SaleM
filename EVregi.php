@@ -102,7 +102,7 @@
 				<input type='date' class='date' style='height:20%' name='KEIJOUBI' required='required' v-model='labels["date_ini"]'>
 			</span>
 			<input list='EVLIST' type='text' class='ev item_2' :name='labels["EV_input_name"]' v-model='labels["EV_input_value"]' required='required' :placeholder='labels["EV_input_placeholder"]'>
-			<datalist id="search_word_suggest">
+			<datalist id="EVLIST">
 				<option value="カメラ話"></option>
 				<option value="雑記"></option>
 				<option value="Web話"></option>
