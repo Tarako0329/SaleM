@@ -101,12 +101,8 @@
 				</span>
 				<input type='date' class='date' style='height:20%' name='KEIJOUBI' required='required' v-model='labels["date_ini"]'>
 			</span>
-			<input list='EVLIST' type='text' class='ev item_2' :name='labels["EV_input_name"]' v-model='labels["EV_input_value"]' required='required' :placeholder='labels["EV_input_placeholder"]'>
-			<datalist id="EVLIST">
-				<option value="カメラ話"></option>
-				<option value="雑記"></option>
-				<option value="Web話"></option>
-			</datalist>
+			<!--<input type='text' class='ev item_2' :name='labels["EV_input_name"]' v-model='labels["EV_input_value"]' required='required' :placeholder='labels["EV_input_placeholder"]'>-->
+			<input type='text' class='ev item_2' :name='labels["EV_input_name"]' v-model='EV_input_value' @Click='clear_EV_input_value()' required='required' :placeholder='labels["EV_input_placeholder"]' readonly data-bs-toggle='modal' data-bs-target='#EventSelect'>
 			<div class='address_disp fs-4' :style='`${labels["address"]}; `'>
 				<input class="form-check-input" type='checkbox' name='nonadd' id='nonadd' v-model='labels_address_check'>
 				<label class="form-check-label ms-1 item_101" for='nonadd' id='address_disp' :style='labels_address_style' onclick='gio_onoff()'>{{vjusho}}</label>
@@ -415,22 +411,6 @@
 			</div>
 		</div>
 	</div>
-	<!--分類表示切替のヘルプ(modal_help1)-->
-	<!--<div class='modal fade' id='modal_help1' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
-		<div class='modal-dialog  modal-dialog-centered'>
-			<div class='modal-content' style='font-size: 1.5rem; font-weight: 600;'>
-				<div class='modal-header'>
-				</div>
-				<div class='modal-body text-center'>
-					<i class="fa-solid fa-arrow-rotate-right fa-lg"></i> をタップすると、商品登録時に設定した分類ごとにパネルが表示されます。<br>
-					タップするごとに（大分類⇒中分類⇒小分類⇒50音順）の順番でループします。<br>
-				</div>
-				<div class='modal-footer'>
-					<button type='button'  data-bs-dismiss='modal'>閉じる</button>
-				</div>
-			</div>
-		</div>
-	</div>-->
 	<!--領収書-->
 	<div class='modal fade' id='ryoushuu' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
 		<div class='modal-dialog  modal-dialog-centered'>
@@ -525,7 +505,29 @@
 			</div>
 		</div>
 	</div>
-
+	<!--イベント選択-->
+	<div class='modal fade' id='EventSelect' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
+		<div class='modal-dialog  modal-dialog-centered modal-sm'>
+			<div class='modal-content' style='font-size: 2rem; font-weight: 600;'>
+				<div class='modal-header'>
+					<div class='modal-title' id='myModalLabel' style='text-align:center;width:100%;'>イベント名入力</div>
+				</div>
+				<div class='modal-body text-center ps-5 pe-5'>
+					<input type='text' class='form-control' v-model='EV_input_value' style='font-size: 2rem;background-color:pink;' placeholder="イベント名入力">
+					
+					<select class='form-select form-select-lg' v-model='EV_input_value' size=5 style='font-size: 1.6rem;'>
+						<template v-for='(list,index) in EventList_filter' :key='list.Event'>
+							<option :value=list.Event>{{list.Event}}</option>
+						</template>
+					</select>
+					<small style='font-size: 1.2rem;'>イベント名を入力。もしくはリストから選択してください。</small>
+					
+				</div>
+				<div class='modal-footer'>
+				</div>
+			</div>
+		</div>
+	</div>
 	</div><!-- <div  id='register'> -->
 	<script src="EVregi_vue.js?<?php echo $time; ?>"></script>
 	<script>

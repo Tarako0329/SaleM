@@ -49,11 +49,6 @@
 					});
 					
 				}//売上リスト取得ajax
-
-				//商品マスタ取得関連
-				const shouhinMS = ref([])			//商品マスタ
-				const disp_category = ref(0)		//パネルの分類別表示設定変更用
-
 				const total_uriage = computed(() =>{//売上リストの合計売上額
 					let sum_uriage = 0
 					UriageList.value.forEach((list) => {
@@ -62,6 +57,11 @@
 					return sum_uriage
 				})//売上リストの合計売上額
  
+
+				//商品マスタ取得関連
+				const shouhinMS = ref([])			//商品マスタ
+				const disp_category = ref(0)		//パネルの分類別表示設定変更用
+
 				const shouhinMS_filter = computed(() => {//商品パネルのソート・フィルタ:表示対象のみを返す or 表示対象かつ注文数１以上を返す
 					let order_panel = ([])
 					if (chk_register_show.value === "chk"){//表示対象のみを返す(商品マスタの[レジ表示]chk)
@@ -480,7 +480,6 @@
 				const alert_status = ref(['alert'])
 				const MSG = ref('')
 				const loader = ref(false)
-				//const csrf = ref('<?php echo $token; ?>') 
 				const csrf = ref('') 
 				const rtURL = ref('')
 
@@ -546,7 +545,8 @@
 						})
 						.finally(()=>{
 							get_UriageList()
-							IDD_Write('LocalParameters',[{id:'EventName',EventName:labels.value["EV_input_value"]}])
+							//IDD_Write('LocalParameters',[{id:'EventName',EventName:labels.value["EV_input_value"]}])
+							IDD_Write('LocalParameters',[{id:'EventName',EventName:EV_input_value.value}])
 							document.getElementById('main_area').style.paddingTop = '215px'
 							loader.value = false
 
@@ -788,14 +788,15 @@
 				}
 
 				//細かな表示設定など
-				let EventName=''
+				const EV_input_value= ref('')
 				const set_EventName = (jsonobj) =>{
 						console_log('set_EventName start')
 						//console_log(jsonobj)
 						if(jsonobj===undefined){return}
 						EventName = jsonobj
 						console_log(EventName)
-						labels.value["EV_input_value"] = EventName.EventName
+						//labels.value["EV_input_value"] = EventName.EventName
+						EV_input_value.value = EventName.EventName
 				}
 
 				//IDD_Read('LocalParameters','EventName',set_EventName)
@@ -815,12 +816,12 @@
 						rtn_labels.EV_input_name='KOKYAKU'
 						rtn_labels.EV_input_hidden='EV'
 						rtn_labels.EV_input_placeholder='顧客名'
-						rtn_labels.EV_input_value=''
+						//rtn_labels.EV_input_value=''
 					}else{
 						rtn_labels.EV_input_name='EV'
 						rtn_labels.EV_input_hidden='KOKYAKU'
 						rtn_labels.EV_input_placeholder='イベント名等'
-						rtn_labels.EV_input_value=EventName.EventName
+						//rtn_labels.EV_input_value=EventName.EventName
 					}
 					if(rg_mode.value !== 'evrez'){
 						rtn_labels.address='display:none'
@@ -839,6 +840,44 @@
 						return ''
 					}
 				})
+				const EventList = ref([])
+				const clear_EV_input_value = () =>{
+					EV_input_value.value = ""
+				}
+				const EventList_filter = computed(() => {
+					let searchWord = EV_input_value.value
+					//let searchWord = `マルシェ`;
+	
+	
+					//if (searchWord.length() === "0") return EventList.value;
+					return EventList.value.filter((row) => {
+						return (
+						row.Event.includes(searchWord) 
+						);
+					});
+				})
+	
+				const getEventList = () =>{
+					console_log(`*****【 getEventList start 】*****`);
+					let params = new URLSearchParams();
+					//params.append('user_id', '<?php echo $_SESSION["user_id"];?>');
+					params.append('user_id', p_uid);
+
+					axios
+					.post('ajax_get_event_list_for_regi.php',params)
+					.then((response) => {
+						console_log('getEventList succsess')
+						console_log(response.data)
+						EventList.value = response.data
+					})
+					.catch((error) => {
+						console_log(`getEventList ERROR:${error}`)
+					})
+					.finally(()=>{
+						console_log(`*****【 getEventList end 】*****`);
+					});
+
+				}
 
 				onMounted(() => {
 					//console_log(get_value(1000,0.1,'IN'))
@@ -858,8 +897,11 @@
 					get_UriageList()
 					v_get_gio()
 					order_list_area_set()
-					IDD_Read('LocalParameters','EventName',set_EventName)
 					IDD_Read('LocalParameters','category',set_category)
+					if(rg_mode.value !== 'kobetu'){
+						getEventList()
+						IDD_Read('LocalParameters','EventName',set_EventName)
+					}
 					window.addEventListener('resize', order_list_area_set)
 				})
 				return{
@@ -924,6 +966,10 @@
 					CHOUSEI_TYPE,
 					keydown_waribiki,
 					par,
+					EventList,
+					EventList_filter,
+					EV_input_value,
+					clear_EV_input_value,
 				}
 			}
 		})

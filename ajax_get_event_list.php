@@ -8,7 +8,7 @@ $ymto=get_getsumatsu($_POST['date_to']);
 
 
 // DBとの接続
-$pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
+//$pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
 if($_POST["list_type"]=="Event"){
     $sqlstr = "select CODE , LIST from (select Event as CODE,CONCAT('Ev:',Event) as LIST,UriDate from UriageData where uid =? and Event <> '' group by UriDate,Event ";
