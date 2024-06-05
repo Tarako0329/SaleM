@@ -102,7 +102,7 @@
 				<input type='date' class='date' style='height:20%' name='KEIJOUBI' required='required' v-model='labels["date_ini"]'>
 			</span>
 			<!--<input type='text' class='ev item_2' :name='labels["EV_input_name"]' v-model='labels["EV_input_value"]' required='required' :placeholder='labels["EV_input_placeholder"]'>-->
-			<input type='text' class='ev item_2' :name='labels["EV_input_name"]' v-model='EV_input_value' @Click='clear_EV_input_value()' required='required' :placeholder='labels["EV_input_placeholder"]' readonly data-bs-toggle='modal' data-bs-target='#EventSelect'>
+			<input type='text' class='ev item_2' :name='labels["EV_input_name"]' v-model='EV_input_value' @Click='clear_EV_input_value()' required='required' :placeholder='labels["EV_input_placeholder"]'  data-bs-toggle='modal' data-bs-target='#EventSelect'>
 			<div class='address_disp fs-4' :style='`${labels["address"]}; `'>
 				<input class="form-check-input" type='checkbox' name='nonadd' id='nonadd' v-model='labels_address_check'>
 				<label class="form-check-label ms-1 item_101" for='nonadd' id='address_disp' :style='labels_address_style' onclick='gio_onoff()'>{{vjusho}}</label>
@@ -129,8 +129,8 @@
 				<i class="bi bi-question-square logoff-color fs-1 fw-bold"></i>
 			</a>-->
 			<div class='fs-5 fw-bold' style='position:absolute;right:5px;width:130px;'>
-				<a class='btn-view ps-1 pt-0 pb-0 pe-1 me-2 item_15' href='javascript:void(0)' @Click='panel_changer()' >
-					<i class="bi bi-sort-down fs-1 me-1"></i>切換
+				<a class='btn-view ps-1 pt-1 pb-0 pe-1 me-2 item_15' href='#' @Click='panel_changer()' style='height: 30px;'>
+					<i class="bi bi-sort-down fs-3 me-1">切換</i>
 				</a>
 				<span class='logoff-color'>{{category}}</span>
 			</div>
@@ -510,12 +510,12 @@
 		<div class='modal-dialog  modal-dialog-centered modal-sm'>
 			<div class='modal-content' style='font-size: 2rem; font-weight: 600;'>
 				<div class='modal-header'>
-					<div class='modal-title' id='myModalLabel' style='text-align:center;width:100%;'>イベント名入力</div>
+					<div class='modal-title' id='myModalLabel' style='text-align:center;width:100%;'>イベント名入力 or 検索してリスト選択</div>
 				</div>
 				<div class='modal-body text-center ps-5 pe-5'>
-					<input type='text' class='form-control' v-model='EV_input_value' style='font-size: 2rem;background-color:pink;' placeholder="イベント名入力">
+					<input type='text' class='form-control ps-3' v-model='EV_input_value' style='font-size: 2rem;background-color:pink;' placeholder="入力 or 検索">
 					
-					<select class='form-select form-select-lg' v-model='EV_input_value' size=5 style='font-size: 1.6rem;'>
+					<select class='form-select form-select-lg ps-3' v-model='EV_input_value' size=5 style='font-size: 1.6rem;'>
 						<template v-for='(list,index) in EventList_filter' :key='list.Event'>
 							<option :value=list.Event>{{list.Event}}</option>
 						</template>
@@ -524,6 +524,7 @@
 					
 				</div>
 				<div class='modal-footer'>
+					<button type='button'  class='btn btn-primary' data-bs-dismiss='modal' style='font-size: 2.0rem;width:100%;'>決定</button>
 				</div>
 			</div>
 		</div>

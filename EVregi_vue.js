@@ -546,7 +546,10 @@
 						.finally(()=>{
 							get_UriageList()
 							//IDD_Write('LocalParameters',[{id:'EventName',EventName:labels.value["EV_input_value"]}])
-							IDD_Write('LocalParameters',[{id:'EventName',EventName:EV_input_value.value}])
+							const today = new Date().toLocaleDateString('sv-SE')
+							//IDD_Write('LocalParameters',[{id:'EventName',EventName:EV_input_value.value}])
+							IDD_Write('LocalParameters',[{id:'EventName',EventName:EV_input_value.value,LastUseDate:today}])
+							
 							document.getElementById('main_area').style.paddingTop = '215px'
 							loader.value = false
 
@@ -793,10 +796,16 @@
 						console_log('set_EventName start')
 						//console_log(jsonobj)
 						if(jsonobj===undefined){return}
+						if(jsonobj.LastUseDate===undefined){return}
 						EventName = jsonobj
 						console_log(EventName)
 						//labels.value["EV_input_value"] = EventName.EventName
-						EV_input_value.value = EventName.EventName
+
+						const today = new Date().toLocaleDateString('sv-SE')
+						
+						if(EventName.LastUseDate === today){
+							EV_input_value.value = EventName.EventName
+						}
 				}
 
 				//IDD_Read('LocalParameters','EventName',set_EventName)
