@@ -101,7 +101,12 @@
 				</span>
 				<input type='date' class='date' style='height:20%' name='KEIJOUBI' required='required' v-model='labels["date_ini"]'>
 			</span>
-			<input type='text' class='ev item_2' :name='labels["EV_input_name"]' v-model='labels["EV_input_value"]' required='required' :placeholder='labels["EV_input_placeholder"]'>
+			<input list='EVLIST' type='text' class='ev item_2' :name='labels["EV_input_name"]' v-model='labels["EV_input_value"]' required='required' :placeholder='labels["EV_input_placeholder"]'>
+			<datalist id="search_word_suggest">
+				<option value="カメラ話"></option>
+				<option value="雑記"></option>
+				<option value="Web話"></option>
+			</datalist>
 			<div class='address_disp fs-4' :style='`${labels["address"]}; `'>
 				<input class="form-check-input" type='checkbox' name='nonadd' id='nonadd' v-model='labels_address_check'>
 				<label class="form-check-label ms-1 item_101" for='nonadd' id='address_disp' :style='labels_address_style' onclick='gio_onoff()'>{{vjusho}}</label>
