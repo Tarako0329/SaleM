@@ -45,7 +45,7 @@ $token = csrf_create();
     $array = [
          '売上金額ランキング'=>['analysis_uriagejisseki.php?sum_tani=4&csrf_token='.$token,'商品ごとの売上金額ランキングを表示。']
         ,'売上個数ランキング'=>['analysis_uriagejisseki.php?sum_tani=5&csrf_token='.$token,'商品ごとの売上個数ランキングを表示。']
-        ,'ジャンル別売上集計'=>['analysis_uriagejisseki.php?sum_tani="12"&csrf_token='.$token,'ジャンルごとの売上を集計し、円グラフで表示。']
+        ,'ジャンル別売上集計'=>['analysis_uriagejisseki.php?sum_tani=12&csrf_token='.$token,'ジャンルごとの売上を集計し、円グラフで表示。']
         ,'ｲﾍﾞﾝﾄ別平均客単価ﾗﾝｷﾝｸﾞ'=>['analysis_uriagejisseki.php?sum_tani=7&csrf_token='.$token,'イベントごとの平均客単価を算出し、ランキングを表示。']
         ,'ｲﾍﾞﾝﾄ別平均来客数ﾗﾝｷﾝｸﾞ'=>['analysis_uriagejisseki.php?sum_tani=9&csrf_token='.$token,'イベントごとの平均来客数を算出し、ランキングを表示。']
         ,'ｲﾍﾞﾝﾄ別平均総売上ﾗﾝｷﾝｸﾞ'=>['analysis_uriagejisseki.php?sum_tani=Ev_Avr_uri_rank&csrf_token='.$token,'イベントごとの平均総売上を算出し、ランキングを表示。']

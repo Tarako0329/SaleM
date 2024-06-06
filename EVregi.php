@@ -516,8 +516,8 @@
 					<input type='text' class='form-control ps-3' v-model='EV_input_value' style='font-size: 2rem;background-color:pink;' placeholder="入力 or 検索">
 					
 					<select class='form-select form-select-lg ps-3' v-model='EV_input_value' size=5 style='font-size: 1.6rem;'>
-						<template v-for='(list,index) in EventList_filter' :key='list.Event'>
-							<option :value=list.Event>{{list.Event}}</option>
+						<template v-for='(list,index) in EventList_filter' :key='list.meishou'>
+							<option :value=list.meishou>{{list.meishou}}</option>
 						</template>
 					</select>
 					<small style='font-size: 1.2rem;'>イベント名を入力。もしくはリストから選択してください。</small>

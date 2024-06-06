@@ -12,7 +12,11 @@ if(empty($_SESSION['user_id'])){
 	$alert_status = "alert-warning";
 	$reseve_status = true;
 }else{
-    $sqlstr = "SELECT max(UriDate),Event FROM `UriageData` WHERE uid=:uid  and LENGTH(Event)<>0 group by Event order by max(UriDate) desc ";
+    if($_POST["regi_mode"]==="evrez"){
+        $sqlstr = "SELECT max(UriDate),Event as meishou FROM `UriageData` WHERE uid=:uid  and LENGTH(Event)<>0 group by Event order by max(UriDate) desc ";
+    }else if($_POST["regi_mode"]==="kobetu"){
+        $sqlstr = "SELECT max(UriDate),TokuisakiNM as meishou FROM `UriageData` WHERE uid=:uid  and LENGTH(TokuisakiNM)<>0 group by TokuisakiNM order by max(UriDate) desc ";
+    }
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue("uid", $_SESSION['user_id'], PDO::PARAM_INT);
     $stmt->execute();

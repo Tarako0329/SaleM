@@ -856,12 +856,11 @@
 				const EventList_filter = computed(() => {
 					let searchWord = EV_input_value.value
 					//let searchWord = `マルシェ`;
-	
-	
-					//if (searchWord.length() === "0") return EventList.value;
+		
+					if (String(searchWord).length === "0") {return EventList.value;}
 					return EventList.value.filter((row) => {
 						return (
-						row.Event.includes(searchWord) 
+						row.meishou.includes(searchWord) 
 						);
 					});
 				})
@@ -871,6 +870,7 @@
 					let params = new URLSearchParams();
 					//params.append('user_id', '<?php echo $_SESSION["user_id"];?>');
 					params.append('user_id', p_uid);
+					params.append('regi_mode', p_mode);
 
 					axios
 					.post('ajax_get_event_list_for_regi.php',params)
@@ -910,6 +910,8 @@
 					if(rg_mode.value !== 'kobetu'){
 						getEventList()
 						IDD_Read('LocalParameters','EventName',set_EventName)
+					}else if(rg_mode.value === 'kobetu'){
+						getEventList()
 					}
 					window.addEventListener('resize', order_list_area_set)
 				})
