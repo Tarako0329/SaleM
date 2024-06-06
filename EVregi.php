@@ -102,7 +102,9 @@
 				<input type='date' class='date' style='height:20%' name='KEIJOUBI' required='required' v-model='labels["date_ini"]'>
 			</span>
 			<!--<input type='text' class='ev item_2' :name='labels["EV_input_name"]' v-model='labels["EV_input_value"]' required='required' :placeholder='labels["EV_input_placeholder"]'>-->
-			<input type='text' class='ev item_2' :name='labels["EV_input_name"]' v-model='EV_input_value' @Click='clear_EV_input_value()' required='required' :placeholder='labels["EV_input_placeholder"]'  data-bs-toggle='modal' data-bs-target='#EventSelect'>
+			<input type='text' class='ev' :name='labels["EV_input_name"]' v-model='EV_input_value' required='required' style='width:1px;'>
+			<div role='button' class='ev item_2'  @Click='clear_EV_input_value()'   data-bs-toggle='modal' data-bs-target='#EventSelect'>{{EV_input_value}}</div>
+
 			<div class='address_disp fs-4' :style='`${labels["address"]}; `'>
 				<input class="form-check-input" type='checkbox' name='nonadd' id='nonadd' v-model='labels_address_check'>
 				<label class="form-check-label ms-1 item_101" for='nonadd' id='address_disp' :style='labels_address_style' onclick='gio_onoff()'>{{vjusho}}</label>

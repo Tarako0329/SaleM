@@ -10,13 +10,15 @@ body,#register,#form1{
     height: 70%;
 }
 
-INPUT.ev{
+/*INPUT.ev{*/
+.ev{
     /*INPUT イベント名・店舗名部*/
     border-right:none;
     border-left:none;
     border-top:none;
+    border-bottom:solid 1px;;
     border-color:#fff;  /*下線・色固定*/
-    text-align:center;
+    /*text-align:center;*/
     font-size: 1.7rem;
     font-weight: 600;
     color: #fff;
@@ -27,7 +29,10 @@ INPUT.ev{
     width:16rem;
     /*background: #ff838b;*/
     background:transparent;
-    /*padding:0;*/
+    padding-top:10px;
+    padding-left:15px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 /*電卓ボタン*/
 .btn--dentaku{
