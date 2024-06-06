@@ -1,7 +1,7 @@
 <?php
 require "php_header.php";
 
-log_writer2("ajax_get_event_list_for_regi.php",$_POST,"lv0");
+log_writer2("ajax_get_event_list_for_regi.php",$_POST,"lv3");
 
 // DBとの接続
 //$pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());

@@ -510,14 +510,14 @@
 	<!--イベント選択-->
 	<div class='modal fade' id='EventSelect' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
 		<div class='modal-dialog  modal-dialog-centered modal-sm'>
-			<div class='modal-content' style='font-size: 2rem; font-weight: 600;'>
+			<div class='modal-content' style='font-size: 1.6rem; font-weight: 600;'>
 				<div class='modal-header'>
 					<div class='modal-title' id='myModalLabel' style='text-align:center;width:100%;'>イベント名入力 or 検索してリスト選択</div>
 				</div>
 				<div class='modal-body text-center ps-5 pe-5'>
-					<input type='text' class='form-control ps-3' v-model='EV_input_value' style='font-size: 2rem;background-color:pink;' placeholder="入力 or 検索">
+					<input type='text' class='form-control ps-3' v-model='EV_input_value' style='font-size: 1.6rem;background-color:pink;' placeholder="入力 or 検索">
 					
-					<select class='form-select form-select-lg ps-3' v-model='EV_input_value' size=5 style='font-size: 1.6rem;'>
+					<select class='form-select form-select-lg ps-3' v-model='EV_input_value' style='font-size: 1.6rem;'>
 						<template v-for='(list,index) in EventList_filter' :key='list.meishou'>
 							<option :value=list.meishou>{{list.meishou}}</option>
 						</template>
