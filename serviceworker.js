@@ -1,6 +1,6 @@
 // キャッシュするリソース(css、jsがあれば個別で追加)
 //キャッシュ利用部分を止める
-const CACHE_VERSION = 'v40_';
+const CACHE_VERSION = 'v41';
 const CACHE_NAME = `${CACHE_VERSION}!${registration.scope}`;
 
 // キャッシュするファイルをセットする
