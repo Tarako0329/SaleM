@@ -870,7 +870,7 @@
 					let params = new URLSearchParams();
 					//params.append('user_id', '<?php echo $_SESSION["user_id"];?>');
 					params.append('user_id', p_uid);
-					params.append('regi_mode', p_mode);
+					params.append('regi_mode', rg_mode.value);
 
 					axios
 					.post('ajax_get_event_list_for_regi.php',params)
