@@ -12,7 +12,6 @@
 	data : []
 	chart_type
 */
-//log_writer2("ajax_UriageDate_update_sql.php",$sql,"lv3");
 require "php_header.php";
 register_shutdown_function('shutdown');
 
@@ -30,6 +29,7 @@ $data=[];
 $chart_type="";
 
 $rtn = csrf_checker(["analysis_uriagejisseki.php","analysis_abc.php"],["P","C","S"]);
+log_writer2("\$_POST",$_POST,"lv3");
 if($rtn !== true){
 	$msg=$rtn;
 	$alert_status = "alert-warning";
@@ -242,6 +242,7 @@ if($rtn !== true){
 				}else{
 					foreach($result as $row){
 						$labels[$i] = (mb_strwidth($row["Labels"])<=12)?$row["Labels"]:mb_strimwidth($row["Labels"],0,12)."…";
+						$labels_long[$i] = $row["Labels"];
 						$data[$i] = $row["datasets"];
 						$i++;
 					}
@@ -341,6 +342,7 @@ $return_sts = array(
 	,"aryColumn" => $aryColumn
 	,"result" => $result
 	,"labels" => $labels
+	,"labels_long" => $labels_long
 	,"data" => $data
 	,"chart_type" => $chart_type
 	,"top15" => $top15

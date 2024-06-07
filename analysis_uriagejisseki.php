@@ -82,15 +82,6 @@ log_writer2("test",$SLVresult,"lv3");
 			<input type='hidden' name='csrf_token' value='<?php echo $csrf_create; ?>'>
 			<div class='container-fluid'>
 				<div class='row'>
-					<!--<div class='col-3' style='padding-top:3px;'>集計期間:</div>
-					<div class='col-9'>
-					<div class='input-group' id='YM'>
-						<input type='radio' class='btn-check' name='options' autocomplete='off' id='ym' checked>
-						<label @click='change_mode_ym()' class='btn btn-outline-primary' for='ym' style='font-size:1.2rem;height:25px;border-radius:0;padding-top:2px;'>年月</label>
-						<input type='radio' class='btn-check' name='options' autocomplete='off' id='ymd'> 
-						<label @click='change_mode_ymd()' class='btn btn-outline-primary' for='ymd' style='font-size:1.2rem;height:25px;border-radius:0;padding-top:2px;'>年月日</label>
-					</div>
-					</div>-->
 					<div class='col-12 d-inline-flex ' style='padding-top:3px;'>
 						<div>集計期間:</div>
 						<div class='' id='YM' style='width:200px;'>
@@ -215,7 +206,7 @@ log_writer2("test",$SLVresult,"lv3");
 				const analysis_type = ref('<?php echo $analysis_type; ?>')
 				const bunseki_menu = ref(BUNSEKI_MENU)
 				var category_lv = 0 //商品分類ごとの売上円グラフで使用。0：大分類　1：中分類　2：小分類
-				var over_category   //商品分類ごとの売上円グラフで使用。クリックした分類の下分類の円グラフを表示する際に使用
+				var over_category = ""   //商品分類ごとの売上円グラフで使用。クリックした分類の下分類の円グラフを表示する際に使用
 				var myChart
 				const drow_chart = (chart_type) => {
 					console_log('drow_chart start','lv3')
@@ -270,6 +261,7 @@ log_writer2("test",$SLVresult,"lv3");
 									}
 									over_category = chart.data.labels[el[0].index]
 									console_log('onClick : category_lv ' + category_lv);
+									console_log('onClick : over_category ' + over_category);
 									get_analysis_data()
 								}
 						}
@@ -335,7 +327,10 @@ log_writer2("test",$SLVresult,"lv3");
 				const get_analysis_data = () => {//売上分析データ取得ajax
 					console_log("get_analysis_data start",'lv3')
 					let params = new URLSearchParams()
-					if(analysis_type.value!=='12'){category_lv=0}
+					if(analysis_type.value != '12'){//ジャンル別売上円グラフ以外
+						category_lv = 0
+						over_category = ""
+					}
 					params.append('user_id', '<?php echo $_SESSION["user_id"];?>')
 					params.append('date_from', date_from.value)
 					params.append('date_to', date_to.value)
@@ -346,6 +341,7 @@ log_writer2("test",$SLVresult,"lv3");
 					params.append('category_lv', category_lv)
 					params.append('over_category', over_category)
 					console_log(category_lv)
+					console_log(params)
 
 					axios
 					.post('ajax_get_analysi_uridata.php',params)
@@ -353,17 +349,20 @@ log_writer2("test",$SLVresult,"lv3");
 						console_log(response.data,'lv3')
 						CSRF.value = response.data.csrf_create
 						chart_type.value = response.data.chart_type
-						//chart_labels.value = [...response.data.labels]
-						chart_labels.value = response.data.labels
-						//chart_datasets.value = [...response.data.data]
+						//chart_labels.value = response.data.labels
 						chart_datasets.value = response.data.data
+						if(response.data.chart_type==='doughnut'){
+							chart_labels.value = response.data.labels_long
+						}else{
+							chart_labels.value = response.data.labels
+						}
 						if(response.data.chart_type!=='line'){
 							for(let i=0;i<=chart_datasets.value.length;i++){
 								chart_color.value[i]='rgba('+(~~(256 * Math.random()))+','+(~~(256 * Math.random()))+','+ (~~(256 * Math.random()))+', 0.8)'
 							}
 						}
 						//グラフエリアのサイズ設定
-						if(response.data.chart_type==='bar'){
+						if(response.data.chart_type==='bar'){//棒グラフはデータ数に応じて変える
 							//document.getElementById("chart_area").style.height='750px'
 							if(Number(chart_datasets.value.length) * 30 < 150){
 								document.getElementById("chart_area").style.height='150px'
