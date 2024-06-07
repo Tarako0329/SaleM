@@ -16,7 +16,7 @@ body,#register,#form1{
     border-right:none;
     border-left:none;
     border-top:none;
-    border-bottom:solid 1px;;
+    border-bottom:solid 1px;
     border-color:#fff;  /*下線・色固定*/
     /*text-align:center;*/
     font-size: 1.7rem;
@@ -33,6 +33,13 @@ body,#register,#form1{
     padding-left:15px;
     white-space: nowrap;
     overflow: hidden;
+}
+.evlist_area{
+    border:solid 1px;
+    /*white-space: nowrap;*/
+    overflow-x: hidden;
+    overflow-y: scroll;
+    height:200px;
 }
 /*電卓ボタン*/
 .btn--dentaku{

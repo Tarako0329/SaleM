@@ -517,16 +517,25 @@
 				<div class='modal-body text-center ps-5 pe-5'>
 					<input type='text' class='form-control ps-3' v-model='EV_input_value' style='font-size: 1.6rem;background-color:pink;' placeholder="入力 or 検索">
 					
-					<select class='form-select form-select-lg ps-3' v-model='EV_input_value' style='font-size: 1.6rem;'>
+					<!--<select class='form-select form-select-lg ps-3' v-model='EV_input_value' style='font-size: 1.6rem;'>
 						<template v-for='(list,index) in EventList_filter' :key='list.meishou'>
 							<option :value=list.meishou>{{list.meishou}}</option>
 						</template>
-					</select>
+					</select>-->
+					<div class='evlist_area text-start ps-1'>
+						<template v-for='(list,index) in EventList_filter' :key='list.meishou'>
+							<div class="form-check ps-3">
+								<input class='form-check-input' type='radio' name='ev_select' v-model='EV_input_value' :value=list.meishou :id='`evlist_${index}`' style='border:0;display:none;'>
+								<label class="form-check-label" :for='`evlist_${index}`'>{{list.meishou}}</label>
+							</div>
+						</template>
+					</div>
 					<small style='font-size: 1.2rem;'>イベント名を入力。もしくはリストから選択してください。</small>
 					
 				</div>
 				<div class='modal-footer'>
-					<button type='button'  class='btn btn-primary' data-bs-dismiss='modal' style='font-size: 2.0rem;width:100%;'>決定</button>
+					<button type='button'  class='btn btn-primary' style='font-size: 2.0rem;width:40%;' @click='clear_EV_input_value()'>クリア</button>
+					<button type='button'  class='btn btn-primary' data-bs-dismiss='modal' style='font-size: 2.0rem;width:40%;'>決定</button>
 				</div>
 			</div>
 		</div>
