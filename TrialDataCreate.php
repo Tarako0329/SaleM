@@ -12,23 +12,23 @@ $stmt->bindValue(3, 'hoge', PDO::PARAM_STR);
 $stmt->bindValue(4, 'hoge', PDO::PARAM_STR);
 $flg=$stmt->execute();
 
-$sqlstr="insert into Users_webrez(uid,loginrez,insdate,yuukoukigen,introducer_id,name,yagou,yubin,address1,address2,ForcedLogout,invoice_no,inquiry_tel,inquiry_mail,address3) values(0,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+$sqlstr="insert into Users_webrez(uid,loginrez,insdate,yuukoukigen,introducer_id,name,yagou,yubin,address1,address2,ForcedLogout,invoice_no,inquiry_tel,inquiry_mail,address3) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 $stmt = $pdo_h->prepare($sqlstr);
 $stmt->bindValue(1, 'hoge', PDO::PARAM_STR);
-$stmt->bindValue(5, null, PDO::PARAM_STR);
-$stmt->bindValue(6, date("Y-m-d"), PDO::PARAM_STR);
-$stmt->bindValue(7, $kigen, PDO::PARAM_STR);
-$stmt->bindValue(8, '', PDO::PARAM_STR);
-$stmt->bindValue(9, 'トライアル太郎', PDO::PARAM_STR);
-$stmt->bindValue(10, 'おためしパン屋さん', PDO::PARAM_STR);
-$stmt->bindValue(11, '1231234', PDO::PARAM_STR);
-$stmt->bindValue(12, '都道府県', PDO::PARAM_STR);
-$stmt->bindValue(13, '市区町村', PDO::PARAM_STR);
-$stmt->bindValue(14, 0, PDO::PARAM_INT);
-$stmt->bindValue(15, 'T1234567890123', PDO::PARAM_STR);
-$stmt->bindValue(16, '000-0000-0000', PDO::PARAM_STR);
-$stmt->bindValue(17, 'webrez@greeen-sys.com', PDO::PARAM_STR);
-$stmt->bindValue(18, '１－１０－７', PDO::PARAM_STR);
+$stmt->bindValue(2, null, PDO::PARAM_STR);
+$stmt->bindValue(3, date("Y-m-d"), PDO::PARAM_STR);
+$stmt->bindValue(4, $kigen, PDO::PARAM_STR);
+$stmt->bindValue(5, '', PDO::PARAM_STR);
+$stmt->bindValue(6, 'トライアル太郎', PDO::PARAM_STR);
+$stmt->bindValue(7, 'おためしパン屋さん', PDO::PARAM_STR);
+$stmt->bindValue(8, '1231234', PDO::PARAM_STR);
+$stmt->bindValue(9, '都道府県', PDO::PARAM_STR);
+$stmt->bindValue(10, '市区町村', PDO::PARAM_STR);
+$stmt->bindValue(11, 0, PDO::PARAM_INT);
+$stmt->bindValue(12, 'T1234567890123', PDO::PARAM_STR);
+$stmt->bindValue(13, '000-0000-0000', PDO::PARAM_STR);
+$stmt->bindValue(14, 'webrez@greeen-sys.com', PDO::PARAM_STR);
+$stmt->bindValue(15, '１－１０－７', PDO::PARAM_STR);
 $flg=$stmt->execute();
 
 if($flg){
