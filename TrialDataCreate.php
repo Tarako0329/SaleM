@@ -4,7 +4,8 @@ require "php_header.php";
  
 //ユーザデータの登録
 $kigen=date('Y-m-d', strtotime(date("Y-m-d") . "+1 day"));
-$sqlstr="insert into Users(uid,mail,password,question,answer) values(0,?,?,?,?)";
+//$sqlstr="insert into Users(uid,mail,password,question,answer) values(0,?,?,?,?)";
+$sqlstr="insert into Users(mail,password,question,answer) values(?,?,?,?)";
 $stmt = $pdo_h->prepare($sqlstr);
 $stmt->bindValue(1, 'hoge', PDO::PARAM_STR);
 $stmt->bindValue(2, '', PDO::PARAM_STR);
@@ -12,23 +13,25 @@ $stmt->bindValue(3, 'hoge', PDO::PARAM_STR);
 $stmt->bindValue(4, 'hoge', PDO::PARAM_STR);
 $flg=$stmt->execute();
 
-$sqlstr="insert into Users_webrez(uid,loginrez,insdate,yuukoukigen,introducer_id,name,yagou,yubin,address1,address2,ForcedLogout,invoice_no,inquiry_tel,inquiry_mail,address3) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+/*$sqlstr="insert into Users_webrez(uid,loginrez,insdate,yuukoukigen,introducer_id,name,yagou,yubin,address1,address2,address3,ForcedLogout,invoice_no,inquiry_tel,inquiry_mail) 
+values(0,:loginrez,:insdate,:yuukoukigen,:introducer_id,:name,:yagou,:yubin,:address1,:address2,:address3,:ForcedLogout,:invoice_no,:inquiry_tel,:inquiry_mail)";*/
+$sqlstr="insert into Users_webrez(loginrez,insdate,yuukoukigen,introducer_id,name,yagou,yubin,address1,address2,address3,ForcedLogout,invoice_no,inquiry_tel,inquiry_mail) 
+values(:loginrez,:insdate,:yuukoukigen,:introducer_id,:name,:yagou,:yubin,:address1,:address2,:address3,:ForcedLogout,:invoice_no,:inquiry_tel,:inquiry_mail)";
 $stmt = $pdo_h->prepare($sqlstr);
-$stmt->bindValue(1, 'hoge', PDO::PARAM_STR);
-$stmt->bindValue(2, null, PDO::PARAM_STR);
-$stmt->bindValue(3, date("Y-m-d"), PDO::PARAM_STR);
-$stmt->bindValue(4, $kigen, PDO::PARAM_STR);
-$stmt->bindValue(5, '', PDO::PARAM_STR);
-$stmt->bindValue(6, 'トライアル太郎', PDO::PARAM_STR);
-$stmt->bindValue(7, 'おためしパン屋さん', PDO::PARAM_STR);
-$stmt->bindValue(8, '1231234', PDO::PARAM_STR);
-$stmt->bindValue(9, '都道府県', PDO::PARAM_STR);
-$stmt->bindValue(10, '市区町村', PDO::PARAM_STR);
-$stmt->bindValue(11, 0, PDO::PARAM_INT);
-$stmt->bindValue(12, 'T1234567890123', PDO::PARAM_STR);
-$stmt->bindValue(13, '000-0000-0000', PDO::PARAM_STR);
-$stmt->bindValue(14, 'webrez@greeen-sys.com', PDO::PARAM_STR);
-$stmt->bindValue(15, '１－１０－７', PDO::PARAM_STR);
+$stmt->bindValue("loginrez", 'on', PDO::PARAM_STR);
+$stmt->bindValue("insdate", date("Y-m-d"), PDO::PARAM_STR);
+$stmt->bindValue("yuukoukigen", $kigen, PDO::PARAM_STR);
+$stmt->bindValue("introducer_id", 'hoge', PDO::PARAM_STR);
+$stmt->bindValue("name", 'トライアル太郎', PDO::PARAM_STR);
+$stmt->bindValue("yagou", 'おためしパン屋さん', PDO::PARAM_STR);
+$stmt->bindValue("yubin", '1231234', PDO::PARAM_STR);
+$stmt->bindValue("address1", '都道府県', PDO::PARAM_STR);
+$stmt->bindValue("address2", '市区町村', PDO::PARAM_STR);
+$stmt->bindValue("address3", '１－１０－７', PDO::PARAM_STR);
+$stmt->bindValue("ForcedLogout", '', PDO::PARAM_STR);
+$stmt->bindValue("invoice_no", 'T1234567890123', PDO::PARAM_STR);
+$stmt->bindValue("inquiry_tel", '000-0000-0000', PDO::PARAM_STR);
+$stmt->bindValue("inquiry_mail", 'webrez@greeen-sys.com', PDO::PARAM_STR);
 $flg=$stmt->execute();
 
 if($flg){
