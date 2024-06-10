@@ -20,8 +20,8 @@ $stmt->execute();
 $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $uri = $row[0]["cnt"];
 if($uri!=0){
-    $_SESSION["MSG"]= "売上実績があるため、".secho($_GET["nm"])." を削除できません。";
-    $_SESSION["alert"] = "alert-warning";
+    $MSG= "売上実績があるため、".secho($_GET["nm"])." を削除できません。";
+    $alert = "alert-warning";
     $flg=false;
 }
 
@@ -42,19 +42,27 @@ if($flg === true){
         $pdo_h->commit();
         $sqllog .= rtn_sqllog("commit",[]);
         sqllogger($sqllog,0);
-        $_SESSION["MSG"]= secho($_GET["nm"])." が削除されました。";
-        $_SESSION["alert"] = "alert-success";
+        $MSG= secho($_GET["nm"])." が削除されました。";
+        $alert = "alert-success";
     }catch(Exception $e){
         $pdo_h->rollBack();
         $sqllog .= rtn_sqllog("rollBack",[]);
         sqllogger($sqllog,$e);
-        $_SESSION["MSG"] = "登録が失敗しました。";
-        $_SESSION["alert"] = "alert-danger";
+        $MSG = "登録が失敗しました。";
+        $alert = "alert-danger";
     }
 }
 $stmt  = null;
 $pdo_h = null;
-header("HTTP/1.1 301 Moved Permanently");
-header("Location: shouhinMSList.php?csrf_token=".$csrf_token);
+$return_sts = array(
+    "MSG" => $MSG
+    ,"alert" => $alert
+    ,"csrf" => $csrf_token
+);
+//header("HTTP/1.1 301 Moved Permanently");
+//header("Location: shouhinMSList.php?csrf_token=".$csrf_token);
+header('Content-type: application/json');
+echo json_encode($return_sts, JSON_UNESCAPED_UNICODE);
+
 
 exit();

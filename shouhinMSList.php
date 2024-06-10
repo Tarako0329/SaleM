@@ -164,7 +164,8 @@
 								<input type='text'   :name ='`ORDERS[${index}][tani]`' class='form-contral' style='width:20%;text-align:right;padding-right:15px;' :value='list.tani'>
 							</td>
 							<td class=' text-center'>
-								<a href='#' @click='delete_item(list.shouhinNM,`shouhinDEL_sql.php?cd=${list.shouhinCD}&nm=${list.shouhinNM}&csrf_token=<?php echo $csrf_create; ?>`)'>
+								<!--<a href='#' @click='delete_item(list.shouhinNM,`shouhinDEL_sql.php?cd=${list.shouhinCD}&nm=${list.shouhinNM}&csrf_token=<?php echo $csrf_create; ?>`)'>-->
+								<a href='#' @click='delete_item(list.shouhinNM,`shouhinDEL_sql.php?cd=${list.shouhinCD}&nm=${list.shouhinNM}&csrf_token=${csrf}`)'>
 									<i class='fa-regular fa-trash-can fa-2x'></i>
 								</a>
 							</td><!--削除アイコン-->

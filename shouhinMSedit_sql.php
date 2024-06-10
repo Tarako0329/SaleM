@@ -82,7 +82,7 @@ try{
 	$params["shouhinCD"]=$new_shouhinCD;
 	$params["shouhinNM"]=$_POST["shouhinNM"];
 	$params["tanka"]=$_POST["tanka"]; 
-	$params["tankazei"]=$_POST["shouhizei"];
+	$params["zeitanka"]=$_POST["shouhizei"];
 	$params["zeiritu"]=$zeiritu;
 	$params["zeiKBN"]=$zeikbn;
 	$params["utisu"]=$_POST["utisu"];
@@ -90,13 +90,13 @@ try{
 	$params["genka_tanka"]=$_POST["genka"];
 	$params["hyoujiKBN1"]=$_POST["hyoujiKBN1"];
 	
-	$sqlstr="insert into ShouhinMS(uid,shouhinCD,shouhinNM,tanka,tanka_zei,zeiritu,zeiKBN,utisu,tani,genka_tanka,hyoujiKBN1) values(:uid,:shouhinCD,:shouhinNM,:tanka,:tankazei,:zeiritu,:zeiKBN,:utisu,:tani,:genka_tanka,:hyoujiKBN1)";
+	$sqlstr="insert into ShouhinMS(uid,shouhinCD,shouhinNM,tanka,tanka_zei,zeiritu,zeiKBN,utisu,tani,genka_tanka,hyoujiKBN1) values(:uid,:shouhinCD,:shouhinNM,:tanka,:zeitanka,:zeiritu,:zeiKBN,:utisu,:tani,:genka_tanka,:hyoujiKBN1)";
 	$stmt = $pdo_h->prepare($sqlstr);
 	$stmt->bindValue("uid", $params["uid"], PDO::PARAM_INT);
 	$stmt->bindValue("shouhinCD", $params["shouhinCD"], PDO::PARAM_INT);
 	$stmt->bindValue("shouhinNM", $params["shouhinNM"], PDO::PARAM_STR);
 	$stmt->bindValue("tanka", $params["tanka"], PDO::PARAM_INT);
-	$stmt->bindValue("tankazei", $params["tankazei"], PDO::PARAM_INT);
+	$stmt->bindValue("zeitanka", $params["zeitanka"], PDO::PARAM_INT);
 	$stmt->bindValue("zeiritu", $params["zeiritu"], PDO::PARAM_INT);
 	$stmt->bindValue("zeiKBN", $params["zeiKBN"], PDO::PARAM_INT);
 	$stmt->bindValue("utisu", $params["utisu"], PDO::PARAM_INT);

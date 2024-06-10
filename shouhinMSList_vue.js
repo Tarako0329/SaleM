@@ -170,9 +170,39 @@ const REZ_APP = () => createApp({
 			console_log(item)
 			console_log(link)
 			if(confirm(`${item} を削除します。よろしいですか？`)===true){
-				window.location.href = link
+				loader.value = true
+				//window.location.href = link
+				axios.get(link)
+				.then((response)=>{
+					console_log(`delete_item SUCCESS`)
+					//console_log(response.data)
+					MSG.value = response.data.MSG
+					alert_status.value[1]=response.data.alert
+					csrf.value = response.data.csrf
+					if(alert_status.value[1] === "alert-success"){
+						GET_SHOUHINMS()
+						.then((response)=>{
+							shouhinMS.value = []
+							shouhinMS_BK.value = []
+							shouhinMS.value = response
+							shouhinMS_BK.value = JSON.parse(JSON.stringify(shouhinMS.value))
+							console_log('GET_SHOUHINMS succsess')
+						})
+						.catch((error) => {
+							console_log(`GET_SHOUHINMS ERROR:${error}`)
+						})
+					}
+				})
+				.catch((error) => {
+					console_log(`delete_item ERROR:${error}`)
+					MSG.value = error.response.data.MSG
+					csrf.value = error.response.data.csrf_create
+					alert_status.value[1]='alert-danger'
+				})
+				.finally(()=>{
+					loader.value = false
+				})
 			}
-			
 		}
 
 		const csrf = ref('') 

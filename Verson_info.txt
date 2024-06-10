@@ -147,6 +147,7 @@ ver3.04.3-000:分析機能[イベント別平均総売上ランキング]追加-
 ver3.05.0-000:レジ画面：イベントサジェスト-commited
 ver3.05.1-000:レジ画面：イベントサジェスト selectタグのsizeが使えなかった対応-commited
 ver3.05.1-001:bugfix[イベント別売上分析円グラフのタッチ動作修正]-commited
+ver3.05.1-002:bugfix[商品MSの削除ができない]-commited
 
 verA.BB.C.DDD
 カウントアップ条件
