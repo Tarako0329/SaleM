@@ -31,7 +31,7 @@ const get_value = (value,zei,kbn) => {
 
   if(ZEIHASU===0 || ZEIHASU===1 || ZEIHASU===2){
   }else{
-    alert('ユーザ情報から端数処理設定を読み込んでください')
+    alert('ユーザ情報から消費税端数処理の方法を設定してください')
     return
   }
   
@@ -72,7 +72,11 @@ const get_value = (value,zei,kbn) => {
   }
   zeikomi = Number(hontai) + Number(zeigaku)
   if(kbn==='IN' && value!==zeikomi){
-    msg = '税込金額は設定できません'
+    console_log(`${value}:${zeikomi}`)
+    zeigaku = Number(zeigaku) - (Number(zeikomi) - Number(value))
+    zeikomi = Number(hontai) + Number(zeigaku)
+    //msg = '税込金額は設定できません'
+    console_log("悪魔の調整")
   }else{
     //msg=''
   }

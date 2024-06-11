@@ -160,13 +160,13 @@
 						pay_bk = pay.value
 						kaikei_zei_bk = kaikei_zei.value
 						let rtn = chk_csrf()	//token紛失のチェック
+						document.getElementById('main_area').style.paddingTop = '140px'
 						if(auto_ajust.value===true){
-							document.getElementById('main_area').style.paddingTop = '140px'
 							console_log(`自動端数調整開始`)
-							let zeiritu
+							/*let zeiritu
 							let zeikomi
 							
-							let chouseigo
+							let chouseigo*/
 							let zeikomisougaku = 0
 							let utizei = 0
 							let index = -1
@@ -185,14 +185,11 @@
 								utizei += Number(row['消費税']) + Number(row['税調整額'])
 							}
 							if(pay_bk !== zeikomisougaku){
-
-							}
-							if(pay_bk !== zeikomisougaku){
 								alert("調整失敗")
 								console_log(`それでもだめなのか！：${Number(pay_bk) - Number(zeikomisougaku)}`)
 							}
-							order_panel_show("show")
 						}
+						order_panel_show("show")
 					}else if(args==='chk'){				//戻る時は調整額を０にクリアする
 						document.getElementById('main_area').style.paddingTop = '200px'
 						for(const row of hontai.value){
@@ -778,11 +775,12 @@
 				const order_list = ref([])
 				const order_panel_show_flg = ref(true)
 				const order_panel_show = (status) => {
-					console_log(`order_panel_show now:`)
+					console_log(`order_panel_show now:chk_register_show.value=>${chk_register_show.value}`)
 					let sizeW = window.innerWidth
 					let sizeH = window.innerHeight
 					let H_minus = Number(360)
 					let W_minus = Number(31)
+					console_log(`order_panel_show now:sizeH=>${sizeH}`)
 					
 					if(sizeW<=767){
 						if(status==='show'){

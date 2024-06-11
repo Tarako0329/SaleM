@@ -1,11 +1,11 @@
 <?php
-define("VERSION", "ver3.05.2-000");
+define("VERSION", "ver3.06.0-000");
 
 date_default_timezone_set('Asia/Tokyo');
 require "./vendor/autoload.php";
 require_once "functions.php";
 //本番はリリースした日を指定
-$time="20240611-03";
+$time="20240611-04";
 
 //.envの取得
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
