@@ -5,7 +5,7 @@ date_default_timezone_set('Asia/Tokyo');
 require "./vendor/autoload.php";
 require_once "functions.php";
 //本番はリリースした日を指定
-$time="20240607-03";
+$time="20240611-03";
 
 //.envの取得
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
