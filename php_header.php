@@ -1,5 +1,5 @@
 <?php
-define("VERSION", "ver3.05.1-002");
+define("VERSION", "ver3.05.2-000");
 
 date_default_timezone_set('Asia/Tokyo');
 require "./vendor/autoload.php";
@@ -44,14 +44,7 @@ define("POP_PASS", $_ENV["POP_PASS"]);
 define("SYSTEM_NOTICE_MAIL",$_ENV["SYSTEM_NOTICE_MAIL"]);
 
 //契約・支払関連のキー情報
-/*暗号化
-define("SKEY", $_ENV["SKey"]);
-define("PKEY", $_ENV["PKey"]);
-define("PLAN_M", $_ENV["PLAN_M"]);
-define("PLAN_Y", $_ENV["PLAN_Y"]);
-define("PAY_CONTRACT_URL", $_ENV["PAY_contract_url"]);
-define("PAY_CANCEL_URL", $_ENV["PAY_cancel_url"]);
-*/
+/*暗号化*/
 define("SKEY", rot13encrypt2($_ENV["SKey"]));
 define("PKEY", rot13encrypt2($_ENV["PKey"]));
 define("PLAN_M", rot13encrypt2($_ENV["PLAN_M"]));

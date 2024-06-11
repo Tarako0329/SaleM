@@ -370,7 +370,7 @@
 				<div class='modal-body'>
 					<div class='urilist'>
 					<table class="table table-sm" style='font-family:"Meiryo UI";'>
-						<thead class='header-color' style='color:var(--title-color);'>
+						<thead class='header-color sticky-top' style='color:var(--title-color);'>
 							<tr>
 								<th>時刻</th>
 								<th>商品</th>
@@ -408,7 +408,8 @@
 					</div>
 				</div>
 				<div class='modal-footer' style='font-size:2.5rem;font-weight:600;'>
-					合計：{{Number(total_uriage).toLocaleString()}} 円
+					<div>来店数：{{Konyusha_su}}人</div>
+					<div class='ms-3'>合計：{{Number(total_uriage).toLocaleString()}} 円</div>
 				</div>
 			</div>
 		</div>

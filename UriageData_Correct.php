@@ -96,7 +96,6 @@
 						<th scope='col' style='width:60px;' class='d-none d-md-table-cell'>税</th>
 						<th scope='col' style='width:50px;'>原価</th>
 						<th scope='col' style='width:60px;'>粗利</th>
-						<!--<th v-if='Type==="rireki"' scope='col' class='d-none d-md-table-cell'>天候</th>-->
 						<th v-if='Type==="rireki"' scope='col' style='width:20px;'></th>
 					</tr>
 					</thead>
@@ -113,7 +112,6 @@
 							<td class='text-right d-none d-md-table-cell'></td>
 							<td v-if='Type==="rireki"' class='text-right d-none d-md-table-cell'></td>
 							<td v-if='Type==="rireki"' class='text-right d-table-cell d-md-none'></td>
-							<!--<td></td>-->
 						</tr><!--売上日+Event行-->
 						<tr v-if='(index===0 && (Type==="rireki")) || (index!==0 && list.UriageNO !== UriageList_filter[index-1].UriageNO)'><!--売上No行-->
 							<td :colspan='colspan' role='button' @click='set_filter("UriNO",list.UriageNO,"")'>
@@ -125,7 +123,6 @@
 							</td>
 							<td class='text-right d-none d-md-table-cell'></td>
 							<td class='text-right d-none d-md-table-cell'></td>
-							<!--<td v-if='Type==="rireki"' class='text-right d-none d-md-table-cell'></td>-->
 							<td v-if='Type==="rireki"'>
 								<template v-if='list.RNO==0'>
 								<a @click='delete_Uriage(list.UriageNO, "%")' href='#'>
@@ -135,10 +132,6 @@
 							</td>
 						</tr><!--売上No行-->
 						<tr><!--売上明細行-->
-							<!--
-							<td v-if='list.UriageNO%2===0' role='button' class='text-center' @click='set_filter("UriNO",list.UriageNO,"")'><span class='link'>★</span></td>
-							<td v-if='list.UriageNO%2!==0' role='button' class='text-center' @click='set_filter("UriNO",list.UriageNO,"")'><span class='link'>☆</span></td>
-							-->
 							<td></td>
 							<td role='button' class='link' @click='set_filter("ShouhinCD",list.ShouhinCD,list.ShouhinNM)'>{{list.ShouhinNM}}</td>
 							<td align='right' v-if='Type==="sum_items"' class='text-right'>{{Number(list.shuppin_su)}}</td>
@@ -149,11 +142,6 @@
 							<td align='right' class='text-right d-none d-md-table-cell'>{{Number(list.zei).toLocaleString()}}</td>
 							<td align='right' class='text-right'>{{Number(list.genka).toLocaleString()}}</td>
 							<td align='right' class='text-right'>{{Number(list.arari).toLocaleString()}}</td>
-							<!--
-							<td v-if='Type==="rireki"' class='d-none d-md-table-cell'>
-								<img v-if='list.icon.length>=5' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>（<span>{{list.temp}}℃ </span><span>{{list.description}}</span>）
-							</td>
-							-->
 							<td v-if='Type==="rireki"' >
 								<template v-if='list.RNO==0 && list.zeiKBN==0'><!--領収書未発行かつ非課税売上のみ削除可能-->
 								<a @click='delete_Uriage(list.UriageNO, list.ShouhinCD)' href='#'>

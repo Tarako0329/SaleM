@@ -38,7 +38,7 @@
 					axios
 					.post('ajax_get_Uriage.php',params)
 					.then((response) => {
-						UriageList.value = [...response.data]
+						UriageList.value = response.data
 						console_log('get_UriageList succsess')
 					})
 					.catch((error) => {
@@ -56,6 +56,17 @@
 					})
 					return sum_uriage
 				})//売上リストの合計売上額
+				const Konyusha_su = computed(()=>{
+					let ninzu = 0
+					let UriNO = 0
+					UriageList.value.forEach((list) => {
+						if(list.UriageNO != UriNO){
+							ninzu = Number(ninzu) + 1
+							UriNO = list.UriageNO
+						}
+					})
+					return ninzu
+				})
  
 
 				//商品マスタ取得関連
@@ -937,6 +948,7 @@
 					csrf,
 					get_UriageList,
 					UriageList,
+					Konyusha_su,
 					disp_category,
 					category,
 					panel_changer,

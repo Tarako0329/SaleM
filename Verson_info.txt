@@ -149,6 +149,7 @@ ver3.05.1-000:レジ画面：イベントサジェスト selectタグのsizeが�
 ver3.05.1-001:bugfix[イベント別売上分析円グラフのタッチ動作修正]-commited
 ver3.05.1-002:bugfix[商品MSの削除ができない]-commited
 ver3.05.1-003:bugfix[トライアル環境修正]
+ver3.05.2-000:軽微な改良
 
 verA.BB.C.DDD
 カウントアップ条件
