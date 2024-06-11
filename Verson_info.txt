@@ -151,6 +151,8 @@ ver3.05.1-002:bugfix[商品MSの削除ができない]-commited
 ver3.05.1-003:bugfix[トライアル環境修正]
 ver3.05.2-000:軽微な改良
 ver3.06.0-000:税込1000円問題に対応
+ver3.07.0-000:住所関連
+	ALTER TABLE `UriageData_GioWeather` ADD `address` VARCHAR(400) NULL DEFAULT NULL COMMENT '住所' AFTER `lon`;
 
 verA.BB.C.DDD
 カウントアップ条件

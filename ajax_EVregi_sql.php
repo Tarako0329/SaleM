@@ -190,12 +190,14 @@ try{
 	//位置情報、天気情報の付与（uid,売上No,緯度、経度、住所、天気、気温、体感温度、天気アイコンping,無効FLG,insdate,update）
 	if(empty($_POST["nonadd"]) && $ins_cnt>0){
 		$emsg=$emsg."/位置情報、天気情報　処理開始\n";
-		$sqlstr = "insert into UriageData_GioWeather(uid, UriNo, lat, lon, weather, description, temp, feels_like, icon) values(:uid,:UriNo,:lat,:lon,:weather,:description,:temp,:feels_like,:icon)";
+		//$sqlstr = "insert into UriageData_GioWeather(uid, UriNo, lat, lon, weather, description, temp, feels_like, icon) values(:uid,:UriNo,:lat,:lon,:weather,:description,:temp,:feels_like,:icon)";
+		$sqlstr = "insert into UriageData_GioWeather(uid, UriNo, lat, lon,address, weather, description, temp, feels_like, icon) values(:uid,:UriNo,:lat,:lon,:address,:weather,:description,:temp,:feels_like,:icon)";
 		$params=[];
 		$params["uid"] = $_SESSION['user_id'];
 		$params["UriNo"] = $UriageNO;
 		$params["lat"] = $_POST['lat'];
 		$params["lon"] = $_POST['lon'];
+		$params["address"] = $_POST['address'];
 		$params["weather"] = $_POST['weather'];
 		$params["description"] = $_POST['description'];
 		$params["temp"] = $_POST['temp'];
@@ -203,15 +205,16 @@ try{
 		$params["icon"] = $_POST['icon'];
 
 		$stmt = $pdo_h->prepare($sqlstr);
-		$stmt->bindValue(1,  $params["uid"], PDO::PARAM_INT);
-		$stmt->bindValue(2,  $params["UriNo"], PDO::PARAM_INT);
-		$stmt->bindValue(3,  $params["lat"], PDO::PARAM_INT);
-		$stmt->bindValue(4,  $params["lon"], PDO::PARAM_INT);
-		$stmt->bindValue(5,  $params["weather"], PDO::PARAM_STR);
-		$stmt->bindValue(6,  $params["description"], PDO::PARAM_INT);
-		$stmt->bindValue(7,  $params["temp"], PDO::PARAM_INT);
-		$stmt->bindValue(8,  $params["feels_like"], PDO::PARAM_INT);
-		$stmt->bindValue(9,  $params["icon"], PDO::PARAM_STR);
+		$stmt->bindValue("uid",  $params["uid"], PDO::PARAM_INT);
+		$stmt->bindValue("UriNo",  $params["UriNo"], PDO::PARAM_INT);
+		$stmt->bindValue("lat",  $params["lat"], PDO::PARAM_INT);
+		$stmt->bindValue("lon",  $params["lon"], PDO::PARAM_INT);
+		$stmt->bindValue("address",  $params["address"], PDO::PARAM_STR);
+		$stmt->bindValue("weather",  $params["weather"], PDO::PARAM_STR);
+		$stmt->bindValue("description",  $params["description"], PDO::PARAM_INT);
+		$stmt->bindValue("temp",  $params["temp"], PDO::PARAM_INT);
+		$stmt->bindValue("feels_like",  $params["feels_like"], PDO::PARAM_INT);
+		$stmt->bindValue("icon",  $params["icon"], PDO::PARAM_STR);
 
 		$sqllog .= rtn_sqllog($sqlstr,$params);
 		$stmt->execute();
