@@ -629,16 +629,18 @@
 
 									await res_add
 									.then((response) => {
-										//console_log(response.data)
-										address = response.data.results
+										console_log(response.data)
+										let address = response.data.results
 										// 変換表から都道府県などを取得
-										muniCd.value = address.muniCd		//DB登録用
-										lv01Nm.value = address.lv01Nm		//DB登録用
-										muniData = GSI.MUNI_ARRAY[address.muniCd]
+										let muniData = GSI.MUNI_ARRAY[address.muniCd]
 										// 都道府県コード,都道府県名,市区町村コード,市区町村名 に分割
-										[prefCode, pref, muniCode, city] = muniData.split(',')
+										let [prefCode, pref, muniCode, city] = muniData.split(',')
 										//${pref}${city}${data.lv01Nm}->県・市区町村・番地
 										vjusho.value = (`${city}${address.lv01Nm}`).replace(/\s+/g, "")
+
+										console_log(muniData)
+										muniCd.value = address.muniCd		//DB登録用
+										lv01Nm.value = address.lv01Nm		//DB登録用
 										//,jusho_es = escape(jusho.replace(/\s+/g, ""))								
 									})
 									.catch((error) => {
