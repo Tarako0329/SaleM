@@ -156,6 +156,7 @@ ver3.07.0-000:住所関連-commited
 ver3.07.0-001:レジラベル修正-commited
 ver3.07.0-002:住所変換処理
 	ALTER TABLE `UriageData_GioWeather` ADD `MUNI` VARCHAR(10) NULL AFTER `lon`;
+ver3.07.1-000:住所登録方法変更	
 
 verA.BB.C.DDD
 カウントアップ条件

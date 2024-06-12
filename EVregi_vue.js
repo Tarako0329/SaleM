@@ -603,6 +603,8 @@
 				const icon = ref('')
 
 				const vjusho = ref('')
+				const muniCd = ref('')
+				const lv01Nm = ref('')
 				const v_get_gio = () =>{//緯度経度,天気情報取得
 					return new Promise(resolve => {
 						console_log('v_get_gio start')
@@ -626,17 +628,19 @@
 									})
 
 									await res_add
-									.then((response) => (
+									.then((response) => {
 										//console_log(response.data)
 										address = response.data.results
 										// 変換表から都道府県などを取得
-										,muniData = GSI.MUNI_ARRAY[address.muniCd]
+										muniCd.value = address.muniCd		//DB登録用
+										lv01Nm.value = address.lv01Nm		//DB登録用
+										muniData = GSI.MUNI_ARRAY[address.muniCd]
 										// 都道府県コード,都道府県名,市区町村コード,市区町村名 に分割
-										,[prefCode, pref, muniCode, city] = muniData.split(',')
+										[prefCode, pref, muniCode, city] = muniData.split(',')
 										//${pref}${city}${data.lv01Nm}->県・市区町村・番地
-										,vjusho.value = (`${city}${address.lv01Nm}`).replace(/\s+/g, "")
+										vjusho.value = (`${city}${address.lv01Nm}`).replace(/\s+/g, "")
 										//,jusho_es = escape(jusho.replace(/\s+/g, ""))								
-									))
+									})
 									.catch((error) => {
 										console_log(`v_get_gio[address] ERROR:${error}`)
 										rtn_val = false

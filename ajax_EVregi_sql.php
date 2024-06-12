@@ -191,13 +191,16 @@ try{
 	if(empty($_POST["nonadd"]) && $ins_cnt>0){
 		$emsg=$emsg."/位置情報、天気情報　処理開始\n";
 		//$sqlstr = "insert into UriageData_GioWeather(uid, UriNo, lat, lon, weather, description, temp, feels_like, icon) values(:uid,:UriNo,:lat,:lon,:weather,:description,:temp,:feels_like,:icon)";
-		$sqlstr = "insert into UriageData_GioWeather(uid, UriNo, lat, lon,address, weather, description, temp, feels_like, icon) values(:uid,:UriNo,:lat,:lon,:address,:weather,:description,:temp,:feels_like,:icon)";
+		//$sqlstr = "insert into UriageData_GioWeather(uid, UriNo, lat, lon,address, weather, description, temp, feels_like, icon) values(:uid,:UriNo,:lat,:lon,:address,:weather,:description,:temp,:feels_like,:icon)";
+		$sqlstr = "insert into UriageData_GioWeather(uid, UriNo, lat, lon,MUNI,address, weather, description, temp, feels_like, icon) values(:uid,:UriNo,:lat,:lon,:MUNI,:address,:weather,:description,:temp,:feels_like,:icon)";
 		$params=[];
 		$params["uid"] = $_SESSION['user_id'];
 		$params["UriNo"] = $UriageNO;
 		$params["lat"] = $_POST['lat'];
 		$params["lon"] = $_POST['lon'];
-		$params["address"] = $_POST['address'];
+		$params["MUNI"] = $_POST['muniCd'];
+		$params["address"] = $_POST['lv01Nm'];
+		//$params["address"] = $_POST['address'];
 		$params["weather"] = $_POST['weather'];
 		$params["description"] = $_POST['description'];
 		$params["temp"] = $_POST['temp'];
@@ -209,6 +212,7 @@ try{
 		$stmt->bindValue("UriNo",  $params["UriNo"], PDO::PARAM_INT);
 		$stmt->bindValue("lat",  $params["lat"], PDO::PARAM_INT);
 		$stmt->bindValue("lon",  $params["lon"], PDO::PARAM_INT);
+		$stmt->bindValue("MUNI",  $params["MUNI"], PDO::PARAM_STR);
 		$stmt->bindValue("address",  $params["address"], PDO::PARAM_STR);
 		$stmt->bindValue("weather",  $params["weather"], PDO::PARAM_STR);
 		$stmt->bindValue("description",  $params["description"], PDO::PARAM_INT);

@@ -91,6 +91,8 @@
 	<form method = 'post' id='form1' @submit.prevent='on_submit'>
 		<input v-model='csrf' type='hidden' name='csrf_token' >
 		<input v-model='vjusho' type='hidden' name='address' >
+		<input v-model='muniCd' type='hidden' name='muniCd' >
+		<input v-model='lv01Nm' type='hidden' name='lv01Nm' >
 		<input v-model='rg_mode' type='hidden' name='mode'> <!--レジor個別売上or在庫登録-->
 		<input type='hidden' :name='labels["EV_input_hidden"]' value=''>
 	
