@@ -957,6 +957,8 @@
 					total_uriage,
 					vlat,
 					vlon,
+					muniCd,
+					lv01Nm,
 					vjusho,
 					v_get_gio,
 					rg_mode,
