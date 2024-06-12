@@ -154,8 +154,8 @@ ver3.06.0-000:税込1000円問題に対応-commited
 ver3.07.0-000:住所関連-commited
 	ALTER TABLE `UriageData_GioWeather` ADD `address` VARCHAR(400) NULL DEFAULT NULL COMMENT '住所' AFTER `lon`;
 ver3.07.0-001:レジラベル修正-commited
-
-ALTER TABLE `UriageData_GioWeather` ADD `MUNI` VARCHAR(10) NULL AFTER `lon`;
+ver3.07.0-002:住所変換処理
+	ALTER TABLE `UriageData_GioWeather` ADD `MUNI` VARCHAR(10) NULL AFTER `lon`;
 
 verA.BB.C.DDD
 カウントアップ条件
