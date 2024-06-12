@@ -59,6 +59,7 @@
             {sort:65,val:'Ev_Avr_uri_rank',  name:"ｲﾍﾞﾝﾄ別平均総売上ﾗﾝｷﾝｸﾞ"},
             {sort:70,val:6,  name:"客単価実績(ｲﾍﾞﾝﾄ開催ごと)"},
             {sort:80,val:7,  name:"ｲﾍﾞﾝﾄ別平均客単価ﾗﾝｷﾝｸﾞ"},
+            {sort:85,val:'Area_tanka_1',  name:"エリア別平均客単価ﾗﾝｷﾝｸﾞ"},
             {sort:90,val:8,  name:"来客数実績(ｲﾍﾞﾝﾄ開催ごと)"},
             {sort:100,val:9, name:"ｲﾍﾞﾝﾄ別平均来客数ﾗﾝｷﾝｸﾞ"},
             {sort:110,val:10,name:"売れる勢い"},
