@@ -815,7 +815,7 @@
 						if(EventName.LastUseDate === today){
 							EV_input_value.value = EventName.EventName
 						}else{
-							EV_input_value.value = "イベント名等"
+							EV_input_value.value = ""
 						}
 				}
 

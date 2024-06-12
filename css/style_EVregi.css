@@ -23,16 +23,22 @@ body,#register,#form1{
     font-weight: 600;
     color: #fff;
     position: fixed;    /* ウィンドウを基準に画面に固定 */
-    top: 0;             /* 上下の固定位置を上から0pxにする */
+    top: 5px;             /* 上下の固定位置を上から0pxにする */
     right: 0;           /* 左右の固定位置を左から0pxにする */
-    height:40px;
+    height:35px;
     width:16rem;
     /*background: #ff838b;*/
     background:transparent;
-    padding-top:10px;
-    padding-left:15px;
+    padding-top:5px;
+    padding-left:10px;
     white-space: nowrap;
     overflow: hidden;
+}
+.evlabel{
+    position: fixed;    /* ウィンドウを基準に画面に固定 */
+    top: 0px;             /* 上下の固定位置を上から0pxにする */
+    right: 100px;           /* 左右の固定位置を左から0pxにする */
+    color:var(--title-color);
 }
 .evlist_area{
     border:solid 0.7px gray;
