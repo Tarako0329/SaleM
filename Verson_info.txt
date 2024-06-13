@@ -154,10 +154,11 @@ ver3.06.0-000:税込1000円問題に対応-commited
 ver3.07.0-000:住所関連-commited
 	ALTER TABLE `UriageData_GioWeather` ADD `address` VARCHAR(400) NULL DEFAULT NULL COMMENT '住所' AFTER `lon`;
 ver3.07.0-001:レジラベル修正-commited
-ver3.07.0-002:住所変換処理
+ver3.07.0-002:住所変換処理-commited
 	ALTER TABLE `UriageData_GioWeather` ADD `MUNI` VARCHAR(10) NULL AFTER `lon`;
-ver3.07.1-000:住所登録方法変更
-ver3.07.2-000:売上分析エリア別客単価追加
+ver3.07.1-000:住所登録方法変更-commited
+ver3.07.2-000:売上分析エリア別客単価追加-commited
+ver3.07.3-000:住所取得精度アップ
 
 verA.BB.C.DDD
 カウントアップ条件
