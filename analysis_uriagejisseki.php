@@ -121,18 +121,6 @@ log_writer2("test",$SLVresult,"lv3");
 				<div class='row'>
 					<div class='col-6'>
 						<select v-model='analysis_type' name='sum_tani' class='form-select form-select-lg' style='margin:5px' ><!--集計単位-->
-							<!--<option value='1' >売上実績(日計)</option>
-							<option value='2' >売上実績(月計)</option>
-							<option value='3' >売上実績(年計)</option>
-							<option value='12'>ジャンル別売上比</option>
-							<option value='4' >売上ランキング(金額)</option>
-							<option value='5' >売上ランキング(個数)</option>
-							<option value='6' >客単価実績(イベントごと)</option>
-							<option value='7' >平均客単価ランキング</option>
-							<option value='8' >来客数実績(イベントごと)</option>
-							<option value='9' >平均来客数ランキング</option>
-							<option value='10'>売れる勢い</option>
-							<option value='11'>来客数推移</option>-->
 							<template v-for='(list,index) in bunseki_menu' :key='list.sort'>
 								<option :value='list.val'>{{list.name}}</option>
 							</template>
@@ -179,7 +167,9 @@ log_writer2("test",$SLVresult,"lv3");
 		</div>
 	</main>
 	</div>
+	
 	<script>
+		var GSI = {}
 		function send2(category,lv){
 			const form1 = document.getElementById('form1');
 
@@ -208,6 +198,7 @@ log_writer2("test",$SLVresult,"lv3");
 				var category_lv = 0 //商品分類ごとの売上円グラフで使用。0：大分類　1：中分類　2：小分類
 				var over_category = ""   //商品分類ごとの売上円グラフで使用。クリックした分類の下分類の円グラフを表示する際に使用
 				var myChart
+				
 				const drow_chart = (chart_type) => {
 					console_log('drow_chart start','lv3')
 					if (myChart) {
@@ -384,12 +375,50 @@ log_writer2("test",$SLVresult,"lv3");
 								chart_datasets.value[i] = chart_datasets.value[i].slice(response.data.xStart,response.data.xEnd+1)
 							}
 						}
+
+						//table_labels.value = [...response.data.aryColumn]
+						table_labels.value = response.data.aryColumn
+						//table_data.value = [...response.data.result]
+						table_data.value = response.data.result
+
+						if(analysis_type.value === "Area_tanka_1"){
+							chart_labels.value.forEach((item,index)=>{
+								//console_log(item)
+								let muniData = GSI.MUNI_ARRAY[item]
+								let [prefCode, pref, muniCode, city] = muniData.split(',')
+								//item = `${pref}${city}`
+								chart_labels.value[index] = `${city.replace(/\s+/g, "")}`
+							})
+
+							table_data.value.forEach((row,index)=>{
+								console_log(row.Labels)
+								let muniData = GSI.MUNI_ARRAY[row.Labels]
+								let [prefCode, pref, muniCode, city] = muniData.split(',')
+								//item = `${pref}${city}`
+								table_data.value[index]["Labels"] = `${pref.replace(/\s+/g, "")}${city.replace(/\s+/g, "")}`
+							})
+						}
+						if(analysis_type.value === "Area_tanka_2"){
+							chart_labels.value.forEach((item,index)=>{
+								//console_log(item)
+								let [muniCd,jusho] = item.split(',')
+								let muniData = GSI.MUNI_ARRAY[muniCd]
+								let [prefCode, pref, muniCode, city] = muniData.split(',')
+								//item = `${pref}${city}`
+								chart_labels.value[index] = `${city.replace(/\s+/g, "")}${jusho}`
+							})
+
+							table_data.value.forEach((row,index)=>{
+								console_log(row.Labels)
+								let [muniCd,jusho] = row.Labels.split(',')
+								let muniData = GSI.MUNI_ARRAY[muniCd]
+								let [prefCode, pref, muniCode, city] = muniData.split(',')
+								//item = `${pref}${city}`
+								table_data.value[index]["Labels"] = `${pref.replace(/\s+/g, "")}${city.replace(/\s+/g, "")}${jusho}`
+							})
+						}
 						drow_chart(response.data.chart_type)
 
-						table_labels.value = [...response.data.aryColumn]
-						//table_labels.value = response.data.aryColumn
-						table_data.value = [...response.data.result]
-						//table_data.value = response.data.result
 					})
 					.catch((error) => {
 						console_log(`get_analysis_data ERROR:${error}`,'lv3')
@@ -420,6 +449,7 @@ log_writer2("test",$SLVresult,"lv3");
 				onMounted(() => {
 					get_event()
 					get_analysis_data()
+					console_log(GSI)
 				})
 				return{
 					bunseki_menu,
@@ -446,6 +476,7 @@ log_writer2("test",$SLVresult,"lv3");
 			}
 		}).mount('#app');
 	</script><!--chart.js-->
+	<script src="https://maps.gsi.go.jp/js/muni.js"></script><!--gio住所逆引リスト-->
 </BODY>
 </html>
 <?php
