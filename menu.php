@@ -508,21 +508,6 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         },
         tourName:'shuppin_zaiko_help1'
     });
-    /*
-    shuppin_zaiko_help1.addStep({
-        title: `<p class='tour_header'>出品在庫機能</p>`,
-        text: `<p class='tour_discription'>出品在庫機能をリリースしました。</p>`,
-        buttons: [
-            {
-                text: 'Next',
-                action: shuppin_zaiko_help1.nextAndSave
-            }
-        ],
-        cancelIcon:{
-            enabled:false
-        }
-    });
-    */
     shuppin_zaiko_help1.addStep({
         title: `<p class='tour_header'>出品在庫機能</p>`,
         text: `<p class='tour_discription'>各イベントの出品数を登録できます。

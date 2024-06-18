@@ -612,8 +612,8 @@
 							console_log('v_get_gio no_exec')
 							resolve(false)	//位置情報なし
 						}else{
-							//navigator.geolocation.getCurrentPosition(
-							navigator.geolocation.watchPosition(
+							navigator.geolocation.getCurrentPosition(
+							//navigator.geolocation.watchPosition(
 								async (geoLoc) => {
 									vlat.value = geoLoc.coords.latitude
 									vlon.value = geoLoc.coords.longitude
