@@ -148,6 +148,18 @@
 				const chk_register_show = ref('chk')		//確認・登録ボタンの表示
 				const hontai = ref([])	//注文明細を税区分単位に集計し、連想配列で保存(消費税額を本体額合計から算出するため)
 				const auto_ajust = ref(true)	//税込単価の合計＝支払額になるように調整するか否かのフラグ
+				const auto_ajust_change=()=>{
+					console_log(auto_ajust.value)
+					if(confirm("注文はクリアされます。よろしいですか？")){
+						reset_order()
+					}else{
+						if(auto_ajust.value){
+							auto_ajust.value=false
+						}else{
+							auto_ajust.value=true
+						}
+					}
+				}
 				
 				const btn_changer = (args) => {	//確認ボタン・戻るボタンを押したとき
 					console_log("*****【 btn_changer start 】*****")
@@ -188,6 +200,7 @@
 								alert("調整失敗")
 								console_log(`それでもだめなのか！：${Number(pay_bk) - Number(zeikomisougaku)}`)
 							}
+							kaikei_zei.value = utizei
 						}
 						order_panel_show("show")
 					}else if(args==='chk'){				//戻る時は調整額を０にクリアする
@@ -987,6 +1000,7 @@
 					open_R,
 					total_area,
 					auto_ajust,
+					auto_ajust_change,
 					order_list_area,
 					order_list,
 					order_list_pm,

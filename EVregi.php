@@ -145,7 +145,7 @@
 		<div class='header-plus-minus d-flex justify-content-center align-items-center item_4' style='font-size:1.4rem;font-weight:700;'><!--カート編集など-->
 			<div class="form-check form-switch" style='position:fixed;top:105px;left:10px;padding:0;'>
 				<p style='margin-bottom:2px;'>端数自動調整</p>
-				<input type='checkbox' style='margin:0;' v-model='auto_ajust' class='form-check-input'  id='chousei'><!---->
+				<input type='checkbox' style='margin:0;' v-model='auto_ajust' class='form-check-input'  id='chousei' @change='auto_ajust_change()'><!---->
 				<label v-if='auto_ajust!==true' style='margin-left:3px;' class='form-check-label' for='chousei'>OFF</label><!---->
 				<label v-if='auto_ajust===true' style='margin-left:3px;' class='form-check-label' for='chousei'>ON</label><!-- -->
 			</div>
@@ -189,7 +189,8 @@
 									<div class='order_item'>{{list.NM}}</div>
 									<div style='display:flex;'>
 										<div class='order_su' >{{list.SU}}点</div>
-										<div class='order_kin'>¥{{(list.SU * (list.TANKA + list.TANKA_ZEI)).toLocaleString()}}</div>
+										<!--<div class='order_kin'>¥{{(list.SU * (list.TANKA + list.TANKA_ZEI)).toLocaleString()}}</div>-->
+										<div class='order_kin'>¥{{(Number(list.SU) * Number(list.TANKA)).toLocaleString()}}</div>
 									</div>
 									<div id='side-pm' style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;padding-bottom:3px;position:relative;'>
 										<button type='button' class='order_list_area_btn plus' @click='order_list_pm(index,1)'></button>
@@ -218,17 +219,30 @@
 										<div class='order_item'>値引({{list.税区分名}}分)</div>
 										<div style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;padding-bottom:3px;'>
 											<div class='order_su' >1点</div>
-											<div class='order_kin text-danger'>¥{{(list.調整額 + list.税調整額).toLocaleString()}}</div>
+											<!--<div class='order_kin text-danger'>¥{{(list.調整額 + list.税調整額).toLocaleString()}}</div>-->
+											<div class='order_kin text-danger'>¥{{(list.調整額).toLocaleString()}}</div>
 										</div>
 									</template>
 									<template v-if='list.調整額>0'>
 										<div class='order_item'>値増({{list.税区分名}}分)</div>text-danger
 										<div style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;padding-bottom:3px;'>
 											<div class='order_su' >1点</div>
-											<div class='order_kin'>¥{{(list.調整額 + list.税調整額).toLocaleString()}}</div>
+											<!--<div class='order_kin'>¥{{(list.調整額 + list.税調整額).toLocaleString()}}</div>-->
+											<div class='order_kin'>¥{{(list.調整額).toLocaleString()}}</div>
 										</div>
 									</template>
 								</div>
+							</template>
+							<template v-for='(list,index) in hontai' :key='list.CD'>
+								<template v-if='list.税区分名!=="非課税"'>
+									<div class='container'>
+										<div class='order_item'>{{list.税区分名}} 税</div>
+										<div style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;padding-bottom:3px;'>
+											<div class='order_su' >－</div>
+											<div class='order_kin text-danger'>¥{{(list.消費税 + list.税調整額).toLocaleString()}}</div>
+										</div>
+									</div>
+								</template>
 							</template>
 						</div>
 					</div><!--注文内容-->
