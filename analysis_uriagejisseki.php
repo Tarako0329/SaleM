@@ -143,7 +143,7 @@ log_writer2("test",$SLVresult,"lv3");
 			<div id='chart_area' style='width:95%;'> <canvas id='ChartCanvas'></canvas></div>
 		</div>
 		<div class='col-md-3' style='padding:5px'>
-			<table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
+			<table v-if='analysis_type!=="urikire"' class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
 				<thead>
 					<tr>
 						<template v-for='(list,index) in table_labels' :key='list'>
@@ -154,11 +154,33 @@ log_writer2("test",$SLVresult,"lv3");
 				<tbody v-for='(row,index) in table_data' :key='row.Labels'>
 					<tr>
 						<template v-for='(data,index) in row' :key='data'>
-							<!--<td align='right' v-if='data.match(/[^0-9]/)===null'>{{Number(data).toLocaleString()}}</td>
-							<td v-if='data.match(/[^0-9]/)!==null'>{{data}}</td>-->
 							<td v-if='isNaN(data)==false'><div class='text-end'>{{Number(data).toLocaleString()}}</div></td>
 							<td v-else>{{data}}</td>
 							</template>
+					</tr>
+				</tbody>
+			</table>
+			<table v-if='analysis_type==="urikire"' class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
+				<thead>
+					<!--<tr>
+						<th scope='col' style='width:auto;'>日付</th>
+						<th scope='col' colspan="2" style='width:auto;'>Event</th>
+					</tr>-->
+					<tr>
+						<th scope='col' style='width:auto;'>商品</th>
+						<th scope='col' style='width:auto;'>出品数</th>
+						<th scope='col' style='width:auto;'>完売時刻</th>
+					</tr>
+				</thead>
+				<tbody v-for='(row,index) in table_data' :key='row.UriDate+row.Event+row.ShouhinNM'>
+					<tr>
+							<td>{{row.UriDate}}</td>
+							<td colspan="2" >{{row.Event}}</td>
+					</tr>
+					<tr>
+						<td>{{row.ShouhinNM}}</td>
+						<td class='text-end'>{{Number(row.shuppin_su).toLocaleString()}}</td>
+						<td>{{row.売切日時}}</td>
 					</tr>
 				</tbody>
 			</table>
