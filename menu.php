@@ -146,7 +146,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         <?php
         }
         ?>
-        <div class='<?php echo $bell_action;?> logoff-color' style='position:fixed;top:35px;right:5px;'>
+        <div class='<?php echo $bell_action;?> logoff-color' style='position:fixed;top:35px;right:5px;' id='bell'>
             <a href="#" style='color:var(--user-disp-color);' onclick='new_releace_start()'>
                 <?php echo $bell_msg; ?><i class="fa-regular fa-bell <?php echo $bell_size;?> logoff-color"></i>
             </a>
@@ -613,7 +613,9 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         text: `<p class='tour_discription'>売上分析メニューに<span style='color:blue'>「売切分析」</span>を追加しました。
             <br>
             <br>完売した商品の出品数と完売時間を確認できます。
-            <br>早い時間に完売している商品は出品数を増やすと、より儲かるかもしれません。</p>`,
+            <br>早い時間に完売している商品は出品数を増やすと、より儲かるかもしれません。
+            <br>
+            <br><span style='color:red'>※</span>使用するには<span style='color:red'>出品在庫登録</span>を行う必要があります。</p>`,
         buttons: [
 			{
 				text: 'OK',
@@ -631,6 +633,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         //new_releace_002.start(tourFinish,'new_releace_002',''); 
         //new_releace_003.start(tourFinish,'new_releace_003','finish'); 
         new_releace_004.start(tourFinish,'new_releace_004','finish'); 
+        document.getElementById("bell").className = 'logoff-color'
     }
 </script>
 <!--pwa対応部-->
