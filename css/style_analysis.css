@@ -26,3 +26,8 @@ canvas{
         height:100%;
     }
 }
+.link{
+    color:#1a1aff;
+    font-weight: 700;
+    /*text-decoration: underline;*/
+}

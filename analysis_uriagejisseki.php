@@ -167,21 +167,20 @@ log_writer2("test",$SLVresult,"lv3");
 						<th scope='col' colspan="2" style='width:auto;'>Event</th>
 					</tr>-->
 					<tr>
-						<th scope='col' style='width:auto;'>商品</th>
+						<th scope='col' colspan="2" style='width:auto;'>商品</th>
 						<th scope='col' style='width:auto;'>出品数</th>
 						<th scope='col' style='width:auto;'>完売時刻</th>
 					</tr>
 				</thead>
 				<tbody v-for='(row,index) in table_data' :key='row.UriDate+row.Event+row.ShouhinNM'>
 					<tr v-if='index===0'>
-						<td>{{row.UriDate}}</td>
-						<td colspan="2" >{{row.Event}}</td>
+						<td colspan="4" class='link'>{{row.UriDate}}:{{row.Event}}</td>
 					</tr>
 					<tr v-else-if='table_data[index].UriDate+table_data[index].Event !== table_data[index-1].UriDate+table_data[index-1].Event'>
-						<td>{{row.UriDate}}</td>
-						<td colspan="2" >{{row.Event}}</td>
+						<td colspan="4" class='link'>{{row.UriDate}}:{{row.Event}}</td>
 					</tr>
 					<tr>
+						<td></td>
 						<td>{{row.ShouhinNM}}</td>
 						<td class='text-end'>{{Number(row.shuppin_su).toLocaleString()}}</td>
 						<td>{{row.売切日時}}</td>
