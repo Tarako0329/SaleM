@@ -56,6 +56,7 @@ $token = csrf_create();
         ,'時間帯別売上実績'=>['analysis_uriagejisseki.php?sum_tani=10&csrf_token='.$token,'時間帯ごとに何がどれだけ売れているかを分析・グラフ化します。<br>グラフ化して見ることで商品の売れる勢いを確認出来ます。<br>例えば、開店と同時に売れる商品は人気商品なので多めに準備するといいでしょうし、地味に売れ続ける商品も根強い人気があると分析できます。']
         ,'時間帯別来客実績'=>['analysis_uriagejisseki.php?sum_tani=11&csrf_token='.$token,'１時間ごとの来客数を集計・グラフ化します。<br>グラフがグンと伸びたところが繁忙期。なだらかなとこは凪となります。']
         ,'期間毎売上集計'=>['analysis_uriagejisseki.php?sum_tani=2&csrf_token='.$token,'日ごと、月毎、年間の売上金額を確認<br>イベント名を指定することで過去の売上傾向を確認出来ます。']
+        ,'売切分析'=>['analysis_uriagejisseki.php?sum_tani=urikire&csrf_token='.$token,'過去イベントで売切れが発生した商品と売切れた時間をピックアップ<br>出品数を調整し、より売上を上げましょう！']
         ,'ABC分析'=>['analysis_abc.php?sum_tani=2&csrf_token='.$token,'売上げの7割を支える商品群をAグループ、2割を支える商品群をBグループ、残り1割をCグループに分類してます。<br>Aグループは人気商品。Cグループはあまり売上げに貢献していない商品と位置づけられます。<br>取扱商品の検討材料等に利用できます。']
         //,'バスケット分析'=>['xxxx.php?mode=1&csrf_token='.$token]
     ];

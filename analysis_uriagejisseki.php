@@ -139,7 +139,7 @@ log_writer2("test",$SLVresult,"lv3");
 		</div>
 		</div>
 		<div class='row'>
-		<div class='col-md-9'>
+		<div class='col-md-9' id='chart_area_upper_div'>
 			<div id='chart_area' style='width:95%;'> <canvas id='ChartCanvas'></canvas></div>
 		</div>
 		<div class='col-md-3' style='padding:5px'>
@@ -353,6 +353,9 @@ log_writer2("test",$SLVresult,"lv3");
 							}
 						}
 						//グラフエリアのサイズ設定
+						document.getElementById("chart_area").style.display='block'
+						document.getElementById("chart_area_upper_div").style.display='block'
+
 						if(response.data.chart_type==='bar'){//棒グラフはデータ数に応じて変える
 							//document.getElementById("chart_area").style.height='750px'
 							if(Number(chart_datasets.value.length) * 30 < 150){
@@ -360,9 +363,13 @@ log_writer2("test",$SLVresult,"lv3");
 							}else{
 								document.getElementById("chart_area").style.height=`${Number(chart_datasets.value.length) * 30}px`
 							}
+						}else if(response.data.chart_type==='-'){//グラフ不要
+							document.getElementById("chart_area").style.display='none'
+							document.getElementById("chart_area_upper_div").style.display='none'
 						}else{
 							document.getElementById("chart_area").style.height='100%'
 						}
+
 						console_log(document.getElementById("chart_area").style.height)
 						
 						if(response.data.chart_type==='line'){
@@ -417,8 +424,9 @@ log_writer2("test",$SLVresult,"lv3");
 								table_data.value[index]["Labels"] = `${pref.replace(/\s+/g, "")}${city.replace(/\s+/g, "")}${jusho}`
 							})
 						}
-						drow_chart(response.data.chart_type)
-
+						if(response.data.chart_type!=='-'){
+							drow_chart(response.data.chart_type)
+						}
 					})
 					.catch((error) => {
 						console_log(`get_analysis_data ERROR:${error}`,'lv3')

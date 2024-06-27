@@ -99,7 +99,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     
         
         //新機能リリース通知
-        $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.new_releace_003') as ToursLog FROM Users_webrez WHERE uid=?";
+        $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.new_releace_004') as ToursLog FROM Users_webrez WHERE uid=?";
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
         $stmt->execute();
@@ -569,6 +569,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         }
     });
 */
+/*
     const new_releace_003 = new Shepherd.Tour({
         useModalOverlay: true,
         defaultStepOptions: {
@@ -595,11 +596,41 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             enabled:false
         }
     });
+*/
+    const new_releace_004 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'new_releace_004'
+    });
+    new_releace_004.addStep({
+        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+        text: `<p class='tour_discription'>売上分析メニューに<span style='color:blue'>「売切分析」</span>を追加しました。
+            <br>
+            <br>完売した商品の出品数と完売時間を確認できます。
+            <br>早い時間に完売している商品は出品数を増やすと、より儲かるかもしれません。</p>`,
+        buttons: [
+			{
+				text: 'OK',
+				action: new_releace_004.next
+			}
+        ],
+        cancelIcon:{
+            enabled:false
+        }
+    });
+
     function new_releace_start(){
         //新機能のリリース通知はこの関数で呼び出すツアーを更新する
         //shuppin_zaiko_help1.start(tourFinish,'new_releace_001','');
         //new_releace_002.start(tourFinish,'new_releace_002',''); 
-        new_releace_003.start(tourFinish,'new_releace_003','finish'); 
+        //new_releace_003.start(tourFinish,'new_releace_003','finish'); 
+        new_releace_004.start(tourFinish,'new_releace_004','finish'); 
     }
 </script>
 <!--pwa対応部-->

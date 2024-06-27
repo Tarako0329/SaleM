@@ -160,7 +160,7 @@ if($rtn !== true){
 			$chart_type="";
 		}elseif($analysis_type==14){//abc分析(Event別)
 			$sqlstr = "SELECT tmp.* ,truncate(100 * (税抜売上 / (sum(税抜売上) over(PARTITION BY Event))),1) as 売上占有率 from 
-				(SELECT concat(Event,TokuisakiNM) as Event,ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ".$sql_where_OUT."group by Event,ShouhinNM) tmp 
+				(SELECT concat(Event,TokuisakiNM) as Event,ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ".$sql_where_OUT." group by Event,ShouhinNM) tmp 
 				order by Event,税抜売上 desc";
 			$aryColumn = ["商品名","売上","占有率","Rank"];
 			$chart_type="";
@@ -177,6 +177,11 @@ if($rtn !== true){
 			$sqlstr = "SELECT CONCAT(MUNI,',',address) AS Labels,ROUND(AVG(Uriage)) as datasets from UriageData_GioWeather A inner join ( SELECT uid ,UriageNO ,sum(UriageKin) as Uriage from UriageData ".$sql_where_IN." group by uid ,UriageNO ) B on A.uid = B.uid and A.UriNo = B.UriageNO and MUNI > 0 group by MUNI ,address order by AVG(Uriage) desc";
 			$aryColumn = ["エリア","客単価"];
 			$chart_type="bar";
+			$tokui="xxxx";//エリア別客単価の場合は個別売りを除く
+		}else if($analysis_type==='urikire'){//エリア別客単価
+			$sqlstr = "SELECT B.UriDate,B.Event,B.ShouhinNM,A.shuppin_su,B.売切日時 FROM `UriageDataSummary` A inner join ( select uid,UriDate,Event,ShouhinCD,ShouhinNM,LEFT(TIME(max(insDatetime)),5) as 売切日時 from UriageData ".$sql_where_OUT." group by uid,UriDate,ShouhinCD,ShouhinNM,Event ) B on A.uid = B.uid and A.UriDate = B.UriDate and A.ShouhinCD = B.ShouhinCD and A.ShouhinNM = B.ShouhinNM and A.Event = B.Event WHERE zan_su = 0 and shuppin_su <> 0 ORDER BY `B`.`UriDate` DESC,A.Event;";
+			$aryColumn = ["日付","Event","商品","出品","完売"];
+			$chart_type="-";
 			$tokui="xxxx";//エリア別客単価の場合は個別売りを除く
 		}
 

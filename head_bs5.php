@@ -65,6 +65,7 @@
             {sort:100,val:9, name:"ｲﾍﾞﾝﾄ別平均来客数ﾗﾝｷﾝｸﾞ"},
             {sort:110,val:10,name:"売れる勢い"},
             {sort:120,val:11,name:"来客数推移"},
+            {sort:130,val:'urikire',name:"売切分析"},
         ]
     </script>
     <script src="script/function.js?<?php echo $time; ?>"></script>
