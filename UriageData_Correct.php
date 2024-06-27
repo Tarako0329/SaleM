@@ -134,14 +134,14 @@
 						<tr><!--売上明細行-->
 							<td></td>
 							<td role='button' class='link' @click='set_filter("ShouhinCD",list.ShouhinCD,list.ShouhinNM)'>{{list.ShouhinNM}}</td>
-							<td v-if='Type==="sum_items"' class='text-start'>{{Number(list.shuppin_su)}}</td>
-							<td class='text-start'>{{Number(list.su)}}</td>
-							<td v-if='Type==="sum_items"' class='text-start'>{{Number(list.zan_su)}}</td>
-							<td class='text-start d-none d-md-table-cell'>{{Number(list.tanka).toLocaleString()}}</td>
-							<td class='text-start'>{{Number(list.UriageKin).toLocaleString()}}</td>
-							<td class='text-start d-none d-md-table-cell'>{{Number(list.zei).toLocaleString()}}</td>
-							<td class='text-start'>{{Number(list.genka).toLocaleString()}}</td>
-							<td class='text-start'>{{Number(list.arari).toLocaleString()}}</td>
+							<td v-if='Type==="sum_items"' class='text-end'>{{Number(list.shuppin_su)}}</td>
+							<td class='text-end'>{{Number(list.su)}}</td>
+							<td v-if='Type==="sum_items"' class='text-end'>{{Number(list.zan_su)}}</td>
+							<td class='text-end d-none d-md-table-cell'>{{Number(list.tanka).toLocaleString()}}</td>
+							<td class='text-end'>{{Number(list.UriageKin).toLocaleString()}}</td>
+							<td class='text-end d-none d-md-table-cell'>{{Number(list.zei).toLocaleString()}}</td>
+							<td class='text-end'>{{Number(list.genka).toLocaleString()}}</td>
+							<td class='text-end'>{{Number(list.arari).toLocaleString()}}</td>
 							<td v-if='Type==="rireki"' >
 								<template v-if='list.RNO==0 && list.zeiKBN==0'><!--領収書未発行かつ非課税売上のみ削除可能-->
 								<a @click='delete_Uriage(list.UriageNO, list.ShouhinCD)' href='#'>
