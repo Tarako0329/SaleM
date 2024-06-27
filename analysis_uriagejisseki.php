@@ -173,9 +173,13 @@ log_writer2("test",$SLVresult,"lv3");
 					</tr>
 				</thead>
 				<tbody v-for='(row,index) in table_data' :key='row.UriDate+row.Event+row.ShouhinNM'>
-					<tr>
-							<td>{{row.UriDate}}</td>
-							<td colspan="2" >{{row.Event}}</td>
+					<tr v-if='index===0'>
+						<td>{{row.UriDate}}</td>
+						<td colspan="2" >{{row.Event}}</td>
+					</tr>
+					<tr v-else-if='table_data[index].UriDate+table_data[index].Event !== table_data[index-1].UriDate+table_data[index-1].Event'>
+						<td>{{row.UriDate}}</td>
+						<td colspan="2" >{{row.Event}}</td>
 					</tr>
 					<tr>
 						<td>{{row.ShouhinNM}}</td>
