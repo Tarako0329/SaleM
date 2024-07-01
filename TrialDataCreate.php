@@ -57,7 +57,7 @@ $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
 $flg=$stmt->execute();
 
 //出品在庫実績の複写
-$sqlstr="insert into Zaiko select ?, 0,sousa, concat('".date('Y')."',RIGHT(`shuooindate`,6)), `zaikoNO`, `hokanbasho`, `ShouhinCD`, `ShouhinNM`, `su`,  `genka_tanka`, `insdate` , `sakujodate` from Zaiko where uid=2";
+$sqlstr="insert into Zaiko select ?, 0,sousa, concat('".date('Y')."',RIGHT(`shuppindate`,6)), `zaikoNO`, `hokanbasho`, `ShouhinCD`, `ShouhinNM`, `su`,  `genka_tanka`, `insdate` , `sakujodate` from Zaiko where uid=2";
 $stmt = $pdo_h->prepare($sqlstr);
 $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
 $flg=$stmt->execute();
