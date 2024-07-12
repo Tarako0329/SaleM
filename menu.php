@@ -83,6 +83,14 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
                 $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
                 $msg= "有効期限付き(".$row[0]["yuukoukigen"]." まで)<br>";
             }
+            $kigen = $row[0]["yuukoukigen"];
+            if((strtotime($row[0]["yuukoukigen"]) - strtotime(date("Y-m-d")))/ (60 * 60 * 24) <= 7){
+                $msg = "<p class='mb-1 fs-3' style='color:red;'>残り ".(strtotime($row[0]["yuukoukigen"]) - strtotime(date("Y-m-d")))/ (60 * 60 * 24)."日 で無料期間が終了します。</p>";
+                $msg.="<p class='mb-1 fs-3'>引続きのご利用は<a href='".rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path."'>本契約</a>をお願いいたします。</p>";
+                $msg.="<p class='mb-1 fs-3'>なお、無料期間終了前のご契約でも無料期間後に本契約に切り替わります。</p>";
+            }
+
+
             $plan=0;
         }else{
             //契約済
@@ -188,13 +196,13 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     
     if(EXEC_MODE=="Product"){
         if($plan==0){
-            $array2 = ['本契約'=>[rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku']];
+            $array2 = ['本契約へ'=>[rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku']];
         }else{
             $array2 = ['契約解除へ'=>['sub_cancel.php','kaijo']];
         }
     }else if(EXEC_MODE=="Test" || EXEC_MODE=="Local"){
         if($plan==0){
-            $array2 = ['本契約'=>[rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku'],'機能テスト'=>['sample.php?a=a','kinoutest']];
+            $array2 = ['本契約へ'=>[rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku'],'機能テスト'=>['sample.php?a=a','kinoutest']];
         }else{
             $array2 = ['契約解除へ'=>['sub_cancel.php','kaijo'],'機能テスト'=>['sample.php','kinoutest']];
         }
