@@ -77,14 +77,15 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             if(strtotime($row[0]["yuukoukigen"]) < strtotime(date("Y-m-d"))){
                 //有効期限切れ。申込日から即課金
                 $_SESSION["KIGEN"] = strtotime("+3 day");
-                $msg= "有効期限切れ<br>";
+                $msg= "<p class='mb-1 fs-3' style='color:red;'>無料期間は終了しました。</p>";
+                $msg.="<p class='mb-1 fs-3'>引続きのご利用は<a href='".rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path."'>本契約</a>をお願いいたします。</p>";
             }else{
                 //試用期間、もしくは支払済み期間の翌日から課金
                 $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
-                $msg= "有効期限付き(".$row[0]["yuukoukigen"]." まで)<br>";
+                $msg= "有効期限付き(".$row[0]["yuukoukigen"]." まで無料)<br>";
             }
             $kigen = $row[0]["yuukoukigen"];
-            if((strtotime($row[0]["yuukoukigen"]) - strtotime(date("Y-m-d")))/ (60 * 60 * 24) <= 7){
+            if((strtotime($row[0]["yuukoukigen"]) - strtotime(date("Y-m-d")))/ (60 * 60 * 24) >= 0 && (strtotime($row[0]["yuukoukigen"]) - strtotime(date("Y-m-d")))/ (60 * 60 * 24) <= 7){
                 $msg = "<p class='mb-1 fs-3' style='color:red;'>残り ".(strtotime($row[0]["yuukoukigen"]) - strtotime(date("Y-m-d")))/ (60 * 60 * 24)."日 で無料期間が終了します。</p>";
                 $msg.="<p class='mb-1 fs-3'>引続きのご利用は<a href='".rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path."'>本契約</a>をお願いいたします。</p>";
                 $msg.="<p class='mb-1 fs-3'>ご契約完了後、無料期間終了をもって本契約に切り替わります。</p>";

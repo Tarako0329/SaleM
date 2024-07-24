@@ -38,6 +38,7 @@
 	$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 	$stmt->execute();
 	$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	$emsg = "";
 	
 	//有効期限チェック
 	if($row[0]["yuukoukigen"]==""){
@@ -172,14 +173,15 @@
 			<button type='button' style='width:80%;max-width:500px;' class='btn btn-outline-primary' data-bs-toggle='modal' data-bs-target='#waribiki' id='item_11'>割引・割増</button>
 		</div><!--割引・割増-->
 		<main class='common_body' id='main_area'>
+
+			<div class="container-fluid">
 			<?php 
 				if(!empty($emsg)){
 					echo $emsg;
-					exit;
+					//exit;
 				}
 			?>
-			<div class="container-fluid">
-				<div class='row'>
+				<div v-if='"<?php echo strlen($emsg);?>"==="0"' class='row'>
 
 					<div class='col-lg-3 col-md-4 col-sm-12 col-12'><!--注文内容-->
 						<div class='order_list' ref='order_list_area'>

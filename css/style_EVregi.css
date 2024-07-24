@@ -282,7 +282,7 @@ INPUT.su{
     border-bottom:solid var(--panel-bd-color) 0.3px;
 }
 .common_body {
-    padding-top: 200px; /* ヘッダーの後ろに要素が隠れないようにするため  160*/
+    padding-top: 210px; /* ヘッダーの後ろに要素が隠れないようにするため  160*/
     padding-bottom:200px;  /*フッターーの後ろに要素が隠れないようにするため */
     min-height:100%;
 }

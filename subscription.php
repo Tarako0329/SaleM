@@ -47,6 +47,8 @@ try{
         $sqllog .= rtn_sqllog("commit",[]);
         sqllogger($sqllog,0);
         $msg= "ご契約が成立しました。<br>本登録頂き、ありがとうございます。<br>引き続き、『WebRez+』をよろしくお願いします。";
+
+        send_mail(SYSTEM_NOTICE_MAIL,"【売上通知】レジ売れたよ","お買い上げUID：".$_SESSION["user_id"]."\r\nおめでとう！");
         /*
         if($flg){
             $msg= "ご契約が成立しました。<br>本登録頂き、ありがとうございます。<br>引き続き、『WebRez+』をよろしくお願いします。";

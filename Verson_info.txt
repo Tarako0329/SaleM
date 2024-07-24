@@ -166,7 +166,7 @@ ver3.08.0-001:トライアルデータに在庫を追加
 ver3.09.0-000:無料期間終了間近処理追加
 ver3.10.0-000:会計ソフト情報
 	ALTER TABLE `Users_webrez` ADD `Accounting_soft` VARCHAR(50) NULL DEFAULT NULL COMMENT 'ご利用会計ソフト' AFTER `inquiry_mail`;
-
+ver3.10.0-001:お試し終了時の表記等修正
 
 verA.BB.C.DDD
 カウントアップ条件
