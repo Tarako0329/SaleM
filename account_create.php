@@ -85,11 +85,15 @@ $token=csrf_create();
 						<input v-model='account_r.loginrez' :='locker' type='checkbox' class='form-check-input mb-3' id='loginrez' name='LOGINREZ' >
 						<label class="form-check-label" for='loginrez' >ログイン後レジ画面表示</label><br>
 						<label for='hasushori' >消費税の端数処理</label>
-						<select v-model='account_r.ZeiHasu' :='locker' class="form-select form-select-lg" style='font-size:1.5rem' id='hasushori' name='ZEIHASU'>
+						<select v-model='account_r.ZeiHasu' :='locker' class="form-select form-select-lg mb-3" style='font-size:1.5rem' id='hasushori' name='ZEIHASU'>
 							<option value=0>切り捨て</option>
 							<option value=1>四捨五入</option>
 							<option value=2>切り上げ</option>
 						</select>
+
+						<label for='Accounting_soft' >ご利用会計ソフト</label>
+						<input v-model='account_r.Accounting_soft' :='locker' type='text' maxlength='25' class='form-control' id='Accounting_soft' name='Accounting_soft' required='required' placeholder='例：やよいの青色申告 オンライン' >
+						<small id='Accounting_soft' class='form-text text-muted'>確定申告に使用しているサービスを記載してください。</small>
 
 						<br>
 						<hr>

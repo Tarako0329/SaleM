@@ -55,6 +55,7 @@ if($rtn !== true){
 				$_SESSION["P"]["invoice_no"] = $_POST["invoice"];
 				$_SESSION["P"]["inquiry_tel"] = $_POST["inquiry_tel"];
 				$_SESSION["P"]["inquiry_mail"] = $_POST["inquiry_mail"];
+				$_SESSION["P"]["Accounting_soft"] = $_POST["Accounting_soft"];
 				$_SESSION["P"]["password"] = passEX($_POST["PASS"],$_POST["MAIL"],$key);
 				$_SESSION["P"]["uid"] = $_SESSION['user_id'];
 

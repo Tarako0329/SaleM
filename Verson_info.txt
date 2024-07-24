@@ -164,6 +164,9 @@ ver3.07.3-002:税調整機能の修正-commited
 ver3.08.0-000:売上分析[売切リスト]追加
 ver3.08.0-001:トライアルデータに在庫を追加
 ver3.09.0-000:無料期間終了間近処理追加
+ver3.10.0-000:会計ソフト情報
+	ALTER TABLE `Users_webrez` ADD `Accounting_soft` VARCHAR(50) NULL DEFAULT NULL COMMENT 'ご利用会計ソフト' AFTER `inquiry_mail`;
+
 
 verA.BB.C.DDD
 カウントアップ条件

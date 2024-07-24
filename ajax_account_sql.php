@@ -99,7 +99,7 @@ if($rtn !== true){
 				$sqllog .= rtn_sqllog("--execute():正常終了",[]);
 
 				//Users_webrez の更新
-				$sqlstr_r="update Users_webrez set loginrez=:loginrez,zeihasu=:zeihasu,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3,invoice_no=:invoice_no ,inquiry_tel=:inquiry_tel ,inquiry_mail=:inquiry_mail where uid=:uid";
+				$sqlstr_r="update Users_webrez set loginrez=:loginrez,zeihasu=:zeihasu,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3,invoice_no=:invoice_no ,inquiry_tel=:inquiry_tel ,inquiry_mail=:inquiry_mail,Accounting_soft=:Accounting_soft where uid=:uid";
 				$stmt = $pdo_h->prepare($sqlstr_r);
 				$stmt->bindValue("loginrez", $_SESSION["P"]["loginrez"], PDO::PARAM_STR);
 				$stmt->bindValue("zeihasu", $_SESSION["P"]["zeihasu"], PDO::PARAM_STR);
@@ -112,6 +112,7 @@ if($rtn !== true){
 				$stmt->bindValue("invoice_no", $_SESSION["P"]["invoice_no"], PDO::PARAM_INT);
 				$stmt->bindValue("inquiry_tel", $_SESSION["P"]["inquiry_tel"], PDO::PARAM_STR);
 				$stmt->bindValue("inquiry_mail", $_SESSION["P"]["inquiry_mail"], PDO::PARAM_STR);
+				$stmt->bindValue("Accounting_soft", $_SESSION["P"]["Accounting_soft"], PDO::PARAM_STR);
 				$stmt->bindValue("uid", $_SESSION["P"]["uid"], PDO::PARAM_INT);
 				$sqllog .= rtn_sqllog($sqlstr_r,$_SESSION["P"]);
 				$status=$stmt->execute();
