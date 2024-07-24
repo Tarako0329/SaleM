@@ -93,7 +93,7 @@ $token=csrf_create();
 
 						<label for='Accounting_soft' >ご利用会計ソフト</label>
 						<input v-model='account_r.Accounting_soft' :='locker' type='text' maxlength='25' class='form-control' id='Accounting_soft' name='Accounting_soft' required='required' placeholder='例：やよいの青色申告 オンライン' >
-						<small id='Accounting_soft' class='form-text text-muted'>確定申告に使用しているサービスを記載してください。</small>
+						<small id='Accounting_soft' class='form-text text-muted'>確定申告に使用しているサービスを入力。ご利用がない場合は「なし、未定」等</small>
 
 						<br>
 						<hr>
