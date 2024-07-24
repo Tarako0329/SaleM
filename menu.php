@@ -46,6 +46,11 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         $stmt->execute();
         $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $msg="";
+
+        //契約・解約関連は各時で実装したファイルを指定する
+        $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', "1"));
+        $dir_path = bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', "1"));
+        
         //強制ログアウト処理
         if($row[0]["ForcedLogout"]==true){
             //system更新を有効にするためにログアウトが必要な場合の処理
