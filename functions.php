@@ -427,7 +427,8 @@ function getGUID(){
 // =========================================================
 function output_csv($data,$kikan){
     $date = date("Ymd");
-    header("Content-Type: application/octet-stream");
+    //header("Content-Type: application/octet-stream");
+    header('Content-Type: text/csv') ;
     header("Content-Disposition: attachment; filename=売上実績_{$date}_{$kikan}.csv");
     
     // データ行の文字コード変換・加工
