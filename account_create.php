@@ -1,5 +1,5 @@
 <?php
-//ユーザ登録、登録情報の修正画面
+//ユーザ登録、登録情報の修正画面+
 //$mode 0:新規　1:更新
 //acc:mailaddress
 require "php_header.php";
