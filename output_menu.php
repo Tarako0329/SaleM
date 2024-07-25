@@ -3,6 +3,8 @@ require "php_header.php";
 $rtn=check_session_userid($pdo_h);
 $token = csrf_create();
 $ua = $_SERVER['HTTP_USER_AGENT'];
+log_writer2("\$_SERVER['HTTP_USER_AGENT']",$_SERVER['HTTP_USER_AGENT'],"lv3");
+
 $tanmatu="";
 if ((strpos($ua, 'Android') !== false) && (strpos($ua, 'Mobile') !== false) || (strpos($ua, 'iPhone') !== false) || (strpos($ua, 'Windows Phone') !== false)) {
   //スマホの場合に読み込むソースを記述
@@ -69,29 +71,33 @@ if(!empty($_POST)){
     </header>
 
     <body class='common_body'>
-        <div class="container" style="padding-top:15px;" id='form1'>
-        <div v-if='tanmatsu!=="PC"' >
-            売上データを会計・確定申告用ソフトに取り込むためのファイルを出力します。
-            確定申告に使用しているPC等からWebRez＋(下記URL)へアクセスしてください。
-            URL：https://webrez.greeen-sys.com
+        <div class="container" style="padding-top:10px;" id='form1'>
+        <div v-if='tanmatsu!=="PC"' style="font-size:1.5rem">
+            <p>売上データを会計・確定申告用ソフトに取り込むためのファイルを出力します。</p>
+            <p>確定申告に使用しているPC等からWebRez＋(下記URL)へアクセスしてください。</p>
+            <p>URL：https://webrez.greeen-sys.com</p>
+            <p></p>
+            <label class='mt-5' for='mail'>URLをメールで送信</label>
+            <input class='form-control' style="font-size:1.5rem;max-width:300px;" type='mail' id='mail' name='mail' v-model='mail' required='required' >
+            <button type='button' class='btn btn-primary mt-3' @click='sendmail'>送信</button>
         </div>
-        <!--<form v-if='tanmatsu==="PC"' method='post' action='#' style="font-size:1.5rem">-->
-        <form method='post' action='#' style="font-size:1.5rem" target="_blank">
+        <form v-if='tanmatsu==="PC"' method='post' action='#' style="font-size:1.5rem">
+        <!--<form method='post' action='#' style="font-size:1.5rem" target="_blank">-->
             <label for='soft'>連携会計システムの選択</label>
-            <select class='form-select mb-3' style="font-size:1.5rem;padding:0;max-width:400px;" name='soft' id='soft' v-model='soft'>
+            <select class='form-select mb-3' style="font-size:1.5rem;padding:0;max-width:400px;" name='soft' id='soft' v-model='soft' required='required' >
                 <option value='yayoi'>やよいの青色申告 オンライン</option>
                 <option value='freee'>freee会計(確定申告)</option>
             </select>
             <div v-if='kamoku_set'>
                 <label for='kamoku'>{{uri_label}}</label>
-                <input class='form-control mb-5' style="font-size:1.5rem;max-width:200px;" type='text' id='kamoku' name='kamoku' v-model='kamoku'>
+                <input class='form-control mb-5' style="font-size:1.5rem;max-width:200px;" type='text' id='kamoku' name='kamoku' v-model='kamoku' required='required' >
             </div>
             <label for='ymfrom'> 出力対象期間</label>
-            <input class='form-control' style="font-size:1.5rem;max-width:200px;" type='date' id='ymfrom' name='ymfrom' v-model='ymfrom'>
+            <input class='form-control' style="font-size:1.5rem;max-width:200px;" type='date' id='ymfrom' name='ymfrom' v-model='ymfrom' required='required' >
             <label for='ymto'>から</label>
-            <input class='form-control mb-3' style="font-size:1.5rem;max-width:200px;" type='date' id='ymto' name='ymto' v-model='ymto'>
+            <input class='form-control mb-3' style="font-size:1.5rem;max-width:200px;" type='date' id='ymto' name='ymto' v-model='ymto' required='required' >
             
-            <input class='btn btn-primary mt-5' type='submit' value='CSV出力' style='width:200px;height:100px;'>
+            <input class='btn btn-primary mt-5' type='submit' value='CSV出力' style='width:200px;height:70px;'>
         </form>
         </div>
 
@@ -104,7 +110,8 @@ if(!empty($_POST)){
 			const ymfrom = ref('<?php echo $ymfrom; ?>')
 			const ymto = ref('<?php echo $ymto; ?>')
 			const tanmatsu = ref('<?php echo $tanmatu; ?>')
-            const soft = ref('yayoi')
+            const soft = ref('')
+            const mail = ref('')
             const uri_label = computed(()=>{
                 if(soft.value==="yayoi"){
                     return '売上計上名目'
@@ -135,6 +142,19 @@ if(!empty($_POST)){
                 }
             })
 
+            const sendmail = () =>{
+                let params = new URLSearchParams()
+				params.append('mail', mail.value);
+				params.append('subject', "【WebRez+】より送信");
+				params.append('body', "WebRez+ へのURLは以下の通りです。\r\nhttps://webrez.greeen-sys.com");
+				axios
+				.post('ajax_sendmail.php',params)
+				.then((response) => {
+                    UriageList.value = [...response.data]
+				})
+				.catch((error) => console_log(`get_UriageList ERROR:${error}`,'lv3'));
+            }
+
 			onMounted(() => {
 				console_log('onMounted','lv3')
 			})
@@ -146,6 +166,8 @@ if(!empty($_POST)){
                 kamoku,
                 kamoku_set,
                 tanmatsu,
+                mail,
+                sendmail
 			}                
 		}
 	}).mount('#form1');
