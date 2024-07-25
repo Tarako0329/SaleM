@@ -16,8 +16,11 @@ if ((strpos($ua, 'Android') !== false) && (strpos($ua, 'Mobile') !== false) || (
   //PCの場合に読み込むソースを記述
   $tanmatu="PC";
 }
+$sqlstr="";
 //
+//log_writer2("\$POST",$_POST,"lv3");
 if(!empty($_POST)){
+
     $ymfrom = $_POST["ymfrom"];
     $ymto = $_POST["ymto"];
     $list = $_POST["list"];
@@ -73,7 +76,7 @@ if(!empty($_POST)){
             URL：https://webrez.greeen-sys.com
         </div>
         <!--<form v-if='tanmatsu==="PC"' method='post' action='#' style="font-size:1.5rem">-->
-        <form method='post' action='#' style="font-size:1.5rem">
+        <form method='post' action='#' style="font-size:1.5rem" target="_blank">
             <label for='soft'>連携会計システムの選択</label>
             <select class='form-select mb-3' style="font-size:1.5rem;padding:0;max-width:400px;" name='soft' id='soft' v-model='soft'>
                 <option value='yayoi'>やよいの青色申告 オンライン</option>
@@ -101,7 +104,7 @@ if(!empty($_POST)){
 			const ymfrom = ref('<?php echo $ymfrom; ?>')
 			const ymto = ref('<?php echo $ymto; ?>')
 			const tanmatsu = ref('<?php echo $tanmatu; ?>')
-            const soft = ref('')
+            const soft = ref('yayoi')
             const uri_label = computed(()=>{
                 if(soft.value==="yayoi"){
                     return '売上計上名目'

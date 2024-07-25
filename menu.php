@@ -256,7 +256,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
         $stmt->execute();
         $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        log_writer2("JSON_VALUE",$row,"lv3");
+        //log_writer2("JSON_VALUE",$row,"lv3");
         if(empty($row[0]["tutorial"])){
             //チュートリアル未実施
             $_SESSION["tour"]="tutorial_1";
