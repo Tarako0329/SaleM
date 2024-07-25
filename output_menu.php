@@ -72,7 +72,8 @@ if(!empty($_POST)){
             確定申告に使用しているPC等からWebRez＋(下記URL)へアクセスしてください。
             URL：https://webrez.greeen-sys.com
         </div>
-        <form v-if='tanmatsu==="PC"' method='post' action='#' style="font-size:1.5rem">
+        <!--<form v-if='tanmatsu==="PC"' method='post' action='#' style="font-size:1.5rem">-->
+        <form method='post' action='#' style="font-size:1.5rem">
             <label for='soft'>連携会計システムの選択</label>
             <select class='form-select mb-3' style="font-size:1.5rem;padding:0;max-width:400px;" name='soft' id='soft' v-model='soft'>
                 <option value='yayoi'>やよいの青色申告 オンライン</option>
