@@ -105,9 +105,9 @@ try{
         <br>
         <!--LINE-->
         <a href='https://line.me/R/share?text=<?php echo urlencode("こちらからWEBREZ+（ウェブレジ＋）の仮登録を行い、有料会員の本登録まで行うとAMAZONギフト500円分をプレゼント！\n".$url."\n\n初回支払完了後に配布されます。")?>'><i class="fa-brands fa-line fa-3x line-green"></i></a>
-        <!--FACEBOOK
+        <!--FACEBOOK-->
         <a href='http://www.facebook.com/share.php?u=<?php echo $url; ?>' ><i class="fa-brands fa-facebook-square fa-2x facebook-blue"></i></a>
-        -->
+        
         <!--TWITTER
         <a href="http://twitter.com/share?text=【ツイート文（日本語が含まれる場合にはURLエンコードが必要）】&url=<?php echo $url; ?>&hashtags=#レジアプリ" rel="nofollow"><i class="fa-brands fa-twitter-square fa-2x twitter-blue"></i></a>
         -->

@@ -427,7 +427,7 @@ function getGUID(){
 // =========================================================
 function output_csv($data,$kikan){
     $date = date("Ymd");
-    //header("Content-Type: application/octet-stream");
+    
     
     // データ行の文字コード変換・加工
     foreach ($data as $data_key => $line) {
@@ -436,7 +436,7 @@ function output_csv($data,$kikan){
         }
     }
 
-    header('Content-Type: text/csv') ;
+    header("Content-Type: application/octet-stream");
     header("Content-Disposition: attachment; filename=webrez_uriage_{$date}_{$kikan}.csv");
     foreach ($data as $key => $line) {
         echo implode(",", $line ) . "\r\n";
@@ -449,7 +449,7 @@ function output_csv($data,$kikan){
 function output_xlsx($data,$kikan){
     // ファイル名
     $temp_file = 'template/freee.xlsx';
-    $gen_file = 'template/freee_'.date("Ymd").'.xlsx';
+    $gen_file = 'template/freee_'.date("Ymd").'_'.$kikan.'.xlsx';
 
 
     // テンプレートファイルを読み込み
