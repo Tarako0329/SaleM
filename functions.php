@@ -392,7 +392,7 @@ function send_mail($to,$subject,$body){
 	//$smtp ->timeOut(10);
 	
     $mail ->to($to);
-    $mail ->from('sysinfo@greeen-sys.com' , 'WEBREZ-info');
+    $mail ->from(FROM , 'WEBREZ-info');
     $mail ->subject($subject);
     $mail ->text($body);
 

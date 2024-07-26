@@ -6,43 +6,6 @@ $shoukai="";
 if(!empty($_GET["shoukai"])){
 	$shoukai=$_GET["shoukai"];
 }
-/*
-	$shoukai="";
-	$choufuku_flg=0;
-	$okflg=0;
-	if(!empty($_GET["shoukai"])){
-		$shoukai=$_GET["shoukai"];
-	}elseif(!empty($_POST["shoukai"])){
-		$shoukai=$_POST["shoukai"];
-	}
-	
-	if(filter_input(INPUT_POST,"BTN") == "send"){
-		//登録用メール送信
-		$to = $_POST["MAIL"];
-		$subject = "WEBREZ登録のご案内";
-		$mail2=rot13encrypt2($to);
-		$url=ROOT_URL."account_create.php?mode=0&acc=".$mail2."&shoukai=".$shoukai;
-		$body = <<< "EOM"
-			WEBREZ+（ウェブレジプラス）にご興味をもっていただきありがとうございます。
-			こちらのURLから登録をお願いいたします。
-			
-			$url
-			EOM;
-		if(FROM==""){
-			//.env にメールアカウント情報が設定されてない場合、phpのsendmailで送付
-			define("FROM", "information@WEBREZ.jp");
-			$okflg = touroku_mail($to,$subject,$body);
-		}else{
-			//qdmailでメール送付
-			$okflg = send_mail($to,$subject,$body);
-		}
-		deb_echo("<a href=".$url.">".$url."</a>");
-	}else{
-		//echo "登録が失敗しました。";
-	}
-	$stmt=null;
-	$pdo_h=null;
-*/
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -62,25 +25,11 @@ if(!empty($_GET["shoukai"])){
 		<p style="font-size:1rem;color:var(--user-disp-color);">  ユーザー登録</p>
 	</header>
 	<main id='form1'>
-	<!--<form method="post" action="pre_account.php" style="font-size:1.5rem">-->
 		<div class="container" style="padding-top:15px;">
 			<input type="hidden" name="shoukai" value=<?php echo $shoukai; ?>>
 			<template v-if='MSG!==""'>
 				<div :class='alert_status' role='alert'>{{MSG}}</div>
 			</template>
-			<?php
-			/*
-				if($okflg===0){
-				}elseif($okflg===true){
-					echo $_POST['MAIL']." へ登録用のURLを記載したメールを送信いたしました。<br>メールが届いてない場合、メールアドレスが間違えているか、迷惑メールになっている可能性があります。<br>送信元アドレスは ".FROM. "となります。<br>";
-				}else{
-					echo $_POST['MAIL']." への登録用メール送信が失敗しました。<br>";
-				}
-				if($shoukai<>""){
-					echo "<br>紹介者CD付き登録画面<br>紹介者CD：".$shoukai."<br>";
-				}
-				*/
-			?>
 			<div v-if='shoukai!==""'>紹介者CD付き登録画面<br>紹介者CD：{{shoukai}}</div>
 			<div v-if='alert_status[1]==="alert-warning"' style='border:1px solid;padding:3px;'>
 				<p><a href='index.php'>TOP画面</a>に戻ってログインして下さい。</p>
@@ -89,14 +38,16 @@ if(!empty($_GET["shoukai"])){
 			<div class='mt-3 mb-3'>
 				<label for="mail" class="form-label">登録用URLの送信先を指定してください。</label>
 				<input v-model='email' type="email" maxlength="40" class="form-control" id="mail" name="MAIL" required="required" >
+				<small>
+					<p class='mb-0'>{{from_address}} から登録用のURLが記載されたメールが届きます。</p>
+					<p>受信できない場合、迷惑メールフィルタなどの設定をご確認ください。</p>
+				</small>
 			</div>
 			<div>
-				<!--<button type="submit" class="btn btn-primary" style="font-size:1.5rem" name="BTN" value="send">送 信</button>-->
 				<button type="button" class="btn btn-primary" style="font-size:1.5rem" @click='send_mail()'>送 信</button>
 			</div>
 			
 		</div>
-	<!--</form>-->
 	</main>
 	<script>
 		const { createApp, ref, onMounted, computed, VueCookies, watch } = Vue
@@ -161,13 +112,14 @@ if(!empty($_GET["shoukai"])){
 					})
 
 				}
-
+				const from_address = ref('<?php echo FROM;?>')
 				return{
 					email,
 					alert_status,
 					MSG,
 					send_mail,
 					shoukai,
+					from_address,
 				}
 			}
 		})

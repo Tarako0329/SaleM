@@ -3,7 +3,9 @@ require "php_header.php";
 $rtn=check_session_userid($pdo_h);
 $token = csrf_create();
 $ua = $_SERVER['HTTP_USER_AGENT'];
+$domain = $_SERVER['HTTP_HOST'];
 log_writer2("\$_SERVER['HTTP_USER_AGENT']",$_SERVER['HTTP_USER_AGENT'],"lv3");
+log_writer2("\$_SERVER['HTTP_HOST']",$_SERVER['HTTP_HOST'],"lv3");
 
 $tanmatu="";
 if ((strpos($ua, 'Android') !== false) && (strpos($ua, 'Mobile') !== false) || (strpos($ua, 'iPhone') !== false) || (strpos($ua, 'Windows Phone') !== false)) {
@@ -79,6 +81,11 @@ if(!empty($_POST)){
             <p></p>
             <label class='mt-5' for='mail'>URLをメールで送信</label>
             <input class='form-control' style="font-size:1.5rem;max-width:300px;" type='mail' id='mail' name='mail' v-model='mail' required='required' >
+            <small>
+				<p class='mb-0'>{{from_address}} から登録用のURLが記載されたメールが届きます。</p>
+				<p>受信できない場合、迷惑メールフィルタなどの設定をご確認ください。</p>
+			</small>
+
             <button type='button' class='btn btn-primary mt-3' @click='sendmail'>送信</button>
         </div>
         <form v-if='tanmatsu==="PC"' method='post' action='#' style="font-size:1.5rem">
@@ -150,7 +157,7 @@ if(!empty($_POST)){
 				axios
 				.post('ajax_sendmail.php',params)
 				.then((response) => {
-                    UriageList.value = [...response.data]
+                    alert('メールを送信しました。')
 				})
 				.catch((error) => console_log(`get_UriageList ERROR:${error}`,'lv3'));
             }
