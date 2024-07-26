@@ -92,12 +92,13 @@ if(!empty($_POST)){
 
             <button type='button' class='btn btn-primary mt-3' @click='sendmail'>送　信</button>
             <hr>
-                ITに強い方は、このままスマホ・タブレットで「連携データ出力」を行い、ダウンロードしたデータを確定申告ソフトに取り込んでください。
+                ITに強い方はブラウザアクセスに切替えて、このまま「連携データ出力」を行い、ダウンロードしたデータを確定申告ソフトに取り込んでください。
                 <br>データをメールで転送、クラウドに保存等の手段でPCからアクセス可能とする等の方法が考えられます。
                 <br>なお、その場合の操作方法は端末により様々ですので、WebRezのサポート対象外です。
+                <p><a href='https://<?php echo $domain;?>' target="_blank" rel="noopener noreferrer">https://<?php echo $domain;?></a></p>
             <hr class='mb-5'>
         </div>
-        <form  method='post' action='#' style="font-size:1.5rem">
+        <form v-if='tanmatsu!=="pwa"' method='post' action='#' style="font-size:1.5rem">
             <label for='soft'>連携会計システムの選択</label>
             <select class='form-select mb-3' style="font-size:1.5rem;padding:0;max-width:400px;width:100%;" name='soft' id='soft' v-model='soft' required='required' >
                 <option value='yayoi'>やよいの青色申告 オンライン</option>
@@ -207,6 +208,11 @@ if(!empty($_POST)){
 
 			onMounted(() => {
 				console_log('onMounted','lv3')
+                if(window.matchMedia('(display-mode: standalone)').matches){
+                    // ここにPWA環境下でのみ実行するコードを記述
+                    console_log('onPWA','lv3')
+                    tanmatsu.value = "pwa"
+                }
 			})
 			return{
 				ymfrom,
