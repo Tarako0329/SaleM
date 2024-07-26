@@ -13,14 +13,15 @@
 }
 
 .common_body {
-    padding-top:100px;
+    padding-top:80px;
     padding-bottom:80px;
 }
 
 .box29 {
     margin: 2em 0;
     background: #dcefff;
-    width: 600px;
+    max-width: 600px;
+    width:100%;
 }
 .box29 .box-title {
     font-size: 1.2em;

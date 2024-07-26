@@ -428,8 +428,6 @@ function getGUID(){
 function output_csv($data,$kikan){
     $date = date("Ymd");
     //header("Content-Type: application/octet-stream");
-    header('Content-Type: text/csv') ;
-    header("Content-Disposition: attachment; filename=webrez_uriage_{$date}_{$kikan}.csv");
     
     // データ行の文字コード変換・加工
     foreach ($data as $data_key => $line) {
@@ -438,10 +436,35 @@ function output_csv($data,$kikan){
         }
     }
 
+    header('Content-Type: text/csv') ;
+    header("Content-Disposition: attachment; filename=webrez_uriage_{$date}_{$kikan}.csv");
     foreach ($data as $key => $line) {
         echo implode(",", $line ) . "\r\n";
     }
     exit;
+}
+// =========================================================
+// XLSX出力
+// =========================================================
+function output_xlsx($data,$kikan){
+    // ファイル名
+    $temp_file = 'template\freee.xlsx';
+    $gen_file = 'template\freee_'.date("Ymd").'.xlsx';
+
+
+    // テンプレートファイルを読み込み
+    $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($temp_file);
+    $worksheet = $spreadsheet->getActiveSheet();
+
+    // 書き込み
+    $worksheet->fromArray($data, null, 'A2');
+
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;'); 
+    header("Content-Disposition: attachment; filename=\"{$gen_file}\"");
+    header('Cache-Control: max-age=0'); 
+    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+    $writer->save('php://output');
+exit();
 }
 
 // =========================================================

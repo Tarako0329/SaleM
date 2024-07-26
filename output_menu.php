@@ -48,7 +48,12 @@ if(!empty($_POST)){
     $stmt->bindValue(3, $ymto, PDO::PARAM_INT);
     $stmt->execute();
     $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    output_csv($row,$ymfrom."-".$ymto);
+
+    if($_POST["soft"]==="yayoi"){
+        output_csv($row,$ymfrom."-".$ymto);
+    }elseif($_POST["soft"]==="freee"){
+        output_xlsx($row,$ymfrom."-".$ymto);
+    }
 }else{
     $ymfrom = (string)date('Y')."-01-01";
     $ymto = (string)date('Y')."-12-31";
@@ -75,57 +80,65 @@ if(!empty($_POST)){
     <body class='common_body'>
         <div class="container" style="padding-top:10px;" id='form1'>
         <div v-if='tanmatsu!=="PC"' style="font-size:1.5rem">
-            <p>売上データを会計・確定申告用ソフトに取り込むためのファイルを出力します。</p>
-            <p>確定申告に使用しているPC等からWebRez＋(下記URL)へアクセスしてください。</p>
+            <div class='alert alert-warning'>ＰＣからの操作を推奨します。</div>
+            <p>ＰＣで下記URLへアクセスしてください。</p>
             <p>URL：https://<?php echo $domain;?></p>
-            <p></p>
-            <label class='mt-5' for='mail'>URLをメールで送信</label>
-            <input class='form-control' style="font-size:1.5rem;max-width:300px;" type='mail' id='mail' name='mail' v-model='mail' required='required' >
+            <label class='mt-3' for='mail'>URLをメールで送る</label>
+            <input class='form-control' style="font-size:1.5rem;max-width:400px;width:100%;" type='mail' id='mail' name='mail' v-model='mail' required='required' >
             <small>
-				<p class='mb-0'>{{from_address}} からURLが記載されたメールを送信します。</p>
+				<p class='mb-0'><?php echo FROM;?> からURLが記載したメールが届きます。</p>
 				<p>受信できない場合、迷惑メールフィルタなどの設定をご確認ください。</p>
 			</small>
 
-            <button type='button' class='btn btn-primary mt-3' @click='sendmail'>送信</button>
+            <button type='button' class='btn btn-primary mt-3' @click='sendmail'>送　信</button>
+            <hr>
+                ITに強い方は、このままスマホ・タブレットで「連携データ出力」を行い、ダウンロードしたデータを確定申告ソフトに取り込んでください。
+                <br>データをメールで転送、クラウドに保存等の手段でPCからアクセス可能とする等の方法が考えられます。
+                <br>なお、その場合の操作方法は端末により様々ですので、WebRezのサポート対象外です。
+            <hr class='mb-5'>
         </div>
-        <form v-if='tanmatsu==="PC"' method='post' action='#' style="font-size:1.5rem">
+        <form  method='post' action='#' style="font-size:1.5rem">
             <label for='soft'>連携会計システムの選択</label>
-            <select class='form-select mb-3' style="font-size:1.5rem;padding:0;max-width:400px;" name='soft' id='soft' v-model='soft' required='required' >
+            <select class='form-select mb-3' style="font-size:1.5rem;padding:0;max-width:400px;width:100%;" name='soft' id='soft' v-model='soft' required='required' >
                 <option value='yayoi'>やよいの青色申告 オンライン</option>
                 <option value='freee'>freee会計</option>
             </select>
             <div class="box29">
                 <div class="box-title mb-3">連携手順</div>
                 <ol v-if='soft==="yayoi"' style='list-style-position: inside;'>
-                    <li>売上データを出力</li>
+                    <li>連携データを出力</li>
                     <li>やよいの青色申告を開く</li>
-                    <li>スマート取引取込　から　CSVファイル取込　を起動</li>
-                    <li>出力した売上データを指定して取込</li>
+                    <li>スマート取引取込　を選択</li>
+                    <li>CSVファイル取込　を起動</li>
+                    <li>出力した連携データを指定して取込（※）</li>
                 </ol>
                 <ol v-if='soft==="freee"' style='list-style-position: inside;'>
-                    <li>{{uri_label}} を設定</li>
-                    <li>売上データを出力</li>
-                    <li>売上データをExcel形式に変換</li>
+                    <li>各計上科目 を設定</li>
+                    <li>連携データを出力</li>
                     <li>freee会計を開く</li>
-                    <li>［取引］メニュー →［エクセルインポート］　を起動</li>
-                    <li>出力した売上データを指定して取込</li>
+                    <li>［取引］メニュー を選択</li>
+                    <li>［エクセルインポート］　を起動</li>
+                    <li>出力した連携データを指定して取込（※）</li>
                 </ol>
                 <div class='ps-3 mt-3'>
-                    <a :href='manual_url' class='btn btn-primary' target="_blank">取込の詳しい手順はコチラ</a>
+                    <a :href='manual_url' class='btn btn-primary' target="_blank">（※）取込の詳しい手順はコチラ</a>
                     <p class='mt-0 p-1'><small>ご利用ソフトのヘルプページを表示します。</small></p>
                 </div>
             </div>
 
-            <div v-if='kamoku_set'>
-                <label for='kamoku'>{{uri_label}}</label>
-                <input class='form-control mb-5' style="font-size:1.5rem;max-width:200px;" type='text' id='kamoku' name='kamoku' v-model='kamoku' required='required' >
+            <div v-if='soft==="freee"' class='mb-5'>
+                <label for='kamoku'>売上計上科目名</label>
+                <input class='form-control mb-3' style="font-size:1.5rem;max-width:200px;" type='text' id='kamoku' name='kamoku' v-model='kamoku' required='required' >
+                <label for='nyukin_kamoku'>売上入金先科目名</label>
+                <input class='form-control mb-1' style="font-size:1.5rem;max-width:200px;" type='text' id='nyukin_kamoku' name='nyukin_kamoku' v-model='nyukin_kamoku' required='required' >
+                <small>[事業主貸] [現金] など</small>
             </div>
             <label for='ymfrom'> 出力対象期間</label>
             <input class='form-control' style="font-size:1.5rem;max-width:200px;" type='date' id='ymfrom' name='ymfrom' v-model='ymfrom' required='required' >
             <label for='ymto'>から</label>
             <input class='form-control mb-3' style="font-size:1.5rem;max-width:200px;" type='date' id='ymto' name='ymto' v-model='ymto' required='required' >
             
-            <input class='btn btn-primary mt-5' type='submit' value='CSV出力' style='width:200px;height:70px;'>
+            <input class='btn btn-primary mt-5' type='submit' value='連携データ出力' style='width:200px;height:70px;'>
         </form>
         </div>
 
@@ -149,9 +162,16 @@ if(!empty($_POST)){
             })
             const kamoku = computed(()=>{
                 if(soft.value==="yayoi"){
-                    return '売上'
+                    return ''
                 }else if(soft.value==="freee"){
                     return '売上高'
+                }
+            })
+            const nyukin_kamoku = computed(()=>{
+                if(soft.value==="yayoi"){
+                    return ''
+                }else if(soft.value==="freee"){
+                    return '事業主貸'
                 }
             })
             const kamoku_set = computed(()=>{
@@ -194,6 +214,7 @@ if(!empty($_POST)){
                 soft,
                 uri_label,
                 kamoku,
+                nyukin_kamoku,
                 kamoku_set,
                 tanmatsu,
                 mail,
