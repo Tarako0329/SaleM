@@ -448,8 +448,8 @@ function output_csv($data,$kikan){
 // =========================================================
 function output_xlsx($data,$kikan){
     // ファイル名
-    $temp_file = 'template\freee.xlsx';
-    $gen_file = 'template\freee_'.date("Ymd").'.xlsx';
+    $temp_file = 'template/freee.xlsx';
+    $gen_file = 'template/freee_'.date("Ymd").'.xlsx';
 
 
     // テンプレートファイルを読み込み
