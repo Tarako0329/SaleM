@@ -104,40 +104,58 @@ if($row[0]["introducer_id"]<>""){
     <!--<script src='script/jquery-3.6.0.min.js'></script>-->
     <link rel="stylesheet" href="css/style_menu.css?<?php echo $time; ?>" >
     <TITLE><?php echo $title;?></TITLE>
+	<style>
+		#qrOutput {
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-around;
+		padding: 20px;
+		}
+	</style>
 </head>
 <body class='common_body'>
     <header class="header-color common_header">
         <div class="yagou title"><a href="menu.php"><?php echo $title;?></a></div></a></div>
     </header>
     <?php
-    if($flg=="success"){
-        echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-s' class='lead'></div></div></div></div>";
-    }elseif($flg=="failed"){
-        echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-e' class='lead'></div></div></div></div>";
-    }
+        if($flg=="success"){
+            echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-s' class='lead'></div></div></div></div>";
+        }elseif($flg=="failed"){
+            echo "<div class='container'><div class='row'><div class='col-12'><div style='padding-top:5px;text-align:center;font-size:1.5rem;' id='alert-e' class='lead'></div></div></div></div>";
+        }
     
-    $url=ROOT_URL."pre_account.php?shoukai=".$ShoukaiCD;
+        $url=ROOT_URL."pre_account.php?shoukai=".$ShoukaiCD;
     ?>
     <div class="container" style="padding-top:15px;">
-        WEBREZ+を紹介していただくと、紹介者・登録者の双方にAMAZONギフト券500円分をプレゼントします。<br>
-        <br>
-        紹介された方がWEBREZ＋の初回支払を終えた時点で、プレゼント対象となります。<br>
-        AMAZONギフト券はご登録されているE-MAILアドレスにお届けします。<br>
-        <br>
-        <!--LINE-->
-        <a href='https://line.me/R/share?text=<?php echo urlencode("こちらからWEBREZ+（ウェブレジ＋）の仮登録を行い、有料会員の本登録まで行うとAMAZONギフト500円分をプレゼント！\n".$url."\n\n初回支払完了後に配布されます。")?>'><i class="fa-brands fa-line fa-3x line-green"></i></a>
-        <!--FACEBOOK-->
-        <a href='http://www.facebook.com/share.php?u=<?php echo $url; ?>' ><i class="fa-brands fa-facebook-square fa-2x facebook-blue"></i></a>
-        
+        <div class='row mb-5'>
+            <p>WEBREZ+を紹介していただくと、紹介者・登録者の双方にAMAZONギフト券500円分をプレゼントします。</p>
+            <p>紹介された方がWEBREZ＋の初回支払を終えた時点で、プレゼント対象となります。</p>
+            <p>AMAZONギフト券はご登録されているE-MAILアドレスにお届けします。</p>
+        </div>
+        <div class='row mb-3'>
+            <!--LINE-->
+            <a href='https://line.me/R/share?text=<?php echo urlencode("こちらからWEBREZ+（ウェブレジ＋）の仮登録を行い、有料会員の本登録まで行うとAMAZONギフト500円分をプレゼント！\n".$url."\n\n初回支払完了後に配布されます。")?>'><i class="fa-brands fa-line fa-3x line-green me-3"></i>Lineで紹介する</a>
+        </div>
+        <div class='row mb-3'>
+            <!--FACEBOOK-->
+            <a href='http://www.facebook.com/share.php?u=<?php echo $url; ?>' ><i class="fa-brands fa-facebook-square fa-3x facebook-blue me-3"></i>FaceBookでシェアする</a>
+        </div>
+        <div class='row mb-3'>
+            <!--E-Mail-->
+            <a href='mailto:@?subject=WEBREZ+（ウェブレジ＋）のご紹介&body=こちらからWEBREZ+（ウェブレジ＋）の仮登録を行い、有料会員の本登録まで行うとAMAZONギフト500円分をプレゼント！%0D%0A<?php echo $url; ?>' ><i class="fa-regular fa-envelope fa-3x me-3"></i>メールで紹介する</a>
+        </div>
         <!--TWITTER
         <a href="http://twitter.com/share?text=【ツイート文（日本語が含まれる場合にはURLエンコードが必要）】&url=<?php echo $url; ?>&hashtags=#レジアプリ" rel="nofollow"><i class="fa-brands fa-twitter-square fa-2x twitter-blue"></i></a>
         -->
         <br>
-        紹介CD付URLで紹介する。
-        <br>
-        <br>
-        <h3>紹介用URL：</h3>
-        <p><?php echo $url; ?></p>
+
+        紹介用ＱＲコードから登録
+        <div id="qrOutput">
+			<canvas id="qr"></canvas>
+		</div>
+
+
+
         <h3>紹介用CD：</h3>
         <p><?php echo $ShoukaiCD; ?></p>
         <hr>
@@ -150,15 +168,15 @@ if($row[0]["introducer_id"]<>""){
         
     </div>
     <script>
-        window.onload = function() {
+        /*window.onload = function() {
             //アラート用
             function alert(msg) {
               return $('<div class="alert" role="alert"></div>')
                 .text(msg);
             }
             (function($){
-              const s = alert('<?php echo $msg; ?> ').addClass('alert-success');
-              const e = alert('<?php echo $msg; ?> ').addClass('alert-danger');
+              const s = alert('<?php //echo $msg; ?> ').addClass('alert-success');
+              const e = alert('<?php //echo $msg; ?> ').addClass('alert-danger');
               // アラートを表示する
               $('#alert-s').append(s);
               // 5秒後にアラートを消す
@@ -168,7 +186,32 @@ if($row[0]["introducer_id"]<>""){
               $('#alert-e').append(e);
             })(jQuery);
             console_log("<?php echo $url; ?>","lv3")
-        }  
+        }*/
+        const QRout = () =>{
+			// 入力された文字列を取得
+			let userInput = '<?php echo $url; ?>'
+			console_log(userInput)
+			var query = userInput.split(' ').join('+');
+			// QRコードの生成
+			(function() {
+				var qr = new QRious({
+					element: document.getElementById('qr'), 
+					// 入力した文字列でQRコード生成
+					value: query
+				});
+				qr.background = '#FFF'; //背景色
+				qr.backgroundAlpha = 1; // 背景の透過率
+				qr.foreground = '#1c1c1c'; //QRコード自体の色
+				qr.foregroundAlpha = 1.0; //QRコード自体の透過率
+				qr.level = 'L'; // QRコードの誤り訂正レベル
+				qr.size = 240; // QRコードのサイズ
+				// QRコードをflexboxで表示
+				document.getElementById('qrOutput').style.display = 'flex';
+			})();
+			// png出力用コード
+			var cvs = document.getElementById("qr");
+		}
+        QRout()
     </script>
     
 </body>

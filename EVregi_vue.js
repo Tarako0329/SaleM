@@ -717,7 +717,7 @@
 					// QRコードの生成
 					(function() {
 						var qr = new QRious({
-							element: document.getElementById('qr'),
+							element: document.getElementById('qr'), 
 							// 入力した文字列でQRコード生成
 							value: query
 						});
