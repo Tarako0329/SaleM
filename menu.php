@@ -101,6 +101,10 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         }else{
             //契約済
             $plan=1;
+            if(empty($row[0]["Accounting_soft"])){
+                $msg = "<p class='mb-1 fs-3' style='color:red;'>確定申告に利用しているソフトを『ユーザ情報』より登録してください。</p>";
+                $msg .= "<p class='mb-1 fs-5'>登録いただいたソフトがWebRez未対応の場合、対応するためにご協力をお願いする場合がございます。</p>";
+            }
         }
         //ユーザ名・屋号の取得
         if($row[0]["yagou"]<>""){
@@ -172,8 +176,8 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     <div class='container-fluid' style='padding-top:15px;'>
 
 <?php
-    deb_echo(ROOT_URL);
-    deb_echo(EXEC_MODE."：uid_".$_SESSION["user_id"]);
+    //deb_echo(ROOT_URL);
+    //deb_echo(EXEC_MODE."：uid_".$_SESSION["user_id"]);
 
     echo $msg;
 

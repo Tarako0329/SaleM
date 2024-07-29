@@ -79,11 +79,11 @@ $token=csrf_create();
 					<input v-model='account_u.question' :='locker' type='text' maxlength='20' class='form-control mb-3' id='question' name='QUESTION' required='required' placeholder='例：初恋の人の名前' >
 					<label for='answer' >答え</label>
 					<input v-model='account_u.answer' :='locker' type='text' maxlength='20' class='form-control' id='answer' name='ANSWER' required='required' placeholder='例：ささき' >
-					<small id='answer' class='form-text text-muted'>ひらがな・半角英数・スペース不使用を推奨</small>
+					<small id='answer' class='form-text text-muted mb-3'>ひらがな・半角英数・スペース不使用を推奨</small>
 					<br>
 					<template v-if='mode==="update"'>
-						<input v-model='account_r.loginrez' :='locker' type='checkbox' class='form-check-input mb-3' id='loginrez' name='LOGINREZ' >
-						<label class="form-check-label" for='loginrez' >ログイン後レジ画面表示</label><br>
+						<input v-model='account_r.loginrez' :='locker' type='checkbox' class='form-check-input mt-3 mb-3' id='loginrez' name='LOGINREZ' >
+						<label class="form-check-label mt-3 mb-3" for='loginrez' >アプリ起動時にレジ画面を自動で表示する</label><br>
 						<label for='hasushori' >消費税の端数処理</label>
 						<select v-model='account_r.ZeiHasu' :='locker' class="form-select form-select-lg mb-3" style='font-size:1.5rem' id='hasushori' name='ZEIHASU'>
 							<option value=0>切り捨て</option>

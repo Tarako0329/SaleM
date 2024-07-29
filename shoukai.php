@@ -6,7 +6,7 @@ $msg="";
 $sqllog="";
 try{
     
-    $sqlstr="select * from Users where uid=?";
+    //$sqlstr="select * from Users where uid=?";
     $flg="";
     if(!empty($_POST)){
         $ShoukaishaCD=sort_hash(secho($_POST["SHOUKAI"]),"dec");
@@ -19,7 +19,8 @@ try{
 			$pdo_h->beginTransaction();
 			$sqllog .= rtn_sqllog("START TRANSACTION",[]);
 
-            $sqlstr2="update Users set introducer_id=? where uid=? and introducer_id is null";
+            //$sqlstr2="update Users set introducer_id=? where uid=? and introducer_id is null";
+            $sqlstr2="update Users_webrez set introducer_id=? where uid=? and introducer_id is null";
             $stmt = $pdo_h->prepare($sqlstr2);
             $stmt->bindValue(1, $ShoukaishaCD, PDO::PARAM_INT);
             $stmt->bindValue(2, $_SESSION["user_id"], PDO::PARAM_INT);
@@ -48,7 +49,7 @@ try{
         }
     }
     
-    
+    /*
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
     $stmt->execute();
@@ -59,7 +60,7 @@ try{
     if($row[0]["introducer_id"]<>""){
         $ShoukaishaCD=sort_hash($row[0]["introducer_id"],"enc");
     }
-    
+    */
 }catch(Exception $e){
     $pdo_h->rollBack();
     $sqllog .= rtn_sqllog("rollBack",[]);
@@ -68,6 +69,25 @@ try{
     $msg="紹介者CDの登録に失敗しました。";
     $flg="failed";
 
+}
+
+$sqlstr="select A.*,B.introducer_id from Users A inner join Users_webrez B on A.uid=B.uid where A.uid=?";
+$stmt = $pdo_h->prepare($sqlstr);
+$stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
+$stmt->execute();
+$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$ShoukaiCD=sort_hash($row[0]["uid"],"enc");
+$ShoukaishaCD="";
+if($row[0]["introducer_id"]<>""){
+    //$ShoukaishaCD=sort_hash($row[0]["introducer_id"],"enc");
+    $sqlstr="select A.*,B.introducer_id,B.yagou,B.name from Users A inner join Users_webrez B on A.uid=B.uid where A.uid=?";
+    $stmt = $pdo_h->prepare($sqlstr);
+    $stmt->bindValue(1, $row[0]["introducer_id"], PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $ShoukaishaCD = empty($row[0]["yagou"])?$row[0]["name"]:$row[0]["yagou"];
 }
 
 
@@ -80,7 +100,7 @@ try{
     include "head_bs5.php" ;
     ?>
     <!--ページ専用CSS-->
-    <script src='script/jquery-3.6.0.min.js'></script>
+    <!--<script src='script/jquery-3.6.0.min.js'></script>-->
     <link rel="stylesheet" href="css/style_menu.css?<?php echo $time; ?>" >
     <TITLE><?php echo $title;?></TITLE>
 </head>
@@ -123,7 +143,7 @@ try{
         <h3>紹介者CDの登録：</h3>
         <form method='post' action='shoukai.php'>
             あなたにWEBREZ+を紹介して下さった方の紹介者CDを登録して下さい。
-            <input type='text' class='form-control' required="required" style='width:13rem;font-size:1.8rem;margin-top:5px;margin-bottom:5px;padding:0;' name='SHOUKAI' <?php if($ShoukaishaCD<>""){echo "value=".$ShoukaishaCD." readonly='readonly'";} ?>>
+            <input type='text' class='form-control' required="required" style='width:200px;font-size:1.8rem;margin-top:5px;margin-bottom:5px;padding:0;' name='SHOUKAI' <?php if($ShoukaishaCD<>""){echo "value=".$ShoukaishaCD." readonly='readonly'";} ?>>
             <input type='submit' class='btn-primary' style='width:100px;font-size:1.8rem' value= <?php if($ShoukaishaCD<>""){echo "'登録済' disabled";}else{echo "'登　録'";}?>>
         </form>
         

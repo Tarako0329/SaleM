@@ -35,7 +35,7 @@ if(!empty($_POST)){
         $sqlstr=$sqlstr." group by Uridate,CONCAT('売上No:',UriageNo),case when zeiKBN='1001' then '軽減税率8%' else '' end";
         $sqlstr=$sqlstr." order by Uridate,売上No";
     }elseif($_POST["soft"]==="freee"){
-        $sqlstr="select '収入' as 収支,CURDATE()+0,Uridate,'".$_POST["kamoku"]."' as 科目,sum(UriageKin) as 売上,'外税',sum(zei) as 税額,CONCAT('売上No:',UriageNo) as 備考,'事業主貸' as 決済口座";
+        $sqlstr="select '収入' as 収支,CURDATE()+0,Uridate,'".$_POST["kamoku"]."' as 科目,sum(UriageKin) as 売上,'外税',sum(zei) as 税額,CONCAT('売上No:',UriageNo) as 備考,'".$_POST["nyukin_kamoku"]."' as 決済口座";
         $sqlstr=$sqlstr." from UriageData where uid=? and Uridate between ? and ?";
         $sqlstr=$sqlstr." group by CURDATE()+0,Uridate,CONCAT('売上No:',UriageNo)";
         $sqlstr=$sqlstr." order by Uridate,備考";
@@ -80,7 +80,7 @@ if(!empty($_POST)){
     <body class='common_body'>
         <div class="container" style="padding-top:10px;" id='form1'>
         <div v-if='tanmatsu!=="PC"' style="font-size:1.5rem">
-            <div class='alert alert-warning'>ＰＣからの操作を推奨します。</div>
+            <div class='alert alert-warning'>ＰＣからの操作をお願いします。</div>
             <p>ＰＣで下記URLへアクセスしてください。</p>
             <p>URL：https://<?php echo $domain;?></p>
             <label class='mt-3' for='mail'>URLをメールで送る</label>
@@ -90,15 +90,15 @@ if(!empty($_POST)){
 				<p>受信できない場合、迷惑メールフィルタなどの設定をご確認ください。</p>
 			</small>
 
-            <button type='button' class='btn btn-primary mt-3' @click='sendmail'>送　信</button>
-            <hr>
+            <button type='button' class='btn btn-primary mt-3' @click='sendmail'>メール送信</button>
+            <!--<hr>
                 ITに強い方はブラウザアクセスに切替えて、このまま「連携データ出力」を行い、ダウンロードしたデータを確定申告ソフトに取り込んでください。
                 <br>データをメールで転送、クラウドに保存等の手段でPCからアクセス可能とする等の方法が考えられます。
                 <br>なお、その場合の操作方法は端末により様々ですので、WebRezのサポート対象外です。
-                <p><a href='https://<?php echo $domain;?>' target="_blank" rel="noopener noreferrer">https://<?php echo $domain;?></a></p>
-            <hr class='mb-5'>
+                <p><a href='https://<?php //echo $domain;?>' target="_blank" rel="noopener noreferrer">https://<?php //echo $domain;?></a></p>
+            <hr class='mb-5'>-->
         </div>
-        <form v-if='tanmatsu!=="pwa"' method='post' action='#' style="font-size:1.5rem">
+        <form v-if='tanmatsu==="PC"' method='post' action='#' style="font-size:1.5rem">
             <label for='soft'>連携会計システムの選択</label>
             <select class='form-select mb-3' style="font-size:1.5rem;padding:0;max-width:400px;width:100%;" name='soft' id='soft' v-model='soft' required='required' >
                 <option value='yayoi'>やよいの青色申告 オンライン</option>
@@ -149,6 +149,7 @@ if(!empty($_POST)){
 	const { createApp, ref, onMounted, computed, VueCookies, watch,nextTick  } = Vue;
     createApp({
 		setup(){
+            const token = ref('<?php echo $token;?>')
 			const ymfrom = ref('<?php echo $ymfrom; ?>')
 			const ymto = ref('<?php echo $ymto; ?>')
 			const tanmatsu = ref('<?php echo $tanmatu; ?>')
@@ -194,14 +195,24 @@ if(!empty($_POST)){
             })
 
             const sendmail = () =>{
+                if(mail.value.length==0){
+                    alert('メールアドレスを入力して下さい')
+                    return
+                }
                 let params = new URLSearchParams()
+				params.append('csrf_token', token.value);
 				params.append('mail', mail.value);
 				params.append('subject', "【WebRez+】より送信");
 				params.append('body', "WebRez+ へのURLは以下の通りです。\r\nhttps://<?php echo $domain;?>");
 				axios
 				.post('ajax_sendmail.php',params)
 				.then((response) => {
-                    alert('メールを送信しました。')
+                    if(response.data.status==='success'){
+                        alert('メールを送信しました。')
+                    }else{
+                        alert(response.data.MSG)
+                    }
+                    token.value = response.data.csrf_create
 				})
 				.catch((error) => console_log(`get_UriageList ERROR:${error}`,'lv3'));
             }

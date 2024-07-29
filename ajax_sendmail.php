@@ -9,7 +9,7 @@ $reseve_status=false;               //処理結果セット済みフラグ。
 $timeout=false;                     //セッション切れ。ログイン画面に飛ばすフラグ
 $sqllog="";
 
-$rtn = true;//csrf_checker(["xxx.php","xxx.php"],["P","C","S"]);
+$rtn = csrf_checker(["output_menu.php","xxx.php"],["P","C","S"]);
 if($rtn !== true){
     $msg=$rtn;
     $alert_status = "alert-warning";
@@ -24,6 +24,7 @@ if($rtn !== true){
     }else{
         try{
             send_mail($_POST["mail"],$_POST["subject"],$_POST["body"]);
+            $alert_status = "success";
             $reseve_status=true;
         }catch(Exception $e){
             $msg = "システムエラーによる更新失敗。管理者へ通知しました。";
