@@ -9,6 +9,7 @@ try{
     //$sqlstr="select * from Users where uid=?";
     $flg="";
     if(!empty($_POST)){
+        $sqlstr="select A.*,B.introducer_id from Users A inner join Users_webrez B on A.uid=B.uid where A.uid=?";
         $ShoukaishaCD=sort_hash(secho($_POST["SHOUKAI"]),"dec");
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $ShoukaishaCD, PDO::PARAM_INT);

@@ -169,6 +169,7 @@ ver3.10.0-000:会計ソフト情報-commited
 ver3.10.0-001:お試し終了時の表記等修正-commited
 ver3.11.0-001:freeeの設定追加
 ver3.12.0-000:freeeの設定追加:Excel出力
+ver3.12.0-001:freeeの設定追加:Excel出力
 
 verA.BB.C.DDD
 カウントアップ条件
