@@ -187,7 +187,7 @@ if(!empty($_POST)){
             const manual_url = computed(()=>{
                 let url
                 if(soft.value==="yayoi"){
-                    return 'https://support.yayoi-kk.co.jp/subcontents.html?page_id=27061'
+                    return 'https://support.yayoi-kk.co.jp/subcontents.html?page_id=27061&grade_id=Blue'
                 }else if(soft.value==="freee"){
                     return 'https://support.freee.co.jp/hc/ja/articles/216527163-Excel-%E8%B2%A9%E5%A3%B2%E7%AE%A1%E7%90%86%E3%82%BD%E3%83%95%E3%83%88%E3%81%8B%E3%82%89%E3%83%87%E3%83%BC%E3%82%BF%E3%82%92%E5%8F%96%E3%82%8A%E8%BE%BC%E3%82%80-%E3%82%A8%E3%82%AF%E3%82%BB%E3%83%AB%E3%82%A4%E3%83%B3%E3%83%9D%E3%83%BC%E3%83%88#h_01FZD6MB131E4HB2NHXX5XYN03'
                 }
