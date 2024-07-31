@@ -13,3 +13,4 @@ xxx*
 /vendor/dompdf/dompdf/lib/fonts/installed-fonts.json
 *.mm
 *.zip
+installed-fonts.json

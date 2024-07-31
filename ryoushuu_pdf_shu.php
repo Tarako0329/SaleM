@@ -52,6 +52,7 @@
 	$id=($_GET["i"]);
 	//$UriNo=rot13decrypt2($_GET["u"]);
 	$UriNo=($_GET["u"]);
+	$RyoNo=($_GET["r"]);
 	$Atena = (!empty($_GET["s"])?$_GET["s"] . "　　" . $_GET["k"]:"");
 	$type = ($_GET["tp"]==="1"?"領　収　書":"請　求　書");
 	$filename = ($_GET["tp"]==="1"?"Ryoushusho":"Seikyusho");
@@ -143,19 +144,7 @@ $inquiry = (!empty($userinfo["inquiry_tel"])?$userinfo["inquiry_tel"]:"")."/".$u
 }
 $message="";
 if($saiban==="on"){//領収書Noの取得
-	
-	$sql = "select max(R_NO) as R_NO from ryoushu where uid = ? group by uid";
-	$stmt = $pdo_h->prepare($sql);
-	$stmt->bindValue(1, $id, PDO::PARAM_INT);
-	$stmt->execute();
-	$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-	$count = $stmt->rowCount();
-
-	if(empty($result[0]["R_NO"])){
-		$RyoushuuNO = 1;
-	}else{
-		$RyoushuuNO = $result[0]["R_NO"] + 1;
-	}
+	$RyoushuuNO = $RyoNo;
 }else{
 	$RyoushuuNO = "xxxxx";
 	$message = "<br><span style='font-size:12px;'>この領収書は確認表示のため、お客様に発行できません。</span>";
@@ -270,22 +259,23 @@ try{
 	$sqllog="";
 	if($saiban==="on"){
 		$pdo_h->beginTransaction();
+		
 		$sqllog .= rtn_sqllog("START TRANSACTION",[]);
-		$sql = "insert into ryoushu(uid,R_NO,UriNO,Atena,html,QR_GUID) values(?,?,?,?,?,?)";
+		$sql = "update ryoushu set Atena=?,html=?,QR_GUID=? where uid=? and R_NO=?";
 		$stmt = $pdo_h->prepare($sql);
-		$stmt->bindValue(1, $id, PDO::PARAM_INT);
-		$stmt->bindValue(2, $RyoushuuNO, PDO::PARAM_INT);
-		$stmt->bindValue(3, $UriNo, PDO::PARAM_INT);
-		$stmt->bindValue(4, $Atena, PDO::PARAM_STR);
-		$stmt->bindValue(5, $html, PDO::PARAM_STR);
-		$stmt->bindValue(6, $qr_GUID, PDO::PARAM_STR);
+		$stmt->bindValue(1, $Atena, PDO::PARAM_STR);
+		$stmt->bindValue(2, $html, PDO::PARAM_STR);
+		$stmt->bindValue(3, $qr_GUID, PDO::PARAM_STR);
+		$stmt->bindValue(4, $id, PDO::PARAM_INT);
+		$stmt->bindValue(5, $RyoushuuNO, PDO::PARAM_INT);
 
 		$status = $stmt->execute();
-		$sqllog .= rtn_sqllog($sql,[$id,$RyoushuuNO,$UriNo,$Atena,$html,$qr_GUID]);
-
+		$sqllog .= rtn_sqllog($sql,[$UriNo,$Atena,$html,$qr_GUID,$id,$RyoushuuNO]);
+		
 		$pdo_h->commit();
 		$sqllog .= rtn_sqllog("commit",[]);
 		sqllogger($sqllog,0);
+
 	}
 	// PDFの設定～出力
 	output($html,$filename);

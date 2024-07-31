@@ -171,6 +171,7 @@ ver3.11.0-001:freeeの設定追加-commited
 ver3.12.0-000:freeeの設定追加:Excel出力-commited
 ver3.12.0-001:freeeの設定追加:Excel出力-commited
 ver3.13.0-000:紹介画面の改良-commited
+ver3.14.0-000:領収書再発行・返品対応
 
 verA.BB.C.DDD
 カウントアップ条件
@@ -206,6 +207,8 @@ php load_font.php ipag css/ipag.ttf
 php load_font.php ipagp css/ipagp.ttf
 php load_font.php Kranky css/Kranky-Regular.ttf
 
+
+cd C:\xampp\htdocs\SaleM\
 php load_font.php ipag C:\xampp\htdocs\SaleM\css\ipag.ttf
 php load_font.php ipagp C:\xampp\htdocs\SaleM\css\ipagp.ttf
 php load_font.php Kranky C:\xampp\htdocs\SaleM\css\Kranky-Regular.ttf
