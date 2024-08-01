@@ -12,6 +12,9 @@
 
 	define("EXEC_MODE",$_ENV["EXEC_MODE"]);
 	log_writer2("\$GET",$_GET,"lv3");
+	
+	$dtStr = date("Y-m-d H:i:s") . "." . substr(explode(".", (microtime(true) . ""))[1], 0, 3);
+	log_writer2("\$dtStr",$dtStr,"lv3");
 
 	define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
 	//DB接続関連
@@ -32,7 +35,7 @@
 
 	//システム通知
 	define("SYSTEM_NOTICE_MAIL",$_ENV["SYSTEM_NOTICE_MAIL"]);
-/*
+
 	$rtn=session_set_cookie_params(24*60*60*24*3,'/','.'.MAIN_DOMAIN,true);
 	if($rtn==false){
 			log_writer2("php_header.php","ERROR:[session_set_cookie_params] が FALSE を返しました。","lv0");
@@ -41,7 +44,7 @@
 			exit();
 	}
 	session_start();
-*/	
+	
 	$pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
 	if(empty($_GET)){
@@ -52,13 +55,14 @@
 	$id=($_GET["i"]);
 	//$UriNo=rot13decrypt2($_GET["u"]);
 	$UriNo=($_GET["u"]);
+	$RyoNo=($_GET["r"]);
 	$Atena = (!empty($_GET["s"])?$_GET["s"] . "　　" . $_GET["k"]:"");
 	$type = ($_GET["tp"]==="1"?"領　収　書":"請　求　書");
 	$filename = ($_GET["tp"]==="1"?"Ryoushusho":"Seikyusho");
 	$qr_GUID=(!empty($_GET["qr"])?$_GET["qr"]:null);
 	$saiban=(!empty($_GET["sb"])?$_GET["sb"]:null);
 }
-use Dompdf\Dompdf;
+//use Dompdf\Dompdf;
 
 if(!empty($qr_GUID)){
 	$sql = "select * from ryoushu where QR_GUID = ?";
@@ -90,19 +94,28 @@ $inquiry = (!empty($userinfo["inquiry_tel"])?$userinfo["inquiry_tel"]:"")."/".$u
 
 //売上明細の取得
 {
-	$sql="select *,ZeiMS.hyoujimei as 税率desp,ZeiMS.zeiritu as 税率 from UriageData Uri inner join ZeiMS on Uri.zeiKBN = ZeiMS.zeiKBN where uid = ? and UriageNO like ? and ShouhinCD not like 'Z%' order by Uri.zeiKBN,Uri.ShouhinCD";
+	$sql="select *,ZeiMS.hyoujimei as 税率desp,ZeiMS.zeiritu as 税率 
+	from UriageData Uri 
+	inner join ZeiMS on Uri.zeiKBN = ZeiMS.zeiKBN 
+	where uid = ? and UriageNO like ? and ShouhinCD not like 'Z%' and H_moto_UNO is null
+	order by Uri.zeiKBN,Uri.ShouhinCD";
 	$stmt = $pdo_h->prepare($sql);
 	$stmt->bindValue(1, $id, PDO::PARAM_INT);
 	$stmt->bindValue(2, $UriNo, PDO::PARAM_STR);
 	$stmt->execute();
-	$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	$count = $stmt->rowCount();
+	if($count==0){
+		echo "返品領収書は発行済みです。";
+		exit();
+	}
+	$result_meisai = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 	$i=0;
 	$Goukei=0;
 	$meisai="";
 	$ZeiKei="";
 
-	foreach($result as $row){
+	foreach($result_meisai as $row){
 		if($i===0){
 			$UriageDate = (string)$row["UriDate"];
 			$insDT = (string)$row["insDatetime"];
@@ -110,15 +123,15 @@ $inquiry = (!empty($userinfo["inquiry_tel"])?$userinfo["inquiry_tel"]:"")."/".$u
 			$TkName = $row["TokuisakiNM"];
 		}
 		if(substr($row["ShouhinCD"],0,1)!=="C"){
-			$meisai .= "<tr><td style='text-align:left;'>".($row["zeiKBN"]=="1001"?"※": ($row["zeiKBN"]=="0"?"(非課税)":"")).$row["ShouhinNM"]."</td><td class='meisaival'>".number_format($row["su"]);
-			$meisai .= "</td><td class='meisaival'>".number_format($row["tanka"])."</td><td class='meisaival'>".number_format($row["UriageKin"])."</td></tr>\n";
+			$meisai .= "<tr><td style='text-align:left;'>".($row["zeiKBN"]=="1001"?"※": ($row["zeiKBN"]=="0"?"(非課税)":"")).$row["ShouhinNM"]."</td><td class='meisaival'>".number_format($row["su"]*(-1));
+			$meisai .= "</td><td class='meisaival'>".number_format($row["tanka"])."</td><td class='meisaival'>".number_format($row["UriageKin"]*(-1))."</td></tr>\n";
 	
 		}else{
-			$meisai .= "<tr><td style='text-align:left;'>".($row["zeiKBN"]=="1001"?"※": "").$row["ShouhinNM"]."</td><td class='meisaival'>".number_format($row["su"]);
-			$meisai .= "</td><td class='meisaival'>".number_format($row["tanka"])."</td><td class='meisaival'>".number_format($row["UriageKin"])."</td></tr>\n";
+			$meisai .= "<tr><td style='text-align:left;'>".($row["zeiKBN"]=="1001"?"※": "").$row["ShouhinNM"]."</td><td class='meisaival'>".number_format($row["su"]*(-1));
+			$meisai .= "</td><td class='meisaival'>".number_format($row["tanka"])."</td><td class='meisaival'>".number_format($row["UriageKin"]*(-1))."</td></tr>\n";
 	
 		}
-		$Goukei += $row["UriageKin"];
+		$Goukei += $row["UriageKin"]*(-1);
 		$i++;
 	}
 }
@@ -134,8 +147,8 @@ $inquiry = (!empty($userinfo["inquiry_tel"])?$userinfo["inquiry_tel"]:"")."/".$u
 	$ZeiGoukei = 0;
 	foreach($result as $row){
 		$zeigaku = $row["消費税額"] ;
-		$ZeiKei .= "<tr><td style='width:30%;'>".$row["税率"]."対象</td><td style='text-align:right;width:30%;'>￥".number_format($row["売上金額"])."-</td><td style='width:20%;'>消費税</td><td style='text-align:right;width:20%;'>	￥".number_format($zeigaku)."-</td></tr>\n";
-		$ZeiGoukei += $zeigaku;
+		$ZeiKei .= "<tr><td style='width:30%;'>".$row["税率"]."対象</td><td style='text-align:right;width:30%;'>￥".number_format($row["売上金額"]*(-1))."-</td><td style='width:20%;'>消費税</td><td style='text-align:right;width:20%;'>	￥".number_format($zeigaku*(-1))."-</td></tr>\n";
+		$ZeiGoukei += $zeigaku*(-1);
 	}
 	$Goukei = $Goukei+$ZeiGoukei;
 	$ZeiGoukei = number_format($ZeiGoukei);
@@ -160,6 +173,15 @@ if($saiban==="on"){//領収書Noの取得
 	$RyoushuuNO = "xxxxx";
 	$message = "<br><span style='font-size:12px;'>この領収書は確認表示のため、お客様に発行できません。</span>";
 }
+
+//売上番号の取得
+$sqlstr = "select max(UriageNO) as UriageNO from UriageData where uid=?";
+$stmt = $pdo_h->prepare($sqlstr);
+$stmt->bindValue(1, $id, PDO::PARAM_INT);
+$stmt->execute();
+$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$UriageNO = $row[0]["UriageNO"]+1;
+
 // PDFにする内容をHTMLで記述
 $html = <<< EOM
 <html>
@@ -218,7 +240,7 @@ $html = <<< EOM
 			powered by <span style='font-family:Kranky;font-weight: bolder;'>$sysname</span>
 		</div>
 		<div style='height:70px;'>
-			<span class='title'> - $type - </span>
+			<span class='title'> - (返品)$type - </span>
 			$message
 		</div>
 		<div style='text-align:left;font-size:25px;'>
@@ -229,7 +251,8 @@ $html = <<< EOM
 			<p>$invoice</p>
 			<p>$add</p>
 			<p>取引日時[$insDT]</p>
-			<p>伝票番号[$UriNo/$RyoushuuNO]</p>
+			<p>伝票番号[$UriageNO/$RyoushuuNO]</p>
+			<p>返品元伝票番号[$UriNo/$RyoNo]</p>
 		</div>
 		<div class='Seikyu' style='display:flex;'>
 			<table style='width:100%;'>
@@ -271,18 +294,71 @@ try{
 	if($saiban==="on"){
 		$pdo_h->beginTransaction();
 		$sqllog .= rtn_sqllog("START TRANSACTION",[]);
-		$sql = "insert into ryoushu(uid,R_NO,UriNO,Atena,html,QR_GUID) values(?,?,?,?,?,?)";
+
+		//領収書HTMLの登録
+		$sql = "insert into ryoushu(uid,R_NO,UriNO,Atena,html,QR_GUID,H_moto_RNO) values(?,?,?,?,?,?,?)";
 		$stmt = $pdo_h->prepare($sql);
 		$stmt->bindValue(1, $id, PDO::PARAM_INT);
 		$stmt->bindValue(2, $RyoushuuNO, PDO::PARAM_INT);
-		$stmt->bindValue(3, $UriNo, PDO::PARAM_INT);
+		$stmt->bindValue(3, $UriageNO, PDO::PARAM_INT);
 		$stmt->bindValue(4, $Atena, PDO::PARAM_STR);
 		$stmt->bindValue(5, $html, PDO::PARAM_STR);
 		$stmt->bindValue(6, $qr_GUID, PDO::PARAM_STR);
+		$stmt->bindValue(7, $RyoNo, PDO::PARAM_STR);
 
 		$status = $stmt->execute();
 		$sqllog .= rtn_sqllog($sql,[$id,$RyoushuuNO,$UriNo,$Atena,$html,$qr_GUID]);
 
+		//売上返品の登録
+
+
+		$params["uid"] = $id; 
+		$params["UriageNO"] = $UriageNO;
+		$params["UriDate"] = date("Y/m/d");
+		$params["insDatetime"] = date("Y/m/d H:i:s");
+		
+		$sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zeiKBN,genka_tanka,H_moto_UNO)";
+		$sqlstr = $sqlstr." values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:su,:Utisu,:tanka,:UriageKin,:zeiKBN,:genka_tanka,:H_moto_UNO)";
+	
+		foreach($result_meisai as $row){//本体額明細の登録
+			
+			$stmt = $pdo_h->prepare($sqlstr);
+	
+			$params["Event"] = $row["Event"];
+			$params["TokuisakiNM"] = $row["TokuisakiNM"];
+			$params["ShouhinCD"] = $row["ShouhinCD"];
+			$params["ShouhinNM"] = $row["ShouhinNM"];
+			$params["su"] = $row["su"]*(-1);
+			$params["Utisu"] = $row["Utisu"]*(-1);
+			$params["tanka"] = $row["tanka"];
+			$params["UriageKin"] = ($row["su"] * $row["tanka"])*(-1);
+			$params["zeiKBN"] = $row["zeiKBN"];
+			$params["genka_tanka"] = $row["genka_tanka"];
+			$params["H_moto_UNO"] = $UriNo;
+	
+			$stmt->bindValue("uid",  $params["uid"], PDO::PARAM_INT);
+			$stmt->bindValue("UriageNO",  $params["UriageNO"], PDO::PARAM_INT);
+			$stmt->bindValue("UriDate",  $params["UriDate"], PDO::PARAM_STR);
+			$stmt->bindValue("insDatetime",  $params["insDatetime"], PDO::PARAM_STR);
+			$stmt->bindValue("Event",  $params["Event"], PDO::PARAM_INT);
+			$stmt->bindValue("TokuisakiNM",  $params["TokuisakiNM"], PDO::PARAM_STR);
+			$stmt->bindValue("ShouhinCD",  $params["ShouhinCD"], PDO::PARAM_STR);      //商品CD
+			$stmt->bindValue("ShouhinNM",  $params["ShouhinNM"], PDO::PARAM_STR);      //商品名
+			$stmt->bindValue("su",  $params["su"], PDO::PARAM_INT);      //数量
+			$stmt->bindValue("Utisu", $params["Utisu"], PDO::PARAM_INT);      //内数
+			$stmt->bindValue("tanka", $params["tanka"], PDO::PARAM_INT);     //単価
+			$stmt->bindValue("UriageKin", $params["UriageKin"], PDO::PARAM_INT);     //数量×単価
+			$stmt->bindValue("zeiKBN", $params["zeiKBN"], PDO::PARAM_INT);     //税区分
+			$stmt->bindValue("genka_tanka", $params["genka_tanka"], PDO::PARAM_INT);     //原価単価
+			$stmt->bindValue("H_moto_UNO", $params["H_moto_UNO"], PDO::PARAM_INT);     //原価単価
+	
+			$sqllog .= rtn_sqllog($sqlstr,$params);
+			$stmt->execute();
+			$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+			$ins_cnt++;
+		}
+	
+		
 		$pdo_h->commit();
 		$sqllog .= rtn_sqllog("commit",[]);
 		sqllogger($sqllog,0);
@@ -300,6 +376,7 @@ try{
 	echo "<button onclick='window.close()'>戻る</button>\n";
 }
 
+use Dompdf\Dompdf;
 function output($html,$filename){
 	$dompdf = new Dompdf();
 	$dompdf->loadHtml($html);

@@ -72,7 +72,7 @@ if(!empty($_POST)){
 				<div class='modal-header'>
 					<div class='modal-title' id='myModalLabel' style='text-align:center;width:100%;'>領収書発行</div>
 				</div>
-				<div class='modal-body text-center'>
+				<div class='modal-body text-center ps-5 pe-5'>
 					<div class='input-group d-flex justify-content-center align-items-center ps-3 pe-3' >
 						<input type='radio' class='btn-check' name='process' value='saihakkou' autocomplete='off' v-model='process' id='saihakkou'>
 						<label class='btn btn-outline-primary ' for='saihakkou' style='border-radius:0;'>再発行</label>
@@ -215,15 +215,20 @@ if(!empty($_POST)){
 				}
 				const prv = () =>{
 					//プレビュー印刷
-					let URL
-					if(confirm("表示する領収書をお客様に発行しますか？")===true){
-						URL = PHP + (`&sb=on`)
-						window.setTimeout(get_ryoshu(),7000)
+					console_log("start prv()")
+					let URL = P_ROOT_URL 
+					if(process.value!=="saihakkou"){
+						if(confirm("表示する領収書をお客様に発行しますか？")===true){
+							URL += PHP + (`&sb=on`)
+						}else{
+							URL += PHP + (`&sb=off`)
+						}
 					}else{
-						URL = PHP + (`&sb=off`)
+						URL += PHP
 					}
 					console_log(URL)
-					window.open(URL, '_blank')
+					window.open(URL)
+					window.setTimeout(get_ryoshu(),7000)
 				}
 
 				onMounted(() => {
