@@ -13,9 +13,6 @@
 	define("EXEC_MODE",$_ENV["EXEC_MODE"]);
 	log_writer2("\$GET",$_GET,"lv3");
 
-	$dtStr = date("Y-m-d H:i:s") . "." . substr(explode(".", (microtime(true) . ""))[1], 0, 3);
-	log_writer2("\$dtStr PG start",$dtStr,"lv3");
-
 	define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
 	//DB接続関連
 	define("DNS","mysql:host=".$_ENV["SV"].";dbname=".$_ENV["DBNAME"].";charset=utf8");
@@ -282,7 +279,6 @@ try{
 	}
 	// PDFの設定～出力
 	output($html,$filename);
-	//echo "finish";
 	
 }catch(Exception $e){
 	$pdo_h->rollBack();
@@ -297,8 +293,6 @@ try{
 exit();
 
 function output($html,$filename){
-	$dtStr = date("Y-m-d H:i:s") . "." . substr(explode(".", (microtime(true) . ""))[1], 0, 3);
-	log_writer2("\$dtStr PG output start",$dtStr,"lv3");
 	$dompdf = new Dompdf();
 	$dompdf->loadHtml($html);
 	$options = $dompdf->getOptions();
@@ -307,8 +301,5 @@ function output($html,$filename){
 	$dompdf->setPaper('A4', 'portrait');
 	$dompdf->render();
 	$dompdf->stream($filename, array('Attachment' => 0));
-	$dtStr = date("Y-m-d H:i:s") . "." . substr(explode(".", (microtime(true) . ""))[1], 0, 3);
-	log_writer2("\$dtStr PG output end",$dtStr,"lv3");
-	exit();
 }
 ?>

@@ -753,7 +753,7 @@
 					send_msg.value = `${oaite.value}　${keishou.value}\n\nお買い上げ、ありがとうございます。\n領収書はこちらからダウンロードしてください。\n${(D_ROOT_URL+DL_URL.value)}`
 					axios.get(`ajax_rtn_urlencode.php?url=${encodeURIComponent(send_msg.value)}`)
 					.then((response)=>{
-						console_log(response.data)
+						//console_log(response.data)
 						send_msg.value = response.data
 						const myModal = new bootstrap.Modal(document.getElementById('ryoushuu'), {})
 						myModal.show()
@@ -765,7 +765,7 @@
 					send_msg.value = `${oaite.value}　${keishou.value}\n\nお買い上げ、ありがとうございます。\n領収書はこちらからダウンロードしてください。\n${(D_ROOT_URL+DL_URL.value)}`
 					axios.get(`ajax_rtn_urlencode.php?url=${encodeURIComponent(send_msg.value)}`)
 					.then((response)=>{
-						console_log(response.data)
+						//console_log(response.data)
 						send_msg.value = response.data
 					})
 				})

@@ -60,10 +60,15 @@
 }
 use Dompdf\Dompdf;
 
-if(!empty($qr_GUID)){
-	$sql = "select * from ryoushu where QR_GUID = ?";
+//if(!empty($qr_GUID)){
+	//クロームのバグ？対応
+	//２回連続でジョブが走ることがある
+	//$sql = "select * from ryoushu where QR_GUID = ?";
+	$sql = "select * from ryoushu where QR_GUID = ? or (uid = ? and UriNO = ?)";
 	$stmt = $pdo_h->prepare($sql);
 	$stmt->bindValue(1, $qr_GUID, PDO::PARAM_STR);
+	$stmt->bindValue(2, $id, PDO::PARAM_STR);
+	$stmt->bindValue(3, $UriNo, PDO::PARAM_STR);
 	$stmt->execute();
 	$ryoushu_info = $stmt->fetch(PDO::FETCH_ASSOC);
 	$html = $ryoushu_info["html"];
@@ -73,7 +78,9 @@ if(!empty($qr_GUID)){
 		output($html,$filename);
 		exit();
 	}
-}
+//}
+
+
 
 $sysname="WEBREZ+";
 

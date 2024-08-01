@@ -46,18 +46,22 @@ if(!empty($_POST)){
 			<table class="table result_table">
 				<thead class='sticky-top' style='top:70px;'>
 					<tr>
-					<th>領収/売上No</th>
-					<th>宛名</th>
-					<th>最終発行日時</th>
-					<th>確認</th>
+						<th>領収/売上No</th>
+						<th>宛名</th>
+						<th rowspan="2">確認</th>
+					</tr>
+					<tr>
+						<th colspan="2">最終発行日時</th>
 					</tr>
 				</thead>
 				<tbody v-for='(list,index) in ryoushu' :key='list.R_No'>
 					<tr>
 						<td>{{list.R_NO}} / {{list.UriNO}}</td>
 						<td>{{list.Atena}}</td>
-						<td>{{list.LastHakkouDate}}</td>
-						<td><button type='button' class='btn btn-primary' @click='open_modal(list.UriNO,list.R_NO,list.Atena)'><i class="bi bi-filetype-pdf"></i></button></td>
+						<td rowspan="2"><button type='button' class='btn btn-primary' @click='open_modal(list.UriNO,list.R_NO,list.Atena,list.H_saki_RNO,list.H_moto_RNO)'><i class="bi bi-filetype-pdf"></i></button></td>
+					</tr>
+					<tr>
+						<td colspan="2">{{list.LastHakkouDate}}</td>
 					</tr>
 				</tbody>
 			</table>
@@ -78,8 +82,10 @@ if(!empty($_POST)){
 						<label class='btn btn-outline-primary ' for='saihakkou' style='border-radius:0;'>再発行</label>
 						<input type='radio' class='btn-check' name='process' value='shusei' autocomplete='off' v-model='process' id='shusei'>
 						<label class='btn btn-outline-primary ' for='shusei' style='border-radius:0;'>修正</label>
-						<input type='radio' class='btn-check' name='process' value='henpin' autocomplete='off' v-model='process' id='henpin' >
-						<label class='btn btn-outline-primary ' for='henpin' style='border-radius:0;'>返品</label>
+						<template v-if='henpin'>
+							<input type='radio' class='btn-check' name='process' value='henpin' autocomplete='off' v-model='process' id='henpin' >
+							<label class='btn btn-outline-primary ' for='henpin' style='border-radius:0;'>返品</label>
+						</template>
 						<div class='shadow-sm mt-3 text-start' >
 							<p class='fs-4 fw-light' v-html='discription'></p>
 						</div>
@@ -121,6 +127,7 @@ if(!empty($_POST)){
 				const process = ref('')
 				const oaite = ref('')
 				const keishou = ref('御中')
+				const henpin = ref(true)
 				const discription = computed(()=>{
 					if(process.value==="saihakkou"){
 						return "領収書の再発行を行います。"
@@ -151,9 +158,15 @@ if(!empty($_POST)){
 				let R_NO
 				let U_NO
 				let PHP
-				const open_modal=(uriage_no,ryoushu_no,atena)=>{
+				const open_modal=(uriage_no,ryoushu_no,atena,H_saki_RNO,H_moto_RNO)=>{
 					R_NO = ryoushu_no
 					U_NO = uriage_no
+
+					if(H_saki_RNO > 0 || H_moto_RNO > 0){
+						henpin.value = false
+					}else{
+						henpin.value = true
+					}
 
 					if(String(atena).endsWith('様') ){
 						keishou.value="様"
@@ -248,6 +261,7 @@ if(!empty($_POST)){
 					prv,
 					oaite,
 					keishou,
+					henpin,
 				}
 			}
 		}).mount('#app');

@@ -23,7 +23,7 @@ if($rtn !== true){
         $timeout=true;
     }else{
         try{
-            $sqlstr="select R_NO,UriNO,Atena,LastHakkouDate from ryoushu where uid=? order by LastHakkouDate desc";
+            $sqlstr="select R_NO,UriNO,Atena,LastHakkouDate,H_moto_RNO,H_saki_RNO from ryoushu where uid=? order by LastHakkouDate desc";
 
             $stmt = $pdo_h->prepare($sqlstr);
             $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
