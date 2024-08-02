@@ -95,6 +95,11 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
                 $msg.="<p class='mb-1 fs-3'>引続きのご利用は<a href='".rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path."'>本契約</a>をお願いいたします。</p>";
                 $msg.="<p class='mb-1 fs-3'>ご契約完了後、無料期間終了をもって本契約に切り替わります。</p>";
             }
+            if(EXEC_MODE=="Trial"){
+                $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
+                $msg= "無料お試し期間(".$row[0]["yuukoukigen"]." まで無料)<br>";
+               
+            }
 
 
             $plan=0;
