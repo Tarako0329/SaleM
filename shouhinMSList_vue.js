@@ -116,14 +116,6 @@ const REZ_APP = () => createApp({
 
 		//更新関連
 		const upd_zei_kominuki = ref('IN')
-		/*const zm = [
-								<?php
-								reset($ZEIresult);
-								foreach($ZEIresult as $row2){
-										echo "{税区分:".$row2["zeiKBN"].",税率:".($row2["zeiritu"]/100)."},\n";
-								}
-								?> 
-						]*/
 		const return_tax = (kingaku,zeikbn,kominuki) => {
 			console_log('return_tax start')
 			//console_log(zm)

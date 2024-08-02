@@ -134,7 +134,7 @@
 							</td>
 						</tr>
 						<tr>
-							<td><input @blur='set_new_value(index,`#new_val_${index}`)' :id='`new_val_${index}`' type='number' class='form-contral' style='width:100%;text-align:right' placeholder='新価格' ></td>   <!--単価修正欄 -->
+							<td><input @blur='set_new_value(index,`#new_val_${index}`)' :id='`new_val_${index}`' type='number' class='form-contral text-end pe-3' style='width:100%;' placeholder='新価格' ></td>   <!--単価修正欄 -->
 							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;color:blue;' class='text-end'>
 								￥{{Number(list.tanka).toLocaleString()}}
 							</td><!--登録単価-->
@@ -157,11 +157,12 @@
 								</select>
 
 							</td>
-							<td><input type='number' :name ='`ORDERS[${index}][genka]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.genka_tanka'></td>
-							<!--<td class=''><input type='number' :name ='`ORDERS[${index}][utisu]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.utisu'></td>-->
+							<!--<td><input type='number' :name ='`ORDERS[${index}][genka]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.genka_tanka'></td>-->
+							<td><input type='number' :name ='`ORDERS[${index}][genka]`' class='form-contral text-end pe-1' style='width:100%;' v-model='list.genka_tanka'></td>
+
 							<td class=''>
-								<input type='number' :name ='`ORDERS[${index}][utisu]`' class='form-contral' style='width:60%;text-align:right;padding-right:15px;' :value='list.utisu'>
-								<input type='text'   :name ='`ORDERS[${index}][tani]`' class='form-contral' style='width:20%;text-align:right;padding-right:15px;' :value='list.tani'>
+								<input type='number' :name ='`ORDERS[${index}][utisu]`' class='form-contral text-end pe-1' style='width:60%;' v-model='list.utisu'>
+								<input type='text'   :name ='`ORDERS[${index}][tani]`' class='form-contral text-end pe-1' style='width:35%;' v-model='list.tani'>
 							</td>
 							<td class=' text-center'>
 								<!--<a href='#' @click='delete_item(list.shouhinNM,`shouhinDEL_sql.php?cd=${list.shouhinCD}&nm=${list.shouhinNM}&csrf_token=<?php echo $csrf_create; ?>`)'>-->
