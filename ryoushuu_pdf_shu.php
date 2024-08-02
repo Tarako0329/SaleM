@@ -218,7 +218,7 @@ $html = <<< EOM
 			<p>$invoice</p>
 			<p>$add</p>
 			<p>取引日時[$insDT]</p>
-			<p>伝票番号[$UriNo/$RyoushuuNO]</p>
+			<p>伝票番号[$RyoushuuNO-$UriNo]</p>
 		</div>
 		<div class='Seikyu' style='display:flex;'>
 			<table style='width:100%;'>
@@ -270,7 +270,7 @@ try{
 		$stmt->bindValue(5, $RyoushuuNO, PDO::PARAM_INT);
 
 		$status = $stmt->execute();
-		$sqllog .= rtn_sqllog($sql,[$UriNo,$Atena,$html,$qr_GUID,$id,$RyoushuuNO]);
+		$sqllog .= rtn_sqllog($sql,[$Atena,$html,$qr_GUID,$id,$RyoushuuNO]);
 		
 		$pdo_h->commit();
 		$sqllog .= rtn_sqllog("commit",[]);

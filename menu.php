@@ -194,7 +194,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         ,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko&csrf_token='.$token,'z_rez']
         ,'売上実績'=>['UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where&csrf_token='.$token,'uri']
         ,'売上分析'=>['analysis_menu.php?csrf_token='.$token,'bunseki']
-        ,'領収書'=>['ryoushu_menu.php?csrf_token='.$token,'ryoushu']
+        ,'領収書<p style="font-size:11px;margin:0;">再発行・返品処理</p>'=>['ryoushu_menu.php?csrf_token='.$token,'ryoushu']
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token,'user']
         ,'確定申告'=>['output_menu.php?csrf_token='.$token,'kaikei']
         ,'ｱﾌﾟﾘを紹介する'=>['shoukai.php?csrf_token='.$token,'shoukai']

@@ -236,7 +236,7 @@ $html = <<< EOM
 			<p>$invoice</p>
 			<p>$add</p>
 			<p>取引日時[$insDT]</p>
-			<p>伝票番号[$UriNo/$RyoushuuNO]</p>
+			<p>伝票番号[$RyoushuuNO-$UriNo]</p>
 		</div>
 		<div class='Seikyu' style='display:flex;'>
 			<table style='width:100%;'>

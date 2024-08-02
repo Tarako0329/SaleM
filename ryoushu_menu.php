@@ -41,12 +41,19 @@ if(!empty($_POST)){
 		</div>
 	</header>
 	<main class='common_body'>
-		<div class="container" style="padding-top:10px;position:relative;">
+		<div class="container" style="padding-top:0px;position:relative;">
+		<details class='mb-3'>
+  		<summary class='text-end'>help</summary>
+  		<button type='button' class='btn btn-primary'><i class="bi bi-filetype-pdf"></i>通常領収書</button>
+  		<button type='button' class='btn btn-warning'><i class="bi bi-filetype-pdf"></i>返品発行済</button>
+  		<button type='button' class='btn btn-danger'><i class="bi bi-filetype-pdf"></i>返品領収書</button>
+		</details>
+
 			<!--<button class='position-fix' style='top:75px' type='button' @click=''>モーダル</button>-->
 			<table class="table result_table">
 				<thead class='sticky-top' style='top:70px;'>
 					<tr>
-						<th>領収/売上No</th>
+						<th>領収-売上No</th>
 						<th>宛名</th>
 						<th rowspan="2">確認</th>
 					</tr>
@@ -56,9 +63,13 @@ if(!empty($_POST)){
 				</thead>
 				<tbody v-for='(list,index) in ryoushu' :key='list.R_No'>
 					<tr>
-						<td>{{list.R_NO}} / {{list.UriNO}}</td>
-						<td>{{list.Atena}}</td>
-						<td rowspan="2"><button type='button' class='btn btn-primary' @click='open_modal(list.UriNO,list.R_NO,list.Atena,list.H_saki_RNO,list.H_moto_RNO)'><i class="bi bi-filetype-pdf"></i></button></td>
+						<td style='border-bottom-width:0px;'>{{list.R_NO}}-{{list.UriNO}}</td>
+						<td style='border-bottom-width:0px;'>{{list.Atena}}</td>
+						<td rowspan="2" class='align-middle text-center'>
+							<button v-if='list.H_saki_RNO > 0' type='button' class='btn btn-warning' @click='open_modal(list.UriNO,list.R_NO,list.Atena,list.H_saki_RNO,list.H_moto_RNO)'><i class="bi bi-filetype-pdf"></i></button>
+							<button v-else-if='list.H_moto_RNO > 0' type='button' class='btn btn-danger' @click='open_modal(list.UriNO,list.R_NO,list.Atena,list.H_saki_RNO,list.H_moto_RNO)'><i class="bi bi-filetype-pdf"></i></button>
+							<button v-else type='button' class='btn btn-primary' @click='open_modal(list.UriNO,list.R_NO,list.Atena,list.H_saki_RNO,list.H_moto_RNO)'><i class="bi bi-filetype-pdf"></i></button>
+						</td>
 					</tr>
 					<tr>
 						<td colspan="2">{{list.LastHakkouDate}}</td>
