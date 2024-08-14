@@ -23,10 +23,11 @@
 	$ZeiHasu = $row[0]["ZeiHasu"];
 
 	//税区分M取得.基本変動しないので残す
+	/*
 	$ZEIsql="select * from ZeiMS order by zeiKBN;";
 	$stmt = $pdo_h->query($ZEIsql);
 	$ZEIresult = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+	*/
 
 
 ?>
@@ -148,20 +149,19 @@
 								<select v-model='list.zeiKBN' @change='set_new_value(index,`#new_val_${index}`)' :name ='`ORDERS[${index}][zeikbn]`' class='form-select form-select-lg' 
 								style='font-size:1.7rem;width:100%;height:30px;'><!--税区分 -->
 									<?php
-									foreach($ZEIresult as $row){
-										echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
-									}
+									//foreach($ZEIresult as $row){
+									//	echo "<option value=".secho($row["zeiKBN"]).">".secho($row["hyoujimei"])."</option>\n";
+									//}
 									?>
+									<template v-for='(list,index) in ZeiMS' :key='list.税区分名'>
+										<option :value="list.税区分">{{list.税区分名}}</option>
+									</template>
 								</select>
 
 							</td>
-<<<<<<< HEAD
-							<td><input type='number' :name ='`ORDERS[${index}][genka]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.genka_tanka'></td>
-=======
 							<!--<td><input type='number' :name ='`ORDERS[${index}][genka]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.genka_tanka'></td>-->
 							<td><input type='number' :name ='`ORDERS[${index}][genka]`' class='form-contral text-end pe-1' style='width:100%;' v-model='list.genka_tanka'></td>
 
->>>>>>> 55cf993f8ff5e04328a4b692b9dbc5c70d5e7d5a
 							<td class=''>
 								<input type='number' :name ='`ORDERS[${index}][utisu]`' class='form-contral text-end pe-1' style='width:60%;' v-model='list.utisu'>
 								<input type='text'   :name ='`ORDERS[${index}][tani]`' class='form-contral text-end pe-1' style='width:35%;' v-model='list.tani'>

@@ -5,6 +5,7 @@ const REZ_APP = () => createApp({
 		//商品マスタ取得関連
 		const shouhinMS = ref([])			//商品マスタ
 		const shouhinMS_BK = ref([])	//商品マスタ修正前バックアップ
+		const ZeiMS = ref(ZEIM)
 
 		//商品マスタのソート・フィルタ関連
 		const chk_register_show = ref('all')	//フィルタ
@@ -121,7 +122,6 @@ const REZ_APP = () => createApp({
 			//console_log(zm)
 			console_log(ZEIM)
 			let zmrec = ([])
-			//zmrec = zm.filter((list)=>{
 			zmrec = ZEIM.filter((list)=>{
 					return list.税区分 == zeikbn
 			})
@@ -216,9 +216,9 @@ const REZ_APP = () => createApp({
 			return 0
 		} 
 
-		//const MSG = ref('<?php echo $MSG; ?>')
+		
 		const MSG = ref('')
-		//const alert_status = ref(['alert','<?php echo $ALERT; ?>'])
+		
 		const alert_status = ref(['alert'])
 
 		const on_submit = (e) => {//登録・submit/
@@ -301,6 +301,7 @@ const REZ_APP = () => createApp({
 			search_word,
 			csrf,
 			on_submit,
+			ZeiMS,
 		}
 	}
 });

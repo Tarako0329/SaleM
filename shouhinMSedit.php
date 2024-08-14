@@ -206,14 +206,6 @@ $_SESSION["MSG"]=null;
 				const zkomitanka = ref(0)
 				const kominuki = ref('IN')
 				const zeikbn = ref('')
-				/*const zm = [
-					<?php
-					//reset($zeimaster);
-					//foreach($zeimaster as $row2){
-					//	echo "{税区分:".$row2["zeiKBN"].",税率:".($row2["zeiritu"]/100)."},\n";
-					//}
-					?> 
-				]*/
 
 				watch([zeikbn,new_tanka,kominuki],() => {
 					console_log(new_tanka.value,)
@@ -222,7 +214,6 @@ $_SESSION["MSG"]=null;
 						return
 					}
 					let zmrec = ([])
-					//zmrec = zm.filter((list)=>{
 					zmrec = ZEIM.filter((list)=>{
 						return list.税区分 == zeikbn.value
 					})
