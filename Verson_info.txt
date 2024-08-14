@@ -171,7 +171,7 @@ ver3.11.0-001:freeeの設定追加-commited
 ver3.12.0-000:freeeの設定追加:Excel出力-commited
 ver3.12.0-001:freeeの設定追加:Excel出力-commited
 ver3.13.0-000:紹介画面の改良-commited
-ver3.14.0-000:領収書再発行・返品対応
+ver3.14.0-000:領収書再発行・返品対応・bugfix-commited
 	ALTER TABLE `ryoushu` ADD `H_moto_RNO` INT NULL DEFAULT NULL COMMENT '返品元領収書NO' AFTER `LastHakkouDate`, ADD `H_saki_RNO` INT NULL DEFAULT NULL COMMENT '返品先領収書NO' AFTER `H_moto_RNO`;
 	ALTER TABLE `UriageData` ADD `H_moto_UNO` INT NULL DEFAULT NULL COMMENT '返品元売上NO' AFTER `genka_tanka`;
 	ALTER TABLE `ryoushu` DROP PRIMARY KEY, ADD PRIMARY KEY( `uid`, `UriNo` ) ;

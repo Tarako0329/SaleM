@@ -51,7 +51,7 @@ $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
 $flg=$stmt->execute();
 
 //売上実績の複写
-$sqlstr="insert into UriageData select ?, `UriageNO`, concat('".date('Y')."',RIGHT(`UriDate`,6)), `insDatetime`, `Event`, `TokuisakiNM`, `ShouhinCD`, `ShouhinNM`, `su`, `Utisu`, `tanka`, `UriageKin`, `zei`, `zeiKBN`, `genka_tanka`, `updDatetime` from UriageData where uid=2";
+$sqlstr="insert into UriageData select ?, `UriageNO`, concat('".date('Y')."',RIGHT(`UriDate`,6)), `insDatetime`, `Event`, `TokuisakiNM`, `ShouhinCD`, `ShouhinNM`, `su`, `Utisu`, `tanka`, `UriageKin`, `zei`, `zeiKBN`, `genka_tanka`, `H_moto_UNO`, `updDatetime` from UriageData where uid=2";
 $stmt = $pdo_h->prepare($sqlstr);
 $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
 $flg=$stmt->execute();
