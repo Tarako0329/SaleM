@@ -44,9 +44,30 @@ if(!empty($_POST)){
 		<div class="container" style="padding-top:0px;position:relative;">
 		<details class='mb-3'>
   		<summary class='text-end'>help</summary>
-  		<button type='button' class='btn btn-primary'><i class="bi bi-filetype-pdf"></i>通常領収書</button>
-  		<button type='button' class='btn btn-warning'><i class="bi bi-filetype-pdf"></i>返品発行済</button>
-  		<button type='button' class='btn btn-danger'><i class="bi bi-filetype-pdf"></i>返品領収書</button>
+  		<div class='d-flex'>
+				<div class='d-flex align-items-center'>
+					<button type='button' class='btn btn-primary'><i class="bi bi-filetype-pdf"></i></button>
+				</div>
+				<div class='p-3'>
+					領収書の再発行・修正・返品が可能です
+				</div>
+			</div>
+  		<div class='d-flex'>
+				<div class='d-flex align-items-center'>
+					<button type='button' class='btn btn-warning'><i class="bi bi-filetype-pdf"></i></button>
+				</div>
+				<div class='p-3'>
+					返品領収書を発行済みです。返品前の売上領収書の修正・再発行が可能です。
+				</div>
+			</div>
+  		<div class='d-flex'>
+				<div class='d-flex align-items-center'>
+					<button type='button' class='btn btn-danger'><i class="bi bi-filetype-pdf"></i></button>
+				</div>
+				<div class='p-3'>
+					返品領収書の再発行・修正が可能です
+				</div>
+			</div>
 		</details>
 
 			<!--<button class='position-fix' style='top:75px' type='button' @click=''>モーダル</button>-->
@@ -145,7 +166,7 @@ if(!empty($_POST)){
 					}else if(process.value==="shusei"){
 						return "あて名書きを再設定し、領収書を発行します。"
 					}else if(process.value==="henpin"){
-						return "<p>指定した領収書の返品領収書を発行し、マイナスの売上データを計上します。</p><p>一部返品の場合、返品領収書発行後にレジ画面から未返品分の売上を入力し、再度領収書を発行してください。</P>"
+						return "<p>指定した領収書の返品領収書を発行し、該当売上分の取消データを計上します。</p><p>一部返品の場合、返品領収書発行後にレジ画面から未返品分の売上を入力し、再度領収書を発行してください。</P>"
 					}
 				})
 				const ryoushu = ref([])

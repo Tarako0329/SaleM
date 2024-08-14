@@ -28,7 +28,7 @@
 		<p style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>  取扱商品 カテゴリー一括修正 画面</p>
 		<?php 
 		if(empty($_SESSION["tour"])){
-			echo "<a href='#' style='color:inherit;position:fixed;top:5px;right:5px;' onclick='help()'><i class='fa-regular fa-circle-question fa-lg logoff-color'></i></a>";
+			echo "<a href='#' style='color:inherit;position:fixed;top:5px;right:5px;' onclick='help()'><i class='bi bi-question-circle Qicon logoff-color'></i></a>";
 		}
 		?>
 	</header>

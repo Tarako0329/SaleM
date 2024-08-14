@@ -53,7 +53,7 @@ $_SESSION["MSG"]=null;
 	<header class="header-color common_header" style="flex-wrap:wrap">
 		<div class="title" style="width: 100%;"><a href="menu.php" class='item_15'><?php echo secho($title);?></a></div>
 		<p style="font-size:1rem;color:var(--user-disp-color);font-weight:400;">  取扱商品登録画面</p>
-		<a href="#" style='color:inherit;position:fixed;top:75px;right:5px;' onclick='help()'><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>
+		<a href="#" style='color:inherit;position:fixed;top:75px;right:5px;' onclick='help()'><i class="bi bi-question-circle Qicon awesome-color-panel-border-same"></i></a>
 	</header>
 	<form method="post" id="form1" class="" action="shouhinMSedit_sql.php" autocomplete="off">
 		<main class="container" style="padding-top:20px;padding-bottom:100px;">

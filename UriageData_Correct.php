@@ -40,7 +40,7 @@
 			<i class="fa-solid fa-filter fa-lg awesome-color-white"></i>：{{filter_flg[1]}}
 		</div>
 		<a href="#" style='position:fixed;color:inherit;right:15px;top:45px;' data-bs-toggle='modal' data-bs-target='#modal_help1'>
-				<i class="fa-regular fa-circle-question fa-lg awesome-color-white"></i>
+				<i class="bi bi-question-circle Qicon awesome-color-white"></i>
 		</a>
 	</header>
 	<div class='header_menu' style='border-bottom:solid var(--panel-bd-color) 0.5px;padding:0;'>
@@ -123,10 +123,11 @@
 							</td>
 							<td class='text-right d-none d-md-table-cell'></td>
 							<td class='text-right d-none d-md-table-cell'></td>
-							<td v-if='Type==="rireki"'>
+							<td v-if='Type==="rireki"' class='text-center align-middle'>
 								<template v-if='list.RNO==0'>
 								<a @click='delete_Uriage(list.UriageNO, "%")' href='#'>
-									<i class='fa-regular fa-trash-can'></i>
+									<!--<i class='fa-regular fa-trash-can'></i>-->
+									<i class="bi bi-trash3"></i>
 								</a>
 								</template>
 							</td>
@@ -142,10 +143,11 @@
 							<td class='text-end d-none d-md-table-cell'>{{Number(list.zei).toLocaleString()}}</td>
 							<td class='text-end'>{{Number(list.genka).toLocaleString()}}</td>
 							<td class='text-end'>{{Number(list.arari).toLocaleString()}}</td>
-							<td v-if='Type==="rireki"' >
+							<td v-if='Type==="rireki"' class='text-center align-middle' >
 								<template v-if='list.RNO==0 && list.zeiKBN==0'><!--領収書未発行かつ非課税売上のみ削除可能-->
 								<a @click='delete_Uriage(list.UriageNO, list.ShouhinCD)' href='#'>
-									<i class='fa-regular fa-trash-can'></i>
+									<!--<i class='fa-regular fa-trash-can'></i>-->
+									<i class="bi bi-trash3"></i>
 								</a>
 								</template>
 							</td>
@@ -188,8 +190,8 @@
 				<p style='color:red;margin-bottom: 2px;font-size: large;'>※上記データが更新対象となります。</p>
 				<p style='color:red;margin-bottom: 2px;font-size: large;'>※<span style='color:blue;'>青字の項目</span>のタップで絞込みできます。</p>
 				<a href="#" style='font-size: large;' onclick='urihelp()'>
-						<i class="bi bi-question-square Qicon awesome-color-panel-border-same me-1"></i>詳細help
-					</a>
+					<i class="bi bi-question-circle Qicon awesome-color-panel-border-same me-1"></i>詳細help
+				</a>
 			</div>
 			<div class='row mb-2'><!--売上日/help icon-->
 				<div class="col-11" style='display:flex;'>
@@ -199,11 +201,6 @@
       		</div>
 					<input type='date' style='font-size:1.5rem;width:250px;background-color:#999999;' name='up_uridate' id='up_uridate' maxlength='10'  class='form-control'>
     		</div>
-				<!--<div class="col-1">
-					<a href="#" style='color:inherit;' onclick='urihelp()'>
-						<i class="fa-regular fa-circle-question fa-2x awesome-color-panel-border-same"></i>
-					</a>
-				</div>-->
 			</div><!--売上日/help icon-->
 			<div class='row mb-2'><!--イベント名-->
 				<div class="col-11" style='display:flex;'>
@@ -340,6 +337,10 @@
 						<p>イベント集計モードで表示している場合、「<span style='color:blue;'>日付</span>」「<span style='color:blue;'>イベント名</span>」をタップすると明細を表示。</p>
 						<p><span style='color:blue;'>青文字</span>をタップすると、タップしたデータと同じ条件で絞り込まれます。</p>
 						<p>例：イベント名をタップすると、同名のイベントの売上のみが表示</p>
+						<p class='mb-0'><i class="bi bi-trash3" style='color:blue;'></i> をタップすると売上を削除できます。</p>
+						<p class='mb-1'>なお、以下の場合は<i class="bi bi-trash3" style='color:blue;'></i>マークが表示されません。</p>
+						<p class='mb-0'><span class='text_underline_red'>課税売上の場合</span>：売上番号単位の削除のみとなります。</p>
+						<p><span class='text_underline_red'>領収書を発行している場合</span>：領収書メニューから返品領収書を発行することで売上を削除できます。</p>
 					</div>        
 					<h4 style='margin-bottom:0;'>修正モードについて</h4>
 					<div style='border:solid thin var(--panel-bd-color);border-radius:3px;padding:10px;'>
@@ -826,7 +827,7 @@
 				<br>
 				<br>画面上部にあるこれらのボタンをタップすると、売上実績の表示方法を変更できます。
 				<br>
-				<br><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i> をタップするとボタンの説明と表の操作方法を確認出来ます。
+				<br><i class="bi bi-question-circle Qicon awesome-color-panel-border-same"></i> をタップするとボタンの説明と表の操作方法を確認出来ます。
 				</p>`,
 		buttons: [
 			{
@@ -902,7 +903,7 @@
 		title: `<p class='tour_header'>チュートリアル</p>`,
 		text: `<p class='tour_discription'>この「修正モード」をタップしてONに変更すると、修正用の画面に切り替わります。
 				<br>
-				<br>今回は説明しませんが、修正が必要となったら修正モードに切り替えて<i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i> マークより使い方を確認して下さい。
+				<br>修正が必要となったら修正モードに切り替えて<i class="bi bi-question-circle Qicon awesome-color-panel-border-same"></i> マークより使い方を確認して下さい。
 			   </p>`,
 		attachTo: {
 			element: '.item_2',

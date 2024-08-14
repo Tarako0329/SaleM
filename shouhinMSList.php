@@ -56,7 +56,7 @@
 			</div>
 			<p style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>  取扱商品 確認・編集 画面</p>
 			<?php if(empty($_SESSION["tour"])){?>
-			<a href="#" style='color:inherit;position:fixed;top:50px;right:5px;' onclick='help()'><i class="fa-regular fa-circle-question fa-lg logoff-color"></i></a>
+			<a href="#" style='color:inherit;position:fixed;top:40px;right:5px;' onclick='help()'><i class="bi bi-question-circle Qicon logoff-color"></i></a>
 			<?php }?>
 		</header>
 		<div class='header2'>
@@ -75,12 +75,12 @@
 							<option value='off'>レジOFF</option>
 						</select>
 					</div>
-					<div style='display:flex;'>
+					<div style='display:flex;' id='order_by'>
 						<select v-model='order_by[0]' class='form-select form-select-lg' style='margin-bottom:5px;'>
 							<option value='seq'>登録順</option>
 							<option value='name'>名称順</option>
 						</select>
-						<button @click='up_or_down' class='btn btn-primary' style='height:25px;padding:0px 10px;font-size:1.2rem;margin-top:0px;margin-left:5px;' type='button' id='order_by'>
+						<button @click='up_or_down' class='btn btn-primary' style='height:25px;padding:0px 10px;font-size:1.2rem;margin-top:0px;margin-left:5px;' type='button' id=''>
 							{{order_by[1]}}
 						</button>
 					</div>
@@ -93,7 +93,6 @@
 				<template v-if='MSG!==""'>
 					<div :class='alert_status' role='alert'>{{MSG}}</div>
 				</template>
-				<!--<input type='hidden' name='csrf_token' value='<?php //echo $csrf_create; ?>'>-->
 				<input type='hidden' name='csrf_token' :value='csrf'>
 				
 				<table class='table result_table item_1' style='width:100%;max-width:630px;table-layout: fixed;'>
@@ -117,7 +116,6 @@
 						</tr>
 					
 					</thead>
-					<!--<tbody v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>-->
 					<tbody>
 						<template v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
 						<tr>
@@ -158,13 +156,11 @@
 
 							</td>
 							<td><input type='number' :name ='`ORDERS[${index}][genka]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.genka_tanka'></td>
-							<!--<td class=''><input type='number' :name ='`ORDERS[${index}][utisu]`' class='form-contral' style='width:100%;text-align:right;padding-right:15px;' :value='list.utisu'></td>-->
 							<td class=''>
 								<input type='number' :name ='`ORDERS[${index}][utisu]`' class='form-contral' style='width:60%;text-align:right;padding-right:15px;' :value='list.utisu'>
 								<input type='text'   :name ='`ORDERS[${index}][tani]`' class='form-contral' style='width:20%;text-align:right;padding-right:15px;' :value='list.tani'>
 							</td>
 							<td class=' text-center'>
-								<!--<a href='#' @click='delete_item(list.shouhinNM,`shouhinDEL_sql.php?cd=${list.shouhinCD}&nm=${list.shouhinNM}&csrf_token=<?php echo $csrf_create; ?>`)'>-->
 								<a href='#' @click='delete_item(list.shouhinNM,`shouhinDEL_sql.php?cd=${list.shouhinCD}&nm=${list.shouhinNM}&csrf_token=${csrf}`)'>
 									<i class='fa-regular fa-trash-can fa-2x'></i>
 								</a>
@@ -235,7 +231,7 @@
 	});
 	tutorial_12.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'> 登録した商品の「価格変更」やレジへの「表示/非表示」の切替はこの状態(縦画面表示)で行えます。
+		text: `<p class='tour_discription'> 登録した商品の「価格変更」やレジへの「表示/非表示」の切替などを行います。
 				</p>`,
 		buttons: [
 			{
@@ -518,7 +514,7 @@
 	});
 	helpTour.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'> 登録した商品の「価格変更」やレジへの「表示/非表示」の切替はこの状態(縦画面表示)で行えます。
+		text: `<p class='tour_discription'> 登録した商品の「価格変更」やレジへの「表示/非表示」の切替などを行います。
 				</p>`,
 		buttons: [
 			{
@@ -533,39 +529,7 @@
 	});
 	helpTour.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'> 画面を横にすると他の項目も表示され、修正可能な状態となります。
-				</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: helpTour.back
-			},
-			{
-				text: 'Next',
-				action: helpTour.next
-			}
-		]
-	});
-	helpTour.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'> 画面を横にしてみてください。
-				<br>PCの場合、ブラウザの幅を拡大縮小すると表示が切り替わります。
-				<br>タブレットの場合は最初から全て表示されているかと思います。
-				</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: helpTour.back
-			},
-			{
-				text: 'Next',
-				action: helpTour.next
-			}
-		]
-	});
-	helpTour.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'><i class='fa-regular fa-trash-can'></i>　マークをタップすると削除を確認する画面に移動します。
+		text: `<p class='tour_discription'><i class='fa-regular fa-trash-can'></i>　マークをタップすると削除を確認するメッセージが表示され、OKをタップすると削除されます。
 				</p>`,
 		buttons: [
 			{
@@ -603,7 +567,7 @@
 				<br>三角マークは昇順・降順の切り替えに使います。
 				</p>`,
 		attachTo: {
-			element: '.item_01',
+			element: '#order_by',
 			on: 'bottom'
 		},
 		buttons: [
@@ -637,10 +601,10 @@
 	});
 	helpTour.addStep({
 		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>入力した「新価格」が「税込か税抜」かは、こちらで選択して下さい。
+		text: `<p class='tour_discription'>入力した「新価格」が「税込/税抜」は、こちらで選択して下さい。
 				</p>`,
 		attachTo: {
-			element: '.item_2',
+			element: '#tax_inout',
 			on: 'auto'
 		},
 		buttons: [

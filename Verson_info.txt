@@ -175,7 +175,10 @@ ver3.14.0-000:領収書再発行・返品対応
 	ALTER TABLE `ryoushu` ADD `H_moto_RNO` INT NULL DEFAULT NULL COMMENT '返品元領収書NO' AFTER `LastHakkouDate`, ADD `H_saki_RNO` INT NULL DEFAULT NULL COMMENT '返品先領収書NO' AFTER `H_moto_RNO`;
 	ALTER TABLE `UriageData` ADD `H_moto_UNO` INT NULL DEFAULT NULL COMMENT '返品元売上NO' AFTER `genka_tanka`;
 	ALTER TABLE `ryoushu` DROP PRIMARY KEY, ADD PRIMARY KEY( `uid`, `UriNo` ) ;
-	
+ver3.14.0-001:help修正
+
+
+
 verA.BB.C.DDD
 カウントアップ条件
 A ：大きな変更時

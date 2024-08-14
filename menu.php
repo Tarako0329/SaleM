@@ -320,7 +320,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     tutorial_1.addStep({
         title: `<p class='tour_header'>チュートリアル</p>`,
         text: `<p class='tour_discription'>＜WebRez+の基本的な使い方＞
-                <br><a href="#" ><i class="fa-regular fa-circle-question fa-lg awesome-color-panel-border-same"></i></a>マークをタップするとヘルプが表示されます。
+                <br><a href="#" ><i class="bi bi-question-circle Qicon awesome-color-panel-border-same"></i></a>マークをタップするとヘルプが表示されます。
                 <br>
                 <br>色々試しながら使い方を覚えたい方は「不要」をタップすると、以降のチュートリアルは表示されません。
                 </p>`,

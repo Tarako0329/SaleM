@@ -360,3 +360,11 @@ a:active{
 	/*background-color: var(--panel-bd-color);*/
 	transform: rotate(90deg);
 }
+.text_underline_red {
+	text-decoration:underline;
+	text-decoration-color: red;
+}
+summary,
+summary::-webkit-details-marker  {
+	display: block;
+}

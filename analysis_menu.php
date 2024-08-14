@@ -60,21 +60,14 @@ $token = csrf_create();
         ,'ABC分析'=>['analysis_abc.php?sum_tani=2&csrf_token='.$token,'売上げの7割を支える商品群をAグループ、2割を支える商品群をBグループ、残り1割をCグループに分類してます。<br>Aグループは人気商品。Cグループはあまり売上げに貢献していない商品と位置づけられます。<br>取扱商品の検討材料等に利用できます。']
         //,'バスケット分析'=>['xxxx.php?mode=1&csrf_token='.$token]
     ];
-//<i class="fa-regular fa-circle-question fa-lg logoff-color"></i>
     echo "<div class='row' >";
 	foreach(array_merge($array) as $key=>$vals){
         
         echo "  <div class ='col-md-4 col-sm-6 col-12 mb-3' >\n";
         echo "      <a href='".$vals[0]."' class='btn--topmenu btn-view' style='font-size:1.5rem;width:80%;height:50px;padding:12px 10px;'>".$key."\n";
         echo "      </a>\n";
-        echo "      <i class='fa-regular fa-circle-question fa-2x' data-bs-placement='top' data-bs-trigger='click' data-bs-custom-class='custom-tooltip' data-bs-toggle='tooltip' data-bs-html='true' title='".$vals[1]."'></i>";
+        echo "      <i class='bi bi-question-circle Qicon awesome-color-panel-border-same' data-bs-placement='top' data-bs-trigger='click' data-bs-custom-class='custom-tooltip' data-bs-toggle='tooltip' data-bs-html='true' title='".$vals[1]."'></i>";
         echo "  </div>\n";
-        //echo "</div>";
-        //echo "<div class='row'>";
-        //echo "  <div class ='col-12'  style='paddin-left:10px' >\n";
-        //echo "<div>".$vals[1]."</div>";
-        //echo "  </div>\n";
-        
 	}
     echo "</div>";
     
