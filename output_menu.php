@@ -194,12 +194,12 @@ if(!empty($_POST)){
 
             })
 
-            const sendmail = () =>{
-                if(mail.value.length==0){
-                    alert('メールアドレスを入力して下さい')
-                    return
-                }
-                let params = new URLSearchParams()
+			const sendmail = () =>{
+				if(mail.value.length==0){
+					alert('メールアドレスを入力して下さい')
+					return
+				}
+				let params = new URLSearchParams()
 				params.append('csrf_token', token.value);
 				params.append('mail', mail.value);
 				params.append('subject', "【WebRez+】より送信");
