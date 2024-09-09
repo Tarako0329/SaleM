@@ -177,6 +177,7 @@ ver3.14.0-000:領収書再発行・返品対応・bugfix-commited
 	ALTER TABLE `ryoushu` DROP PRIMARY KEY, ADD PRIMARY KEY( `uid`, `UriNo` ) ;
 ver3.14.0-001:help修正
 ver3.14.0-002:細かな修正
+ver3.15.0-000:MoneyForwardクラウドの追加
 
 
 
