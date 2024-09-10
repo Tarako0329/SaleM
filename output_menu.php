@@ -233,9 +233,9 @@ if(!empty($_POST)){
 			const delete_manual_url = computed(()=>{
 				let url
 				if(soft.value==="yayoi"){
-					return ''
+					return 'https://support.yayoi-kk.co.jp/faq_Subcontents.html?page_id=27321&grade_id=Blue'
 				}else if(soft.value==="freee"){
-					return ''
+					return 'https://support.freee.co.jp/hc/ja/articles/360000683243-%E3%82%A2%E3%83%83%E3%83%97%E3%83%AD%E3%83%BC%E3%83%89%E3%81%97%E3%81%9F%E6%98%8E%E7%B4%B0%E3%82%92%E5%89%8A%E9%99%A4%E3%81%99%E3%82%8B%E3%81%AB%E3%81%AF%E3%81%A9%E3%81%86%E3%81%99%E3%82%8C%E3%81%B0%E3%82%88%E3%81%84%E3%81%A7%E3%81%99%E3%81%8B#:~:text=%EF%BC%BB%E5%8F%A3%E5%BA%A7%EF%BC%BD%E3%83%A1%E3%83%8B%E3%83%A5%E3%83%BC%20%E2%86%92%EF%BC%BB%E6%98%8E%E7%B4%B0,%E3%81%97%E3%81%A6%E5%89%8A%E9%99%A4%E3%81%97%E3%81%BE%E3%81%99%E3%80%82'
 				}else if(soft.value==="moneyforward"){
 					return 'https://biz.moneyforward.com/support/account/faq/import-features/import018.html'
 				}
