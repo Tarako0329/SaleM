@@ -166,9 +166,9 @@ if(!empty($_POST)){
 			<div class='d-flex'>
 				<div>
 					<label for='ymfrom'> 出力対象期間</label>
-					<input class='form-control' style="font-size:1.5rem;max-width:200px;" type='date' id='ymfrom' name='ymfrom' v-model='ymfrom' required='required' >
+					<input class='form-control' style="font-size:1.5rem;width:200px;" type='date' id='ymfrom' name='ymfrom' v-model='ymfrom' required='required' >
 					<label for='ymto'>から</label>
-					<input class='form-control mb-3' style="font-size:1.5rem;max-width:200px;" type='date' id='ymto' name='ymto' v-model='ymto' required='required' >
+					<input class='form-control mb-3' style="font-size:1.5rem;width:200px;" type='date' id='ymto' name='ymto' v-model='ymto' required='required' >
 				</div>
 				<div style='padding:20px;'>
 					<input class='btn btn-primary ms-5' type='submit' value='連携データ出力' style='width:200px;height:70px;'>
@@ -184,10 +184,10 @@ if(!empty($_POST)){
 						<option value='M'>月度</option>
 					</select>
 					<label for='uriden_kikan'>　</label>
-					<input class='form-control mb-3' v-model='uriden_kikan' :placeholder='sample' style="font-size:1.5rem;max-width:200px;" type='text' id='uriden_kikan' >
+					<input class='form-control mb-3' v-model='uriden_kikan' :placeholder='sample' style="font-size:1.5rem;width:200px;" type='text' id='uriden_kikan' >
 				</div>
 				<div style='padding:20px;'>
-				<button class='btn btn-primary ms-5' type='button' style='width:200px;height:70px;' @click='prv()'>保管用売上明細PDF</button>
+				<button class='btn btn-primary ms-5' type='button' style='width:200px;height:70px;' @click='prv()'>保管用 売上帳PDF出力</button>
 				</div>
 			</div>
 			
