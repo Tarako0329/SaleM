@@ -205,6 +205,7 @@ if(!empty($_POST)){
 			const ymfrom = ref('<?php echo $ymfrom; ?>')
 			const ymto = ref('<?php echo $ymto; ?>')
 			const tanmatsu = ref('<?php echo $tanmatu; ?>')
+			const user_id = ref('<?php echo $_SESSION["user_id"]; ?>')
 			const soft = ref('yayoi')
 			const mail = ref('')
 			const uri_label = computed(()=>{
@@ -299,8 +300,8 @@ if(!empty($_POST)){
 			})
 			const prv = () =>{
 				//プレビュー印刷
-				if(confirm("表示する領収書をお客様に発行しますか？")===true){
-					let URL = `output_menu_uriage_denpyou_pdf.php?i=2&YM_F=${uriden_ym.value}&YM=${uriden_kikan.value}`
+				if(confirm("売上帳を発行します")===true){
+					let URL = `output_menu_uriage_denpyou_pdf.php?i=${user_id.value}&YM_F=${uriden_ym.value}&YM=${uriden_kikan.value}`
 					window.open(P_ROOT_URL + URL, '_blank')
 				}
 				
