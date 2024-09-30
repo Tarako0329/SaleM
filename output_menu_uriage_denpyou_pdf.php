@@ -50,8 +50,10 @@
 	}
 	//$id=rot13decrypt2($_GET["i"]);
 	$uid=($_GET["i"]);
-	$from = (!empty($_GET["from"])?$_GET["from"] :"2023-01-01");
-	$to = (!empty($_GET["to"])?$_GET["to"] :"2023-12-31");
+	//$from = (!empty($_GET["from"])?$_GET["from"] :"2023-01-01");
+	$ym = (!empty($_GET["YM"])?$_GET["YM"] :"2024");
+	//$to = (!empty($_GET["to"])?$_GET["to"] :"2023-12-31");
+	$tani = ($_GET["YM_F"]==='Y')?" 年度" :" 月度";
 	$filename = "Uriage_meisai";
 }
 use Dompdf\Dompdf;
@@ -62,25 +64,32 @@ $sysname="WEBREZ+";
 
 //売上明細の取得
 
-	$sql="select * from uriagedenpyou where uid = :uid and 計上日 between :from and :to";
+	//$sql="select * from uriagedenpyou where uid = :uid and 計上日 between :from and :to ";
+	$sql="select * from uriagedenpyou where uid = :uid and 計上日 like :ym ";
 	$stmt = $pdo_h->prepare($sql);
 	$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
-	$stmt->bindValue("from", $from, PDO::PARAM_STR);
-	$stmt->bindValue("to", $to, PDO::PARAM_STR);
+	$stmt->bindValue("ym", $ym."%", PDO::PARAM_STR);
+	//$stmt->bindValue("to", $to, PDO::PARAM_STR);
 	$stmt->execute();
 	$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	//log_writer2("\$result",$result,"lv3");
 	$meisai = "";
+	$before_date = "";
+	$before_urino = "";
 	foreach($result as $row){
-		$meisai .= "<tr><td>".$row["計上日"]."</td><td>".$row["売上NO"]."</td><td>".$row["売上先"]."</td><td>".$row["商品"]."</td><td>".number_format($row["数"])."</td><td>".number_format($row["単価"])."</td><td>".number_format($row["金額"])."</td><td>".number_format($row["税額"])."</td><td>".$row["区分"]."</td></tr>\r\n";
+		if($row["売上先"] === "月計" || $row["売上先"] === "年間合計" ){
+			$meisai .= "<tr style='font-size:12px;'><td colspan='3'>".$row["売上先"]."</td><td>".$row["商品"]."</td><td class='meisaival'></td><td class='meisaival'></td><td class='meisaival'>".number_format($row["金額"])."</td><td class='meisaival'>".number_format($row["税額"])."</td><td>".$row["区分"]."</td></tr>\r\n";
+		}else if($before_date !== $row["計上日"]){
+			$meisai .= "<tr><td>".$row["計上日"]."</td><td>".$row["売上NO"]."</td><td>".$row["売上先"]."</td><td>".$row["商品"]."</td><td class='meisaival'>".(empty($row["数"])?"":number_format($row["数"]))."</td><td class='meisaival'>".(empty($row["単価"])?"":number_format($row["単価"]))."</td><td class='meisaival'>".number_format($row["金額"])."</td><td class='meisaival'>".number_format($row["税額"])."</td><td>".$row["区分"]."</td></tr>\r\n";
+			$before_date = $row["計上日"];
+			$before_urino = $row["売上NO"];
+		}else if($before_urino!==$row["売上NO"]){
+			$meisai .= "<tr><td></td><td>".$row["売上NO"]."</td><td>".$row["売上先"]."</td><td>".$row["商品"]."</td><td class='meisaival'>".(empty($row["数"])?"":number_format($row["数"]))."</td><td class='meisaival'>".(empty($row["単価"])?"":number_format($row["単価"]))."</td><td class='meisaival'>".number_format($row["金額"])."</td><td class='meisaival'>".number_format($row["税額"])."</td><td>".$row["区分"]."</td></tr>\r\n";
+			$before_urino = $row["売上NO"];
+		}else{
+			$meisai .= "<tr><td></td><td></td><td>".$row["売上先"]."</td><td>".$row["商品"]."</td><td class='meisaival'>".(empty($row["数"])?"":number_format($row["数"]))."</td><td class='meisaival'>".(empty($row["単価"])?"":number_format($row["単価"]))."</td><td class='meisaival'>".number_format($row["金額"])."</td><td class='meisaival'>".number_format($row["税額"])."</td><td>".$row["区分"]."</td></tr>\r\n";
+		}
 	}
-	//log_writer2("\$meisai",$meisai,"lv3");
-	/*
-	<!--<tr><td>伝票合計</td><td>$row["売上NO"]</td><td>$row["売上先"]</td><td>$row["商品"]</td><td>$row["数"]</td><td>$row["単価"]</td><td>$row["金額"]</td><td>$row["区分"]</td>
-	<tr><td>日計</td><td>$row["売上NO"]</td><td>$row["売上先"]</td><td>$row["商品"]</td><td>$row["数"]</td><td>$row["単価"]</td><td>$row["金額"]</td><td>$row["区分"]</td>
-	<tr><td>月計</td><td>$row["売上NO"]</td><td>$row["売上先"]</td><td>$row["商品"]</td><td>$row["数"]</td><td>$row["単価"]</td><td>$row["金額"]</td><td>$row["区分"]</td>
-	<tr><td>年計</td><td>$row["売上NO"]</td><td>$row["売上先"]</td><td>$row["商品"]</td><td>$row["数"]</td><td>$row["単価"]</td><td>$row["金額"]</td><td>$row["区分"]</td>-->
-	*/
 
 // PDFにする内容をHTMLで記述
 $html = <<< EOM
@@ -105,7 +114,7 @@ $html = <<< EOM
 				margin: 0 auto;
 				border:solid;
 				border-collapse: collapse;
-				font-size:10px;
+				font-size:8px;
 			}
 			th{
 				border-bottom:solid;
@@ -119,8 +128,8 @@ $html = <<< EOM
 				padding:auto 5px;
 			}
 			.meisaival{
-				width:80px;
-				min-width:50px;
+				/*width:80px;
+				min-width:50px;*/
 				text-align: right;
 				padding:auto 5px;
 			}
@@ -140,11 +149,11 @@ $html = <<< EOM
 		<div style='text-align:left;'>
 			powered by <span style='font-family:Kranky;font-weight: bolder;'>$sysname</span>
 		</div>
-		<div style='height:70px;'>
-			<span class='title'> - 売上明細 - </span>
+		<div style='height:50px;'>
+			<span class='title'> - 売上帳 - </span>
 		</div>
-		<div style='margin-top:15px;'>
-			<span style='font-size:20px;'>【 内　訳 】</span>
+		<div style='margin-top:5px;'>
+			<span style='font-size:20px;'>【 $ym $tani 】</span>
 			<table style='width:100%;'>
 				<thead>
 					<tr>

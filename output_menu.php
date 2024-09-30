@@ -163,13 +163,35 @@ if(!empty($_POST)){
 				<input class='form-control mb-1' style="font-size:1.5rem;max-width:200px;" type='text' id='nyukin_kamoku' name='nyukin_kamoku' v-model='nyukin_kamoku' required='required' >
 				<small>[事業主貸] [現金] など</small>
 			</div>
-			<label for='ymfrom'> 出力対象期間</label>
-			<input class='form-control' style="font-size:1.5rem;max-width:200px;" type='date' id='ymfrom' name='ymfrom' v-model='ymfrom' required='required' >
-			<label for='ymto'>から</label>
-			<input class='form-control mb-3' style="font-size:1.5rem;max-width:200px;" type='date' id='ymto' name='ymto' v-model='ymto' required='required' >
+			<div class='d-flex'>
+				<div>
+					<label for='ymfrom'> 出力対象期間</label>
+					<input class='form-control' style="font-size:1.5rem;max-width:200px;" type='date' id='ymfrom' name='ymfrom' v-model='ymfrom' required='required' >
+					<label for='ymto'>から</label>
+					<input class='form-control mb-3' style="font-size:1.5rem;max-width:200px;" type='date' id='ymto' name='ymto' v-model='ymto' required='required' >
+				</div>
+				<div style='padding:20px;'>
+					<input class='btn btn-primary ms-5' type='submit' value='連携データ出力' style='width:200px;height:70px;'>
+				</div>
+			</div>
+			<hr>
+			<div class='d-flex'>
+				<div>
+					<label for='ymfrom'> 売上帳 出力単位</label>
+					<!--<input class='form-control' style="font-size:1.5rem;max-width:200px;" type='date' id='ymfrom' name='ymfrom' v-model='ymfrom' required='required' >-->
+					<select class='form-select' v-model='uriden_ym' style="font-size:1.5rem;max-width:200px;">
+						<option value='Y'>年度</option>
+						<option value='M'>月度</option>
+					</select>
+					<label for='uriden_kikan'>　</label>
+					<input class='form-control mb-3' v-model='uriden_kikan' :placeholder='sample' style="font-size:1.5rem;max-width:200px;" type='text' id='uriden_kikan' >
+				</div>
+				<div style='padding:20px;'>
+				<button class='btn btn-primary ms-5' type='button' style='width:200px;height:70px;' @click='prv()'>保管用売上明細PDF</button>
+				</div>
+			</div>
 			
-			<input class='btn btn-primary mt-5' type='submit' value='連携データ出力' style='width:200px;height:70px;'>
-			<button class='btn btn-primary mt-5' type='button' style='width:200px;height:70px;' @click='prv()'>保管用売上明細PDF</button>
+			
 		</form>
 		</div>
 
@@ -266,10 +288,19 @@ if(!empty($_POST)){
 				.catch((error) => console_log(`get_UriageList ERROR:${error}`,'lv3'));
 			}
 
+			const uriden_ym = ref('Y')
+			const uriden_kikan = ref('')
+			const sample = computed(()=>{
+				if(uriden_ym.value==='Y'){
+					return '例: 2024'
+				}else{
+					return '例: 2024-05'
+				}
+			})
 			const prv = () =>{
 				//プレビュー印刷
 				if(confirm("表示する領収書をお客様に発行しますか？")===true){
-					let URL = `output_menu_uriage_denpyou_pdf.php?i=2&from=${ymfrom.value}&to=${ymto.value}`
+					let URL = `output_menu_uriage_denpyou_pdf.php?i=2&YM_F=${uriden_ym.value}&YM=${uriden_kikan.value}`
 					window.open(P_ROOT_URL + URL, '_blank')
 				}
 				
@@ -296,6 +327,9 @@ if(!empty($_POST)){
 				manual_url,
 				delete_manual_url,
 				prv,
+				sample,
+				uriden_ym,
+				uriden_kikan,
 			}                
 		}
 	}).mount('#form1');
