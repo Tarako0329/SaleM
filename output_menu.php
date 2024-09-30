@@ -169,6 +169,7 @@ if(!empty($_POST)){
 			<input class='form-control mb-3' style="font-size:1.5rem;max-width:200px;" type='date' id='ymto' name='ymto' v-model='ymto' required='required' >
 			
 			<input class='btn btn-primary mt-5' type='submit' value='連携データ出力' style='width:200px;height:70px;'>
+			<button class='btn btn-primary mt-5' type='button' style='width:200px;height:70px;' @click='prv()'>保管用売上明細PDF</button>
 		</form>
 		</div>
 
@@ -242,7 +243,6 @@ if(!empty($_POST)){
 
 			})
 
-
 			const sendmail = () =>{
 				if(mail.value.length==0){
 					alert('メールアドレスを入力して下さい')
@@ -266,6 +266,14 @@ if(!empty($_POST)){
 				.catch((error) => console_log(`get_UriageList ERROR:${error}`,'lv3'));
 			}
 
+			const prv = () =>{
+				//プレビュー印刷
+				if(confirm("表示する領収書をお客様に発行しますか？")===true){
+					let URL = `output_menu_uriage_denpyou_pdf.php?i=2&from=${ymfrom.value}&to=${ymto.value}`
+					window.open(P_ROOT_URL + URL, '_blank')
+				}
+				
+			}
 			onMounted(() => {
 				console_log('onMounted','lv3')
 				if(window.matchMedia('(display-mode: standalone)').matches){
@@ -286,7 +294,8 @@ if(!empty($_POST)){
 				mail,
 				sendmail,
 				manual_url,
-				delete_manual_url
+				delete_manual_url,
+				prv,
 			}                
 		}
 	}).mount('#form1');
