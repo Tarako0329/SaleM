@@ -300,6 +300,10 @@ if(!empty($_POST)){
 			})
 			const prv = () =>{
 				//プレビュー印刷
+				if(!uriden_kikan.value){
+					alert("期間を指定してください")
+					return 0
+				}
 				if(confirm("売上帳を発行します")===true){
 					let URL = `output_menu_uriage_denpyou_pdf.php?i=${user_id.value}&YM_F=${uriden_ym.value}&YM=${uriden_kikan.value}`
 					window.open(P_ROOT_URL + URL, '_blank')
