@@ -884,7 +884,6 @@
 				}
 				const EventList_filter = computed(() => {
 					let searchWord = EV_input_value.value
-					//let searchWord = `マルシェ`;
 		
 					if (String(searchWord).length === "0") {return EventList.value;}
 					return EventList.value.filter((row) => {
@@ -917,6 +916,29 @@
 
 				}
 
+				const barcode_mode = () =>{
+					const video  = document.querySelector('#js-video')
+
+					navigator.mediaDevices
+						.getUserMedia({
+								audio: false,
+								video: {
+										facingMode: {
+												exact: 'environment'
+										}
+								}
+						})
+						.then(function(stream) {
+								video.srcObject = stream
+								video.onloadedmetadata = function(e) {
+										video.play()
+								}
+						})
+						.catch(function(err) {
+								alert('Error!!')
+						})
+				}
+				
 				onMounted(() => {
 					//console_log(get_value(1000,0.1,'IN'))
 					console_log('onMounted')
@@ -1014,6 +1036,7 @@
 					EventList_filter,
 					EV_input_value,
 					clear_EV_input_value,
+					barcode_mode,
 				}
 			}
 		})
