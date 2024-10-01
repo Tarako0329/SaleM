@@ -48,11 +48,11 @@ if(csrf_checker(["UriageData_Correct.php"],["C","P","S"])===false){
             //$up_sqllog = $up_sqllog." UriDate = '".$_POST["up_uridate"]."' , ";
         }
         if(!empty($_POST["chk_event"])){
-            $up_sql = $up_sql." Event = :Event , ";
+            $up_sql = $up_sql." Event = :Event , TokuisakiNM='' , ";
             //$up_sqllog = $up_sqllog." Event = '".$_POST["up_event"]."' , ";
         }
         if(!empty($_POST["chk_kokyaku"])){
-            $up_sql = $up_sql." TokuisakiNM = :TokuisakiNM , ";
+            $up_sql = $up_sql." TokuisakiNM = :TokuisakiNM , Event = '' , ";
             //$up_sqllog = $up_sqllog." TokuisakiNM = '".$_POST["up_kokyaku"]."' , ";
         }
         if(!empty($_POST["chk_urikin"])){

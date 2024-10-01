@@ -1,5 +1,5 @@
 <?php
-define("VERSION", "ver3.15.0-000");
+define("VERSION", "ver3.16.0-001");
 
 date_default_timezone_set('Asia/Tokyo');
 require "./vendor/autoload.php";
