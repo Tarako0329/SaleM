@@ -184,7 +184,7 @@
 
 					<div class='col-lg-3 col-md-4 col-sm-12 col-12'><!--注文内容-->
 						<div style='height:80px;'>
-					  	<video id="js-video" class="reader-video" autoplay playsinline></video>
+					  	<video style='height: 100%;' id="js-video" class="reader-video" autoplay playsinline></video>
 						</div>
 						<div class='order_list' ref='order_list_area'>
 							<div class='text-center'> 税込表示 </div>
