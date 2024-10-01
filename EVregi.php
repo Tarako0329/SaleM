@@ -183,8 +183,12 @@
 				<div v-if='"<?php echo strlen($emsg);?>"==="0"' class='row'>
 
 					<div class='col-lg-3 col-md-4 col-sm-12 col-12'><!--注文内容-->
-						<div style='height:80px;'>
-					  	<video style='height: 100%;' id="js-video" class="reader-video" autoplay playsinline></video>
+						<div style='height:80px;width:100%;'>
+					  	<video style='height: 100%;width:100%;' id="js-video" class="reader-video" autoplay playsinline></video>
+							<!--<div style="display:none">-->
+							<div>
+	  						<canvas id="js-canvas"></canvas>
+							</div>
 						</div>
 						<div class='order_list' ref='order_list_area'>
 							<div class='text-center'> 税込表示 </div>

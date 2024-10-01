@@ -918,7 +918,7 @@
 
 				const barcode_mode = () =>{
 					const video  = document.querySelector('#js-video')
-
+					const canvas = document.querySelector('#js-canvas');
 					navigator.mediaDevices
 						.getUserMedia({
 								audio: false,
@@ -933,12 +933,18 @@
 								video.onloadedmetadata = function(e) {
 										video.play()
 								}
+								setInterval(function(){
+									canvas.width = video.videoWidth;
+									canvas.height = video.videoHeight;
+									var ctx = canvas.getContext('2d');
+									ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, canvas.width, canvas.height);
+								}, 200);
 						})
 						.catch(function(err) {
 								alert('Error!!')
 						})
 				}
-				
+
 				onMounted(() => {
 					//console_log(get_value(1000,0.1,'IN'))
 					console_log('onMounted')
