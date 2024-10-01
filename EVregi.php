@@ -184,7 +184,7 @@
 
 					<div class='col-lg-3 col-md-4 col-sm-12 col-12'><!--注文内容-->
 						<div style='height:80px;width:100%;'>
-					  	<video style='height: 100%;width:100%;' id="js-video" class="reader-video" autoplay playsinline></video>
+					  	<video style='height: 100%;width:100%;object-fit: fill;' id="js-video" class="reader-video" autoplay playsinline></video>
 							<!--<div style="display:none">-->
 							<div>
 	  						<canvas id="js-canvas"></canvas>
