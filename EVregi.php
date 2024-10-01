@@ -133,9 +133,6 @@
 					</template>
 				</template>
 			</select>
-			<!--<a href="#" style='color:inherit;margin-left:10px;margin-right:10px;margin-top:0px;' data-bs-toggle='modal' data-bs-target='#modal_help1'>
-				<i class="bi bi-question-square logoff-color fs-1 fw-bold"></i>
-			</a>-->
 			<div class='fs-5 fw-bold' style='position:absolute;right:5px;width:130px;'>
 				<a class='btn-view ps-1 pt-1 pb-0 pe-1 me-2 item_15' href='#' @Click='panel_changer()' style='height: 30px;'>
 					<i class="bi bi-sort-down fs-3 me-1">切換</i>
@@ -154,8 +151,10 @@
 				<button v-if='order_panel_show_flg===true' type='button' class='btn btn-primary' @click='order_panel_show("show")'>カート編集</button>
 				<button v-if='order_panel_show_flg===false' type='button' class='btn btn-primary' @click='order_panel_show("close")'>戻る</button>
 			</div>
+			<a href="#" class='' style='font-size:32px;color:inherit;position:fixed;top:105px;right:80px;'  id='UriToday'>
+				<i class="bi bi-upc-scan awesome-color-panel-border-same"></i>
+			</a>
 			<a href="#" class='' style='font-size:32px;color:inherit;position:fixed;top:110px;right:20px;' data-bs-toggle='modal' data-bs-target='#modal_uriagelist' id='UriToday'>
-				<!--<i class="fa-solid fa-cash-register fa-2x awesome-color-panel-border-same"></i>-->
 				<i class="bi bi-cash-coin awesome-color-panel-border-same"></i>
 			</a>
 		</div><!--カート編集など-->
@@ -184,6 +183,9 @@
 				<div v-if='"<?php echo strlen($emsg);?>"==="0"' class='row'>
 
 					<div class='col-lg-3 col-md-4 col-sm-12 col-12'><!--注文内容-->
+						<div class="reader">
+					  	<video id="js-video" class="reader-video" autoplay playsinline></video>
+						</div>
 						<div class='order_list' ref='order_list_area'>
 							<div class='text-center'> 税込表示 </div>
 							<template v-for='(list,index) in order_list' :key='list.CD'>
@@ -1629,6 +1631,28 @@
 
 </script><!--ジオコーディング-->
 <script src="https://maps.gsi.go.jp/js/muni.js"></script><!--gio住所逆引リスト-->
+<script>
+const video  = document.querySelector('#js-video')
+
+navigator.mediaDevices
+    .getUserMedia({
+        audio: false,
+        video: {
+            facingMode: {
+                exact: 'environment'
+            }
+        }
+    })
+    .then(function(stream) {
+        video.srcObject = stream
+        video.onloadedmetadata = function(e) {
+            video.play()
+        }
+    })
+    .catch(function(err) {
+        alert('Error!!')
+    })
+</script>
 </html>
 <?php
 $stmt = null;
