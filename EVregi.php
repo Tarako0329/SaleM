@@ -75,6 +75,8 @@
 	//共通部分、bootstrap設定、フォントCND、ファビコン等
 	include 'head_bs5.php'
 	?>
+	<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script><!--read QRコードライブラリ-->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.js"></script><!--make QRコードライブラリ-->
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_EVregi.css?<?php echo $time; ?>' >
 	<TITLE><?php echo TITLE.' レジ';?></TITLE>
@@ -151,9 +153,11 @@
 				<button v-if='order_panel_show_flg===true' type='button' class='btn btn-primary' @click='order_panel_show("show")'>カート編集</button>
 				<button v-if='order_panel_show_flg===false' type='button' class='btn btn-primary' @click='order_panel_show("close")'>戻る</button>
 			</div>
+			<!--バーコード読取-->
 			<a @click='barcode_mode' class='' style='font-size:32px;color:inherit;position:fixed;top:105px;right:80px;'  id='UriToday'>
 				<i class="bi bi-upc-scan awesome-color-panel-border-same"></i>
 			</a>
+			<!--今日の売上-->
 			<a href="#" class='' style='font-size:32px;color:inherit;position:fixed;top:110px;right:20px;' data-bs-toggle='modal' data-bs-target='#modal_uriagelist' id='UriToday'>
 				<i class="bi bi-cash-coin awesome-color-panel-border-same"></i>
 			</a>
@@ -183,10 +187,9 @@
 				<div v-if='"<?php echo strlen($emsg);?>"==="0"' class='row'>
 
 					<div class='col-lg-3 col-md-4 col-sm-12 col-12'><!--注文内容-->
-						<div style='height:80px;width:100%;'>
-					  	<video style='height: 100%;width:100%;object-fit: cover;' id="js-video" class="reader-video" autoplay playsinline></video>
-							<!--<div style="display:none">-->
-							<div>
+						<div v-show='barcode_cam_area'  style='height:80px;width:100%;'>
+					  	<video style='height: 150%;width:100%;object-fit: cover;' id="js-video" class="reader-video" autoplay playsinline></video>
+							<div style="display:none">
 	  						<canvas id="js-canvas"></canvas>
 							</div>
 						</div>

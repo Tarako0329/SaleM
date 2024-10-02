@@ -793,15 +793,21 @@
 				const order_list = ref([])
 				const order_panel_show_flg = ref(true)
 				const order_panel_show = (status) => {
+					//status=> show close barcode
 					console_log(`order_panel_show now:chk_register_show.value=>${chk_register_show.value}`)
 					let sizeW = window.innerWidth
-					let sizeH = window.innerHeight
-					let H_minus = Number(360)
+					let sizeH = Number(window.innerHeight)
+					let H_minus
+					if(status==='barcode'){
+						H_minus = Number(440)	//360 + 80
+					}else{
+						H_minus = Number(360)
+					}
 					let W_minus = Number(31)
 					console_log(`order_panel_show now:sizeH=>${sizeH}`)
 					
 					if(sizeW<=767){
-						if(status==='show'){
+						if(status==='show' || status==='barcode'){
 							order_panel_show_flg.value=false
 							//order_list_area.value.style =`width:90%;height:${sizeH-H_minus}px;display:BLOCK;`
 							if(chk_register_show.value==="chk"){
@@ -916,9 +922,11 @@
 
 				}
 
+				const barcode_cam_area = ref(false)
 				const barcode_mode = () =>{
+					barcode_cam_area.value = true
 					const video  = document.querySelector('#js-video')
-					const canvas = document.querySelector('#js-canvas');
+					//const canvas = document.querySelector('#js-canvas');
 					navigator.mediaDevices
 						.getUserMedia({
 								audio: false,
@@ -929,20 +937,51 @@
 								}
 						})
 						.then(function(stream) {
+								order_panel_show("barcode")
 								video.srcObject = stream
 								video.onloadedmetadata = function(e) {
 										video.play()
 								}
-								setInterval(function(){
+								
+								/*setInterval(function(){
 									canvas.width = video.videoWidth;
 									canvas.height = video.videoHeight;
-									var ctx = canvas.getContext('2d');
+									const ctx = canvas.getContext('2d');
 									ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, canvas.width, canvas.height);
-								}, 200);
+
+									const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+
+    							// jsQRに渡す
+    							const code = jsQR(imageData.data, canvas.width, canvas.height)
+									if(code){
+										console_log(code.data)
+									}
+								}, 200);*/
+								barcode_read(video)
 						})
 						.catch(function(err) {
 								alert('Error!!')
+								//order_panel_show("barcode")
+								barcode_cam_area.value=false
 						})
+				}
+				const barcode_read = (v_obj) =>{
+					const canvas = document.querySelector('#js-canvas');
+					canvas.width = v_obj.videoWidth;
+					canvas.height = v_obj.videoHeight;
+					const ctx = canvas.getContext('2d');
+					ctx.drawImage(v_obj, 0, 0, v_obj.videoWidth, v_obj.videoHeight, 0, 0, canvas.width, canvas.height);
+
+					const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+
+					// jsQRに渡す
+					const code = jsQR(imageData.data, canvas.width, canvas.height)
+					if(code){
+						console_log(code.data)
+						alert(code.data)
+					}else{
+						setTimeout(() => { barcode_read() }, 200)
+					}
 				}
 
 				onMounted(() => {
@@ -1042,6 +1081,7 @@
 					EventList_filter,
 					EV_input_value,
 					clear_EV_input_value,
+					barcode_cam_area,
 					barcode_mode,
 				}
 			}
