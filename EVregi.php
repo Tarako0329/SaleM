@@ -188,9 +188,9 @@
 
 					<div class='col-lg-3 col-md-4 col-sm-12 col-12'><!--注文内容-->
 						<div v-show='barcode_cam_area'  style='height:80px;width:100%;'>
-					  	<video style='height: 150%;width:100%;object-fit: cover;' id="js-video" class="reader-video" autoplay playsinline></video>
+									<video style='height: 150%;width:100%;object-fit: cover;' id="js-video" class="reader-video" autoplay playsinline></video>
 							<div style="display:none">
-	  						<canvas id="js-canvas"></canvas>
+										<canvas id="js-canvas"></canvas>
 							</div>
 						</div>
 						<div class='order_list' ref='order_list_area'>
