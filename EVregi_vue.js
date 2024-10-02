@@ -923,10 +923,13 @@
 				}
 
 				const barcode_cam_area = ref(false)
+				const video  = document.querySelector('#js-video')
+				const canvas = document.querySelector('#js-canvas');
+
 				const barcode_mode = () =>{
 					barcode_cam_area.value = true
-					const video  = document.querySelector('#js-video')
-					const canvas = document.querySelector('#js-canvas');
+					//const video  = document.querySelector('#js-video')
+					//const canvas = document.querySelector('#js-canvas');
 					navigator.mediaDevices
 						.getUserMedia({
 								audio: false,
@@ -957,9 +960,8 @@
 										alert(code.data)
 									}
 								}, 200)*/
+								read_qr()
 								
-								setInterval(read_qr(),200)
-
 								const read_qr = () =>{
 									canvas.width = video.videoWidth;
 									canvas.height = video.videoHeight;
@@ -971,7 +973,14 @@
     							// jsQRに渡す
     							const code = jsQR(imageData.data, canvas.width, canvas.height)
 									if(code){
-										alert(code.data)
+										if(confirm(code.data)){
+											//次の商品をスキャン
+											setTimeout(read_qr(), 200);
+										}else{
+											barcode_cam_area.value=false
+										}
+									}else{
+										setTimeout(read_qr(), 200);
 									}
 								}
 						})
