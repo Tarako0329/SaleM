@@ -926,6 +926,12 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 		let canvas //onMountで定義
 
 		const barcode_mode = () =>{//QR読取カメラ起動
+			if(barcode_cam_area.value){//QRボタンを再度タップしたときはエリアを閉じる
+				order_panel_show("close")
+				barcode_cam_area.value=false
+				stream.getTracks().forEach(track => track.stop())
+				return 0
+			}
 			barcode_cam_area.value = true
 			navigator.mediaDevices
 				.getUserMedia({
