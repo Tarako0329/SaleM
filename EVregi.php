@@ -155,7 +155,7 @@
 			</div>
 			<!--バーコード読取-->
 			<a @click='barcode_mode' class='' style='font-size:32px;color:inherit;position:fixed;top:105px;right:80px;'  id='UriToday'>
-				<i class="bi bi-upc-scan awesome-color-panel-border-same"></i>
+				<i class="bi bi-qr-code-scan awesome-color-panel-border-same"></i>
 			</a>
 			<!--今日の売上-->
 			<a href="#" class='' style='font-size:32px;color:inherit;position:fixed;top:110px;right:20px;' data-bs-toggle='modal' data-bs-target='#modal_uriagelist' id='UriToday'>
@@ -181,26 +181,24 @@
 			<?php 
 				if(!empty($emsg)){
 					echo $emsg;
-					//exit;
 				}
 			?>
 				<div v-if='"<?php echo strlen($emsg);?>"==="0"' class='row'>
 
-					<div class='col-lg-3 col-md-4 col-sm-12 col-12'><!--注文内容-->
-						<div v-show='barcode_cam_area'  style='height:80px;width:100%;'>
-									<video style='height: 150%;width:100%;object-fit: cover;' id="js-video" class="reader-video" autoplay playsinline></video>
+					<div class='col-lg-3 col-md-4 col-sm-12 col-12'><!--注文内容/スキャナ-->
+						<div v-show='barcode_cam_area'  style='height:180px;width:100%;'><!--スキャナ-->
+							<video style='height: 100%;width:100%;object-fit: cover;' id="js-video" class="reader-video" autoplay playsinline></video>
 							<div style="display:none">
-										<canvas id="js-canvas"></canvas>
+								<canvas id="js-canvas"></canvas>
 							</div>
-						</div>
-						<div class='order_list' ref='order_list_area'>
+						</div><!--スキャナ-->
+						<div class='order_list' ref='order_list_area'><!--注文内容-->
 							<div class='text-center'> 税込表示 </div>
 							<template v-for='(list,index) in order_list' :key='list.CD'>
 								<div class='container'>
 									<div class='order_item'>{{list.NM}}</div>
 									<div style='display:flex;'>
 										<div class='order_su' >{{list.SU}}点</div>
-										<!--<div class='order_kin'>¥{{(list.SU * (list.TANKA + list.TANKA_ZEI)).toLocaleString()}}</div>-->
 										<div class='order_kin'>¥{{(Number(list.SU) * Number(list.TANKA)).toLocaleString()}}</div>
 									</div>
 									<div id='side-pm' style='display:flex;border-bottom:solid var(--panel-bd-color) 0.3px;padding-bottom:3px;position:relative;'>
@@ -255,8 +253,8 @@
 									</div>
 								</template>
 							</template>
-						</div>
-					</div><!--注文内容-->
+						</div><!--注文内容-->
+					</div><!--注文内容/スキャナ-->
 
 					<div v-show='order_panel_show_flg' class='col-lg-9 col-md-8 col-sm-12 col-12'><!--オーダーパネル部分-->
 						<div class="container-fluid">

@@ -245,15 +245,18 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 		})//商品マスタの税率変更スイッチ
 
 		const ordercounter = (e) => {//注文増減ボタン
-			//console_log(e.target.disabled)
+			//メニューボタンタップ時はe.target,スキャン方式の場合はe=shouhinMS_filterのindex
+			console_log('start ordercounter()')
+			//console_log(e.target)
+			console_log(e)
 			//console_log(shouhinMS_filter.value[e.target.value])
 
 			if(chk_register_show.value==="register"){
 				alert('『戻る』ボタンをタップしてから増減してください。')
 				return 0
 			}
-			e.target.disabled = true	//ボタン連打対応：処理が終わるまでボタンを無効にする
-			let index = e.target.value
+			if(e.target){e.target.disabled = true}	//ボタン連打対応：処理が終わるまでボタンを無効にする
+			let index = (e.target)?e.target.value:e
 
 			//オーダーパネルの数増減
 			shouhinMS_filter.value[index].ordercounter = Number(shouhinMS_filter.value[index].ordercounter) + Number(1)
@@ -282,7 +285,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 				order_list.value[order_list_index].SU = Number(order_list.value[order_list_index].SU) + Number(1)
 			}
 			calculation()	//消費税再計算
-			e.target.disabled = false	//ボタン連打対応：処理が終わったらボタンを有効に戻す
+			if(e.target){e.target.disabled = false}//ボタン連打対応：処理が終わったらボタンを有効に戻す
 			
 			nextTick (() => {//DOMが更新された後に処理を行う
 				resize()
@@ -521,7 +524,6 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 			}
 			return 0
 		} 
-		//const rg_mode = ref('<?php echo $RG_MODE; ?>')	//レジモード
 		const rg_mode = ref(p_mode)	//レジモード
 
 		const on_submit = async(e) => {//登録・submit/
@@ -539,10 +541,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 			}else{
 				php_name = 'ajax_EVregi_sql.php'
 			}
-			
-			await axios
-				//.post(php_name,params,{timeout: <?php echo $timeout; ?>}) //php側は15秒でタイムアウト
-				.post(php_name,params,{timeout:p_timeout }) //php側は15秒でタイムアウト
+			await axios.post(php_name,params,{timeout:p_timeout }) //php側は15秒でタイムアウト
 				.then((response) => {
 					console_log(`on_submit SUCCESS`)
 					//console_log(response.data)
@@ -799,7 +798,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 			let sizeH = Number(window.innerHeight)
 			let H_minus
 			if(status==='barcode'){
-				H_minus = Number(420)	//360 + 80
+				H_minus = Number(540)	//360 + 180
 			}else{
 				H_minus = Number(360)
 			}
@@ -926,10 +925,8 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 		let video  //onMountで定義
 		let canvas //onMountで定義
 
-		const barcode_mode = () =>{
+		const barcode_mode = () =>{//QR読取カメラ起動
 			barcode_cam_area.value = true
-			//video  = document.querySelector('#js-video')
-			
 			navigator.mediaDevices
 				.getUserMedia({
 					audio: false,
@@ -945,24 +942,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 					video.onloadedmetadata = function(e) {
 						video.play()
 					}
-
-					/*
-						setInterval(function(){
-							canvas.width = video.videoWidth;
-							canvas.height = video.videoHeight;
-							const ctx = canvas.getContext('2d');
-							ctx.drawImage(video, 0, 210, video.videoWidth, video.videoHeight, 0, 0, canvas.width, canvas.height);
-							const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-							// jsQRに渡す
-							const code = jsQR(imageData.data, canvas.width, canvas.height)
-							if(code){
-								alert(code.data)
-							}
-						}, 200)
-					*/
-
 					read_qr(stream)
-					//setInterval(read_qr,200)
 				})
 				.catch((err) =>{
 						alert('Error!!')
@@ -973,10 +953,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 						stream.getTracks().forEach(track => track.stop())
 				})
 		}
-		const read_qr = (p_stream) =>{
-			//const canvas = document.querySelector('#js-canvas')
-			//const g_video  = document.querySelector('#js-video')
-			//alert(`w:${video.videoWidth} h:${video.videoHeight}`)
+		const read_qr = (p_stream) =>{//QR読取処理
 			canvas.width = (video.videoHeight===0?300:video.videoHeight)
 			canvas.height = (video.videoHeight===0?80:video.videoHeight);
 			const ctx = canvas.getContext('2d');
@@ -987,19 +964,22 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 			// jsQRに渡す
 			const code = jsQR(imageData.data, canvas.width, canvas.height)
 			if(code){
-				//alert(code.data)
-				if(confirm(code.data)){
-					//次の商品をスキャン
-					p_stream.getTracks().forEach(track => track.play())
-					//setTimeout(() => { read_qr(p_stream)}, 1000)
-					read_qr(p_stream)
-				}else{
-					barcode_cam_area.value=false
-					p_stream.getTracks().forEach(track => track.stop())
+				qr_order(code.data)
+				setTimeout(() => { barcode_mode()}, 1000)
+			}else{
+				setTimeout(() => { read_qr(p_stream)}, 100)
+			}
+		}
+		const qr_order = (p_ShouhinCD) => {
+			const order_list_index = shouhinMS_filter.value.findIndex(//読取した商品NOから連想配列のINDEXを取得する
+				list => p_ShouhinCD == list.shouhinCD
+			)
+			if(order_list_index){
+				if(confirm(`${shouhinMS_filter.value[order_list_index].shouhinNM} １点`)){
+					ordercounter(order_list_index)
 				}
 			}else{
-					//alert('next')
-				setTimeout(() => { read_qr(p_stream)}, 100)
+				alert(`該当する商品はありません。スキャン結果:${p_ShouhinCD}`)
 			}
 		}
 
@@ -1106,6 +1086,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 			clear_EV_input_value,
 			barcode_cam_area,
 			barcode_mode,
+			qr_order,
 		}
 	}
 })
