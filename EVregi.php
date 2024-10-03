@@ -153,8 +153,8 @@
 				<button v-if='order_panel_show_flg===true' type='button' class='btn btn-primary' @click='order_panel_show("show")'>カート編集</button>
 				<button v-if='order_panel_show_flg===false' type='button' class='btn btn-primary' @click='order_panel_show("close")'>戻る</button>
 			</div>
-			<!--バーコード読取-->
-			<a @click='barcode_mode' class='' style='font-size:32px;color:inherit;position:fixed;top:105px;right:80px;'  id='UriToday'>
+			<!--バーコード読取 qr_order(111) barcode_mode("start")-->
+			<a @click='barcode_mode("start")' class='' style='font-size:32px;color:inherit;position:fixed;top:105px;right:80px;'  id='UriToday'>
 				<i class="bi bi-qr-code-scan awesome-color-panel-border-same"></i>
 			</a>
 			<!--今日の売上-->
@@ -186,10 +186,12 @@
 				<div v-if='"<?php echo strlen($emsg);?>"==="0"' class='row'>
 
 					<div class='col-lg-3 col-md-4 col-sm-12 col-12'><!--注文内容/スキャナ-->
-						<div v-show='barcode_cam_area'  style='height:180px;width:100%;'><!--スキャナ-->
+						<div v-show='barcode_cam_area'  style='height:180px;width:100%;position:relative;'><!--スキャナ-->
+						    <div style='position:absolute;top:80px;width:100%;background-color:yellow;' class='text-center fs-2'>{{scan_result}}</div>
+						    
 							<video style='height: 100%;width:100%;object-fit: cover;' id="js-video" class="reader-video" autoplay playsinline></video>
-							<div style="display:none">
-								<canvas id="js-canvas"></canvas>
+								<canvas id="js-canvas" style="display:none;object-fit:cover"></canvas>
+							<div>
 							</div>
 						</div><!--スキャナ-->
 						<div class='order_list' ref='order_list_area'><!--注文内容-->

@@ -925,11 +925,12 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 		let video  //onMountで定義
 		let canvas //onMountで定義
 
-		const barcode_mode = () =>{//QR読取カメラ起動
-			if(barcode_cam_area.value){//QRボタンを再度タップしたときはエリアを閉じる
+		const barcode_mode = (p_mode) =>{//QR読取カメラ起動
+		    //p_mode:start/restart
+			if(barcode_cam_area.value === true && p_mode==='start'){//QRボタンを再度タップしたときはエリアを閉じる
 				order_panel_show("close")
 				barcode_cam_area.value=false
-				stream.getTracks().forEach(track => track.stop())
+				video.srcObject.getTracks().forEach(track => track.stop())
 				return 0
 			}
 			barcode_cam_area.value = true
@@ -948,44 +949,64 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 					video.onloadedmetadata = function(e) {
 						video.play()
 					}
-					read_qr(stream)
+					read_qr()
 				})
 				.catch((err) =>{
 						alert('Error!!')
 						alert(err)
-						//order_panel_show("barcode")
 						order_panel_show("close")
 						barcode_cam_area.value=false
 						stream.getTracks().forEach(track => track.stop())
 				})
 		}
-		const read_qr = (p_stream) =>{//QR読取処理
-			canvas.width = (video.videoHeight===0?300:video.videoHeight)
-			canvas.height = (video.videoHeight===0?80:video.videoHeight);
+		
+		let G_reading_flg = true
+		const read_qr = () =>{//QR読取処理
+			canvas.width = (video.videoWidth===0?300:video.videoWidth)
+			//canvas.height = (video.videoHeight===0?80:video.videoHeight);
+			canvas.height = 180
 			const ctx = canvas.getContext('2d');
-			ctx.drawImage(video, 0, 210, video.videoWidth, video.videoHeight, 0, 0, canvas.width, canvas.height);
+			//ctx.drawImage(video, 0, 210, video.videoWidth, video.videoHeight, 0, 0, canvas.width, canvas.height);
+			ctx.drawImage(video, 0, 210, video.videoWidth, 180, 0, 0, canvas.width, 180);
 
 			const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
 
-			// jsQRに渡す
+			// jsQRに渡す/QRコードから商品CDを取得する
 			const code = jsQR(imageData.data, canvas.width, canvas.height)
-			if(code){
-				qr_order(code.data)
-				setTimeout(() => { barcode_mode()}, 1000)
+			if(code && G_reading_flg){
+			    G_reading_flg = false       //読込停止
+			    loader.value = true         //ローダー表示
+			    canvas.style.display = 'block'    //画像データ表示ON
+			    video.style.display = 'none'      //VideoOFF
+			    
+				qr_order(code.data) //読取した商品CDをオーダーに追加する
+				//qr_order(107) //読取した商品CDをオーダーに追加する
+				setTimeout(() => {
+				    scan_result.value = ''
+    			    canvas.style.display = 'none'
+	    		    video.style.display = 'block'
+				    loader.value = false
+				    G_reading_flg = true
+				    read_qr()
+				}, 2000)
 			}else{
-				setTimeout(() => { read_qr(p_stream)}, 100)
+				setTimeout(() => {
+				    read_qr()
+				    
+				}, 100)
 			}
 		}
+		const scan_result = ref('')
 		const qr_order = (p_ShouhinCD) => {
 			const order_list_index = shouhinMS_filter.value.findIndex(//読取した商品NOから連想配列のINDEXを取得する
-				list => p_ShouhinCD == list.shouhinCD
+				list => String(p_ShouhinCD) === String(list.shouhinCD)
 			)
-			if(order_list_index){
-				if(confirm(`${shouhinMS_filter.value[order_list_index].shouhinNM} １点`)){
-					ordercounter(order_list_index)
-				}
+			
+			if(order_list_index >= 0){
+				ordercounter(order_list_index)
 			}else{
-				alert(`該当する商品はありません。スキャン結果:${p_ShouhinCD}`)
+			    loader.value = false
+				scan_result.value = `該当する商品はありません。スキャン結果:${p_ShouhinCD}`
 			}
 		}
 
@@ -1093,6 +1114,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 			barcode_cam_area,
 			barcode_mode,
 			qr_order,
+			scan_result,
 		}
 	}
 })
