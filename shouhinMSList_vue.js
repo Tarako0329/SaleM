@@ -265,6 +265,35 @@ const REZ_APP = () => createApp({
 				})
 		}
 
+		const create_qr = (px) =>{
+			let url
+			
+      const link = document.createElement('a');
+			
+			shouhinMS.value.forEach((list)=>{
+				if(list.disp_rezi){
+					url = GET_QRCODE(list.shouhinCD,px,'qr').toDataURL('image/png')
+					
+					// ダウンロードリンクを作成
+					link.href = url;
+					link.download = `${list.shouhinCD}_${list.shouhinNM}.png`; // 保存するファイル名を設定
+					
+					// ダウンロードリンクをクリック
+					link.click();
+		
+				}
+			})
+			/*
+			url = GET_QRCODE('148',190,'qr').toDataURL('image/png')
+        
+      // ダウンロードリンクを作成
+      link.href = url;
+      link.download = 'image.png'; // 保存するファイル名を設定
+      
+      // ダウンロードリンクをクリック
+      link.click();
+      */
+		}
 		onMounted(() => {
 			console_log('onMounted')
 			//get_shouhinMS()
@@ -302,6 +331,7 @@ const REZ_APP = () => createApp({
 			csrf,
 			on_submit,
 			ZeiMS,
+			create_qr,
 		}
 	}
 });

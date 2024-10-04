@@ -195,6 +195,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         ,'個別売上レジ<p style="font-size:11px;margin:0;">受注販売・個人オーダー等</p>'=>['EVregi.php?mode=kobetu&csrf_token='.$token,'k_rez']
         ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token,'s_tou']
         ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token,'s_itiran']
+        ,'商品QR作成'=>['shouhinMSQR.php?csrf_token='.$token,'qr_itiran']
         ,'商品ｶﾃｺﾞﾘｰ設定'=>['shouhinMSCategoryEdit.php?csrf_token='.$token,'s_itiran']
         ,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko&csrf_token='.$token,'z_rez']
         ,'売上実績'=>['UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where&csrf_token='.$token,'uri']

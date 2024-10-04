@@ -19,16 +19,6 @@
 	$stmt->execute();
 	$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-	//端数処理設定
-	$ZeiHasu = $row[0]["ZeiHasu"];
-
-	//税区分M取得.基本変動しないので残す
-	/*
-	$ZEIsql="select * from ZeiMS order by zeiKBN;";
-	$stmt = $pdo_h->query($ZEIsql);
-	$ZEIresult = $stmt->fetchAll(PDO::FETCH_ASSOC);
-	*/
-
 
 ?>
 <!DOCTYPE html>
@@ -38,6 +28,7 @@
 	//共通部分、bootstrap設定、フォントCND、ファビコン等
 	include "head_bs5.php"
 	?>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.js"></script><!--make QRコードライブラリ-->
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_ShouhinMSL.css?<?php echo $time; ?>' >
 	<TITLE><?php echo $title." 取扱商品 確認・編集";?></TITLE>
@@ -62,12 +53,6 @@
 		</header>
 		<div class='header2'>
 			<div class='container-fluid'>
-				<div style='padding:0 5px;' id='tax_inout'>
-					<input type='radio' class='btn-check' name='options' value='IN' autocomplete='off' v-model='upd_zei_kominuki' id='plus_mode'>
-					<label class='btn btn-outline-primary' style='font-size:1.2rem;border-radius:0;' for='plus_mode'>税込入力</label>
-					<input type='radio' class='btn-check' name='options' value='NOTIN' autocomplete='off' v-model='upd_zei_kominuki' id='minus_mode'>
-					<label class='btn btn-outline-primary' style='font-size:1.2rem;border-radius:0;' for='minus_mode'>税抜入力</label>
-				</div>
 				<div style='position:fixed;right:10px;top:75px;width:120px;display:block;'>
 					<div>
 						<select v-model='chk_register_show' class='form-select form-select-lg item_0'>
@@ -96,26 +81,15 @@
 				</template>
 				<input type='hidden' name='csrf_token' :value='csrf'>
 				
-				<table class='table result_table item_1' style='width:100%;max-width:630px;table-layout: fixed;'>
+				<table class='table result_table item_1' style='width:100%;max-width:630px;table-layout: fixed;font-size:12px;'>
 					<thead>
 						<tr style='height:30px;'>
 							<th class='th1' scope='col' colspan='2' style='width:auto;padding:0px 5px 0px 0px;'>ID:商品名</th>
 							<th class='th1' scope='col'>レジ</th>
-							<th class='th1' scope='col'>現税込価格</th>
+							<th class='th1' scope='col'>税込価格</th>
+							<th class='th1' scope='col'>税率(%)</th>
+							<th class='th1 text-center' scope='col'>QR出力</th>
 						</tr>
-						<tr style='height:30px;'>
-							<th scope='col' >単価変更</th>
-							<th scope='col' style='color:red;'>本体額</th>
-							<th scope='col' style='color:red;'>消費税</th>
-							<th scope='col' >新税込価格</th>
-						</tr>
-						<tr>
-							<th class='th2' scope='col'>税率(%)</th>
-							<th class='th2' scope='col' class=''>原価</th>
-							<th class='th2' scope='col' class=''>内容量(単位)</th>
-							<th class='th2 text-center' scope='col'>削除</th>
-						</tr>
-					
 					</thead>
 					<tbody>
 						<template v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
@@ -124,61 +98,31 @@
 							<td style='padding:10px 10px;'>
 								<div class="form-check form-switch">
 									<input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' class='form-check-input' v-model='list.disp_rezi' :id='`${list.shouhinCD}`'>
-									<label v-if='list.disp_rezi!==true' class='form-check-label' :for='`${list.shouhinCD}`' style='font-size:1.2rem;'>非表示</label>
-									<label v-if='list.disp_rezi===true' class='form-check-label' :for='`${list.shouhinCD}`'>表示</label>
+									<!--<label v-if='list.disp_rezi!==true' class='form-check-label' :for='`${list.shouhinCD}`' style='font-size:1.2rem;'>非表示</label>
+									<label v-if='list.disp_rezi===true' class='form-check-label' :for='`${list.shouhinCD}`'>表示</label>-->
 								</div>
 							</td>
-							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' class='text-end'><!--変更前価格-->
+							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' class='text-end'><!--税込価格-->
 								￥{{Number(list.moto_kin).toLocaleString()}}
 							</td>
-						</tr>
-						<tr>
-							<td><input @blur='set_new_value(index,`#new_val_${index}`)' :id='`new_val_${index}`' type='number' class='form-contral text-end pe-3' style='width:100%;' placeholder='新価格' ></td>   <!--単価修正欄 -->
-							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;color:blue;' class='text-end'>
-								￥{{Number(list.tanka).toLocaleString()}}
-							</td><!--登録単価-->
-							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;color:blue;' class='text-end'><!--list.tanka_zei-->
-								￥{{Number(list.tanka_zei).toLocaleString()}}
-							</td> 
-							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;color:blue;' class='text-end'><!--list.tanka_zei-->
-								￥{{(Number(list.tanka) + Number(list.tanka_zei)).toLocaleString()}}
-							</td> 
-						</tr>
-						<tr style='border-bottom:3px;'>
-							<td>
-								<select v-model='list.zeiKBN' @change='set_new_value(index,`#new_val_${index}`)' :name ='`ORDERS[${index}][zeikbn]`' class='form-select form-select-lg' 
-								style='font-size:1.7rem;width:100%;height:30px;'><!--税区分 -->
-									<template v-for='(list,index) in ZeiMS' :key='list.税区分名'>
-										<option :value="list.税区分">{{list.税区分名}}</option>
-									</template>
-								</select>
-
-							</td>
-							<td><input type='number' :name ='`ORDERS[${index}][genka]`' class='form-contral text-end pe-1' style='width:100%;' v-model='list.genka_tanka'></td>
-
-							<td class=''>
-								<input type='number' :name ='`ORDERS[${index}][utisu]`' class='form-contral text-end pe-1' style='width:60%;' v-model='list.utisu'>
-								<input type='text'   :name ='`ORDERS[${index}][tani]`' class='form-contral text-end pe-1' style='width:35%;' v-model='list.tani'>
-							</td>
+							<td>{{list.hyoujimei}}</td>
 							<td class=' text-center'>
-								<a href='#' @click='delete_item(list.shouhinNM,`shouhinDEL_sql.php?cd=${list.shouhinCD}&nm=${list.shouhinNM}&csrf_token=${csrf}`)'>
-									<i class='fa-regular fa-trash-can fa-2x'></i>
-								</a>
+								<input type='checkbox' class='form-checkbox' >
 							</td><!--削除アイコン-->
+						</tr>
+
 							<input type='hidden' :name ='`ORDERS[${index}][shouhinCD]`' :value='list.shouhinCD'>
 							<input type='hidden' :name ='`ORDERS[${index}][tanka]`' :value='list.tanka'>
 							<input type='hidden' :name ='`ORDERS[${index}][shouhizei]`' :value='list.tanka_zei'>
-						</tr>
+
 						</template>
 					</tbody>
 				</table>
 			</div>
-			<template v-for='(list,index) in shouhinMS_BK_filter' :key='list.shouhinCD'>
-			</template><!--比較用の変更前商品マスタも呼び出ししないとソートされないため、ダミーで呼び出し-->
-
+			<canvas id='qr' ></canvas>
 		</main>
 		<footer class='common_footer'>
-			<button type='button' @click='chk_onoff()' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >{{btn_name}}</button>
+			<button type='button' @click='create_qr()' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >{{btn_name}}</button>
 			<button v-if='chk==="on"' type='submit' class='btn--chk item_3' style='border-radius:0;border-left: thick double #32a1ce;' name='commit_btn' >登　録</button>
 		</footer>
 	</form>

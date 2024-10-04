@@ -26,6 +26,7 @@ if(!empty($_POST)){
 	//共通部分、bootstrap設定、フォントCND、ファビコン等
 	include "head_bs5.php" 
 	?>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.js"></script><!--make QRコードライブラリ-->
 	<!--ページ専用CSS-->
 	<link rel="stylesheet" href="css/style_outputmenu.css?<?php echo $time; ?>" >
 	<TITLE><?php echo $title;?></TITLE>
@@ -224,6 +225,7 @@ if(!empty($_POST)){
 					QRout()
 				})
 				const getGUID = () =>{
+					/*
 					let dt = new Date().getTime();
 					let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
 							let r = (dt + Math.random()*16)%16 | 0;
@@ -231,6 +233,8 @@ if(!empty($_POST)){
 							return (c=='x' ? r :(r&0x3|0x8)).toString(16);
 					});
 					return uuid;
+					*/
+					return GET_GUID()
 				}
 
 				const QRout = () =>{
@@ -240,6 +244,8 @@ if(!empty($_POST)){
 					console_log(userInput)
 					var query = userInput.split(' ').join('+');
 					// QRコードの生成
+					GET_QRCODE(query,190,'qr')
+					/*
 					(function() {
 						var qr = new QRious({
 							element: document.getElementById('qr'), 
@@ -257,6 +263,7 @@ if(!empty($_POST)){
 					})();
 					// png出力用コード
 					var cvs = document.getElementById("qr");
+					*/
 				}
 				const prv = () =>{
 					//プレビュー印刷

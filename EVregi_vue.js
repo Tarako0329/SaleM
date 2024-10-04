@@ -169,6 +169,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 			}
 			chk_register_show.value = args
 			if(args==='register'){	//登録モード
+				barcode_mode('close')
 				pay_bk = pay.value
 				kaikei_zei_bk = kaikei_zei.value
 				let rtn = chk_csrf()	//token紛失のチェック
@@ -699,6 +700,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 		const DL_URL = ref('')
 		const send_msg = ref('')	//LINEで領収書を送る時のメッセージ
 		const getGUID = () =>{
+			/*
 			let dt = new Date().getTime();
 			let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
 					let r = (dt + Math.random()*16)%16 | 0;
@@ -706,6 +708,8 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 					return (c=='x' ? r :(r&0x3|0x8)).toString(16);
 			});
 			return uuid;
+			*/
+			return GET_GUID()
 		}
 		const QRout = () =>{
 			// 入力された文字列を取得
@@ -714,6 +718,8 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 			console_log(userInput)
 			var query = userInput.split(' ').join('+');
 			// QRコードの生成
+			GET_QRCODE(query,240,'qr')
+			/*
 			(function() {
 				var qr = new QRious({
 					element: document.getElementById('qr'), 
@@ -728,9 +734,9 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 				qr.size = 240; // QRコードのサイズ
 				// QRコードをflexboxで表示
 				document.getElementById('qrOutput').style.display = 'flex';
-			})();
+			})();*/
 			// png出力用コード
-			var cvs = document.getElementById("qr");
+			//var cvs = document.getElementById("qr");
 		}
 		const prv = () =>{
 			//プレビュー印刷
@@ -926,8 +932,8 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 		let canvas //onMountで定義
 
 		const barcode_mode = (p_mode) =>{//QR読取カメラ起動
-		    //p_mode:start/restart
-			if(barcode_cam_area.value === true && p_mode==='start'){//QRボタンを再度タップしたときはエリアを閉じる
+		    //p_mode:start/restart/close
+			if((barcode_cam_area.value === true && p_mode==='start' )|| p_mode==='close'){//QRボタンを再度タップしたときはエリアを閉じる
 				order_panel_show("close")
 				barcode_cam_area.value=false
 				video.srcObject.getTracks().forEach(track => track.stop())

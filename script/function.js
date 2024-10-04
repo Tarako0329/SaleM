@@ -126,3 +126,36 @@ const GET_SHOUHINMS_SHORI = (resolve) =>{
     resolve(obj)
   })
 }
+const GET_GUID = () =>{
+	let dt = new Date().getTime();
+	let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+			let r = (dt + Math.random()*16)%16 | 0;
+			dt = Math.floor(dt/16);
+			return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+	});
+	return uuid;
+}
+
+const GET_QRCODE = (p_string,p_size,p_canvas_id) =>{
+  //p_string:QR化する文字列
+  //p_size：サイズ
+  //p_canvas_id：QRコードを表示するキャンバスID
+
+  //console_log()
+  // QRコードの生成
+  const qr = new QRious({
+    element: document.getElementById(p_canvas_id), //canvasタグのID
+    // 入力した文字列でQRコード生成
+    value: p_string
+  });
+  qr.background = '#FFF'; //背景色
+  qr.backgroundAlpha = 1; // 背景の透過率
+  qr.foreground = '#1c1c1c'; //QRコード自体の色
+  qr.foregroundAlpha = 1.0; //QRコード自体の透過率
+  qr.level = 'L'; // QRコードの誤り訂正レベル
+  qr.size = p_size; // QRコードのサイズ
+
+  // png出力用コード
+  return document.getElementById(p_canvas_id);
+}
+
