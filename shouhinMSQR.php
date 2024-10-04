@@ -122,7 +122,7 @@
 			<canvas id='qr' ></canvas>
 		</main>
 		<footer class='common_footer'>
-			<button type='button' @click='create_qr()' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >{{btn_name}}</button>
+			<button type='button' @click='create_qr(70)' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >{{btn_name}}</button>
 			<button v-if='chk==="on"' type='submit' class='btn--chk item_3' style='border-radius:0;border-left: thick double #32a1ce;' name='commit_btn' >登　録</button>
 		</footer>
 	</form>
