@@ -265,24 +265,56 @@ const REZ_APP = () => createApp({
 				})
 		}
 
-		const create_qr = (px) =>{
-			let url
-			
+		const qr_download = (px) =>{
+			//QRコード連続ダウンロード
       const link = document.createElement('a');
 			
 			shouhinMS.value.forEach((list)=>{
 				if(list.disp_rezi){
-					url = GET_QRCODE(list.shouhinCD,px,'qr').toDataURL('image/png')
-					
+					url = GET_QRCODE(String(list.shouhinCD),Number(px),'qr').toDataURL('image/png')
 					// ダウンロードリンクを作成
-					link.href = url;
+					link.href = url
 					link.download = `${list.shouhinCD}_${list.shouhinNM}.png`; // 保存するファイル名を設定
 					
 					// ダウンロードリンクをクリック
 					link.click();
-		
 				}
 			})
+		}
+
+		const qr_zip_download = (px) =>{
+			//const blob_list = 
+			create_qr(px)
+			console_log(blobs.value)
+
+			const zip_blob = generateZipBlob(blobs.value,"QR_files")
+		}
+
+		const blobs = ref([])
+		const create_qr = (px) =>{
+			
+			//QRコードのBlobを作成
+			shouhinMS.value.forEach((list)=>{
+				if(list.disp_rezi){
+					GET_QRCODE(String(list.shouhinCD),Number(px),'qr').toBlob((b) => { 
+						blobs.value.push({
+							"name":`${list.shouhinCD}_${list.shouhinNM}`
+							,"content":100
+						})
+					}, 'image/png', 1.0);
+				}
+			})
+			//console_log(blobs)
+
+			//return blobs
+			//console_log(blobs2)
+
+			//const zip_blob = generateZipBlob(blobs,"QR_files")
+			//generateZipBlob(blobs,"QR_files")
+
+			//console_log(zip_blob)
+
+			//saveBlob(zip_blob,"QR_files")
 			/*
 			url = GET_QRCODE('148',190,'qr').toDataURL('image/png')
         
@@ -294,6 +326,61 @@ const REZ_APP = () => createApp({
       link.click();
       */
 		}
+
+    const generateZipBlob = (nameContentPairs, folder_name) => {
+			console_log('generateZipBlob?')
+			console_log(nameContentPairs[3])
+			const zip = new JSZip();
+			const folder = zip.folder(folder_name);
+			blobs.value.forEach((list) => {
+				console_log(list)
+
+				const file_name = (list.name);
+				const content = list.content;
+				console_log('nothing?')
+				console_log(content)
+				folder.file(file_name, content);
+
+			});
+
+			//return zip.generateAsync({ type: 'blob' }); // デフォルトで無圧縮
+			/*
+			let reader = new FileReader();
+			reader.readAsDataURL(zip.generateAsync({ type: 'zip' }))
+			reader.onload = function() {
+				a.href = reader.result; // data url
+				a.download = restrictFileName(name) + '.zip';
+				a.click();
+			}*/
+	
+
+		};
+		//const restrictFileName = name => name.replace(/[\\\/:*?"<>|]/g, c => '%' + c.charCodeAt(0).toString(16));
+		const saveBlob = (blob, name) => {
+			console_log('saveBlob params')
+			console_log(blob.Blob)
+			const a = document.createElement('a');
+
+			let reader = new FileReader();
+			reader.readAsDataURL(blob)
+			reader.onload = function() {
+				a.href = reader.result; // data url
+				a.download = restrictFileName(name) + '.zip';
+				a.click();
+			}
+			/*
+			a.href = URL.createObjectURL(blob);
+			a.download = restrictFileName(name) + '.zip';
+
+			a.style.display = 'none';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			*/
+		};
+
+
+
 		onMounted(() => {
 			console_log('onMounted')
 			//get_shouhinMS()
@@ -331,7 +418,9 @@ const REZ_APP = () => createApp({
 			csrf,
 			on_submit,
 			ZeiMS,
-			create_qr,
+			qr_zip_download,
+			qr_download,
+			blobs,
 		}
 	}
 });

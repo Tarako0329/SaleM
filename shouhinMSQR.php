@@ -29,6 +29,7 @@
 	include "head_bs5.php"
 	?>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.js"></script><!--make QRコードライブラリ-->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_ShouhinMSL.css?<?php echo $time; ?>' >
 	<TITLE><?php echo $title." 取扱商品 確認・編集";?></TITLE>
@@ -53,16 +54,16 @@
 		</header>
 		<div class='header2'>
 			<div class='container-fluid'>
-				<div style='position:fixed;right:10px;top:75px;width:120px;display:block;'>
-					<div>
-						<select v-model='chk_register_show' class='form-select form-select-lg item_0'>
+				<div style='position:fixed;right:10px;top:75px;width:240px;display:flex;'>
+					<div class='me-3'>
+						<select v-model='chk_register_show' class='form-select form-select-lg item_0' style='width: 90px;'>
 							<option value='all'>全て表示</option>
 							<option value='on'>レジON</option>
 							<option value='off'>レジOFF</option>
 						</select>
 					</div>
 					<div style='display:flex;' id='order_by'>
-						<select v-model='order_by[0]' class='form-select form-select-lg' style='margin-bottom:5px;'>
+						<select v-model='order_by[0]' class='form-select form-select-lg' style='margin-bottom:5px;width: 90px;'>
 							<option value='seq'>登録順</option>
 							<option value='name'>名称順</option>
 						</select>
@@ -122,8 +123,7 @@
 			<canvas id='qr' ></canvas>
 		</main>
 		<footer class='common_footer'>
-			<button type='button' @click='create_qr(70)' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >{{btn_name}}</button>
-			<button v-if='chk==="on"' type='submit' class='btn--chk item_3' style='border-radius:0;border-left: thick double #32a1ce;' name='commit_btn' >登　録</button>
+			<button type='button' @click='qr_zip_download(50)' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >{{btn_name}}</button>
 		</footer>
 	</form>
 	<div class="loader-wrap" v-show='loader'>
