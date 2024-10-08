@@ -289,14 +289,16 @@ const REZ_APP = () => createApp({
 				console_log('create_qr response')
 				//console_log(response)
 				const zip_blob = await generateZipBlob(response,"QR_files")
-				//generateZipBlob(response,"QR_files")
 				console_log('zip_blob is')
-				console_log(zip_blob)
+				//console_log(zip_blob)
 
 				const a = document.createElement('a');
-				a.href = URL.createObjectURL(zip_blob);
+				//a.href = URL.createObjectURL(zip_blob);
+				a.href = 'blob:'+GET_DIRECT_URL(URL.createObjectURL(zip_blob))
 				a.download = 'QR_codes.zip';
-	
+				//console_log(a.href)
+				//console_log(URL.createObjectURL(zip_blob))
+
 				a.style.display = 'none';
 				document.body.appendChild(a);
 				a.click();
@@ -362,17 +364,6 @@ const REZ_APP = () => createApp({
 			console_log('folder is')
 			console_log(folder)
 			return zip.generateAsync({ type: 'blob' }); // デフォルトで無圧縮
-			
-			const a = document.createElement('a');
-			a.href = URL.createObjectURL(zip.generateAsync({ type: 'blob' }));
-			a.download = 'QR_codes.zip';
-
-			a.style.display = 'none';
-			document.body.appendChild(a);
-			a.click();
-			document.body.removeChild(a);
-
-
 		};
 
 		onMounted(() => {

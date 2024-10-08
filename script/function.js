@@ -159,3 +159,9 @@ const GET_QRCODE = (p_string,p_size,p_canvas_id) =>{
   return document.getElementById(p_canvas_id);
 }
 
+const GET_DIRECT_URL = (url) =>{
+  //サブドメイン表記のURLを直接参照URLに変換
+  console_log(url)
+  let index = url.lastIndexOf('/')
+  return P_ROOT_URL + url.substr(index+Number(1))
+}
