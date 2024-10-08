@@ -1,7 +1,7 @@
 <?php
 	require "php_header.php";
 
-	$rtn = csrf_checker(["shouhinMSList.php","shouhinMSList_sql.php","shouhinDEL_sql.php","menu.php"],["G","C","S"]);
+	$rtn = csrf_checker(["shouhinMSQR.php","menu.php"],["C","S"]);
 	if($rtn !== true){
 			redirect_to_login($rtn);
 	}
@@ -54,7 +54,15 @@
 		</header>
 		<div class='header2'>
 			<div class='container-fluid'>
-				<div style='position:fixed;right:10px;top:75px;width:240px;display:flex;'>
+				<div style='display:flex;'>
+					<div class='me-3'>
+						<select v-model='QR_DLtype' class='form-select form-select-lg ps-3' style='width: 150px;'>
+							<option value='none'>ﾀﾞｳﾝﾛｰﾄﾞ対象選択</option>
+							<option value='all'>全商品QR</option>
+							<option value='rez'>レジ表示商品QRのみ</option>
+							<option value='chk'>QR出力check商品QRのみ</option>
+						</select>
+					</div>
 					<div class='me-3'>
 						<select v-model='chk_register_show' class='form-select form-select-lg item_0' style='width: 90px;'>
 							<option value='all'>全て表示</option>
@@ -72,6 +80,9 @@
 						</button>
 					</div>
 				</div>
+				<div style='display:flex;'>
+					<button type='button' class='btn btn-sm btn-primary fs-5 ps-3 pe-3' data-bs-toggle='modal' data-bs-target='#modal_help1'>QRコードサイズ調整</button>
+				</div>
 			</div>
 		</div>
 	
@@ -85,30 +96,32 @@
 				<table class='table result_table item_1' style='width:100%;max-width:630px;table-layout: fixed;font-size:12px;'>
 					<thead>
 						<tr style='height:30px;'>
-							<th class='th1' scope='col' colspan='2' style='width:auto;padding:0px 5px 0px 0px;'>ID:商品名</th>
-							<th class='th1' scope='col'>レジ</th>
+							<th class='th1' scope='col' colspan='2' >ID:商品名</th>
+							<th class='th1 text-center' scope='col'>レジ</th>
 							<th class='th1' scope='col'>税込価格</th>
-							<th class='th1' scope='col'>税率(%)</th>
+							<th class='th1 text-center' scope='col'>税率(%)</th>
 							<th class='th1 text-center' scope='col'>QR出力</th>
 						</tr>
 					</thead>
 					<tbody>
 						<template v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
 						<tr>
-							<td style='font-size:1.7rem;font-weight:700;' colspan='2'>{{list.shouhinCD}}:{{list.shouhinNM}}</td><!--商品名-->
-							<td style='padding:10px 10px;'>
-								<div class="form-check form-switch">
+							<td style='font-size:1.3rem;font-weight:700;' colspan='2'>{{list.shouhinCD}}:{{list.shouhinNM}}</td><!--商品名-->
+							<td style='padding:10px 10px;' class='text-center'>
+								<!--<div class="form-check form-switch">
 									<input type='checkbox' :name ='`ORDERS[${index}][hyoujiKBN1]`' class='form-check-input' v-model='list.disp_rezi' :id='`${list.shouhinCD}`'>
-									<!--<label v-if='list.disp_rezi!==true' class='form-check-label' :for='`${list.shouhinCD}`' style='font-size:1.2rem;'>非表示</label>
-									<label v-if='list.disp_rezi===true' class='form-check-label' :for='`${list.shouhinCD}`'>表示</label>-->
-								</div>
+									<label v-if='list.disp_rezi!==true' class='form-check-label' :for='`${list.shouhinCD}`' style='font-size:1.2rem;'>非表示</label>
+									<label v-if='list.disp_rezi===true' class='form-check-label' :for='`${list.shouhinCD}`'>表示</label>
+								</div>-->
+								<template v-if='list.disp_rezi!==true' >非表示</template>
+								<template v-if='list.disp_rezi===true'><p style='color:blue;'>表示</p></template>
 							</td>
-							<td style='font-size:1.7rem;padding:10px 15px 10px 10px;' class='text-end'><!--税込価格-->
+							<td style='' class='text-end pe-3'><!--税込価格-->
 								￥{{Number(list.moto_kin).toLocaleString()}}
 							</td>
 							<td>{{list.hyoujimei}}</td>
 							<td class=' text-center'>
-								<input type='checkbox' class='form-checkbox' >
+								<input type='checkbox' class='form-checkbox' v-model='list.cate_chk'>
 							</td><!--削除アイコン-->
 						</tr>
 
@@ -120,17 +133,37 @@
 					</tbody>
 				</table>
 			</div>
-			<canvas id='qr' ></canvas>
-			<canvas id='qr2' ></canvas>
+			<canvas id='qr' style='display: none;'></canvas>
+			<!--canvas id='qr2' ></canvas>-->
 		</main>
 		<footer class='common_footer'>
-			<button type='button' @click='create_qr(50)' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >step_1</button>
-			<button type='button' @click='qr_zip_download(50)' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >step_2</button>
+			<button type='button' @click='qr_zip_download(50)' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >一括DL</button>
 		</footer>
 	</form>
 	<div class="loader-wrap" v-show='loader'>
 		<div class="loader">Loading...</div>
 	</div>
+	<div class='modal fade' id='modal_help1' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
+		<div class='modal-dialog  modal-dialog-centered'>
+			<div class='modal-content' >
+				<div class='modal-header'>
+					<div class='modal-title'>QRコードサイズ</div>
+				</div>
+				<div class='modal-body'>
+				<div class='row ps-5 pe-5'>
+						<select class='form-select'>
+							<option value='50'>50px</option>
+						</select>
+					</div>
+					<div class='row ps-5 pe-5'>
+						<canvas id='qr2' ></canvas>
+					</div>
+				</div>
+				<div class='modal-footer'>
+				</div>
+			</div>
+		</div>
+	</div><!--help1-->	
 	</div>
 	<script>
 		window.onload = function() {

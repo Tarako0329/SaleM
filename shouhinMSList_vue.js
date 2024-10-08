@@ -265,6 +265,7 @@ const REZ_APP = () => createApp({
 				})
 		}
 
+		const QR_DLtype = ref('none')
 		const qr_download = (px) =>{
 			//QRコード連続ダウンロード
       const link = document.createElement('a');
@@ -331,16 +332,14 @@ const REZ_APP = () => createApp({
 					context2.fillText(list.shouhinNM, 0, px+Number(9),width);
 
 					QR_canvas2.toBlob((b) => { 
-						if(list.disp_rezi){
+						if((QR_DLtype.value==='rez' && list.disp_rezi) || (QR_DLtype.value==='chk' && list.cate_chk) || (QR_DLtype.value==='all')){
 							blobs.push({
-								//"name":`${list.shouhinCD}_${list.shouhinNM}.png`
 								"name":`ID_${list.shouhinCD}.png`
 								,"content":b
 							})
 						}
 						
 						if(msLength===index+1){
-							//console_log('resolve!!!!!!!!!!!!!!')
 							resolve(blobs)
 						}
 					}, 'image/png', 1.0);
@@ -406,7 +405,7 @@ const REZ_APP = () => createApp({
 			qr_zip_download,
 			qr_download,
 			//blobs,
-
+			QR_DLtype,
 
 			create_qr,
 		}
