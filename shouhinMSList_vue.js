@@ -285,101 +285,95 @@ const REZ_APP = () => createApp({
 		const qr_zip_download = (px) =>{
 			//const blob_list = 
 			create_qr(px)
-			console_log(blobs.value)
+			.then(async(response)=>{
+				console_log('create_qr response')
+				//console_log(response)
+				const zip_blob = await generateZipBlob(response,"QR_files")
+				//generateZipBlob(response,"QR_files")
+				console_log('zip_blob is')
+				console_log(zip_blob)
 
-			const zip_blob = generateZipBlob(blobs.value,"QR_files")
+				const a = document.createElement('a');
+				a.href = URL.createObjectURL(zip_blob);
+				a.download = 'QR_codes.zip';
+	
+				a.style.display = 'none';
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+	
+			})
 		}
 
-		const blobs = ref([])
 		const create_qr = (px) =>{
-			
-			//QRコードのBlobを作成
-			shouhinMS.value.forEach((list)=>{
-				if(list.disp_rezi){
-					GET_QRCODE(String(list.shouhinCD),Number(px),'qr').toBlob((b) => { 
-						blobs.value.push({
-							"name":`${list.shouhinCD}_${list.shouhinNM}`
-							,"content":100
-						})
+			return new Promise((resolve, reject) => {
+				let blobs = []
+				const msLength = shouhinMS.value.length
+				shouhinMS.value.forEach((list,index)=>{
+					//イメージデータ取得
+					const QR_canvas = GET_QRCODE(String(list.shouhinCD),Number(px),'qr')
+					const context = QR_canvas.getContext("2d");//2次元描画
+					const imageData = context.getImageData(0, 0, QR_canvas.width, QR_canvas.height)
+					//複写・再描画
+					const QR_canvas2 = document.getElementById("qr2")
+					const {width, height} = QR_canvas;
+					QR_canvas2.width = width
+					QR_canvas2.height = height + Number(12)
+					const context2 = QR_canvas2.getContext("2d");//2次元描画
+					context2.putImageData(imageData, 0, 0);
+
+					//商品名を追加
+					//context2.font = '10px Roboto medium';
+					context2.font = '10px';
+					//context2.fillStyle = '#0069b3';
+					context2.fillText(list.shouhinNM, 0, px+Number(9),width);
+
+					QR_canvas2.toBlob((b) => { 
+						if(list.disp_rezi){
+							blobs.push({
+								//"name":`${list.shouhinCD}_${list.shouhinNM}.png`
+								"name":`ID_${list.shouhinCD}.png`
+								,"content":b
+							})
+						}
+						
+						if(msLength===index+1){
+							//console_log('resolve!!!!!!!!!!!!!!')
+							resolve(blobs)
+						}
 					}, 'image/png', 1.0);
-				}
-			})
-			//console_log(blobs)
-
-			//return blobs
-			//console_log(blobs2)
-
-			//const zip_blob = generateZipBlob(blobs,"QR_files")
-			//generateZipBlob(blobs,"QR_files")
-
-			//console_log(zip_blob)
-
-			//saveBlob(zip_blob,"QR_files")
-			/*
-			url = GET_QRCODE('148',190,'qr').toDataURL('image/png')
-        
-      // ダウンロードリンクを作成
-      link.href = url;
-      link.download = 'image.png'; // 保存するファイル名を設定
-      
-      // ダウンロードリンクをクリック
-      link.click();
-      */
+				})
+			});
 		}
 
     const generateZipBlob = (nameContentPairs, folder_name) => {
-			console_log('generateZipBlob?')
-			console_log(nameContentPairs[3])
+			console_log('generateZipBlob exec')
+			console_log(nameContentPairs)
 			const zip = new JSZip();
 			const folder = zip.folder(folder_name);
-			blobs.value.forEach((list) => {
+			nameContentPairs.forEach((list) => {
 				console_log(list)
 
 				const file_name = (list.name);
 				const content = list.content;
-				console_log('nothing?')
-				console_log(content)
 				folder.file(file_name, content);
-
 			});
 
-			//return zip.generateAsync({ type: 'blob' }); // デフォルトで無圧縮
-			/*
-			let reader = new FileReader();
-			reader.readAsDataURL(zip.generateAsync({ type: 'zip' }))
-			reader.onload = function() {
-				a.href = reader.result; // data url
-				a.download = restrictFileName(name) + '.zip';
-				a.click();
-			}*/
-	
-
-		};
-		//const restrictFileName = name => name.replace(/[\\\/:*?"<>|]/g, c => '%' + c.charCodeAt(0).toString(16));
-		const saveBlob = (blob, name) => {
-			console_log('saveBlob params')
-			console_log(blob.Blob)
+			console_log('folder is')
+			console_log(folder)
+			return zip.generateAsync({ type: 'blob' }); // デフォルトで無圧縮
+			
 			const a = document.createElement('a');
-
-			let reader = new FileReader();
-			reader.readAsDataURL(blob)
-			reader.onload = function() {
-				a.href = reader.result; // data url
-				a.download = restrictFileName(name) + '.zip';
-				a.click();
-			}
-			/*
-			a.href = URL.createObjectURL(blob);
-			a.download = restrictFileName(name) + '.zip';
+			a.href = URL.createObjectURL(zip.generateAsync({ type: 'blob' }));
+			a.download = 'QR_codes.zip';
 
 			a.style.display = 'none';
 			document.body.appendChild(a);
 			a.click();
 			document.body.removeChild(a);
-			*/
+
+
 		};
-
-
 
 		onMounted(() => {
 			console_log('onMounted')
@@ -420,7 +414,10 @@ const REZ_APP = () => createApp({
 			ZeiMS,
 			qr_zip_download,
 			qr_download,
-			blobs,
+			//blobs,
+
+
+			create_qr,
 		}
 	}
 });

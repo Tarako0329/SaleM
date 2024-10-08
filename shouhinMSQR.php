@@ -121,9 +121,11 @@
 				</table>
 			</div>
 			<canvas id='qr' ></canvas>
+			<canvas id='qr2' ></canvas>
 		</main>
 		<footer class='common_footer'>
-			<button type='button' @click='qr_zip_download(50)' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >{{btn_name}}</button>
+			<button type='button' @click='create_qr(50)' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >step_1</button>
+			<button type='button' @click='qr_zip_download(50)' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >step_2</button>
 		</footer>
 	</form>
 	<div class="loader-wrap" v-show='loader'>
