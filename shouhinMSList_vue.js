@@ -294,8 +294,8 @@ const REZ_APP = () => createApp({
 				//console_log(zip_blob)
 
 				const a = document.createElement('a');
-				//a.href = URL.createObjectURL(zip_blob);
-				a.href = 'blob:'+GET_DIRECT_URL(URL.createObjectURL(zip_blob))
+				a.href = URL.createObjectURL(zip_blob);
+				//a.href = 'blob:'+GET_DIRECT_URL(URL.createObjectURL(zip_blob))
 				a.download = 'QR_codes.zip';
 				//console_log(a.href)
 				//console_log(URL.createObjectURL(zip_blob))
