@@ -122,13 +122,14 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     
         
         //新機能リリース通知
-        $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.new_releace_004') as ToursLog FROM Users_webrez WHERE uid=?";
+        $sqlstr="SELECT uid, insdate,JSON_VALUE(ToursLog,'$.new_releace_005') as ToursLog FROM Users_webrez WHERE uid=?";
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
         $stmt->execute();
         $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
         //deb_echo($row[0]["ToursLog"]);
-        if(empty($row[0]["ToursLog"])){
+        if(empty($row[0]["ToursLog"]) && $row[0]["insdate"] < RELEACE_DATE){
             //新機能リリース通知 未確認
             $bell_action="blink";
             $bell_size="fa-2x";
@@ -138,6 +139,35 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         }
     
     }
+
+
+    if(empty($_SESSION["tour"])){
+        //ツアー中でない場合、チュートリアルが終わっているか確認する
+        $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.tutorial') as tutorial FROM Users_webrez WHERE uid=?";
+        $stmt = $pdo_h->prepare($sqlstr);
+        $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
+        $stmt->execute();
+        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        //log_writer2("JSON_VALUE",$row,"lv3");
+        if(empty($row[0]["tutorial"])){
+            //チュートリアル未実施
+            $_SESSION["tour"]="tutorial_1";
+        }elseif($row[0]["tutorial"]=="finish"){
+            //チュートリアル完了
+            
+        }else{
+            //チュートリアル実施中（再開）
+            $_SESSION["tour"]=$row[0]["tutorial"];
+        }
+    }else{
+        log_writer2("\$_SESSION['tour']",$_SESSION["tour"],"lv3");
+    }
+
+
+
+
+
+
 }
 ?>
 
@@ -230,7 +260,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     echo "<div class='row'>";
 	foreach(array_merge($array,$array2) as $key=>$vals){
         //echo "  <div class ='col-md-3 col-sm-6 col-6 menu menu_".$i."' style='padding:5px;'>\n";
-        echo "  <div class ='col-md-3 col-sm-6 col-6 menu menu_".$vals[1]."' style='padding:5px;'>\n";
+        echo "  <div class ='col-md-3 col-sm-6 col-6 menu menu_".$vals[1]."' id='menu_".$vals[1]."' style='padding:5px;'>\n";
         if($vals[1]=="rez"){//通常レジ
             echo "      <button class='btn--topmenu btn-view' onClick=postFormRG('".$vals[0]."','evrez','".$token."')>".$key."</button>\n";
         }else if($vals[1]=="k_rez"){//個別売り
@@ -260,7 +290,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/css/shepherd.css"/>
 -->
 <?php
-    if(empty($_SESSION["tour"])){
+/*    if(empty($_SESSION["tour"])){
         //ツアー中でない場合、チュートリアルが終わっているか確認する
         $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.tutorial') as tutorial FROM Users_webrez WHERE uid=?";
         $stmt = $pdo_h->prepare($sqlstr);
@@ -281,7 +311,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     }else{
         log_writer2("\$_SESSION['tour']",$_SESSION["tour"],"lv3");
     }
-    
+*/    
 ?>
 <script src="shepherd/shepherd.min.js?<?php echo $time; ?>"></script>
 <link rel="stylesheet" href="shepherd/shepherd.css?<?php echo $time; ?>"/>
@@ -652,12 +682,62 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         }
     });
 
+    const new_releace_005 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'new_releace_005'
+    });
+    new_releace_005.addStep({
+        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+        text: `<p class='tour_discription'><span style='color:blue'>「QRスキャン登録」機能</span>を追加しました。
+            <br>
+            <br>レジ画面の　<i class="bi bi-qr-code-scan awesome-color-panel-border-same fs-1"></i>　をタップするとQR読取モードになります。
+            <br>
+            <br>『QRスキャン登録』は、<span style='color:red;'>レジ表示の設定不要</span>で全ての商品に利用できます。
+            <br>`,
+        buttons: [
+			{
+				text: 'Next',
+				action: new_releace_005.next
+			}
+        ],
+        cancelIcon:{
+            enabled:false
+        }
+    });
+    new_releace_005.addStep({
+        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+        text: `<p class='tour_discription'>
+            <br>スキャン用のQRコードはコチラのメニューから作成します。
+            <br>`,
+        buttons: [
+			{
+				text: 'Next',
+				action: new_releace_005.next
+			}
+        ],
+        attachTo: {
+            element: '#menu_qr_itiran',
+            on: 'bottom'
+        },
+        cancelIcon:{
+            enabled:false
+        }
+    });
+
     function new_releace_start(){
         //新機能のリリース通知はこの関数で呼び出すツアーを更新する
         //shuppin_zaiko_help1.start(tourFinish,'new_releace_001','');
         //new_releace_002.start(tourFinish,'new_releace_002',''); 
         //new_releace_003.start(tourFinish,'new_releace_003','finish'); 
-        new_releace_004.start(tourFinish,'new_releace_004','finish'); 
+        //new_releace_004.start(tourFinish,'new_releace_004','finish'); 
+        new_releace_005.start(tourFinish,'new_releace_005','finish'); 
         document.getElementById("bell").className = 'logoff-color'
     }
 </script>

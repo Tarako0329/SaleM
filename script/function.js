@@ -141,7 +141,7 @@ const GET_QRCODE = (p_string,p_size,p_canvas_id) =>{
   //p_size：サイズ
   //p_canvas_id：QRコードを表示するキャンバスID
 
-  //console_log()
+  console_log(`GET_QRCODE start`)
   // QRコードの生成
   const qr = new QRious({
     element: document.getElementById(p_canvas_id), //canvasタグのID

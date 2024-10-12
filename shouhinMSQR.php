@@ -134,10 +134,10 @@
 				</table>
 			</div>
 			<canvas id='qr' style='display: none;'></canvas>
-			<!--canvas id='qr2' ></canvas>-->
+			<canvas id='qr2'></canvas>
 		</main>
 		<footer class='common_footer'>
-			<button type='button' @click='qr_zip_download(50)' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >一括DL</button>
+			<button type='button' @click='qr_zip_download()' class='btn--chk item_3' style='border-radius:0;' name='commit_btn' >一括DL</button>
 		</footer>
 	</form>
 	<div class="loader-wrap" v-show='loader'>
@@ -147,16 +147,30 @@
 		<div class='modal-dialog  modal-dialog-centered'>
 			<div class='modal-content' >
 				<div class='modal-header'>
-					<div class='modal-title'>QRコードサイズ</div>
+					<div class='modal-title'>QRコードサイズ調整</div>
 				</div>
 				<div class='modal-body'>
 				<div class='row ps-5 pe-5'>
-						<select class='form-select'>
+						<select class='form-select' v-model='qr_size'>
 							<option value='50'>50px</option>
+							<option value='60'>60px</option>
+							<option value='70'>70px</option>
+							<option value='80'>80px</option>
+							<option value='90'>90px</option>
+							<option value='100'>100px</option>
+							<option value='110'>110px</option>
+							<option value='120'>120px</option>
+							<option value='130'>130px</option>
+							<option value='140'>140px</option>
+							<option value='150'>150px</option>
+							<option value='160'>160px</option>
+							<option value='170'>170px</option>
 						</select>
 					</div>
 					<div class='row ps-5 pe-5'>
-						<canvas id='qr2' ></canvas>
+						<div class='text-center p-5'>
+							<canvas id='qr_sample'></canvas>
+						</div>
 					</div>
 				</div>
 				<div class='modal-footer'>
@@ -186,7 +200,7 @@
 <script>
 	const TourMilestone = '<?php echo $_SESSION["tour"];?>';
 
-	const tutorial_12 = new Shepherd.Tour({
+	const help = new Shepherd.Tour({
 		useModalOverlay: true,
 		defaultStepOptions: {
 			classes: 'tour_modal',
@@ -195,36 +209,36 @@
 				enabled:true
 			}
 		},
-		tourName:'tutorial_12'
+		tourName:'help'
 	});
-	tutorial_12.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+	help.addStep({
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'> 商品一覧の修正画面になります。
 				</p>`,
 		buttons: [
 			{
 				text: 'Next',
-				action: tutorial_12.next
+				action: help.next
 			}
 		]
 	});
-	tutorial_12.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+	help.addStep({
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'> 登録した商品の「価格変更」やレジへの「表示/非表示」の切替などを行います。
 				</p>`,
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_12.back
+				action: help.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_12.next
+				action: help.next
 			}
 		]
 	});
-	tutorial_12.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+	help.addStep({
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'> 右上のリストボックスをタップすると、レジ画面の表示対象チェックが入っているもの、いないもの、全件表示と切り替える事が可能です。
 				</p>`,
 		attachTo: {
@@ -234,16 +248,16 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_12.back
+				action: help.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_12.next
+				action: help.next
 			}
 		]
 	});
-	tutorial_12.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+	help.addStep({
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'> 商品の並び順はここで変更できます。
 				<br>三角マークは昇順・降順の切り替えに使います。
 				</p>`,
@@ -254,16 +268,16 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_12.back
+				action: help.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_12.next
+				action: help.next
 			}
 		]
 	});
-	tutorial_12.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+	help.addStep({
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'>試しにタップして変更してみてください。
 				</p>`,
 		attachTo: {
@@ -273,16 +287,16 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_12.back
+				action: help.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_12.next
+				action: help.next
 			}
 		]
 	});
-	tutorial_12.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+	help.addStep({
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'>商品の価格を変更する際は「新価格」欄に変更後の価格を入力して下さい。
 				</p>`,
 		attachTo: {
@@ -292,16 +306,16 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_12.back
+				action: help.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_12.next
+				action: help.next
 			}
 		]
 	});
-	tutorial_12.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+	help.addStep({
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'>「新価格」の「税込/税抜」設定は、こちらで選択して下さい。
 				</p>`,
 		attachTo: {
@@ -311,16 +325,16 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_12.back
+				action: help.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_12.next
+				action: help.next
 			}
 		]
 	});
-	tutorial_12.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+	help.addStep({
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'>レジへの「表示/非表示」の切替は「レジ」行のチェック有無で切り替えます。
 				</p>`,
 		attachTo: {
@@ -330,16 +344,16 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_12.back
+				action: help.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_12.next
+				action: help.next
 			}
 		]
 	});
-	tutorial_12.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+	help.addStep({
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'>その他の項目についても、コチラの画面で修正したい部分を打ち変えることで修正が可能です。
 				</p>`,
 		attachTo: {
@@ -349,16 +363,16 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_12.back
+				action: help.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_12.next
+				action: help.next
 			}
 		]
 	});
-	tutorial_12.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+	help.addStep({
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'>修正が完了したら「登録」ボタンをタップすると、変更内容が登録されます。
 				</p>`,
 		attachTo: {
@@ -368,41 +382,41 @@
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_12.back
+				action: help.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_12.nextAndSave
+				action: help.nextAndSave
 			}
 		]
 	});
-	tutorial_12.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+	help.addStep({
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'>なお、こちらで商品の価格等を修正しても<span style='color:red;'>過去の売上が変更されることはありません。</span>
 				</p>`,
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_12.back
+				action: help.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_12.next
+				action: help.next
 			}
 		]
 	});
-	tutorial_12.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+	help.addStep({
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'>試しに項目を修正し、「登録」してみてください。
 				</p>`,
 		buttons: [
 			{
 				text: 'Back',
-				action: tutorial_12.back
+				action: help.back
 			},
 			{
 				text: 'Next',
-				action: tutorial_12.complete
+				action: help.complete
 			}
 		]
 	});
@@ -419,7 +433,7 @@
 		tourName:'tutorial_13'
 	});
 	tutorial_13.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'>最後に、登録した商品情報の削除について説明します。
 				</p>`,
 		buttons: [
@@ -434,7 +448,7 @@
 		]
 	});
 	tutorial_13.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'><span style='color:red;'>なお、「売上」実績のある商品は削除出来ません。</span>
 				</p>`,
 		buttons: [
@@ -449,7 +463,7 @@
 		]
 	});
 	tutorial_13.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'>今回登録した商品が不要な商品でしたら<i class='fa-regular fa-trash-can'></i>　マークをタップして削除して下さい。
 				</p>`,
 		buttons: [
@@ -464,8 +478,8 @@
 		]
 	});
 	tutorial_13.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>以上でチュートリアルは終了となります。
+		title: `<p class='tour_header'>ヘルプ</p>`,
+		text: `<p class='tour_discription'>以上でヘルプは終了となります。
 				<br>お疲れ様でした。
 				</p>`,
 		buttons: [
@@ -492,7 +506,7 @@
 		tourName:'helpTour'
 	});
 	helpTour.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'> 登録した商品の「価格変更」やレジへの「表示/非表示」の切替などを行います。
 				</p>`,
 		buttons: [
@@ -507,7 +521,7 @@
 		]
 	});
 	helpTour.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'><i class='fa-regular fa-trash-can'></i>　マークをタップすると削除を確認するメッセージが表示され、OKをタップすると削除されます。
 				</p>`,
 		buttons: [
@@ -522,7 +536,7 @@
 		]
 	});
 	helpTour.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'> 右上のリストボックスをタップすると、レジ画面の表示対象チェックが入っているもの、いないもの、全件表示と切り替える事が可能です。
 				</p>`,
 		attachTo: {
@@ -541,7 +555,7 @@
 		]
 	});
 	helpTour.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'> 商品の並び順はここで変更できます。
 				<br>三角マークは昇順・降順の切り替えに使います。
 				</p>`,
@@ -560,7 +574,7 @@
 			}
 		]
 	});    helpTour.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'>商品の価格を変更する際は「新価格」欄をタップして変更後の価格を入力して下さい。
 				</p>`,
 		attachTo: {
@@ -579,7 +593,7 @@
 		]
 	});
 	helpTour.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'>入力した「新価格」が「税込/税抜」は、こちらで選択して下さい。
 				</p>`,
 		attachTo: {
@@ -598,7 +612,7 @@
 		]
 	});
 	helpTour.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'>レジへの「表示/非表示」の切替は「レジ」行のチェック有無で切り替えます。
 				</p>`,
 		attachTo: {
@@ -617,7 +631,7 @@
 		]
 	});
 	helpTour.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'>その他の項目についても、コチラの画面で修正したい部分をタップして打ち変えることで修正が可能です。
 				</p>`,
 		attachTo: {
@@ -636,7 +650,7 @@
 		]
 	});
 	helpTour.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'>修正が完了したら「登録」ボタンをタップすると、変更内容が登録されます。
 				</p>`,
 		attachTo: {
@@ -655,7 +669,7 @@
 		]
 	});
 	helpTour.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
+		title: `<p class='tour_header'>ヘルプ</p>`,
 		text: `<p class='tour_discription'>なお、こちらで商品の価格等を修正しても過去の売上が変更されることはありません。
 				</p>`,
 		buttons: [
@@ -671,15 +685,15 @@
 	});
 
 	if(TourMilestone=="tutorial_11"){
-		tutorial_12.start(tourFinish,'tutorial','');
-	}/*else if(TourMilestone=="tutorial_12"){
+		help.start(tourFinish,'tutorial','');
+	}/*else if(TourMilestone=="help"){
 		tutorial_13.start(tourFinish,'tutorial','finish');
 	}*/
-
+/*
 	function help(){
 		helpTour.start(tourFinish,'help','');
 	}
-
+*/
 </script>
 </html>
 <?php

@@ -154,7 +154,7 @@
 				<button v-if='order_panel_show_flg===false' type='button' class='btn btn-primary' @click='order_panel_show("close")'>戻る</button>
 			</div>
 			<!--バーコード読取 qr_order(111) barcode_mode("start")-->
-			<a @click='barcode_mode("start")' class='' style='font-size:32px;color:inherit;position:fixed;top:105px;right:80px;'  id='UriToday'>
+			<a @click='barcode_mode("start")' class='' style='font-size:32px;color:inherit;position:fixed;top:105px;right:80px;'>
 				<i class="bi bi-qr-code-scan awesome-color-panel-border-same"></i>
 			</a>
 			<!--今日の売上-->

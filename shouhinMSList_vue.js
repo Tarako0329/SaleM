@@ -283,9 +283,9 @@ const REZ_APP = () => createApp({
 			})
 		}
 
-		const qr_zip_download = (px) =>{
+		const qr_zip_download = () =>{
 			//const blob_list = 
-			create_qr(px)
+			create_qr(qr_size.value)
 			.then(async(response)=>{
 				console_log('create_qr response')
 				//console_log(response)
@@ -295,10 +295,7 @@ const REZ_APP = () => createApp({
 
 				const a = document.createElement('a');
 				a.href = URL.createObjectURL(zip_blob);
-				//a.href = 'blob:'+GET_DIRECT_URL(URL.createObjectURL(zip_blob))
 				a.download = 'QR_codes.zip';
-				//console_log(a.href)
-				//console_log(URL.createObjectURL(zip_blob))
 
 				a.style.display = 'none';
 				document.body.appendChild(a);
@@ -326,7 +323,6 @@ const REZ_APP = () => createApp({
 					context2.putImageData(imageData, 0, 0);
 
 					//商品名を追加
-					//context2.font = '10px Roboto medium';
 					context2.font = '10px';
 					//context2.fillStyle = '#0069b3';
 					context2.fillText(list.shouhinNM, 0, px+Number(9),width);
@@ -365,6 +361,10 @@ const REZ_APP = () => createApp({
 			return zip.generateAsync({ type: 'blob' }); // デフォルトで無圧縮
 		};
 
+		const qr_size = ref(50)
+		watch([qr_size],()=>{
+			GET_QRCODE(String('111'),Number(qr_size.value),'qr_sample')
+		})
 		onMounted(() => {
 			console_log('onMounted')
 			//get_shouhinMS()
@@ -378,6 +378,7 @@ const REZ_APP = () => createApp({
 			.catch((error) => {
 				console_log(`GET_SHOUHINMS ERROR:${error}`)
 			})
+			GET_QRCODE(String('111'),Number(qr_size.value),'qr_sample')
 		})
 
 		return{
@@ -406,7 +407,7 @@ const REZ_APP = () => createApp({
 			qr_download,
 			//blobs,
 			QR_DLtype,
-
+			qr_size,
 			create_qr,
 		}
 	}
