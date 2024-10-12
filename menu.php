@@ -699,7 +699,9 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             <br>
             <br>レジ画面の　<i class="bi bi-qr-code-scan awesome-color-panel-border-same fs-1"></i>　をタップするとQR読取モードになります。
             <br>
-            <br>『QRスキャン登録』は、<span style='color:red;'>レジ表示の設定不要</span>で全ての商品に利用できます。
+            <br>『QRスキャン登録』は、<span style='color:red;'>レジ表示ON/OFFの設定不要</span>で全ての商品に利用できます。
+            <br>
+            <br>また、商品価格などを変更しても<span style='color:red;'>QRコードは変更なしで利用可能です。</span>
             <br>`,
         buttons: [
 			{

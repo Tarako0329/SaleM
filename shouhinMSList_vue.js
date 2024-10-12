@@ -267,7 +267,7 @@ const REZ_APP = () => createApp({
 
 		const QR_DLtype = ref('none')
 		const qr_download = (px) =>{
-			//QRコード連続ダウンロード
+			//QRコードpng連続ダウンロード
       const link = document.createElement('a');
 			
 			shouhinMS.value.forEach((list)=>{
@@ -285,6 +285,14 @@ const REZ_APP = () => createApp({
 
 		const qr_zip_download = () =>{
 			//const blob_list = 
+			if(QR_DLtype.value === 'none'){
+				alert('ダウンロードするQRコードを選択してください。')
+				document.getElementById('QR_DLtype').style.backgroundColor = 'pink'
+				setTimeout(()=>{
+					document.getElementById('QR_DLtype').style.backgroundColor = '#fff'
+				},3000)
+				return 0
+			}
 			create_qr(qr_size.value)
 			.then(async(response)=>{
 				console_log('create_qr response')
@@ -325,7 +333,7 @@ const REZ_APP = () => createApp({
 					//商品名を追加
 					context2.font = '10px';
 					//context2.fillStyle = '#0069b3';
-					context2.fillText(list.shouhinNM, 0, px+Number(9),width);
+					context2.fillText(list.shouhinNM, 0, Number(px)+Number(9),width);
 
 					QR_canvas2.toBlob((b) => { 
 						if((QR_DLtype.value==='rez' && list.disp_rezi) || (QR_DLtype.value==='chk' && list.cate_chk) || (QR_DLtype.value==='all')){
@@ -362,8 +370,26 @@ const REZ_APP = () => createApp({
 		};
 
 		const qr_size = ref(50)
+		const qr_plus_name = () =>{
+			const QR_canvas = GET_QRCODE(String('111'),Number(qr_size.value),'qr_sample')
+			const context = QR_canvas.getContext("2d");//2次元描画
+			const imageData = context.getImageData(0, 0, QR_canvas.width, QR_canvas.height)
+			//複写・再描画
+			const QR_canvas2 = document.getElementById("qr_sample2")
+			const {width, height} = QR_canvas;
+			QR_canvas2.width = width
+			QR_canvas2.height = height + Number(12)
+			const context2 = QR_canvas2.getContext("2d");//2次元描画
+			context2.putImageData(imageData, 0, 0);
+
+			//商品名を追加
+			context2.font = '10px';
+			//context2.fillStyle = '#0069b3';
+			context2.fillText('商品名サンプル', 0, Number(qr_size.value)+Number(9),width);
+		}
+
 		watch([qr_size],()=>{
-			GET_QRCODE(String('111'),Number(qr_size.value),'qr_sample')
+			qr_plus_name()
 		})
 		onMounted(() => {
 			console_log('onMounted')
@@ -378,7 +404,8 @@ const REZ_APP = () => createApp({
 			.catch((error) => {
 				console_log(`GET_SHOUHINMS ERROR:${error}`)
 			})
-			GET_QRCODE(String('111'),Number(qr_size.value),'qr_sample')
+			qr_plus_name()
+			//GET_QRCODE(String('111'),Number(qr_size.value),'qr_sample')
 		})
 
 		return{
@@ -408,7 +435,7 @@ const REZ_APP = () => createApp({
 			//blobs,
 			QR_DLtype,
 			qr_size,
-			create_qr,
+			//create_qr,
 		}
 	}
 });

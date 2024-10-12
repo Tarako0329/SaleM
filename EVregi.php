@@ -1638,8 +1638,6 @@
 
 </script><!--ジオコーディング-->
 <script src="https://maps.gsi.go.jp/js/muni.js"></script><!--gio住所逆引リスト-->
-<script>
-</script>
 </html>
 <?php
 $stmt = null;
