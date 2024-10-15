@@ -259,17 +259,24 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 			if(e.target){e.target.disabled = true}	//ボタン連打対応：処理が終わるまでボタンを無効にする
 			let index = (e.target)?e.target.value:e
 
+			//shouhinMSのINDEXを取得
+			let index2 = shouhinMS.value.findIndex(list=>list.shouhinCD===shouhinMS_filter.value[index].shouhinCD)
+			console_log(`index2:${index2}`)
+
 			//オーダーパネルの数増減
-			shouhinMS_filter.value[index].ordercounter = Number(shouhinMS_filter.value[index].ordercounter) + Number(1)
+			//shouhinMS_filter.value[index].ordercounter = Number(shouhinMS_filter.value[index].ordercounter) + Number(1)
+			shouhinMS.value[index2].ordercounter = Number(shouhinMS.value[index2].ordercounter) + Number(1)
 
 			//オーダーリストの数増減
 			//console_log(`${shouhinMS_filter.value[index].shouhinCD}:${shouhinMS_filter.value[index].hyoujimei}`)
 			const order_list_index = order_list.value.findIndex(//同一商品・同一税率の注文があった場合、該当レコードのindexを取得。ない場合は[-1]を返す
-				item => item.CD == shouhinMS_filter.value[index].shouhinCD && item.ZEIKBN == shouhinMS_filter.value[index].zeiKBN
+				//item => item.CD == shouhinMS_filter.value[index].shouhinCD && item.ZEIKBN == shouhinMS_filter.value[index].zeiKBN
+				item => item.CD == shouhinMS.value[index2].shouhinCD && item.ZEIKBN == shouhinMS.value[index2].zeiKBN
 			)
 			
 			if(order_list_index === -1){
 				order_list.value.unshift({
+					/*
 					CD:shouhinMS_filter.value[index].shouhinCD
 					,NM:shouhinMS_filter.value[index].shouhinNM
 					,SU:1
@@ -280,6 +287,18 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 					,ZEIRITUNM:shouhinMS_filter.value[index].hyoujimei
 					,ZEIRITU:Number(shouhinMS_filter.value[index].zeiritu) 
 					,GENKA_TANKA:Number(shouhinMS_filter.value[index].genka_tanka)
+					,order_panel_index:index
+					*/
+					CD:shouhinMS.value[index2].shouhinCD
+					,NM:shouhinMS.value[index2].shouhinNM
+					,SU:1
+					,UTISU:shouhinMS.value[index2].utisu
+					,TANKA:Number(shouhinMS.value[index2].tanka)
+					,TANKA_ZEI:Number(shouhinMS.value[index2].tanka_zei)
+					,ZEIKBN:shouhinMS.value[index2].zeiKBN
+					,ZEIRITUNM:shouhinMS.value[index2].hyoujimei
+					,ZEIRITU:Number(shouhinMS.value[index2].zeiritu) 
+					,GENKA_TANKA:Number(shouhinMS.value[index2].genka_tanka)
 					,order_panel_index:index
 				});
 			}else{
@@ -293,6 +312,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 			})
 			return 0
 		}
+
 		const order_list_pm = (index,value) =>{
 			//同一パネルでイートインとテイクアウトが混在した場合にパネルからのマイナスカウント操作が
 			//煩雑になるため、マイナスはオーダーリストからのみとする
@@ -1050,6 +1070,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 		return{
 			//get_shouhinMS,
 			shouhinMS_filter,
+			shouhinMS,
 			ordercounter,
 			pay,
 			kaikei_zei,

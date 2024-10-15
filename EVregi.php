@@ -107,7 +107,7 @@
 				</span>
 				<input type='date' class='date' style='height:20%' name='KEIJOUBI' required='required' v-model='labels["date_ini"]'>
 			</span>
-			<!--<input type='text' class='ev item_2' :name='labels["EV_input_name"]' v-model='labels["EV_input_value"]' required='required' :placeholder='labels["EV_input_placeholder"]'>-->
+			
 			<label v-if='rg_mode!=="kobetu"' class='evlabel'>イベント名など</label>
 			<label v-if='rg_mode==="kobetu"' class='evlabel'>顧客名など　　</label>
 			<input type='text' class='ev' :name='labels["EV_input_name"]' v-model='EV_input_value' required='required' style='width:1px;'>
