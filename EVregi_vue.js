@@ -246,7 +246,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 		})//商品マスタの税率変更スイッチ
 
 		const ordercounter = (e) => {//注文増減ボタン
-			//メニューボタンタップ時はe.target,スキャン方式の場合はe=shouhinMS_filterのindex
+			//メニューボタンタップ時はe.target,スキャン方式の場合はe=shouhinMSのindex
 			console_log('start ordercounter()')
 			//console_log(e.target)
 			console_log(e)
@@ -256,12 +256,20 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 				alert('『戻る』ボタンをタップしてから増減してください。')
 				return 0
 			}
-			if(e.target){e.target.disabled = true}	//ボタン連打対応：処理が終わるまでボタンを無効にする
-			let index = (e.target)?e.target.value:e
 
-			//shouhinMSのINDEXを取得
-			let index2 = shouhinMS.value.findIndex(list=>list.shouhinCD===shouhinMS_filter.value[index].shouhinCD)
-			console_log(`index2:${index2}`)
+			let index,index2
+			if(e.target){
+				e.target.disabled = true		//ボタン連打対応：処理が終わるまでボタンを無効にする
+				index = e.target.value
+				//shouhinMSのINDEXを取得
+				index2 = shouhinMS.value.findIndex(list=>list.shouhinCD===shouhinMS_filter.value[index].shouhinCD)
+				console_log(`index2:${index2}`)
+				}else{
+					index = e
+					index2 = e
+				}
+			//let index = (e.target)?e.target.value:e
+
 
 			//オーダーパネルの数増減
 			//shouhinMS_filter.value[index].ordercounter = Number(shouhinMS_filter.value[index].ordercounter) + Number(1)
@@ -1024,7 +1032,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 		}
 		const scan_result = ref('')
 		const qr_order = (p_ShouhinCD) => {
-			const order_list_index = shouhinMS_filter.value.findIndex(//読取した商品NOから連想配列のINDEXを取得する
+			const order_list_index = shouhinMS.value.findIndex(//読取した商品NOから連想配列のINDEXを取得する
 				list => String(p_ShouhinCD) === String(list.shouhinCD)
 			)
 			
