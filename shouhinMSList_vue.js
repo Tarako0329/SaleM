@@ -268,7 +268,7 @@ const REZ_APP = () => createApp({
 		const QR_DLtype = ref('none')
 		const qr_download = (px) =>{
 			//QRコードpng連続ダウンロード
-      const link = document.createElement('a');
+            const link = document.createElement('a');
 			
 			shouhinMS.value.forEach((list)=>{
 				if(list.disp_rezi){
@@ -338,7 +338,8 @@ const REZ_APP = () => createApp({
 					QR_canvas2.toBlob((b) => { 
 						if((QR_DLtype.value==='rez' && list.disp_rezi) || (QR_DLtype.value==='chk' && list.cate_chk) || (QR_DLtype.value==='all')){
 							blobs.push({
-								"name":`ID_${list.shouhinCD}.png`
+								//"name":`ID_${list.shouhinCD}.png`
+								"name":`ID_${list.shouhinCD}_${list.shouhinNM}.png`
 								,"content":b
 							})
 						}
@@ -354,10 +355,11 @@ const REZ_APP = () => createApp({
     const generateZipBlob = (nameContentPairs, folder_name) => {
 			console_log('generateZipBlob exec')
 			console_log(nameContentPairs)
+			const encoder = new TextEncoder("Shift_JIS", {NONSTANDARD_allowLegacyEncoding: true});//ファイル名sjis化
 			const zip = new JSZip();
 			const folder = zip.folder(folder_name);
 			nameContentPairs.forEach((list) => {
-				console_log(list)
+				//console_log(list)
 
 				const file_name = (list.name);
 				const content = list.content;
@@ -366,7 +368,10 @@ const REZ_APP = () => createApp({
 
 			console_log('folder is')
 			console_log(folder)
-			return zip.generateAsync({ type: 'blob' }); // デフォルトで無圧縮
+			return zip.generateAsync({ 
+			    type: 'blob' 
+			    ,encodeFileName: fileName => encoder.encode(fileName)//ファイル名sjis化
+			}); // デフォルトで無圧縮
 		};
 
 		const qr_size = ref(50)

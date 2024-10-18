@@ -30,6 +30,12 @@
 	?>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.js"></script><!--make QRコードライブラリ-->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!--QRファイル名sjisエンコードAPI-->
+    <script>window.TextEncoder = window.TextDecoder = null;</script>
+    <script src="https://cdn.jsdelivr.net/npm/text-encoding@0.6.4/lib/encoding-indexes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/text-encoding@0.6.4/lib/encoding.js"></script>
+
+
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_ShouhinMSL.css?<?php echo $time; ?>' >
 	<TITLE><?php echo $title." 取扱商品 確認・編集";?></TITLE>
