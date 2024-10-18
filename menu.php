@@ -131,11 +131,14 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         //deb_echo($row[0]["ToursLog"]);
         if(empty($row[0]["ToursLog"]) && $row[0]["insdate"] < RELEACE_DATE){
             //新機能リリース通知 未確認
+            //新機能リリース日より前に登録したユーザを対象とする
             $bell_action="blink";
             $bell_size="fa-2x";
             $bell_msg="お知らせ";
+            $version = "new_releace_005";
         }else{
             //新機能リリース通知 確認済み
+            $version="";
         }
     
     }
@@ -319,7 +322,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     require "ajax_func_tourFinish.php";
     $hello=(EXEC_MODE=="Trial"?"WebRez+に興味を持って頂きありがとうございます。":"ご登録ありがとうございます。");
 ?>
-<script>
+<script><!--チュートリアル-->
     const TourMilestone = '<?php echo $_SESSION["tour"];?>';
 
     const tutorial_1 = new Shepherd.Tour({
@@ -549,7 +552,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         tutorial_11.start(tourFinish,'tutorial','');    
     }
     
-</script>
+</script><!--チュートリアル-->
 <!--チュートリアル以外のヘルプ・出品在庫-->
 <script>
     const shuppin_zaiko_help1 = new Shepherd.Tour({
@@ -582,6 +585,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     }
 </script>
 <script>
+    const new_releace = '<?php echo $version;?>'
 /*
     const new_releace_002 = new Shepherd.Tour({
         useModalOverlay: true,
@@ -652,7 +656,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         }
     });
 */
-    const new_releace_004 = new Shepherd.Tour({
+/*    const new_releace_004 = new Shepherd.Tour({
         useModalOverlay: true,
         defaultStepOptions: {
             classes: 'tour_modal',
@@ -681,7 +685,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             enabled:false
         }
     });
-
+*/
     const new_releace_005 = new Shepherd.Tour({
         useModalOverlay: true,
         defaultStepOptions: {
@@ -697,6 +701,28 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
         text: `<p class='tour_discription'><span style='color:blue'>「QRスキャン登録」機能</span>を追加しました。
             <br>
+            <br>一般的なレジでよく見る、バーコードを『ピッ！』とやるやつです。
+            <br>
+            <br>使い方の説明は２分程度です。
+            <br>`,
+        buttons: [
+            {
+                text: '後で見る',
+                action: new_releace_005.cancel
+            },
+ 			{
+				text: 'Next',
+				action: new_releace_005.next
+			}
+        ],
+        cancelIcon:{
+            enabled:false
+        }
+    });
+    new_releace_005.addStep({
+        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+        text: `<p class='tour_discription'><span style='color:blue'>「QRスキャン登録」機能</span>を追加しました。
+            <br>
             <br>レジ画面の　<i class="bi bi-qr-code-scan awesome-color-panel-border-same fs-1"></i>　をタップするとQR読取モードになります。
             <br>
             <br>『QRスキャン登録』は、<span style='color:red;'>レジ表示ON/OFFの設定不要</span>で全ての商品に利用できます。
@@ -704,7 +730,11 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             <br>また、商品価格などを変更しても<span style='color:red;'>QRコードは変更なしで利用可能です。</span>
             <br>`,
         buttons: [
-			{
+            {
+                text: '後で見る',
+                action: tutorial_1.cancel
+            },
+ 			{
 				text: 'Next',
 				action: new_releace_005.next
 			}
@@ -733,7 +763,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         }
     });
 
-    function new_releace_start(){
+    const new_releace_start = () => {
         //新機能のリリース通知はこの関数で呼び出すツアーを更新する
         //shuppin_zaiko_help1.start(tourFinish,'new_releace_001','');
         //new_releace_002.start(tourFinish,'new_releace_002',''); 
@@ -741,6 +771,10 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         //new_releace_004.start(tourFinish,'new_releace_004','finish'); 
         new_releace_005.start(tourFinish,'new_releace_005','finish'); 
         document.getElementById("bell").className = 'logoff-color'
+    }
+    
+    if(new_releace){
+        new_releace_start()
     }
 </script>
 <!--pwa対応部-->
