@@ -586,6 +586,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
 </script>
 <script>
     const new_releace = '<?php echo $version;?>'
+    const new_releace_name = sessionStorage.getItem('tourname');
 /*
     const new_releace_002 = new Shepherd.Tour({
         useModalOverlay: true,
@@ -704,6 +705,9 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             <br>一般的なレジでよく見る、バーコードを『ピッ！』とやるやつです。
             <br>
             <br>使い方の説明は２分程度です。
+            <br>
+            <br>後で見たい方は「後で見る」をタップしてください。
+            <br>「お知らせ」をタップすると、案内が再開します。
             <br>`,
         buttons: [
             {
@@ -731,8 +735,8 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             <br>`,
         buttons: [
             {
-                text: '後で見る',
-                action: tutorial_1.cancel
+                text: '戻る',
+                action: new_releace_005.back
             },
  			{
 				text: 'Next',
@@ -748,12 +752,12 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         text: `<p class='tour_discription'>
             <br>スキャン用のQRコードはコチラのメニューから作成します。
             <br>`,
-        buttons: [
+        /*buttons: [
 			{
 				text: 'Next',
 				action: new_releace_005.next
 			}
-        ],
+        ],*/
         attachTo: {
             element: '#menu_qr_itiran',
             on: 'bottom'
@@ -762,19 +766,53 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             enabled:false
         }
     });
-
+    const new_releace_005_1 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'new_releace_005_1'
+    });
+    new_releace_005_1.addStep({
+        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+        text: `<p class='tour_discription'>
+            <br>レジ画面の説明に移ります。
+            <br>`,
+        /*buttons: [
+			{
+				text: 'Next',
+				action: new_releace_005.next
+			}
+        ],*/
+        attachTo: {
+            element: '#menu_rez',
+            on: 'bottom'
+        },
+        cancelIcon:{
+            enabled:false
+        }
+    });
     const new_releace_start = () => {
         //新機能のリリース通知はこの関数で呼び出すツアーを更新する
         //shuppin_zaiko_help1.start(tourFinish,'new_releace_001','');
         //new_releace_002.start(tourFinish,'new_releace_002',''); 
         //new_releace_003.start(tourFinish,'new_releace_003','finish'); 
         //new_releace_004.start(tourFinish,'new_releace_004','finish'); 
-        new_releace_005.start(tourFinish,'new_releace_005','finish'); 
-        document.getElementById("bell").className = 'logoff-color'
+        new_releace_005.start(tourFinish,'new_releace_005',''); 
+        sessionStorage.setItem('tourname', 'new_releace_005');
+
+        //document.getElementById("bell").className = 'logoff-color'
     }
     
     if(new_releace){
         new_releace_start()
+    }
+    if(new_releace_name==='new_releace_005'){
+        new_releace_005_1.start(tourFinish,'new_releace_005',''); 
     }
 </script>
 <!--pwa対応部-->

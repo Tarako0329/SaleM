@@ -374,7 +374,7 @@ const REZ_APP = () => createApp({
 			}); // デフォルトで無圧縮
 		};
 
-		const qr_size = ref(50)
+		const qr_size = ref(57)
 		const qr_plus_name = () =>{
 			const QR_canvas = GET_QRCODE(String('111'),Number(qr_size.value),'qr_sample')
 			const context = QR_canvas.getContext("2d");//2次元描画
@@ -411,6 +411,12 @@ const REZ_APP = () => createApp({
 			})
 			qr_plus_name()
 			//GET_QRCODE(String('111'),Number(qr_size.value),'qr_sample')
+			
+			const TourMilestone = sessionStorage.getItem('tourname');
+	        if(TourMilestone==='new_releace_005'){
+	            new_releace_start()
+	        }
+
 		})
 
 		return{
