@@ -292,30 +292,6 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
 <script src="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/js/shepherd.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/css/shepherd.css"/>
 -->
-<?php
-/*    if(empty($_SESSION["tour"])){
-        //ツアー中でない場合、チュートリアルが終わっているか確認する
-        $sqlstr="SELECT uid,JSON_VALUE(ToursLog,'$.tutorial') as tutorial FROM Users_webrez WHERE uid=?";
-        $stmt = $pdo_h->prepare($sqlstr);
-        $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
-        $stmt->execute();
-        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        //log_writer2("JSON_VALUE",$row,"lv3");
-        if(empty($row[0]["tutorial"])){
-            //チュートリアル未実施
-            $_SESSION["tour"]="tutorial_1";
-        }elseif($row[0]["tutorial"]=="finish"){
-            //チュートリアル完了
-            
-        }else{
-            //チュートリアル実施中（再開）
-            $_SESSION["tour"]=$row[0]["tutorial"];
-        }
-    }else{
-        log_writer2("\$_SESSION['tour']",$_SESSION["tour"],"lv3");
-    }
-*/    
-?>
 <script src="shepherd/shepherd.min.js?<?php echo $time; ?>"></script>
 <link rel="stylesheet" href="shepherd/shepherd.css?<?php echo $time; ?>"/>
 <?php 
@@ -780,7 +756,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     new_releace_005_1.addStep({
         title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
         text: `<p class='tour_discription'>
-            <br>レジ画面の説明に移ります。
+            <br>レジ画面に移動します。
             <br>`,
         /*buttons: [
 			{
@@ -796,19 +772,63 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             enabled:false
         }
     });
+    const new_releace_005_2 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'new_releace_005_2'
+    });
+    new_releace_005_2.addStep({
+        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+        text: `<p class='tour_discription'>
+            <br>レジ機能に「バーコードでピッと」やる機能を追加しましたが、お使いの端末では利用出来ないようです。
+            <br>
+            <br>カメラ付き端末でレジを起動すると、右上のベルマークから利用方法が確認できます。
+            <br>`,
+        buttons: [
+			{
+				text: 'OK',
+				action: new_releace_005_2.next
+			}
+        ],
+
+        cancelIcon:{
+            enabled:false
+        }
+    });
     const new_releace_start = () => {
         //新機能のリリース通知はこの関数で呼び出すツアーを更新する
         //shuppin_zaiko_help1.start(tourFinish,'new_releace_001','');
         //new_releace_002.start(tourFinish,'new_releace_002',''); 
         //new_releace_003.start(tourFinish,'new_releace_003','finish'); 
         //new_releace_004.start(tourFinish,'new_releace_004','finish'); 
-        new_releace_005.start(tourFinish,'new_releace_005',''); 
-        sessionStorage.setItem('tourname', 'new_releace_005');
+        navigator.mediaDevices
+		.getUserMedia({
+			audio: false,
+			video: {
+				facingMode: {
+					exact: 'environment'
+				}
+			}
+		})
+		.then((stream) => {
+            new_releace_005.start(tourFinish,'new_releace_005',''); 
+            sessionStorage.setItem('tourname', 'new_releace_005');
+		})
+		.catch((err) =>{
+            console_log("cant use camera")
+            new_releace_005_2.start(tourFinish,'new_releace_005','finish'); 
+        })
 
         //document.getElementById("bell").className = 'logoff-color'
     }
     
-    if(new_releace){
+    if(new_releace && !new_releace_name){
         new_releace_start()
     }
     if(new_releace_name==='new_releace_005'){

@@ -413,9 +413,9 @@ const REZ_APP = () => createApp({
 			//GET_QRCODE(String('111'),Number(qr_size.value),'qr_sample')
 			
 			const TourMilestone = sessionStorage.getItem('tourname');
-	        if(TourMilestone==='new_releace_005'){
-	            new_releace_start()
-	        }
+	    if(TourMilestone==='new_releace_005'){
+	        new_releace_start()
+	    }
 
 		})
 

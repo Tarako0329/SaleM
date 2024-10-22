@@ -30,25 +30,25 @@
 	require "ajax_func_tourFinish.php";
 	?>
 	<script src="shepherd/shepherd.min.js?<?php echo $time; ?>"></script>
-    <link rel="stylesheet" href="shepherd/shepherd.css?<?php echo $time; ?>"/>
+		<link rel="stylesheet" href="shepherd/shepherd.css?<?php echo $time; ?>"/>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.js"></script><!--make QRコードライブラリ-->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!--QRファイル名sjisエンコードAPI-->
-    <script>window.TextEncoder = window.TextDecoder = null;</script>
-    <script src="https://cdn.jsdelivr.net/npm/text-encoding@0.6.4/lib/encoding-indexes.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/text-encoding@0.6.4/lib/encoding.js"></script>
+		<!--QRファイル名sjisエンコードAPI-->
+		<script>window.TextEncoder = window.TextDecoder = null;</script>
+		<script src="https://cdn.jsdelivr.net/npm/text-encoding@0.6.4/lib/encoding-indexes.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/text-encoding@0.6.4/lib/encoding.js"></script>
 
 
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_ShouhinMSL.css?<?php echo $time; ?>' >
 	<style>
-	    .header2{
-	        height:65px;
-	    }
-	    .common_body{
-	        padding-top:135px;
-	    }
+			.header2{
+					height:65px;
+			}
+			.common_body{
+					padding-top:135px;
+			}
 	</style>
 	<TITLE><?php echo $title." 取扱商品 QR作成";?></TITLE>
 </head>
@@ -165,8 +165,8 @@
 					<div class='modal-title'>QRコードサイズ調整</div>
 				</div>
 				<div class='modal-body'>
-                    <div class='row ps-5 pe-5'>
-				        <p>1.5cm以上ですと、スムーズに読み込めます</p>
+										<div class='row ps-5 pe-5'>
+								<p>1.5cm以上ですと、スムーズに読み込めます</p>
 						<select class='form-select' v-model='qr_size'>
 							<option value='38'>1.0cm</option>
 							<option value='42'>1.1cm</option>
@@ -207,153 +207,141 @@
 			document.getElementById("app").onkeypress = (e) => {const key = e.keyCode || e.charCode || 0;}
 		};
 	</script><!--js-->
-    <script>
-    /*	const TourMilestone = sessionStorage.getItem('tourname');
-    	if(TourMilestone){
-    	    new_releace_start()
-    	}
-    */
-    	const help = new Shepherd.Tour({
-    		useModalOverlay: true,
-    		defaultStepOptions: {
-    			classes: 'tour_modal',
-    			scrollTo: false,
-    			cancelIcon:{
-    				enabled:true
-    			}
-    		},
-    		tourName:'help'
-    	});
-    	help.addStep({
-    		title: `<p class='tour_header'>ヘルプ</p>`,
-    		text: `<p class='tour_discription'> QRスキャンで利用するQRコード画像(PNG)をZIP形式でまとめてダウンロードします。
-    				<br>
-    				<br>商品のラベルにQRコードの画像を追加するなどしてご利用ください。
-    				</p>`,
-    		buttons: [
-    			{
-    				text: 'Next',
-    				action: help.next
-    			}
-    		]
-    	});
-    	help.addStep({
-    		title: `<p class='tour_header'>ヘルプ</p>`,
-    		text: `<p class='tour_discription'> QR画像をダウンロードする商品を選択します。
-    				</p>`,
-    		attachTo: {
-    			element: '#QR_DLtype',
-    			on: 'bottom'
-    		},
-    		buttons: [
-    			{
-    				text: 'Back',
-    				action: help.back
-    			},
-    			{
-    				text: 'Next',
-    				action: help.next
-    			}
-    		]
-    	});
-    	help.addStep({
-    		title: `<p class='tour_header'>ヘルプ</p>`,
-    		text: `<p class='tour_discription'> 下に表示する商品一覧を（全商品・レジON・レジOFF）から選択できます。
-    				</p>`,
-    		attachTo: {
-    			element: '#chk_register_show',
-    			on: 'bottom'
-    		},
-    		buttons: [
-    			{
-    				text: 'Back',
-    				action: help.back
-    			},
-    			{
-    				text: 'Next',
-    				action: help.next
-    			}
-    		]
-    	});
-    	help.addStep({
-    		title: `<p class='tour_header'>ヘルプ</p>`,
-    		text: `<p class='tour_discription'> 商品の並び順はここで変更できます。
-    				<br>三角マークは昇順・降順の切り替えに使います。
-    				</p>`,
-    		attachTo: {
-    			element: '#order_by',
-    			on: 'bottom'
-    		},
-    		buttons: [
-    			{
-    				text: 'Back',
-    				action: help.back
-    			},
-    			{
-    				text: 'Next',
-    				action: help.next
-    			}
-    		]
-    	});
-    	help.addStep({
-    		title: `<p class='tour_header'>ヘルプ</p>`,
-    		text: `<p class='tour_discription'>『ダウンロード対象』を設定したらコチラからダウンロードしてください。
-    				<br>子ウィンドウが開き、ＱＲコードのサイズを選択・ダウンロードが可能です。
-    				<br>
-    				<br>ダウロードしたファイルはZIP形式となります。解凍することで画像ファイルが利用可能となりますので、各商品のラベルに追加するなどしてご利用ください。
-    				</p>`,
-    		attachTo: {
-    			element: '#dl_btn',
-    			on: 'auto'
-    		},
-    		buttons: [
-    			{
-    				text: 'Back',
-    				action: help.back
-    			},
-    			{
-    				text: 'OK',
-    				action: help.next
-    			}
-    		]
-    	});
-    	
-        const new_releace_005_1 = new Shepherd.Tour({
-            useModalOverlay: true,
-            defaultStepOptions: {
-                classes: 'tour_modal',
-                scrollTo: true,
-                cancelIcon:{
-                    enabled:true
-                }
-            },
-            tourName:'new_releace_005_1'
-        });
-        new_releace_005_1.addStep({
-            title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
-            text: `<p class='tour_discription'>
-                <br>続いてレジ画面の説明に移ります。
-                <br>`,
-            attachTo: {
-                element: '#to_top',
-                on: 'bottom'
-            },
-            cancelIcon:{
-                enabled:false
-            }
-        });
-    
-    	const help_start = async()=>{
-    		//help.start(tourFinish,'help','');
-    		help.start(tourFinish,'new_releace_005','');
-    	}
-    	const new_releace_start = async()=>{
-    		await help_start()
-    		await new_releace_005_1.start(tourFinish,'new_releace_005','');
-    	}
-    
-    </script>
-    <script src="shouhinMSList_vue.js?<?php echo $time; ?>"></script>
+		<script>
+		/*	const TourMilestone = sessionStorage.getItem('tourname');
+			if(TourMilestone){
+					new_releace_start()
+			}
+		*/
+			const help = new Shepherd.Tour({
+				useModalOverlay: true,
+				defaultStepOptions: {
+					classes: 'tour_modal',
+					scrollTo: false,
+					cancelIcon:{
+						enabled:true
+					}
+				},
+				tourName:'help'
+			});
+			help.addStep({
+				title: `<p class='tour_header'>ヘルプ</p>`,
+				text: `<p class='tour_discription'> QRスキャンで利用するQRコード画像(PNG)をZIP形式でまとめてダウンロードします。
+						<br>
+						<br>商品のラベルにQRコードの画像を追加するなどしてご利用ください。
+						</p>`,
+				buttons: [
+					{
+						text: 'Next',
+						action: help.next
+					}
+				]
+			});
+			help.addStep({
+				title: `<p class='tour_header'>ヘルプ</p>`,
+				text: `<p class='tour_discription'> QR画像をダウンロードする商品を選択します。
+						</p>`,
+				attachTo: {
+					element: '#QR_DLtype',
+					on: 'bottom'
+				},
+				buttons: [
+					{
+						text: 'Back',
+						action: help.back
+					},
+					{
+						text: 'Next',
+						action: help.next
+					}
+				]
+			});
+			help.addStep({
+				title: `<p class='tour_header'>ヘルプ</p>`,
+				text: `<p class='tour_discription'> 下に表示する商品一覧を（全商品・レジON・レジOFF）から選択できます。
+						</p>`,
+				attachTo: {
+					element: '#chk_register_show',
+					on: 'bottom'
+				},
+				buttons: [
+					{
+						text: 'Back',
+						action: help.back
+					},
+					{
+						text: 'Next',
+						action: help.next
+					}
+				]
+			});
+			help.addStep({
+				title: `<p class='tour_header'>ヘルプ</p>`,
+				text: `<p class='tour_discription'> 商品の並び順はここで変更できます。
+						<br>三角マークは昇順・降順の切り替えに使います。
+						</p>`,
+				attachTo: {
+					element: '#order_by',
+					on: 'bottom'
+				},
+				buttons: [
+					{
+						text: 'Back',
+						action: help.back
+					},
+					{
+						text: 'Next',
+						action: help.next
+					}
+				]
+			});
+			help.addStep({
+				title: `<p class='tour_header'>ヘルプ</p>`,
+				text: `<p class='tour_discription'>『ダウンロード対象』を設定したらコチラからダウンロードしてください。
+						<br>子ウィンドウが開き、ＱＲコードのサイズを選択・ダウンロードが可能です。
+						<br>
+						<br>ダウロードしたファイルはZIP形式となります。解凍することで画像ファイルが利用可能となりますので、各商品のラベルに追加するなどしてご利用ください。
+						</p>`,
+				attachTo: {
+					element: '#dl_btn',
+					on: 'auto'
+				},
+				buttons: [
+					{
+						text: 'Back',
+						action: help.back
+					},
+					{
+						text: 'OK',
+						action: help.next
+					}
+				]
+			});
+			
+			const help_start = async()=>{
+				//help.start(tourFinish,'help','');
+				help.start(tourFinish,'new_releace_005','');
+			}
+			const new_releace_start = async()=>{
+				help.addStep({
+						title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+						text: `<p class='tour_discription'>
+								<br>続いてレジ画面の説明に移ります。
+								<br>`,
+						attachTo: {
+								element: '#to_top',
+								on: 'bottom'
+						},
+						cancelIcon:{
+								enabled:false
+						}
+				});
+				help.start(tourFinish,'new_releace_005','');
+				//await new_releace_005_1.start(tourFinish,'new_releace_005','');
+			}
+		
+		</script>
+		<script src="shouhinMSList_vue.js?<?php echo $time; ?>"></script>
 	<script>
 		REZ_APP().mount('#app');
 	</script><!--Vue3js-->
@@ -364,7 +352,7 @@
 <!--<script>
 /*	const TourMilestone = sessionStorage.getItem('tourname');
 	if(TourMilestone){
-	    new_releace_start()
+			new_releace_start()
 	}
 */
 	const help = new Shepherd.Tour({

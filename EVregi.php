@@ -80,6 +80,10 @@
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_EVregi.css?<?php echo $time; ?>' >
 	<TITLE><?php echo TITLE.' レジ';?></TITLE>
+	<script src="shepherd/shepherd.min.js?<?php echo $time; ?>"></script>
+	<link rel="stylesheet" href="shepherd/shepherd.css?<?php echo $time; ?>"/>
+	<?php require "ajax_func_tourFinish.php";?>
+
 	<style>
 		#qrOutput {
 		flex-wrap: wrap;
@@ -150,11 +154,11 @@
 				<label v-if='auto_ajust===true' style='margin-left:3px;' class='form-check-label' for='chousei'>ON</label><!-- -->
 			</div>
 			<div v-if="cartbtn_show" style='padding:0;'>
-				<button v-if='order_panel_show_flg===true' type='button' class='btn btn-primary' @click='order_panel_show("show")'>カート編集</button>
+				<button v-if='order_panel_show_flg===true' type='button' class='btn btn-primary' @click='order_panel_show("show")' id='cart_btn'>カート編集</button>
 				<button v-if='order_panel_show_flg===false' type='button' class='btn btn-primary' @click='order_panel_show("close")'>戻る</button>
 			</div>
 			<!--バーコード読取 qr_order(111) barcode_mode("start")-->
-			<a @click='barcode_mode("start")' class='' style='font-size:32px;color:inherit;position:fixed;top:105px;right:80px;'>
+			<a @click='barcode_mode("start")' class='' style='font-size:32px;color:inherit;position:fixed;top:105px;right:80px;' id='qr_code_reader'>
 				<i class="bi bi-qr-code-scan awesome-color-panel-border-same"></i>
 			</a>
 			<!--今日の売上-->
@@ -173,7 +177,7 @@
 			</div><!--イートイン/テイクアウト-->
 		</div>
 		<div v-if='chk_register_show==="register"' class='container header-plus-minus text-center' style='padding:10px;'><!--割引・割増-->
-			<button type='button' style='width:80%;max-width:500px;' class='btn btn-outline-primary' data-bs-toggle='modal' data-bs-target='#waribiki' id='item_11'>割引・割増</button>
+			<button type='button' style='width:80%;max-width:500px;' class='btn btn-outline-primary' data-bs-toggle='modal' data-bs-target='#waribiki' id='Price_change_btn'>割引・割増</button>
 		</div><!--割引・割増-->
 		<main class='common_body' id='main_area'>
 
@@ -186,13 +190,12 @@
 				<div v-if='"<?php echo strlen($emsg);?>"==="0"' class='row'>
 
 					<div class='col-lg-3 col-md-4 col-sm-12 col-12'><!--注文内容/スキャナ-->
-						<div v-show='barcode_cam_area'  style='height:180px;width:100%;position:relative;'><!--スキャナ-->
+						<div v-show='barcode_cam_area'  style='height:180px;width:100%;position:relative;' id='qr_code_reader_camera'><!--スキャナ-->
 						    <div style='position:absolute;top:80px;width:100%;background-color:yellow;' class='text-center fs-2'>{{scan_result}}</div>
-						    
-							<video style='height: 100%;width:100%;object-fit: cover;' id="js-video" class="reader-video" autoplay playsinline></video>
+								<video style='height: 100%;width:100%;object-fit: cover;' id="js-video" class="reader-video" autoplay playsinline></video>
 								<canvas id="js-canvas" style="display:none;object-fit:cover"></canvas>
-							<div>
-							</div>
+								<div>
+								</div>
 						</div><!--スキャナ-->
 						<div class='order_list' ref='order_list_area'><!--注文内容-->
 							<div class='text-center'> 税込表示 </div>
@@ -269,7 +272,7 @@
 								</div>
 							</template><!--登録結果ステータス表示+領収書ボタン-->
 							<div id='jump_0'><hr></div> 
-							<div class='row' id=''>
+							<div class='row' id='order_area'>
 								<template v-for='(list,index) in shouhinMS_filter' :key='list.shouhinCD'>
 									<template v-if='(index===0) || (index!==0 && list.disp_category !== shouhinMS_filter[index-1].disp_category)'><!--カテゴリーバー-->
 										<div class='row' style='background:var(--jumpbar-color);margin-top:5px;' >
@@ -314,12 +317,12 @@
 				</div>
 				<div class='row' style='height:60px;'>
 					<div class='col-4' style='padding:0;'>
-						<button type='button' class='btn--chk item_5' style='border-left:none;border-right:none;' id='dentaku' data-bs-toggle='modal' data-bs-target='#FcModal'>
+						<button type='button' class='btn--chk' style='border-left:none;border-right:none;' id='dentaku' data-bs-toggle='modal' data-bs-target='#FcModal'>
 							{{labels['btn_name']}}
 						</button>
 					</div>
 					<div class='col-4 item_10' style='padding:0;'>
-						<button type='button' @click='reset_order()' v-if='chk_register_show==="chk"' class='btn--chk item_8'>クリア</button><!-- id='order_clear'-->
+						<button type='button' @click='reset_order()' v-if='chk_register_show==="chk"' class='btn--chk' id='order_clear_btn'>クリア</button><!-- id='order_clear'-->
 						<button type='button' @click='btn_changer("chk")' v-if='chk_register_show==="register"' class='btn--chk '>戻　る</button><!-- id='order_return'-->
 					</div>
 					<div class='col-4 item_9' style='padding:0;'>
@@ -471,9 +474,6 @@
 					<a :href='`https://line.me/R/share?text=${send_msg}`' type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1'>
 						<i class="bi bi-line line-green"></i>
 					</a>
-					<!--<a :href='DL_URL' download='RyoushuuSho.pdf' type='button' style='font-size: 2rem;' class='btn btn-outline-primary'>
-						<i class="bi bi-download"></i>
-					</a>-->
 				</div>
 			</div>
 		</div>
@@ -547,12 +547,6 @@
 				</div>
 				<div class='modal-body text-center ps-5 pe-5'>
 					<input type='text' class='form-control ps-3' v-model='EV_input_value' style='font-size: 2rem;' placeholder="入力 or 検索">
-					
-					<!--<select class='form-select form-select-lg ps-3' v-model='EV_input_value' style='font-size: 1.6rem;'>
-						<template v-for='(list,index) in EventList_filter' :key='list.meishou'>
-							<option :value=list.meishou>{{list.meishou}}</option>
-						</template>
-					</select>-->
 					<div class='evlist_area text-start ps-1'>
 						<template v-for='(list,index) in EventList_filter' :key='list.meishou'>
 							<div class="form-check ps-3">
@@ -572,11 +566,6 @@
 		</div>
 	</div>
 	</div><!-- <div  id='register'> -->
-	<script src="EVregi_vue.js?<?php echo $time; ?>"></script>
-	<script>
-		REZ_APP('<?php echo $_SESSION["user_id"]."','".$timeout."','".$RG_MODE; ?>').mount('#register');
-
-	</script><!--Vue3-->
 	<script>
 		var GSI = {};
 		// Enterキーが押された時にSubmitされるのを抑制する
@@ -591,1053 +580,1066 @@
 			}
 		}
 	</script><!--js-->
+	<script>//チュートリアル
+
+		let TourMilestone = '<?php echo $_SESSION["tour"];?>';
+		
+		const tutorial_7 = new Shepherd.Tour({
+			useModalOverlay: true,
+			defaultStepOptions: {
+				classes: 'tour_modal',
+				scrollTo: false,
+				cancelIcon:{
+					enabled:true
+				}
+			},
+			tourName:'tutorial_7'
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>売上計上日はここで変更します。<br><br>過去の売上を入れ忘れた場合、ここの日付を変更して売上登録をして下さい。</p>`,
+			attachTo: {
+				element: '.item_1',
+				on: 'auto'
+			},
+			buttons: [
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>出店しているイベント名を入力します。<br><br>今回は適当に入れてください。</p>`,
+			attachTo: {
+				element: '.item_2',
+				on: 'bottom'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>大まかな出店場所を表示してます。<br><br>端末のGPS機能を使用してます。<br>明らかに変な住所が表示されている場合はチェックを入れて無効にしてください。</p>`,
+			attachTo: {
+				element: '.item_101',
+				on: 'bottom'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>お会計はメニューをタップした数だけカウントされます。</p>`,
+			attachTo: {
+				element: '#order_area',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>試しに何回かタップしてみてください。</p>`,
+			attachTo: {
+				element: '#order_area',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>数量減は「カート編集」ボタンでカートを表示し、「＋－」ボタンで調整します。<br>タブレット端末等では画面左に常に表示されてます。</p>`,
+			attachTo: {
+				element: '#cart_btn',
+				on: 'bottom'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>「戻る」ボタンでレジ画面に戻ってください。</p>`,
+			attachTo: {
+				element: '#main_area',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});	
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>このエリアで税率を変更できます。</p>`,
+			attachTo: {
+				element: '#tax_changer',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});	
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>
+				全てのメニューに以下の税率が適用されます。
+				<br>イートイン：１０％
+				<br>テイクアウト：８％
+				<br>戻る：商品登録時の税率
+				<br>
+				<br><span style='color:red'>８％にしてはいけない商品にも適用できてしまうのでご注意ください。</span>
+				</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});	
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>お釣り計算機が表示されます。<br><br>釣銭ボタンをタップしてください。</p>`,
+			attachTo: {
+				element: '#dentaku',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>受取金額を入力して「計算」ボタンをタップするとお釣りが表示されます。<br><br>ここでは計算するだけで、何も登録されません。</p>`,
+			attachTo: {
+				element: '#main_area',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>閉じるボタン、もしくは計算機のエリア外をタップすると計算機は非表示になります。</p>`,
+			attachTo: {
+				element: '#main_area',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>「クリア」ボタンを押すと、全ての数量を０にクリアします。</p>`,
+			attachTo: {
+				element: '#order_clear_btn',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>「確認」ボタンを押すと、注文内容が表示され、「確認」ボタンが「登録」ボタンに変更されます。</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>適当に注文を入れ、「確認」ボタンを押して下さい。</p>`,
+			attachTo: {
+				element: '#main_area',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>注文済の個数を変更する場合は「＋－」ボタン、もしくは「戻る」ボタンで戻ってオーダーを追加します。</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>次に、「割引・割増」について説明します。</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>「割引・割増」ボタンをタップしてください。
+					<br>
+					<br>ボタンが表示されていない場合、「Back」ボタンで前に戻り、「確認」ボタンを押してください。</p>`,
+			attachTo: {
+				element: '#Price_change_btn',
+				on: 'bottom'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>まとめ買いに対する割引や、サービス時間超過に対する追加料金等で<span style='color:red;'>『支払総額』を変更したい場合</span>に使用します。</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>割引割増を使用すると、売上げの実績は以下の表に登録されます。
+					<br>
+					<br>例：割引（3,300円を3,000円）<br>商品A：1,100円<br>商品B：1,100円<br>商品C：1,100円<br><span style='color:red;'>割引：-300円</span></p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: 
+				`<p class='tour_discription'>
+				以下の方法で変更後金額を設定し、「決定」をタップすると支払総額が変更されます。
+				<br>
+				<br>・金額指定：変更後の支払総額を入力
+				<br>・[%OFF][%ON]：増減する割合を指定
+				<br>・[値引][値増]：増減する金額を指定
+				</p>`,
+			attachTo: {
+				element: '#main_area',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>最後に「登録」ボタンを押すと、売上げの登録が完了します。</p>`,
+			attachTo: {
+				element: '#main_area',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.next
+				}
+			]
+		});
+		tutorial_7.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>いろいろ操作してみて最後に「登録」をタップしてください。</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7.complete
+				}
+			]
+		});
+
+		const tutorial_7_1 = new Shepherd.Tour({
+			useModalOverlay: true,
+			defaultStepOptions: {
+				classes: 'tour_modal',
+				scrollTo: false,
+				cancelIcon:{
+					enabled:true
+				}
+			},
+			tourName:'tutorial_7_1'
+		});
+
+		tutorial_7_1.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>売上が登録されると画面上部に緑色のメッセージバーが表示されます。</p>`,
+			attachTo: {
+				element: '#msg_alert',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Next',
+					action: tutorial_7_1.next
+				}
+			]
+		});
+		tutorial_7_1.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>「領収書」ボタンをタップすると、領収書が発行できます。</p>`,
+			attachTo: {
+				element: '#msg_alert',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7_1.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7_1.next
+				}
+			]
+		});
+		tutorial_7_1.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: 
+			`<p class='tour_discription'>
+			宛名欄・敬称を選択し、下記いずれかの方法でお客様に発行できます。
+				<br><button type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1''><i class="bi bi-qr-code"></i></button>：お客様の携帯からQRコードを読取
+				<br><button type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1'><i class="bi bi-display"></i></button>：プレピューを表示し、スマホの機能で印刷やメール転送など
+				<br><button type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1'><i class="bi bi-line line-green"></i></button>：Lineで転送
+			</p>`,
+			attachTo: {
+				element: '#main_area',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7_1.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7_1.next
+				}
+			]
+		});
+		tutorial_7_1.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: 
+			`<p class='tour_discription'>
+			領収書発行エリアの外をタップすると、発行画面を閉じます。（タップして閉じてください）
+			</p>`,
+			attachTo: {
+				element: '#main_area',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7_1.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7_1.next
+				}
+			]
+		});
+		tutorial_7_1.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: 
+			`<p class='tour_discription'>
+			レジマークをタップすると本日の売上明細が表示されます。
+			</p>`,
+			attachTo: {
+				element: '#UriToday',
+				on: 'bottom'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7_1.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7_1.next
+				}
+			]
+		});
+		tutorial_7_1.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: 
+			`<p class='tour_discription'>
+			レジマークをタップして下さい。
+			</p>`,
+			attachTo: {
+				element: '#main_area',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7_1.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7_1.next
+				}
+			]
+		});
+		tutorial_7_1.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: 
+			`<p class='tour_discription'>
+			売上明細に表示されている「売上No」をタップすると、該当の売上に対する領収書発行画面が開きます。
+			</p>`,
+			attachTo: {
+				element: '#main_area',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7_1.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7_1.next
+				}
+			]
+		});
+		tutorial_7_1.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: 
+			`<p class='tour_discription'>
+			それぞれ、エリア外をタップして閉じてください。
+			</p>`,
+			attachTo: {
+				element: '#main_area',
+				on: 'top'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7_1.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7_1.next
+				}
+			]
+		});
+
+
+
+		tutorial_7_1.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>次に、レジ画面のカテゴリー別表示についてです。</p>`,
+			buttons: [
+				{
+					text: 'Next',
+					action: tutorial_7_1.next
+				}
+			]
+		});
+		tutorial_7_1.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>商品登録時にカテゴリーを設定すると、設定したカテゴリーごとに商品を纏めて表示ます。</p>`,
+			buttons: [
+				{
+					text: 'Next',
+					action: tutorial_7_1.next
+				}
+			]
+		});
+		tutorial_7_1.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>ここをタップするとカテゴリー別表示に変更されます。<br>試しにタップしてください。</p>`,
+			attachTo: {
+				element: '.item_15',
+				on: 'bottom'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7_1.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7_1.next
+				}
+			]
+		});
+		tutorial_7_1.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>カテゴリー別表示の場合、ここのリストにカテゴリーが表示されるようになります。<br>目的のカテゴリーを選択すると、その付近まで画面が自動でスライドするようになります</p>`,
+			attachTo: {
+				element: '.item_16',
+				on: 'bottom'
+			},
+			buttons: [
+				{
+					text: 'Next',
+					action: tutorial_7_1.next
+				}
+			]
+		});
+		tutorial_7_1.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>
+					<a class='btn-view ps-1 pt-0 pb-0 pe-1 me-2' href='javascript:void(0)'>
+						<i class="bi bi-sort-down fs-1 me-1"></i>切換
+					</a>
+					をタップするごとにカテゴリーの粒度が「大→中→小→分別なし」の順で切り替わるので、ご自由に設定して下さい。</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7_1.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7_1.next
+				}
+			]
+		});
+		tutorial_7_1.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>「商品登録～レジの使い方」までの説明は以上となります。</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7_1.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7_1.next
+				}
+			]
+		});
+		tutorial_7_1.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>次はレジで登録した売上げの確認に移ります。</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7_1.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7_1.next
+				}
+			]
+		});
+		tutorial_7_1.addStep({
+			title: `<p class='tour_header'>チュートリアル</p>`,
+			text: `<p class='tour_discription'>画面上部の「WebRez＋」をタップしてメニュー画面に戻ってください。
+					<br>
+					<br><span style='font-size:1rem;color:green;'>※進捗を保存しました。</span>
+					</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: tutorial_7_1.back
+				},
+				{
+					text: 'Next',
+					action: tutorial_7_1.complete
+				}
+			]
+		});
+		if(TourMilestone=="tutorial_4"){
+			tutorial_7.start(tourFinish,'tutorial','save');
+		}
+
+	</script><!--チュートリアル-->
+	<script>
+		//在庫機能のヘルプ
+		const shuppin_zaiko_help2 = new Shepherd.Tour({
+			useModalOverlay: true,
+			defaultStepOptions: {
+				classes: 'tour_modal',
+				scrollTo: false,
+				cancelIcon:{
+					enabled:true
+				}
+			},
+			tourName:'shuppin_zaiko_help2'
+		});
+		shuppin_zaiko_help2.addStep({
+			title: `<p class='tour_header'>出品在庫機能</p>`,
+			text: `<p class='tour_discription'>在庫の登録画面はレジ画面とほぼ同じです。</p>`,
+			buttons: [
+				{
+					text: 'Next',
+					action: shuppin_zaiko_help2.next
+				}
+			]
+		});
+		shuppin_zaiko_help2.addStep({
+			title: `<p class='tour_header'>出品在庫機能</p>`,
+			text: `<p class='tour_discription'>イベント等の出店日を指定します。</p>`,
+			attachTo: {
+				element: '.item_1',
+				on: 'auto'
+			},
+			buttons: [
+				{
+					text: 'Next',
+					action: shuppin_zaiko_help2.next
+				}
+			]
+		});
+		shuppin_zaiko_help2.addStep({
+			title: `<p class='tour_header'>出品在庫機能</p>`,
+			text: `<p class='tour_discription'>出店予定のイベント名を入力します。</p>`,
+			attachTo: {
+				element: '.item_2',
+				on: 'bottom'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: shuppin_zaiko_help2.back
+				},
+				{
+					text: 'Next',
+					action: shuppin_zaiko_help2.next
+				}
+			]
+		});
+		shuppin_zaiko_help2.addStep({
+			title: `<p class='tour_header'>出品在庫機能</p>`,
+			text: `<p class='tour_discription'>後は通常のレジと同じ要領で、商品名を出品予定の数だけタップして、「確認」⇒「登録」と進みます。</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: shuppin_zaiko_help2.back
+				},
+				{
+					text: 'Next',
+					action: shuppin_zaiko_help2.next
+				}
+			]
+		});
+		shuppin_zaiko_help2.addStep({
+			title: `<p class='tour_header'>出品在庫機能（修正について）</p>`,
+			text: `<p class='tour_discription'>登録した内容が間違えていた場合、同じ日付・同じイベント名を入力し、全て打ち直して登録して下さい。
+					<br>すると、前回登録した内容は削除され、今回入力した内容が反映されます。</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: shuppin_zaiko_help2.back
+				},
+				{
+					text: 'Next',
+					action: shuppin_zaiko_help2.next
+				}
+			]
+		});
+		shuppin_zaiko_help2.addStep({
+			title: `<p class='tour_header'>出品在庫機能（削除について）</p>`,
+			text: `<p class='tour_discription'>登録した内容を削除したい場合、誤って登録した日付とイベント名を指定し、何も商品を選択せず、空で登録して下さい。</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: shuppin_zaiko_help2.back
+				},
+				{
+					text: 'Next',
+					action: shuppin_zaiko_help2.next
+				}
+			]
+		});
+		shuppin_zaiko_help2.addStep({
+			title: `<p class='tour_header'>出品在庫機能（登録結果について）</p>`,
+			text: `<p class='tour_discription'>登録した内容は「売上実績」画面を「商品集計」モードで表示すると、「出品数」という項目で確認することが出来ます。</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: shuppin_zaiko_help2.back
+				},
+				{
+					text: 'Next',
+					action: shuppin_zaiko_help2.next
+				}
+			]
+		});
+		shuppin_zaiko_help2.addStep({
+			title: `<p class='tour_header'>出品在庫機能</p>`,
+			text: `<p class='tour_discription'>出品在庫機能の説明は以上で終了です。</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: shuppin_zaiko_help2.back
+				},
+				{
+					text: 'complete',
+					action: shuppin_zaiko_help2.complete
+				}
+			]
+		});
+
+		function help(){
+			shuppin_zaiko_help2.start(tourFinish,'','');
+		}
+	</script><!--出品在庫機能help-->
+	<script>
+		//新機能のリリース
+		const new_releace_name = sessionStorage.getItem('tourname');
+
+		const new_releace_005 = new Shepherd.Tour({
+			useModalOverlay: true,
+			defaultStepOptions: {
+				classes: 'tour_modal',
+				scrollTo: false,
+				cancelIcon:{
+					enabled:true
+				}
+			},
+			tourName:'new_releace_005'
+		});
+		new_releace_005.addStep({
+			title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+			text: `<p class='tour_discription'>QRコードマークをタップすると、QRスキャンモードに切り替わります。
+							<br>
+							<br>その際、端末のカメラ機能へのアクセス許可を求められるので「許可」してください。
+							</p>`,
+			/*attachTo: {
+				element: '#qr_code_reader',
+				on: 'bottom'
+			},*/
+			buttons: [
+				{
+					text: 'Back',
+					action: new_releace_005.back
+				},
+				{
+					text: 'Next',
+					action: new_releace_005.next
+				}
+			]
+		});
+		new_releace_005.addStep({
+			title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+			text: `<p class='tour_discription'>タップして「QRスキャンモード」を起動してください。</p>`,
+			attachTo: {
+				element: '#qr_code_reader',
+				on: 'bottom'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: new_releace_005.back
+				},
+				{
+					text: 'Next',
+					action: new_releace_005.next
+				}
+			]
+		});
+		new_releace_005.addStep({
+			title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+			text: `<p class='tour_discription'>このエリアでQRコードのスキャンが行われます</p>`,
+			attachTo: {
+				element: '#qr_code_reader_camera',
+				on: 'bottom'
+			},
+			buttons: [
+				{
+					text: 'Back',
+					action: new_releace_005.back
+				},
+				{
+					text: 'Next',
+					action: new_releace_005.next
+				}
+			]
+		});
+		new_releace_005.addStep({
+			title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+			text: `<p class='tour_discription'>QRコードが認識されると、次のQR読込まで約１秒ほどリード期間を設けてます。
+						<br>その間にQRコード登録した商品をカメラから外すようにお願いします。
+						<br>
+						<br><span style='color:red'>※リード期間後に同じがカメラに写っていると、連続して同じ商品がスキャン登録されてしまいます。</span>
+						</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: new_releace_005.back
+				},
+				{
+					text: 'Next',
+					action: new_releace_005.next
+				}
+			]
+		});
+		new_releace_005.addStep({
+			title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+			text: `<p class='tour_discription'>通常のレジモードの戻るには、再度QRコードマークをタップしてください。</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: new_releace_005.back
+				},
+				{
+					text: 'Next',
+					action: new_releace_005.next
+				}
+			]
+		});
+		new_releace_005.addStep({
+			title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+			text: `<p class='tour_discription'>スキャン・ボタンによる商品登録が終わったら、通常通り「確認」→「登録」の流れで操作してください。</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: new_releace_005.back
+				},
+				{
+					text: 'Next',
+					action: new_releace_005.next
+				}
+			]
+		});
+		new_releace_005.addStep({
+			title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
+			text: `<p class='tour_discription'>新機能「QRスキャン登録」についての説明は以上です。
+						<br>
+						<br>（メニュー画面のベルマークをタップすると、同じ説明を再度確認できます。）
+						</p>`,
+			buttons: [
+				{
+					text: 'Back',
+					action: new_releace_005.back
+				},
+				{
+					text: 'OK',
+					action: new_releace_005.next
+				}
+			]
+		});
+		
+		if(new_releace_name==='new_releace_005'){
+	    new_releace_005.start(tourFinish,'new_releace_005','finish'); 
+	  }
+
+	</script><!--新機能リリースヘルプ-->
+	<script>
+		/*ジオ・コーディング*/
+
+		//GIO機能のオンオフ説明
+		const gio_on = new Shepherd.Tour({
+			useModalOverlay: true,
+			defaultStepOptions: {
+				classes: 'tour_modal',
+				scrollTo: false,
+				cancelIcon:{
+					enabled:true
+				}
+			},
+			tourName:'gio_on'
+		});
+		gio_on.addStep({
+			title: `<p class='tour_header'>位置情報</p>`,
+			text: `<p class='tour_discription'>位置情報は有効です。
+				<br>
+				<br>現在地が正しくない場合、同じ場所を再度タップして無効にしてください。
+				<br></p>`,
+			buttons: [
+				{
+					text: 'OK',
+					action: gio_on.next
+				}
+			]
+		});
+		const gio_off = new Shepherd.Tour({
+			useModalOverlay: true,
+			defaultStepOptions: {
+				classes: 'tour_modal',
+				scrollTo: false,
+				cancelIcon:{
+					enabled:true
+				}
+			},
+			tourName:'gio_off'
+		});
+		gio_off.addStep({
+			title: `<p class='tour_header'>位置情報</p>`,
+			text: `<p class='tour_discription'>位置情報は無効です。
+				<br>
+				<br>現在地に問題が無い場合、同じ場所を再度タップして有効にしてください。
+				<br></p>`,
+			buttons: [
+				{
+					text: 'OK',
+					action: gio_off.next
+				}
+			]
+		});
+		let gio_onoff = () => {
+			if(address_disp.style.textDecoration=='line-through'){
+				address_disp.style.textDecoration='';
+				gio_on.start(tourFinish,'','');
+			}else{
+				address_disp.style.textDecoration='line-through';
+				gio_off.start(tourFinish,'','');
+			}
+		}
+
+
+	</script><!--ジオコーディング-->
+	<script src="https://maps.gsi.go.jp/js/muni.js"></script><!--gio住所逆引リスト-->
+	<script src="EVregi_vue.js?<?php echo $time; ?>"></script>
+	<script>
+		REZ_APP('<?php echo $_SESSION["user_id"]."','".$timeout."','".$RG_MODE; ?>').mount('#register');
+	</script><!--Vue3-->
+
 </body>
 
 <!--シェパードナビ
 <script src="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/js/shepherd.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/css/shepherd.css"/>
 -->
-<script src="shepherd/shepherd.min.js?<?php echo $time; ?>"></script>
-<link rel="stylesheet" href="shepherd/shepherd.css?<?php echo $time; ?>"/>
-<?php require "ajax_func_tourFinish.php";?>
-<script>//チュートリアル
-	
-	let TourMilestone = '<?php echo $_SESSION["tour"];?>';
-	
-	const tutorial_7 = new Shepherd.Tour({
-		useModalOverlay: true,
-		defaultStepOptions: {
-			classes: 'tour_modal',
-			scrollTo: false,
-			cancelIcon:{
-				enabled:true
-			}
-		},
-		tourName:'tutorial_7'
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>売上計上日はここで変更します。<br><br>過去の売上を入れ忘れた場合、ここの日付を変更して売上登録をして下さい。</p>`,
-		attachTo: {
-			element: '.item_1',
-			on: 'auto'
-		},
-		buttons: [
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>出店しているイベント名を入力します。<br><br>今回は適当に入れてください。</p>`,
-		attachTo: {
-			element: '.item_2',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>大まかな出店場所を表示してます。<br><br>端末のGPS機能を使用してます。<br>明らかに変な住所が表示されている場合はチェックを入れて無効にしてください。</p>`,
-		attachTo: {
-			element: '.item_101',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>お会計はメニューをタップした数だけカウントされます。</p>`,
-		attachTo: {
-			element: '#main_area',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>試しに何回かタップしてみてください。</p>`,
-		attachTo: {
-			element: '#main_area',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>数量減は「カート編集」ボタンでカートを表示し、「＋－」ボタンで調整します。<br>タブレット端末等では画面左に常に表示されてます。</p>`,
-		attachTo: {
-			element: '#main_area',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>「戻る」ボタンでレジ画面に戻ってください。</p>`,
-		attachTo: {
-			element: '#main_area',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});	
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>このエリアで税率を変更できます。</p>`,
-		attachTo: {
-			element: '#tax_changer',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});	
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>
-			全てのメニューに以下の税率が適用されます。
-			<br>イートイン：１０％
-			<br>テイクアウト：８％
-			<br>戻る：商品登録時の税率
-			<br>
-			<br><span style='color:red'>８％にしてはいけない商品にも適用できてしまうのでご注意ください。</span>
-			</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});	
-	/*
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `
-				<input type='radio' class='btn-check' name='options' value='minus' autocomplete='off' id='minus_mode' >
-				<label class='btn btn-outline-warning' for='minus_mode'>　▼　</label>
-				<br><p class='tour_discription'>を選択すると、メニュータップ時にマイナスされるようになります。</p>`,
-		attachTo: {
-			element: '.item_4',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `
-				<input type='radio' class='btn-check' name='options' value='plus' autocomplete='off' id='plus_mode' checked>
-				<label class='btn btn-outline-primary' for='plus_mode'>　▲　</label>
-				<br><p class='tour_discription'>を選択すると、元に戻ります。</p>`,
-		attachTo: {
-			element: '.item_4',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	*/
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>お釣り計算機が表示されます。<br><br>釣銭ボタンをタップしてください。</p>`,
-		attachTo: {
-			element: '.item_5',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>受取金額を入力して「計算」ボタンをタップするとお釣りが表示されます。<br><br>ここでは計算するだけで、何も登録されません。</p>`,
-		attachTo: {
-			element: '#main_area',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>閉じるボタン、もしくは計算機のエリア外をタップすると計算機は非表示になります。</p>`,
-		attachTo: {
-			element: '#main_area',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>「クリア」ボタンを押すと、全ての数量を０にクリアします。</p>`,
-		attachTo: {
-			element: '.item_8',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>「確認」ボタンを押すと、注文内容が表示され、「確認」ボタンが「登録」ボタンに変更されます。</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>適当に注文を入れ、「確認」ボタンを押して下さい。</p>`,
-		attachTo: {
-			element: '#main_area',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>注文済の個数を変更する場合は「＋－」ボタン、もしくは「戻る」ボタンで戻ってオーダーを追加します。</p>`,
-		/*attachTo: {
-			element: '.item_10',
-			on: 'top'
-		},*/
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>次に、「割引・割増」について説明します。</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>「割引・割増」ボタンをタップしてください。
-				<br>
-				<br>ボタンが表示されていない場合、「Back」ボタンで前に戻り、「確認」ボタンを押してください。</p>`,
-		attachTo: {
-			element: '#item_11',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>まとめ買いに対する割引や、サービス時間超過に対する追加料金等で<span style='color:red;'>『支払総額』を変更したい場合</span>に使用します。</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>割引割増を使用すると、売上げの実績は以下の表に登録されます。
-				<br>
-				<br>例：割引（3,300円を3,000円）<br>商品A：1,100円<br>商品B：1,100円<br>商品C：1,100円<br><span style='color:red;'>割引：-300円</span></p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: 
-			`<p class='tour_discription'>
-			以下の方法で変更後金額を設定し、「決定」をタップすると支払総額が変更されます。
-			<br>
-			<br>・金額指定：変更後の支払総額を入力
-			<br>・[%OFF][%ON]：増減する割合を指定
-			<br>・[値引][値増]：増減する金額を指定
-			</p>`,
-		attachTo: {
-			element: '#main_area',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>最後に「登録」ボタンを押すと、売上げの登録が完了します。</p>`,
-		attachTo: {
-			element: '#main_area',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.next
-			}
-		]
-	});
-	tutorial_7.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>いろいろ操作してみて最後に「登録」をタップしてください。</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7.complete
-			}
-		]
-	});
-
-	const tutorial_7_1 = new Shepherd.Tour({
-		useModalOverlay: true,
-		defaultStepOptions: {
-			classes: 'tour_modal',
-			scrollTo: false,
-			cancelIcon:{
-				enabled:true
-			}
-		},
-		tourName:'tutorial_7_1'
-	});
-
-	tutorial_7_1.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>売上が登録されると画面上部に緑色のメッセージバーが表示されます。</p>`,
-		attachTo: {
-			element: '#msg_alert',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Next',
-				action: tutorial_7_1.next
-			}
-		]
-	});
-	tutorial_7_1.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>「領収書」ボタンをタップすると、領収書が発行できます。</p>`,
-		attachTo: {
-			element: '#msg_alert',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7_1.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7_1.next
-			}
-		]
-	});
-	tutorial_7_1.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: 
-		`<p class='tour_discription'>
-		宛名欄・敬称を選択し、下記いずれかの方法でお客様に発行できます。
-			<br><button type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1''><i class="bi bi-qr-code"></i></button>：お客様の携帯からQRコードを読取
-			<br><button type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1'><i class="bi bi-display"></i></button>：プレピューを表示し、スマホの機能で印刷やメール転送など
-			<br><button type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1'><i class="bi bi-line line-green"></i></button>：Lineで転送
-		</p>`,
-		attachTo: {
-			element: '#main_area',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7_1.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7_1.next
-			}
-		]
-	});
-	tutorial_7_1.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: 
-		`<p class='tour_discription'>
-		領収書発行エリアの外をタップすると、発行画面を閉じます。（タップして閉じてください）
-		</p>`,
-		attachTo: {
-			element: '#main_area',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7_1.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7_1.next
-			}
-		]
-	});
-	tutorial_7_1.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: 
-		`<p class='tour_discription'>
-		レジマークをタップすると本日の売上明細が表示されます。
-		</p>`,
-		attachTo: {
-			element: '#UriToday',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7_1.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7_1.next
-			}
-		]
-	});
-	tutorial_7_1.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: 
-		`<p class='tour_discription'>
-		レジマークをタップして下さい。
-		</p>`,
-		attachTo: {
-			element: '#main_area',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7_1.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7_1.next
-			}
-		]
-	});
-	tutorial_7_1.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: 
-		`<p class='tour_discription'>
-		売上明細に表示されている「売上No」をタップすると、該当の売上に対する領収書発行画面が開きます。
-		</p>`,
-		attachTo: {
-			element: '#main_area',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7_1.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7_1.next
-			}
-		]
-	});
-	tutorial_7_1.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: 
-		`<p class='tour_discription'>
-		それぞれ、エリア外をタップして閉じてください。
-		</p>`,
-		attachTo: {
-			element: '#main_area',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7_1.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7_1.next
-			}
-		]
-	});
-
-
-
-	tutorial_7_1.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>次に、レジ画面のカテゴリー別表示についてです。</p>`,
-		buttons: [
-			{
-				text: 'Next',
-				action: tutorial_7_1.next
-			}
-		]
-	});
-	tutorial_7_1.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>商品登録時にカテゴリーを設定すると、設定したカテゴリーごとに商品を纏めて表示ます。</p>`,
-		buttons: [
-			{
-				text: 'Next',
-				action: tutorial_7_1.next
-			}
-		]
-	});
-	tutorial_7_1.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>ここをタップするとカテゴリー別表示に変更されます。<br>試しにタップしてください。</p>`,
-		attachTo: {
-			element: '.item_15',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7_1.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7_1.next
-			}
-		]
-	});
-	tutorial_7_1.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>カテゴリー別表示の場合、ここのリストにカテゴリーが表示されるようになります。<br>目的のカテゴリーを選択すると、その付近まで画面が自動でスライドするようになります</p>`,
-		attachTo: {
-			element: '.item_16',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Next',
-				action: tutorial_7_1.next
-			}
-		]
-	});
-	tutorial_7_1.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>
-				<a class='btn-view ps-1 pt-0 pb-0 pe-1 me-2' href='javascript:void(0)'>
-					<i class="bi bi-sort-down fs-1 me-1"></i>切換
-				</a>
-				をタップするごとにカテゴリーの粒度が「大→中→小→分別なし」の順で切り替わるので、ご自由に設定して下さい。</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7_1.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7_1.next
-			}
-		]
-	});
-	tutorial_7_1.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>「商品登録～レジの使い方」までの説明は以上となります。</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7_1.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7_1.next
-			}
-		]
-	});
-	tutorial_7_1.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>次はレジで登録した売上げの確認に移ります。</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7_1.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7_1.next
-			}
-		]
-	});
-	tutorial_7_1.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>画面上部の「WebRez＋」をタップしてメニュー画面に戻ってください。
-				<br>
-				<br><span style='font-size:1rem;color:green;'>※進捗を保存しました。</span>
-				</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_7_1.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_7_1.complete
-			}
-		]
-	});
-	if(TourMilestone=="tutorial_4"){
-		tutorial_7.start(tourFinish,'tutorial','save');
-	}
-	
-</script><!--チュートリアル-->
-<script>
-	//在庫機能のヘルプ
-	const shuppin_zaiko_help2 = new Shepherd.Tour({
-		useModalOverlay: true,
-		defaultStepOptions: {
-			classes: 'tour_modal',
-			scrollTo: false,
-			cancelIcon:{
-				enabled:true
-			}
-		},
-		tourName:'shuppin_zaiko_help2'
-	});
-	shuppin_zaiko_help2.addStep({
-		title: `<p class='tour_header'>出品在庫機能</p>`,
-		text: `<p class='tour_discription'>在庫の登録画面はレジ画面とほぼ同じです。</p>`,
-		buttons: [
-			{
-				text: 'Next',
-				action: shuppin_zaiko_help2.next
-			}
-		]
-	});
-	shuppin_zaiko_help2.addStep({
-		title: `<p class='tour_header'>出品在庫機能</p>`,
-		text: `<p class='tour_discription'>イベント等の出店日を指定します。</p>`,
-		attachTo: {
-			element: '.item_1',
-			on: 'auto'
-		},
-		buttons: [
-			{
-				text: 'Next',
-				action: shuppin_zaiko_help2.next
-			}
-		]
-	});
-	shuppin_zaiko_help2.addStep({
-		title: `<p class='tour_header'>出品在庫機能</p>`,
-		text: `<p class='tour_discription'>出店予定のイベント名を入力します。</p>`,
-		attachTo: {
-			element: '.item_2',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: shuppin_zaiko_help2.back
-			},
-			{
-				text: 'Next',
-				action: shuppin_zaiko_help2.next
-			}
-		]
-	});
-	shuppin_zaiko_help2.addStep({
-		title: `<p class='tour_header'>出品在庫機能</p>`,
-		text: `<p class='tour_discription'>後は通常のレジと同じ要領で、商品名を出品予定の数だけタップして、「確認」⇒「登録」と進みます。</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: shuppin_zaiko_help2.back
-			},
-			{
-				text: 'Next',
-				action: shuppin_zaiko_help2.next
-			}
-		]
-	});
-	shuppin_zaiko_help2.addStep({
-		title: `<p class='tour_header'>出品在庫機能（修正について）</p>`,
-		text: `<p class='tour_discription'>登録した内容が間違えていた場合、同じ日付・同じイベント名を入力し、全て打ち直して登録して下さい。
-				<br>すると、前回登録した内容は削除され、今回入力した内容が反映されます。</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: shuppin_zaiko_help2.back
-			},
-			{
-				text: 'Next',
-				action: shuppin_zaiko_help2.next
-			}
-		]
-	});
-	shuppin_zaiko_help2.addStep({
-		title: `<p class='tour_header'>出品在庫機能（削除について）</p>`,
-		text: `<p class='tour_discription'>登録した内容を削除したい場合、誤って登録した日付とイベント名を指定し、何も商品を選択せず、空で登録して下さい。</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: shuppin_zaiko_help2.back
-			},
-			{
-				text: 'Next',
-				action: shuppin_zaiko_help2.next
-			}
-		]
-	});
-	shuppin_zaiko_help2.addStep({
-		title: `<p class='tour_header'>出品在庫機能（登録結果について）</p>`,
-		text: `<p class='tour_discription'>登録した内容は「売上実績」画面を「商品集計」モードで表示すると、「出品数」という項目で確認することが出来ます。</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: shuppin_zaiko_help2.back
-			},
-			{
-				text: 'Next',
-				action: shuppin_zaiko_help2.next
-			}
-		]
-	});
-	shuppin_zaiko_help2.addStep({
-		title: `<p class='tour_header'>出品在庫機能</p>`,
-		text: `<p class='tour_discription'>出品在庫機能の説明は以上で終了です。</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: shuppin_zaiko_help2.back
-			},
-			{
-				text: 'complete',
-				action: shuppin_zaiko_help2.complete
-			}
-		]
-	});
-
-	function help(){
-		shuppin_zaiko_help2.start(tourFinish,'','');
-	}
-</script><!--出品在庫機能help-->
-<script>
-	//天気機能のリリース
-	const new_releace_002 = new Shepherd.Tour({
-		useModalOverlay: true,
-		defaultStepOptions: {
-			classes: 'tour_modal',
-			scrollTo: false,
-			cancelIcon:{
-				enabled:true
-			}
-		},
-		tourName:'new_releace_002'
-	});
-	new_releace_002.addStep({
-		title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
-		text: `<p class='tour_discription'>大まかな出店場所を表示してます。<br><br>端末のGPS機能を使用してます。</p>`,
-		attachTo: {
-			element: '.item_101',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: new_releace_002.back
-			},
-			{
-				text: 'Next',
-				action: new_releace_002.next
-			}
-		]
-	});
-	new_releace_002.addStep({
-		title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
-		text: `<p class='tour_discription'>ここに表示されている住所から天気・気温を取得します。<br><br>明らかに変な住所が表示されている場合はチェックを入れて無効にしてください。</p>`,
-		attachTo: {
-			element: '.item_101',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: new_releace_002.back
-			},
-			{
-				text: 'Next',
-				action: new_releace_002.next
-			}
-		]
-	});
-	new_releace_002.addStep({
-		title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
-		text: `<p class='tour_discription'>次の売上から、『売上実績』の画面に売上時の天気、気温が表示されるようになります。</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: new_releace_002.back
-			},
-			{
-				text: 'Next',
-				action: new_releace_002.next
-			}
-		]
-	});
-	new_releace_002.addStep({
-		title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
-		text: `<p class='tour_discription'>今回の追加機能は以上となります。</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: new_releace_002.back
-			},
-			{
-				text: 'OK',
-				action: new_releace_002.next
-			}
-		]
-	});
-	 if(TourMilestone=="new_releace_002"){
-		new_releace_002.start(tourFinish,'new_releace_002','finish');
-	}
-
-</script><!--天気機能リリースヘルプ（次回機能リリース時は不要となる）-->
-<script>
-	/*ジオ・コーディング*/
-
-	//GIO機能のオンオフ説明
-	const gio_on = new Shepherd.Tour({
-		useModalOverlay: true,
-		defaultStepOptions: {
-			classes: 'tour_modal',
-			scrollTo: false,
-			cancelIcon:{
-				enabled:true
-			}
-		},
-		tourName:'gio_on'
-	});
-	gio_on.addStep({
-		title: `<p class='tour_header'>位置情報</p>`,
-		text: `<p class='tour_discription'>位置情報は有効です。
-			<br>
-			<br>現在地が正しくない場合、同じ場所を再度タップして無効にしてください。
-			<br></p>`,
-		buttons: [
-			{
-				text: 'OK',
-				action: gio_on.next
-			}
-		]
-	});
-	const gio_off = new Shepherd.Tour({
-		useModalOverlay: true,
-		defaultStepOptions: {
-			classes: 'tour_modal',
-			scrollTo: false,
-			cancelIcon:{
-				enabled:true
-			}
-		},
-		tourName:'gio_off'
-	});
-	gio_off.addStep({
-		title: `<p class='tour_header'>位置情報</p>`,
-		text: `<p class='tour_discription'>位置情報は無効です。
-			<br>
-			<br>現在地に問題が無い場合、同じ場所を再度タップして有効にしてください。
-			<br></p>`,
-		buttons: [
-			{
-				text: 'OK',
-				action: gio_off.next
-			}
-		]
-	});
-	let gio_onoff = () => {
-		if(address_disp.style.textDecoration=='line-through'){
-			address_disp.style.textDecoration='';
-			gio_on.start(tourFinish,'','');
-		}else{
-			address_disp.style.textDecoration='line-through';
-			gio_off.start(tourFinish,'','');
-		}
-	}
-
-
-</script><!--ジオコーディング-->
-<script src="https://maps.gsi.go.jp/js/muni.js"></script><!--gio住所逆引リスト-->
 </html>
 <?php
 $stmt = null;
