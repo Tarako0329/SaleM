@@ -1500,7 +1500,7 @@
 			text: `<p class='tour_discription'>QRコードが認識されると、次のQR読込まで約１秒ほどリード期間を設けてます。
 						<br>その間にQRコード登録した商品をカメラから外すようにお願いします。
 						<br>
-						<br><span style='color:red'>※リード期間後に同じがカメラに写っていると、連続して同じ商品がスキャン登録されてしまいます。</span>
+						<br><span style='color:red'>※リード期間後に同じ商品がカメラに写っていると、連続して同一商品がスキャン登録されてしまいます。</span>
 						</p>`,
 			buttons: [
 				{
@@ -1558,7 +1558,7 @@
 				}
 			]
 		});
-		
+
 		if(new_releace_name==='new_releace_005'){
 	    new_releace_005.start(tourFinish,'new_releace_005','finish'); 
 	  }
