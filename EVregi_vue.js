@@ -961,7 +961,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 
 		const barcode_mode = (p_mode) =>{//QR読取カメラ起動
 		  //p_mode:start/restart/close
-			if(barcode_cam_area.value === false){
+			if(barcode_cam_area.value === false && p_mode==='close'){
 				return 0
 			}
 			if((barcode_cam_area.value === true && p_mode==='start' )|| p_mode==='close'){//QRボタンを再度タップしたときはエリアを閉じる
