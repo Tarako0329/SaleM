@@ -212,7 +212,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         <b><a href='#' onclick='ColorChange()'>COLOR<i class='fa-solid fa-rotate-right fa-lg rainbow-color'></i></a></b>
     </div>
     <div class='container-fluid' style='padding-top:5px;'>
-
+        <p id='testmsg'></p>
 <?php
     //deb_echo(ROOT_URL);
     //deb_echo(EXEC_MODE."：uid_".$_SESSION["user_id"]);
@@ -802,12 +802,26 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             enabled:false
         }
     });
-    const new_releace_start = () => {
+    const new_releace_start = async() => {
         //新機能のリリース通知はこの関数で呼び出すツアーを更新する
         //shuppin_zaiko_help1.start(tourFinish,'new_releace_001','');
         //new_releace_002.start(tourFinish,'new_releace_002',''); 
         //new_releace_003.start(tourFinish,'new_releace_003','finish'); 
         //new_releace_004.start(tourFinish,'new_releace_004','finish'); 
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        console_log(devices);
+        console_log(devices.filter((device) => device.kind === "videoinput"));
+        const cam_dev = devices.filter((device) => device.kind === "videoinput")
+        document.getElementById('testmsg').innerText =devices
+
+        if(cam_dev.length!==0){
+            new_releace_005.start(tourFinish,'new_releace_005',''); 
+            sessionStorage.setItem('tourname', 'new_releace_005');
+        }else{
+            console_log("cant use camera")
+            new_releace_005_2.start(tourFinish,'new_releace_005','finish'); 
+        }
+        /*
         navigator.mediaDevices
 		.getUserMedia({
 			audio: false,
@@ -825,7 +839,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             console_log("cant use camera")
             new_releace_005_2.start(tourFinish,'new_releace_005','finish'); 
         })
-
+        */
         //document.getElementById("bell").className = 'logoff-color'
     }
     
