@@ -1,5 +1,5 @@
 const { createApp, ref, onMounted, computed, VueCookies, watch } = Vue
-const REZ_APP = () => createApp({
+const REZ_APP = (p_php_name) => createApp({
 	setup(){
 		const loader = ref(false)
 		//商品マスタ取得関連
@@ -409,13 +409,16 @@ const REZ_APP = () => createApp({
 			.catch((error) => {
 				console_log(`GET_SHOUHINMS ERROR:${error}`)
 			})
-			qr_plus_name()
-			//GET_QRCODE(String('111'),Number(qr_size.value),'qr_sample')
-			
+
 			const TourMilestone = sessionStorage.getItem('tourname');
-	    if(TourMilestone==='new_releace_005'){
+			if(p_php_name==="shouhinMSQR.php"){
+				qr_plus_name()
+				if(TourMilestone==='new_releace_005'){
 	        new_releace_start()
-	    }
+		    }
+			}
+			
+			
 
 		})
 

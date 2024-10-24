@@ -207,7 +207,7 @@
 			document.getElementById("app").onkeypress = (e) => {const key = e.keyCode || e.charCode || 0;}
 		};
 	</script><!--js-->
-		<script>
+	<script>
 		/*	const TourMilestone = sessionStorage.getItem('tourname');
 			if(TourMilestone){
 					new_releace_start()
@@ -343,7 +343,7 @@
 		</script>
 		<script src="shouhinMSList_vue.js?<?php echo $time; ?>"></script>
 	<script>
-		REZ_APP().mount('#app');
+		REZ_APP("shouhinMSQR.php").mount('#app');
 	</script><!--Vue3js-->
 </BODY>
 <!--<script src="shepherd/shepherd.min.js?<?php echo $time; ?>"></script>

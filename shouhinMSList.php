@@ -194,7 +194,7 @@
 	</script><!--js-->
 	<script src="shouhinMSList_vue.js?<?php echo $time; ?>"></script>
 	<script>
-		REZ_APP().mount('#app');
+		REZ_APP("shouhinMSList.php").mount('#app');
 	</script><!--Vue3js-->
 </BODY>
 <!--シェパードナビshepherd
