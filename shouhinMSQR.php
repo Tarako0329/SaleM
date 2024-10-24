@@ -165,10 +165,10 @@
 					<div class='modal-title'>QRコードサイズ調整</div>
 				</div>
 				<div class='modal-body'>
-										<div class='row ps-5 pe-5'>
-								<p>1.5cm以上ですと、スムーズに読み込めます</p>
+					<div class='row ps-5 pe-5'>
+						<p>1.5cm以上ですと、スムーズに読み込めます</p>
 						<select class='form-select' v-model='qr_size'>
-							<option value='38'>1.0cm</option>
+							<option value='42'>1.0cm</option>
 							<option value='42'>1.1cm</option>
 							<option value='45'>1.2cm</option>
 							<option value='49'>1.3cm</option>
