@@ -1004,6 +1004,11 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 			canvas.height = 180
 			const ctx = canvas.getContext('2d');
 			//ctx.drawImage(video, 0, 210, video.videoWidth, video.videoHeight, 0, 0, canvas.width, canvas.height);
+			if(!video){
+				alert('カメラがうまく動いていないようです。')
+				alert('端末のソフトウェアアップデートを実行してみてください。(iOS,Android)')
+				return 0
+			}
 			ctx.drawImage(video, 0, 210, video.videoWidth, 180, 0, 0, canvas.width, 180);
 
 			const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
@@ -1042,7 +1047,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 			if(order_list_index >= 0){
 				ordercounter(order_list_index)
 			}else{
-			    loader.value = false
+			  loader.value = false
 				scan_result.value = `該当する商品はありません。スキャン結果:${p_ShouhinCD}`
 			}
 		}

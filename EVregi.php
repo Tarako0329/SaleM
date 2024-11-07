@@ -192,7 +192,7 @@
 					<div class='col-lg-3 col-md-4 col-sm-12 col-12'><!--注文内容/スキャナ-->
 						<div v-show='barcode_cam_area'  style='height:180px;width:100%;position:relative;' id='qr_code_reader_camera'><!--スキャナ-->
 						    <div style='position:absolute;top:80px;width:100%;background-color:yellow;' class='text-center fs-2'>{{scan_result}}</div>
-								<video style='height: 100%;width:100%;object-fit: cover;' id="js-video" class="reader-video" autoplay playsinline></video>
+								<video style='height: 100%;width:100%;object-fit: cover;' id="js-video" class="reader-video" autoplay playsinline muted></video>
 								<canvas id="js-canvas" style="display:none;object-fit:cover"></canvas>
 								<div>
 								</div>
