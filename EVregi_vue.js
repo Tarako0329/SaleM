@@ -968,6 +968,12 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 				return 0
 			}
 			barcode_cam_area.value = true
+			/*
+			setTimeout(() => {
+				read_qr()
+			}, 500);
+			*/
+			
 			navigator.mediaDevices
 				.getUserMedia({
 					audio: false,
@@ -983,7 +989,9 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 					video.onloadedmetadata = function(e) {
 						video.play()
 					}
-					read_qr()
+					setTimeout(() => {
+						read_qr()
+					}, 500);
 				})
 				.catch((err) =>{
 						alert('Error!!')
@@ -994,21 +1002,23 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 						barcode_cam_area.value=false
 						stream.getTracks().forEach(track => track.stop())
 				})
+				
 		}
 		
 		let G_reading_flg = true
 		const read_qr = () =>{//QR読取処理
-			canvas.width = (video.videoWidth===0?300:video.videoWidth)
-			//canvas.height = (video.videoHeight===0?80:video.videoHeight);
-			canvas.height = 180
+			const QR_DIV = document.getElementById('qr_code_reader_camera');
+			const width = QR_DIV.clientWidth
+			const height = QR_DIV.clientHeight
+			canvas.width = (video.videoWidth===0?width:video.videoWidth)
+			canvas.height = height
 			const ctx = canvas.getContext('2d');
-			const {width, height} = ctx;
-			ctx.putImageData(imageData, 0, 0);
+
 			ctx.font = '10px';
 			//ctx.fillStyle = '#0069b3';
-			ctx.fillText('カメラに切り替わらない場合、iOS/Androidをアップデートしてください', 0, Number(height)-Number(50),width);
+			ctx.fillText('カメラに切り替わらない場合、iOS/Androidをアップデートを試して下さい', 50, 50);
 
-			//ctx.drawImage(video, 0, 210, video.videoWidth, 180, 0, 0, canvas.width, 180);
+			
 
 			const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
 
