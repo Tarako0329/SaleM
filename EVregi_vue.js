@@ -865,7 +865,6 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 				if(jsonobj.LastUseDate===undefined){return}
 				EventName = jsonobj
 				console_log(EventName)
-				//labels.value["EV_input_value"] = EventName.EventName
 
 				const today = new Date().toLocaleDateString('sv-SE')
 				
@@ -893,12 +892,10 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 				rtn_labels.EV_input_name='KOKYAKU'
 				rtn_labels.EV_input_hidden='EV'
 				rtn_labels.EV_input_placeholder='顧客名'
-				//rtn_labels.EV_input_value=''
 			}else{
 				rtn_labels.EV_input_name='EV'
 				rtn_labels.EV_input_hidden='KOKYAKU'
 				rtn_labels.EV_input_placeholder='イベント名等'
-				//rtn_labels.EV_input_value=EventName.EventName
 			}
 			if(rg_mode.value !== 'evrez'){
 				rtn_labels.address='display:none'
@@ -991,6 +988,8 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 				.catch((err) =>{
 						alert('Error!!')
 						alert(err)
+						alert('カメラがないか、ブラウザからカメラを起動できない設定になっています。')
+						alert('safari/chrome の設定を確認してください。')
 						order_panel_show("close")
 						barcode_cam_area.value=false
 						stream.getTracks().forEach(track => track.stop())
@@ -1003,13 +1002,13 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 			//canvas.height = (video.videoHeight===0?80:video.videoHeight);
 			canvas.height = 180
 			const ctx = canvas.getContext('2d');
-			//ctx.drawImage(video, 0, 210, video.videoWidth, video.videoHeight, 0, 0, canvas.width, canvas.height);
-			if(!video){
-				alert('カメラがうまく動いていないようです。')
-				alert('端末のソフトウェアアップデートを実行してみてください。(iOS,Android)')
-				return 0
-			}
-			ctx.drawImage(video, 0, 210, video.videoWidth, 180, 0, 0, canvas.width, 180);
+			const {width, height} = ctx;
+			ctx.putImageData(imageData, 0, 0);
+			ctx.font = '10px';
+			//ctx.fillStyle = '#0069b3';
+			ctx.fillText('カメラに切り替わらない場合、iOS/Androidをアップデートしてください', 0, Number(height)-Number(50),width);
+
+			//ctx.drawImage(video, 0, 210, video.videoWidth, 180, 0, 0, canvas.width, 180);
 
 			const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
 
