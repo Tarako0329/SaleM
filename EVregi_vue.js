@@ -1014,9 +1014,9 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 			canvas.height = height
 			const ctx = canvas.getContext('2d');
 
-			ctx.font = '10px';
+			ctx.font = '12px';
 			//ctx.fillStyle = '#0069b3';
-			ctx.fillText('カメラに切り替わらない場合、iOS/Androidをアップデートを試して下さい', 20, 50);
+			ctx.fillText('カメラが表示されない場合、iOS/Androidをアップデートを試して下さい', 20, 50);
 
 			ctx.drawImage(video, 0, 210, video.videoWidth, 180, 0, 0, canvas.width, 180);
 			const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
