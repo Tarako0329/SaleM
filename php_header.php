@@ -1,6 +1,6 @@
 <?php
-define("VERSION", "ver3.17.3-001");
-define("RELEACE_DATE", "2024-10-11");
+define("VERSION", "ver3.17.3-005");
+define("RELEACE_DATE", "2024-11-21");
 
 date_default_timezone_set('Asia/Tokyo');
 require "./vendor/autoload.php";
