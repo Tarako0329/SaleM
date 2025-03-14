@@ -19,15 +19,22 @@ try{
     $count=0;
     //該当ユーザの抽出
     $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
-    $sqlstr="select * from Users where Yuukoukigen < ?";
+    //$sqlstr="select * from Users where Yuukoukigen < ?";
+    $sqlstr="select * from Users_webrez where Yuukoukigen < ?";
     $stmt = $pdo_h->prepare($sqlstr);
     $stmt->bindValue(1, date("Y-m-d"), PDO::PARAM_STR);
     $stmt->execute();
 
     foreach($stmt as $row){
         
-        //商品マスタの削除
+        //ユーザマスタの削除
         $sqlstr="delete from Users where uid=?";
+        $stmt = $pdo_h->prepare($sqlstr);
+        $stmt->bindValue(1, $row["uid"], PDO::PARAM_INT);
+        $stmt->execute();
+        
+        //ユーザマスタの削除
+        $sqlstr="delete from Users_webrez where uid=?";
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $row["uid"], PDO::PARAM_INT);
         $stmt->execute();

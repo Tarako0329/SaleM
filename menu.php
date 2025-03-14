@@ -166,6 +166,42 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         log_writer2("\$_SESSION['tour']",$_SESSION["tour"],"lv3");
     }
 
+    $array = [
+        'レジ<p style="font-size:11px;margin:0;">マルシェ等、店舗型販売</p>'=>['EVregi.php?mode=evrez&csrf_token='.$token,'rez']
+        ,'個別売上レジ<p style="font-size:11px;margin:0;">受注販売・個人オーダー等</p>'=>['EVregi.php?mode=kobetu&csrf_token='.$token,'k_rez']
+        ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token,'s_tou']
+        ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token,'s_itiran']
+        ,'商品QR作成'=>['shouhinMSQR.php?csrf_token='.$token,'qr_itiran']
+        ,'商品ｶﾃｺﾞﾘｰ設定'=>['shouhinMSCategoryEdit.php?csrf_token='.$token,'s_itiran']
+        ,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko&csrf_token='.$token,'z_rez']
+        ,'売上実績'=>['UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where&csrf_token='.$token,'uri']
+        ,'売上分析'=>['analysis_menu.php?csrf_token='.$token,'bunseki']
+        ,'領収書<p style="font-size:11px;margin:0;">再発行・返品処理</p>'=>['ryoushu_menu.php?csrf_token='.$token,'ryoushu']
+        ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token,'user']
+        ,'確定申告'=>['output_menu.php?csrf_token='.$token,'kaikei']
+        ,'ｱﾌﾟﾘを紹介する'=>['shoukai.php?csrf_token='.$token,'shoukai']
+        //,'機能テスト'=>['sample.php']
+    ];
+    
+    //契約・解約関連は各時で実装したファイルを指定する
+    $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', "1"));
+    $dir_path = bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', "1"));
+    
+    if(EXEC_MODE=="Product"){
+        if($plan==0){
+            $array2 = ['本契約へ'=>[rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku']];
+        }else{
+            $array2 = ['契約解除へ'=>['sub_cancel.php','kaijo']];
+        }
+    }else if(EXEC_MODE=="Test" || EXEC_MODE=="Local"){
+        if($plan==0){
+            $array2 = ['本契約へ'=>[rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku'],'機能テスト'=>['sample.php?a=a','kinoutest']];
+        }else{
+            $array2 = ['契約解除へ'=>['sub_cancel.php','kaijo'],'機能テスト'=>['sample.php','kinoutest']];
+        }
+    }else{
+        $array2=array();
+    }
 
 
 
@@ -212,6 +248,9 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         <b><a href='#' onclick='ColorChange()'>COLOR<i class='fa-solid fa-rotate-right fa-lg rainbow-color'></i></a></b>
     </div>
     <div class='container-fluid' style='padding-top:5px;'>
+        <div class='col-12 text-center mb-3'>
+            <button type='button' class='btn btn-info' style='display:none;margin:auto;' onClick='document.getElementById("pwa_info_btn").click()' id='install_info_btn'>インストール手順はコチラ</button>
+        </div>
     <?php
     //deb_echo(ROOT_URL);
     //deb_echo(EXEC_MODE."：uid_".$_SESSION["user_id"]);
@@ -222,42 +261,6 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         echo "有効期限を過ぎると入力内容はすべてクリアされます。ご自由に操作して下さい。<br>";
     }
 
-    $array = [
-        'レジ<p style="font-size:11px;margin:0;">マルシェ等、店舗型販売</p>'=>['EVregi.php?mode=evrez&csrf_token='.$token,'rez']
-        ,'個別売上レジ<p style="font-size:11px;margin:0;">受注販売・個人オーダー等</p>'=>['EVregi.php?mode=kobetu&csrf_token='.$token,'k_rez']
-        ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token,'s_tou']
-        ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token,'s_itiran']
-        ,'商品QR作成'=>['shouhinMSQR.php?csrf_token='.$token,'qr_itiran']
-        ,'商品ｶﾃｺﾞﾘｰ設定'=>['shouhinMSCategoryEdit.php?csrf_token='.$token,'s_itiran']
-        ,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko&csrf_token='.$token,'z_rez']
-        ,'売上実績'=>['UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where&csrf_token='.$token,'uri']
-        ,'売上分析'=>['analysis_menu.php?csrf_token='.$token,'bunseki']
-        ,'領収書<p style="font-size:11px;margin:0;">再発行・返品処理</p>'=>['ryoushu_menu.php?csrf_token='.$token,'ryoushu']
-        ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token,'user']
-        ,'確定申告'=>['output_menu.php?csrf_token='.$token,'kaikei']
-        ,'ｱﾌﾟﾘを紹介する'=>['shoukai.php?csrf_token='.$token,'shoukai']
-        //,'機能テスト'=>['sample.php']
-    ];
-    
-    //契約・解約関連は各時で実装したファイルを指定する
-    $root_url = bin2hex(openssl_encrypt(ROOT_URL, 'AES-128-ECB', "1"));
-    $dir_path = bin2hex(openssl_encrypt(dirname(__FILE__)."/", 'AES-128-ECB', "1"));
-    
-    if(EXEC_MODE=="Product"){
-        if($plan==0){
-            $array2 = ['本契約へ'=>[rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku']];
-        }else{
-            $array2 = ['契約解除へ'=>['sub_cancel.php','kaijo']];
-        }
-    }else if(EXEC_MODE=="Test" || EXEC_MODE=="Local"){
-        if($plan==0){
-            $array2 = ['本契約へ'=>[rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path,'keiyaku'],'機能テスト'=>['sample.php?a=a','kinoutest']];
-        }else{
-            $array2 = ['契約解除へ'=>['sub_cancel.php','kaijo'],'機能テスト'=>['sample.php','kinoutest']];
-        }
-    }else{
-        $array2=array();
-    }
     $i=0;
     echo "<div class='row'>";
 	foreach(array_merge($array,$array2) as $key=>$vals){
@@ -286,6 +289,9 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         <!--<a href='https://green-island.mixh.jp/wdps/%e3%81%8a%e5%95%8f%e3%81%84%e5%90%88%e3%82%8f%e3%81%9b/' style='padding:5px;' target='_blank' rel='noopener noreferrer'><i class="fa-solid fa-square-envelope fa-2x"></i></a>-->
         <p style='position:fixed;right:10px;bottom:0;'><?php echo VERSION;?></p>
     </footer>
+    <?php
+        require "install_modal.php"
+    ?>
 </body>
 <!--シェパードナビshepherd
 <script src="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/js/shepherd.min.js"></script>
@@ -823,6 +829,24 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     }
     if(new_releace_name==='new_releace_005'){
         new_releace_005_1.start(tourFinish,'new_releace_005',''); 
+    }
+    window.onload = function(){
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+    		// PWAとして起動された場合の処理
+    	} else {
+    		//alert('ブラウザとして起動されました');
+    		const userAgent = navigator.userAgent;
+      	    if (
+      	        userAgent.indexOf('Windows') !== -1 ||
+      	        userAgent.indexOf('Macintosh') !== -1 ||
+      	        userAgent.indexOf('Linux') !== -1
+      	    ) {
+      	        // パソコン.なにもしない
+      	    } else {
+      	        // パソコン以外。インストールを勧める
+    	        document.getElementById("install_info_btn").style.display = 'block'
+      	    }
+    	}
     }
 </script>
 <!--pwa対応部-->
