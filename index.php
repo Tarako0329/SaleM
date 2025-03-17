@@ -1,5 +1,6 @@
 <?php
 require "php_header.php";
+define("GOOGLE_AUTH",$_ENV["GOOGLE_AUTH"]);
 //log_writer2("index.php > \$_SESSION",$_SESSION,"lv3");
 if(substr(EXEC_MODE,0,5)==="Trial" && !empty($_SERVER["REQUEST_URI"])){
     //$emsg = print_r($_SERVER,true);
@@ -45,6 +46,7 @@ $csrf = csrf_create();
     //共通部分、bootstrap設定、フォントCND、ファビコン等
     include "head_bs5.php" 
     ?>
+    <script src="https://accounts.google.com/gsi/client" ></script><!--google login api-->
     <!--ページ専用CSS-->
     <link rel="stylesheet" href="css/style_index.css?<?php echo $time; ?>" >
     <!--<script src="script/index.js"></script>-->
@@ -76,6 +78,21 @@ $csrf = csrf_create();
             </a>
             <hr>
             <a href="pre_account.php" class="btn btn-lg btn-primary btn-block btn-signin" style="padding-top:8px" >新 規 登 録</a>
+            <div class="g_id_signin" style='width:200px;margin:auto;'
+				data-type="standard"
+				data-size="large"
+				data-theme="outline"
+				data-text="continue_with"
+				data-shape="rectangular"
+				data-logo_alignment="left">
+			</div>
+
+            <div id="g_id_onload"
+			    data-client_id="<?php echo GOOGLE_AUTH;?>"
+				data-callback="handleCredentialResponse"
+			    data-auto_prompt="false">
+			</div>
+
         </div><!-- /card-container -->
     </div><!-- /container -->    
     <script>
@@ -89,9 +106,50 @@ $csrf = csrf_create();
                     // アクションを行わない
                     e.preventDefault();
                 }
-            }    
+            }
+        };
+        function handleCredentialResponse(response) {
+  		    	// decodeJwtResponse() is a custom function defined by you
+  		    	// to decode the credential response.
+  		    	const responsePayload = decodeJwtResponse(response.credential);
+                
+  		    	console_log(responsePayload);
+                /*
+		    	const form = new FormData()
+		    	form.append("ID",responsePayload.sub)
+		    	form.append("name",responsePayload.given_name)
+		    	form.append("token","<?php echo $token;?>")
+		    	axios.post('recording_ajax.php',form, {headers: {'Content-Type': 'multipart/form-data'}})
+		    	.then((response)=>{
+		    		console_log(response)
+		    		document.getElementById("login_type").value="google"
+		    		document.getElementById("id").value=responsePayload.sub
+		    		document.getElementById("pass").value=responsePayload.sub
+		    		document.getElementById("GO").click()
+		    	})
+		    	.catch((error)=>{
+		    		alert(error)
+		    	})
+		    	.finally(()=>{
+                
+		    	})
+                */
+  		    }
+			function decodeJwtResponse(token) {
+                var base64Url = token.split(".")[1];
+                var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+                var jsonPayload = decodeURIComponent(
+                  atob(base64)
+                    .split("")
+                    .map(function (c) {
+                      return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+                    })
+                    .join("")
+                );
+            
+                return JSON.parse(jsonPayload);
+            }
 
-        };    
     </script>
 </body>
 </html>
