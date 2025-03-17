@@ -1,6 +1,11 @@
 <?php
   //ファビコンパス
-	$icon="img/icon-192x192.png";
+	//$icon="img/mstile2-150x150.png";
+	if(empty($icon)){
+		echo "<script>alert('install_modal.php でエラー。\$icon変数にファビコンのパスをセットしてください。')</script>";
+		exit();
+		//throw new Exception("0 で割ることはできません。");
+	}
   /*
     JSで起動時に実行
   	if (window.matchMedia('(display-mode: standalone)').matches) {
@@ -23,19 +28,18 @@
   */
 ?>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=browser_updated" />
-<button style='display:none;' data-bs-toggle='modal' data-bs-target='#pwa_info' id='pwa_info_btn'>pwa_info</button>
+<button style="display:none;" data-bs-toggle='modal' data-bs-target='#pwa_info' id='pwa_info_btn'>pwa_info</button>
 <div class='modal fade' id='pwa_info' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
-	<div class='modal-dialog  modal-dialog-centered'>
+	<div class='modal-dialog  modal-dialog-centered modal-dialog-scrollable'>
 		<div class='modal-content' style=''>
 				<div class='modal-header'>
-    			<h5 class="modal-title">インストール手順</h5>
+    			<h5 class="modal-title">ご登録ありがとうございます</h5>
     			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class='modal-body container'>
 					<div class="row">
 						<div class='col-12 fs-6'>
-							<p class='mb-1'>ご登録ありがとうございます。</p>
-							<p>下記手順でインストールすることで、アプリケーション風に利用可能となります。(ブラウザでも利用可能です)</p>
+							<p class='mb-1' style='font-size:14px;'>下記手順でインストールすることで、アプリケーション風に利用可能となります。(ブラウザでも利用可能)</p>
 						</div>
 					</div>
 					<ul class="nav nav-underline">
@@ -89,7 +93,7 @@
 					</div>
 				</div>
 				<div class='modal-footer'>
-					<button type='button' class="btn btn-secondary mbtn" data-bs-dismiss="modal" >閉じる</button>
+					<button type='button' class="btn btn-sm btn-secondary mbtn" data-bs-dismiss="modal" >閉じる</button>
 				</div>
 		</div>
 	</div>

@@ -290,6 +290,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         <p style='position:fixed;right:10px;bottom:0;'><?php echo VERSION;?></p>
     </footer>
     <?php
+        $icon="img/icon-192x192.png";
         require "install_modal.php"
     ?>
 </body>
