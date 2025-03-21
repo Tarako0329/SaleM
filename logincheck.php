@@ -45,15 +45,28 @@ $normal_result = false;
 $auto_result = false;
 
 //自動ログイン情報の取得
-$login_type = (!empty($_COOKIE["login_type"])?$_COOKIE["login_type"]:"normal");
+$login_type = "";   //auto or normal or google
+//$login_type = (!empty($_COOKIE["login_type"])?$_COOKIE["login_type"]:"normal");
+if(!empty($_COOKIE["login_type"])){
+    $login_type = $_COOKIE["login_type"];
+}else if(!empty($_POST["login_type"])){
+    $login_type = $_POST["login_type"];
+}else{
+    $login_type = "normal";
+}
 
 if(!empty($_COOKIE['webrez_token']) && $login_type==="auto"){
     $cookie_token = $_COOKIE['webrez_token'];
-}else if(!empty($_POST)){
+}else if(!empty($_POST) && $login_type === "normal"){
     $mail_id = $_POST['LOGIN_EMAIL'];
     $password = $_POST['LOGIN_PASS'];
     $auto = $_POST['AUTOLOGIN'];
     $csrf_token = $_POST['csrf_token'];
+    setCookie("user_type", "ipass", time()+60*60*24*365, "/", "", TRUE, TRUE);
+}else if($_POST["token"]===$_SESSION["csrf_token"] && $login_type==="google"){
+    //この時点でgoogleログインを通過しているのでメニューへGO！
+    $auto = $_POST['AUTOLOGIN'];
+    setCookie("user_type", "google", time()+60*60*24*365, "/", "", TRUE, TRUE);
 }else{
     redirect_to_login("不正アクセス。処理を中止します。");
 }
@@ -79,7 +92,11 @@ try{
 		}else{
             redirect_to_login("メールアドレス、又はパスワードが無効です。");
 		}
-	}else{//$login_type==="auto"
+	}else if($login_type==="google"){
+        $normal_result = true;
+        $_SESSION['user_id']=$_POST["uid"];
+        $id = $_POST["uid"];
+    }else{//$login_type==="auto"
         $rtn = check_auto_login($cookie_token, $pdo);
 		if($rtn===true){
 		    $auto_result = true;

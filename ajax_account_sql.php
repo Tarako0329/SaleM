@@ -36,10 +36,10 @@ if($rtn !== true){
 			$sqllog .= rtn_sqllog("START TRANSACTION",[]);
 
 			if($_POST["mode"] === "insert"){
-				//オーダー番号作成
+				//ユーザID作成
 				$stmt = $pdo_h->prepare("select uid from Users where uid = :uid FOR UPDATE");
 				while(true){
-					//乱数からオーダーナンバーを発行し、受注ヘッダで重複してなければ使用する
+					//乱数からユーザIDを発行し、重複してなければ使用する
 					$_SESSION["P"]["uid"] = rand(0,99999);
 					log_writer2("\$uid",$_SESSION["P"]["uid"],"lv3");
 					$stmt->bindValue("uid", $_SESSION["P"]["uid"], PDO::PARAM_INT);

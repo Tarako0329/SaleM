@@ -834,6 +834,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     window.onload = function(){
         if (window.matchMedia('(display-mode: standalone)').matches) {
     		// PWAとして起動された場合の処理
+            console_log("PWA")
     	} else {
     		//alert('ブラウザとして起動されました');
     		const userAgent = navigator.userAgent;
@@ -843,6 +844,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
       	        userAgent.indexOf('Linux') !== -1
       	    ) {
       	        // パソコン.なにもしない
+                console_log("パソコン")
       	    } else {
       	        // パソコン以外。インストールを勧める
     	        document.getElementById("install_info_btn").style.display = 'block'

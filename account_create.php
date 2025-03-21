@@ -5,19 +5,22 @@
 require "php_header.php";
 $myname = basename(__FILE__);           //ログファイルに出力する自身のファイル名
 //log_writer2($myname." \$row[NAME] =>",$row["NAME"],"lv3");
+log_writer2("\$POST =>",$_POST,"lv3");
+log_writer2("\$_SESSION =>",$_SESSION,"lv3");
 $shoukai=(!empty($_GET["shoukai"])?$_GET["shoukai"]:"");
 
+$login_type="";
 if($_GET["mode"]==="0" && !empty($_GET["acc"])){
 	$mode="insert";
 	//同一端末の前回ログイン情報をクリアする
 	delete_old_token($cookie_token, $pdo_h);
 
 	//GETからメールアドレスを復元
-	//$row[0]["mail"]=rot13decrypt2($_GET["acc"]);
 	$new_mail=rot13decrypt2($_GET["acc"]);
-
+	$login_type="ipass";
 }else if($_GET["mode"]==="1"){
 	$rtn=csrf_checker(["menu.php","forget_pass.php"],["G","C","S"]);
+	$login_type = ($_COOKIE["user_type"]!=="ipass")?$_COOKIE["user_type"]:"ipass";
 	if($rtn!==true){
 		redirect_to_login($rtn);
 	}
@@ -66,20 +69,22 @@ $token=csrf_create();
 					<label for='mail' >メールアドレス</label>
 					<input v-model='account_u.mail' :='locker' type='email' maxlength='40' class='form-control' id='mail' name='MAIL' required='required' placeholder='必須' >
 					<hr>
-					<template v-if='mode==="update"'>
-						<input type='checkbox' id='chk_pass' name='chk_pass' v-model='pass_change'>
-						<label for='chk_pass' >パスワードを変更する</label><br>
-					</template>
-					<label for='pass'>パスワード(6桁以上)</label>
-					<input type='password' minlength='6' class='form-control' id='pass' :='pass_lock'>
-					<label for='pass2'>パスワード（確認）</label>
-					<input type='password' minlength='6' class='form-control' id='pass2' oninput='Checkpass(this)' name='PASS' :='pass_lock'>
-					<hr>
-					<label for='question' >秘密の質問(パスワードを忘れたときに使用します)</label>
-					<input v-model='account_u.question' :='locker' type='text' maxlength='20' class='form-control mb-3' id='question' name='QUESTION' required='required' placeholder='例：初恋の人の名前' >
-					<label for='answer' >答え</label>
-					<input v-model='account_u.answer' :='locker' type='text' maxlength='20' class='form-control' id='answer' name='ANSWER' required='required' placeholder='例：ささき' >
-					<small id='answer' class='form-text text-muted mb-3'>ひらがな・半角英数・スペース不使用を推奨</small>
+					<div v-if='login_type==="ipass"'>
+						<template v-if='mode==="update"'>
+							<input type='checkbox' id='chk_pass' name='chk_pass' v-model='pass_change'>
+							<label for='chk_pass' >パスワードを変更する</label><br>
+						</template>
+						<label for='pass'>パスワード(6桁以上)</label>
+						<input type='password' minlength='6' class='form-control' id='pass' :='pass_lock'>
+						<label for='pass2'>パスワード（確認）</label>
+						<input type='password' minlength='6' class='form-control' id='pass2' oninput='Checkpass(this)' name='PASS' :='pass_lock'>
+						<hr>
+						<label for='question' >秘密の質問(パスワードを忘れたときに使用します)</label>
+						<input v-model='account_u.question' :='locker' type='text' maxlength='20' class='form-control mb-3' id='question' name='QUESTION' required='required' placeholder='例：初恋の人の名前' >
+						<label for='answer' >答え</label>
+						<input v-model='account_u.answer' :='locker' type='text' maxlength='20' class='form-control' id='answer' name='ANSWER' required='required' placeholder='例：ささき' >
+						<small id='answer' class='form-text text-muted mb-3'>ひらがな・半角英数・スペース不使用を推奨</small>
+					</div>
 					<br>
 					<template v-if='mode==="update"'>
 						<input v-model='account_r.loginrez' :='locker' type='checkbox' class='form-check-input mt-3 mb-3' id='loginrez' name='LOGINREZ' >
@@ -138,6 +143,7 @@ $token=csrf_create();
 				const loader = ref(false)
 				const csrf = ref(p_token) 
 				const step = ref('check')
+				const login_type=ref('<?php echo $login_type;?>')
 
 				const account_u = ref([])
 				const account_r = ref([])
@@ -182,7 +188,7 @@ $token=csrf_create();
 						})
 				}
 				const UpdateValue = () =>{
-					let params = new URLSearchParams ({'csrf_token':csrf.value,'mode':mode.value})
+					let params = new URLSearchParams ({'csrf_token':csrf.value,'mode':mode.value,'login_type':login_type.value})
 					axios
 						.post('ajax_account_sql.php',params) 
 						.then((response) => {
@@ -248,6 +254,7 @@ $token=csrf_create();
 					account_r,
 					moto_mail,
 					locker,
+					login_type,
 					pass_change,
 					on_submit,
 					AllUnLock,
