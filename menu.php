@@ -11,6 +11,10 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
 */
 {
     require "php_header.php";
+    if((EXEC_MODE==="Trial" || EXEC_MODE==="TrialL") && !empty($_GET["trid"])){
+        $_SESSION["user_id"] = $_GET["trid"];
+    }
+    //log_writer2("before_check_session_userid",$_SESSION,"lv3");
     $rtn=check_session_userid($pdo_h); 
     //deb_echo($_SESSION["user_id"]);
     $token = csrf_create();
@@ -78,38 +82,41 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             exit();
         }
         //契約状況の確認
-        if(empty($row[0]["keiyakudate"])===true){
-            if(strtotime($row[0]["yuukoukigen"]) < strtotime(date("Y-m-d"))){
-                //有効期限切れ。申込日から即課金
-                $_SESSION["KIGEN"] = strtotime("+3 day");
-                $msg= "<p class='mb-1 fs-3' style='color:red;'>無料お試し期間は終了しました。</p>";
-                $msg.="<p class='mb-1 fs-3'>引続きのご利用は<a href='".rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path."'>本契約</a>をお願いいたします。</p>";
+        if(EXEC_MODE==="Product"){
+            if(empty($row[0]["keiyakudate"])===true){
+                if(strtotime($row[0]["yuukoukigen"]) < strtotime(date("Y-m-d"))){
+                    //有効期限切れ。申込日から即課金
+                    $_SESSION["KIGEN"] = strtotime("+3 day");
+                    $msg= "<p class='mb-1 fs-3' style='color:red;'>無料お試し期間は終了しました。</p>";
+                    $msg.="<p class='mb-1 fs-3'>引続きのご利用は<a href='".rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path."'>本契約</a>をお願いいたします。</p>";
+                }else{
+                    //試用期間、もしくは支払済み期間の翌日から課金
+                    $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
+                    $msg= "無料お試し期間(".$row[0]["yuukoukigen"]." まで無料)<br>";
+                }
+                $kigen = $row[0]["yuukoukigen"];
+                if((strtotime($row[0]["yuukoukigen"]) - strtotime(date("Y-m-d")))/ (60 * 60 * 24) >= 0 && (strtotime($row[0]["yuukoukigen"]) - strtotime(date("Y-m-d")))/ (60 * 60 * 24) <= 7){
+                    $msg = "<p class='mb-1 fs-3' style='color:red;'>残り ".(strtotime($row[0]["yuukoukigen"]) - strtotime(date("Y-m-d")))/ (60 * 60 * 24)."日 で無料期間が終了します。</p>";
+                    $msg.="<p class='mb-1 fs-3'>引続きのご利用は<a href='".rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path."'>本契約</a>をお願いいたします。</p>";
+                    $msg.="<p class='mb-1 fs-3'>ご契約完了後、無料期間終了をもって本契約に切り替わります。</p>";
+                }
+                /*if(EXEC_MODE=="Trial"){
+                    $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
+                    $msg= "無料お試し期間(".$row[0]["yuukoukigen"]." まで無料)<br>";
+                }*/
+            
+                $plan=0;
             }else{
-                //試用期間、もしくは支払済み期間の翌日から課金
-                $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
-                $msg= "無料お試し期間(".$row[0]["yuukoukigen"]." まで無料)<br>";
+                //契約済
+                $plan=1;
+                if(empty($row[0]["Accounting_soft"])){
+                    $msg = "<p class='mb-1 fs-3' style='color:red;'>確定申告に利用しているソフトを『ユーザ情報』より登録してください。</p>";
+                    $msg .= "<p class='mb-1 fs-5'>登録いただいたソフトがWebRez未対応の場合、対応するためにご協力をお願いする場合がございます。</p>";
+                }
             }
-            $kigen = $row[0]["yuukoukigen"];
-            if((strtotime($row[0]["yuukoukigen"]) - strtotime(date("Y-m-d")))/ (60 * 60 * 24) >= 0 && (strtotime($row[0]["yuukoukigen"]) - strtotime(date("Y-m-d")))/ (60 * 60 * 24) <= 7){
-                $msg = "<p class='mb-1 fs-3' style='color:red;'>残り ".(strtotime($row[0]["yuukoukigen"]) - strtotime(date("Y-m-d")))/ (60 * 60 * 24)."日 で無料期間が終了します。</p>";
-                $msg.="<p class='mb-1 fs-3'>引続きのご利用は<a href='".rot13decrypt2(PAY_CONTRACT_URL)."?system=".$title."&sysurl=".$root_url."&dirpath=".$dir_path."'>本契約</a>をお願いいたします。</p>";
-                $msg.="<p class='mb-1 fs-3'>ご契約完了後、無料期間終了をもって本契約に切り替わります。</p>";
-            }
-            if(EXEC_MODE=="Trial"){
-                $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
-                $msg= "無料お試し期間(".$row[0]["yuukoukigen"]." まで無料)<br>";
-               
-            }
-
-
-            $plan=0;
-        }else{
-            //契約済
-            $plan=1;
-            if(empty($row[0]["Accounting_soft"])){
-                $msg = "<p class='mb-1 fs-3' style='color:red;'>確定申告に利用しているソフトを『ユーザ情報』より登録してください。</p>";
-                $msg .= "<p class='mb-1 fs-5'>登録いただいたソフトがWebRez未対応の場合、対応するためにご協力をお願いする場合がございます。</p>";
-            }
+        }else if(EXEC_MODE=="Trial" || EXEC_MODE=="TrialL"){
+            $_SESSION["KIGEN"] = strtotime($row[0]["yuukoukigen"] ."+1 day");
+            $msg= "お試し期間( ～".$row[0]["yuukoukigen"]." )<br>期間を過ぎると入力内容はすべてクリアされます。ご自由に操作して下さい。<br>";
         }
         //ユーザ名・屋号の取得
         if($row[0]["yagou"]<>""){
@@ -212,7 +219,6 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
 
 <!DOCTYPE html>
 <html lang='ja'>
-
 <head>
     <?php 
     //共通部分、bootstrap設定、フォントCND、ファビコン等
@@ -256,10 +262,6 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     //deb_echo(EXEC_MODE."：uid_".$_SESSION["user_id"]);
 
     echo $msg;
-
-    if(EXEC_MODE==="Trial"){
-        echo "有効期限を過ぎると入力内容はすべてクリアされます。ご自由に操作して下さい。<br>";
-    }
 
     $i=0;
     echo "<div class='row'>";

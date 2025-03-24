@@ -3,13 +3,11 @@ require "php_header.php";
 define("GOOGLE_AUTH",$_ENV["GOOGLE_AUTH"]);
 //log_writer2("index.php > \$_SESSION",$_SESSION,"lv3");
 if(substr(EXEC_MODE,0,5)==="Trial" && !empty($_SERVER["REQUEST_URI"])){
-	//$emsg = print_r($_SERVER,true);
-	//send_mail(SYSTEM_NOTICE_MAIL,"【WEBREZ-INFO】トライアルユーザーが来たよ！",$emsg);
 	if(substr(EXEC_MODE,-1)==="L"){
 		$_SESSION=[];
 		setCookie("webrez_token", '', -1, "/", "", TRUE, TRUE); // secure, httponly
 		setCookie("user_id", '', -1, "/", "", TRUE, TRUE); // secure, httponly
-		echo EXEC_MODE;
+		//echo EXEC_MODE;
 	}
 	//echo substr(EXEC_MODE,-1);
 	header("HTTP/1.1 301 Moved Permanently");
@@ -133,12 +131,11 @@ $csrf = csrf_create();
 			}
 		};
 		function handleCredentialResponse(response) {
-  			// decodeJwtResponse() is a custom function defined by you
-  			// to decode the credential response.
-  			const responsePayload = decodeJwtResponse(response.credential);
-			
-  			console_log(responsePayload);
-
+  		// decodeJwtResponse() is a custom function defined by you
+  		// to decode the credential response.
+  		const responsePayload = decodeJwtResponse(response.credential);
+		
+  		console_log(responsePayload);
 			let params = new URLSearchParams();
 			params.append("sub_id",responsePayload.sub)
 			params.append("name",responsePayload.given_name)
@@ -157,7 +154,7 @@ $csrf = csrf_create();
 				console_log(Error)
 			})
 			
-  		}
+  	}
 		function decodeJwtResponse(token) {
 			var base64Url = token.split(".")[1];
 			var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
@@ -176,6 +173,3 @@ $csrf = csrf_create();
 	</script>
 </body>
 </html>
-<?php
-//log_writer2("index.php > \$_SESSION",$_SESSION,"lv3");
-?>

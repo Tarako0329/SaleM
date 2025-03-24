@@ -26,6 +26,18 @@
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/9.0.0/decimal.min.js"></script><!--小数演算ライブラリ-->
 
+    <?php if(EXEC_MODE==="Trial"){?>
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-JR0V5BW6PW"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+        
+          gtag('config', 'G-JR0V5BW6PW');
+        </script>
+    <?php } ?>
+
     <script>//グローバル変数
         var KANKYO = <?php echo "'".EXEC_MODE."'" ;?>;
         var ZEIHASU = <?php echo empty($ZeiHasu)?0:$ZeiHasu ;?>;
