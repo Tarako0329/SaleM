@@ -195,7 +195,7 @@ ver3.17.3-006:トライアルデータ削除修正（トライアル環境書き
 ver3.17.3-007:installサポートモーダル設定-commited
 ver3.18.0-000:googleログイン実装-commited
 ver3.18.0-001:googleログイン実装-commited
-ver3.19.0-000:トライアルモードの修正
+ver3.19.0-000:トライアルモードの修正-commited
 
 
 

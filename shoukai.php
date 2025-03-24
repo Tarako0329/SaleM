@@ -100,8 +100,8 @@ if($row[0]["introducer_id"]<>""){
     //共通部分、bootstrap設定、フォントCND、ファビコン等
     include "head_bs5.php" ;
     ?>
+   	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.js"></script><!--make QRコードライブラリ-->
     <!--ページ専用CSS-->
-    <!--<script src='script/jquery-3.6.0.min.js'></script>-->
     <link rel="stylesheet" href="css/style_menu.css?<?php echo $time; ?>" >
     <TITLE><?php echo $title;?></TITLE>
 	<style>
