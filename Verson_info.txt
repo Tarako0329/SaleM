@@ -196,6 +196,7 @@ ver3.17.3-007:installサポートモーダル設定-commited
 ver3.18.0-000:googleログイン実装-commited
 ver3.18.0-001:googleログイン実装-commited
 ver3.19.0-000:トライアルモードの修正-commited
+ver3.19.1-000:紹介機能のGoogle登録対応
 
 
 

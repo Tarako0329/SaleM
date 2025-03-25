@@ -1,6 +1,7 @@
 <?php
 //ユーザ登録、登録情報の修正画面
 require "php_header.php";
+define("GOOGLE_AUTH",$_ENV["GOOGLE_AUTH"]);
 $token = csrf_create();
 $shoukai="";
 if(!empty($_GET["shoukai"])){
@@ -14,6 +15,7 @@ if(!empty($_GET["shoukai"])){
 	//共通部分、bootstrap設定、フォントCND、ファビコン等
 	include "head_bs5.php" 
 	?>
+	<script src="https://accounts.google.com/gsi/client" ></script><!--google login api-->
 	<!--ページ専用CSS-->
 	<link rel="stylesheet" href="css/style_account_create.css?<?php echo $time; ?>" >
 	<TITLE><?php echo secho($title)." ユーザー登録";?></TITLE>
@@ -46,8 +48,33 @@ if(!empty($_GET["shoukai"])){
 			<div>
 				<button type="button" class="btn btn-primary" style="font-size:1.5rem" @click='send_mail()'>送 信</button>
 			</div>
-			
+			<hr>
+			<div>
+				<p>Google ID で登録する方</p>
+				<div class="g_id_signin " style='width:268px;margin:auto;'
+					data-type="standard"
+					data-size="large"
+					data-theme="outline"
+					data-text="signup_with"
+					data-shape="rectangular"
+					data-logo_alignment="left">
+				</div>
+				<div id="g_id_onload"
+				data-client_id="<?php echo GOOGLE_AUTH;?>"
+				data-callback="handleCredentialResponse"
+				data-auto_prompt="false">
+				</div>
+			</div>
 		</div>
+		<form style='display:none;' id="form2" method="post" action="logincheck.php">
+			<input type='hidden' name='login_type' value='google'>
+			<input type='hidden' id='sub_id' name='sub_id'>
+			<input type='hidden' id='token' name='token'>
+			<input type='hidden' id='uid' name='uid'>
+			<input type='hidden' id='AUTOLOGIN2' name='AUTOLOGIN'>
+			<input type='submit' id='form2_submit'>
+		</form>
+
 	</main>
 	<script>
 		const { createApp, ref, onMounted, computed, VueCookies, watch } = Vue
@@ -94,7 +121,7 @@ if(!empty($_GET["shoukai"])){
 				
 				const send_mail = () =>{
 					axios
-					.get(`ajax_pre_account_mail.php?MAIL=${email.value}&csrf_token=${p_token}`) 
+					.get(`ajax_pre_account_mail.php?MAIL=${email.value}&csrf_token=${p_token}&shoukai=${shoukai.value}`) 
 					.then((response) => {
 						console_log(response.data)
 						if(response.data.status==="success"){
@@ -124,6 +151,47 @@ if(!empty($_GET["shoukai"])){
 			}
 		})
 		pre_account('<?php echo $token."','".$shoukai;?>').mount('#form1')
+
+		function handleCredentialResponse(response) {
+  		// decodeJwtResponse() is a custom function defined by you
+  		// to decode the credential response.
+  		const responsePayload = decodeJwtResponse(response.credential);
+		
+  		console_log(responsePayload);
+			let params = new URLSearchParams();
+			params.append("sub_id",responsePayload.sub)
+			params.append("name",responsePayload.given_name)
+			params.append("mail",responsePayload.email)
+			params.append("shoukai","<?php echo $shoukai;?>")
+			params.append("csrf_token","<?php echo $token;?>")
+			axios.post('ajax_account_subid.php',params)
+			.then((respons)=>{
+				console_log(respons.data)
+				document.getElementById("sub_id").value = responsePayload.sub
+				document.getElementById("token").value = respons.data.token
+				document.getElementById("uid").value = respons.data.uid
+				document.getElementById("AUTOLOGIN2").value = 'on'
+				document.getElementById("form2_submit").click()
+			})
+			.catch((Error)=>{
+				console_log(Error)
+			})
+			
+  	}
+		function decodeJwtResponse(token) {
+			var base64Url = token.split(".")[1];
+			var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+			var jsonPayload = decodeURIComponent(
+			  atob(base64)
+				.split("")
+				.map(function (c) {
+				  return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+				})
+				.join("")
+			);
+		
+			return JSON.parse(jsonPayload);
+		}
 	</script>
 </body>
 

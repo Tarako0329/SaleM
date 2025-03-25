@@ -10,7 +10,7 @@ $sqllog="";
 $uid="";
 log_writer2(basename(__FILE__)." [\$_POST]",$_POST,"lv3");
 log_writer2(basename(__FILE__)." [\$_SESSION]",$_SESSION,"lv3");
-$rtn = csrf_checker(["index.php","/",""],["P","S"]);
+$rtn = csrf_checker(["index.php","/","","pre_account.php"],["P","S"]);
 if($rtn !== true){
 	$msg=$rtn;
 	$status = "warning";
@@ -42,7 +42,8 @@ if($rtn !== true){
 			$params["sub_id"] = $_POST["sub_id"];
 			$params["mail"] = $_POST["mail"];
 			$params["pass"] = csrf_create();
-			$params["yuukoukigen"] = date('Y-m-d', strtotime(date("Y-m-d") . "+2 month"));	
+			$params["yuukoukigen"] = date('Y-m-d', strtotime(date("Y-m-d") . "+2 month"));
+			$params["introducer_id"] = (!empty($_POST["shoukai"]))?$_POST["shoukai"]:NULL;
 
 			$sqlstr="insert into id_map(uid,sub_id) values(:uid,:sub_id)";
 			$stmt = $pdo_h->prepare($sqlstr);
