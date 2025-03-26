@@ -254,7 +254,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         <b><a href='#' onclick='ColorChange()'>COLOR<i class='fa-solid fa-rotate-right fa-lg rainbow-color'></i></a></b>
     </div>
     <div class='container-fluid' style='padding-top:5px;'>
-        <?php if(EXEC_MODE==="Product"){?>
+        <?php if(EXEC_MODE<>"Trial" || EXEC_MODE<>"TrialL"){?>
         <div class='col-12 text-center mb-3'>
             <button type='button' class='btn btn-info' style='display:none;margin:auto;' onClick='document.getElementById("pwa_info_btn").click()' id='install_info_btn'>インストール手順はコチラ</button>
         </div>
