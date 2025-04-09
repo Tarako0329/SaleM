@@ -2,7 +2,51 @@
 
     <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1'>
     <META http-equiv='Content-Type' content='text/html; charset=UTF-8'>
-    <link rel='apple-touch-icon' href='apple-touch-icon.png'>
+    <!--<link rel='apple-touch-icon' href='apple-touch-icon.png'>-->
+
+    <meta name="msapplication-square70x70logo" content="img/site-tile-70x70.png">
+    <meta name="msapplication-square150x150logo" content="img/site-tile-150x150.png">
+    <meta name="msapplication-wide310x150logo" content="img/site-tile-310x150.png">
+    <meta name="msapplication-square310x310logo" content="img/site-tile-310x310.png">
+    <meta name="msapplication-TileColor" content="#0078d7">
+    <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="img/favicon.ico">
+    <link rel="icon" type="image/vnd.microsoft.icon" href="img/favicon.ico">
+    <link rel="apple-touch-icon" sizes="57x57" href="img/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="img/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="img/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="img/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="img/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="img/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="img/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="img/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="36x36" href="img/android-chrome-36x36.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="img/android-chrome-48x48.png">
+    <link rel="icon" type="image/png" sizes="72x72" href="img/android-chrome-72x72.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="img/android-chrome-96x96.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="img/android-chrome-128x128.png">
+    <link rel="icon" type="image/png" sizes="144x144" href="img/android-chrome-144x144.png">
+    <link rel="icon" type="image/png" sizes="152x152" href="img/android-chrome-152x152.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="img/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="img/android-chrome-256x256.png">
+    <link rel="icon" type="image/png" sizes="384x384" href="img/android-chrome-384x384.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="img/android-chrome-512x512.png">
+    <link rel="icon" type="image/png" sizes="36x36" href="img/icon-36x36.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="img/icon-48x48.png">
+    <link rel="icon" type="image/png" sizes="72x72" href="img/icon-72x72.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="img/icon-96x96.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="img/icon-128x128.png">
+    <link rel="icon" type="image/png" sizes="144x144" href="img/icon-144x144.png">
+    <link rel="icon" type="image/png" sizes="152x152" href="img/icon-152x152.png">
+    <link rel="icon" type="image/png" sizes="160x160" href="img/icon-160x160.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="196x196" href="img/icon-196x196.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="img/icon-256x256.png">
+    <link rel="icon" type="image/png" sizes="384x384" href="img/icon-384x384.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="img/icon-512x512.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/icon-16x16.png">
+    <link rel="icon" type="image/png" sizes="24x24" href="img/icon-24x24.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/icon-32x32.png">
 
     <!-- Bootstrap5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">

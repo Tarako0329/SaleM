@@ -56,7 +56,10 @@ $csrf = csrf_create();
 	<TITLE><?php echo secho($title)." ようこそ";?></TITLE>
 </head>
 <header  class="header-color common_header" style="flex-wrap:wrap">
-	<div class="title" style="width: 100%;"><a href="index.php" ><?php echo secho($title);?></a></div>
+	<div class="title d-flex" style="width: 100%;">
+		
+		<a href="index.php" ><?php echo secho($title);?></a>
+	</div>
 	<div style="font-size:1rem;"> ようこそWEBREZへ</div>
 </header>
 <body class='common_body'>
@@ -64,6 +67,13 @@ $csrf = csrf_create();
 		<div class="card card-container">
 			<?php echo $errmsg; ?>
 			<form class="form-signin" id="form1" method="post" action="logincheck.php">
+				<div class=row>
+					<div class='col-12 text-center' style='height:50px;border-radius: 50%;'>
+						<div style='height:48px;width:48px;border-radius: 50%;background-color:red;margin:auto;'>
+							<img style='border-radius: 50%;' src='img/48x48.png'></img>
+						</div>
+					</div>
+				</div> 
 				<span id="reauth-email" class="reauth-email"></span>
 				<input type="email" id="inputEmail" class="form-control" placeholder="Email address" name="LOGIN_EMAIL" required autofocus value='<?php echo $mail;?>'>
 				<input type="password" id="inputPassword" class="form-control" name="LOGIN_PASS" placeholder="Password" required value='<?php echo (EXEC_MODE=="Local"?"000000":""); ?>'>
@@ -106,6 +116,23 @@ $csrf = csrf_create();
 				data-callback="handleCredentialResponse"
 				data-auto_prompt="false">
 			</div>
+			<hr>
+			<a href="https://webrez-trial.greeen-sys.com/" class="btn btn-lg btn-primary btn-block btn-signin mb-3" style="padding-top:8px" >登録不要・お試しモード</a>
+			<hr>
+			<div class='row'>
+				<div class='col-12 ps-3 pe-3 text-center fs-5'>
+					<p>シンプル操作で簡単に利用できるレジアプリ。</p>
+					<p>登録から６０日無料。自動課金なし。</p>
+					<p>利用料は月契約500円・年契約5500円（クレカ払いのみ）</p>
+					<div class='text-center mb-2 fs-5'>
+						<a href="pbPolicy.php">＜プライバシーポリシー＞</a>
+					</div>
+					<div class='text-center mb-2 fs-5'>
+						<a href="kiyaku.php">＜利用規約＞</a>
+					</div>
+				</div>
+			</div>
+
 			<form style='display:none;' id="form2" method="post" action="logincheck.php">
 				<input type='hidden' name='login_type' value='google'>
 				<input type='hidden' id='sub_id' name='sub_id'>
