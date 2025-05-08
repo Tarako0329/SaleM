@@ -427,7 +427,8 @@
 							serch_words = filter_Uridate.value.toString()
 						}
 						if(filter_Event.value!=='%'){
-							serch_cols = serch_cols + (row.Event + row.TokuisakiNM).toString()
+							//serch_cols = serch_cols + (row.Event + row.TokuisakiNM).toString()
+							serch_cols = serch_cols + (row.EVorTK).toString()
 							serch_words = serch_words + filter_Event.value.toString()
 						}
 						if(filter_Shouhin.value!=='%'){
