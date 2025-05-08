@@ -32,13 +32,13 @@ if($Type=="rireki"){
 	$sql = $sql."left join (select uid,UriNo,max(R_NO) as RNO from ryoushu group by uid,UriNo) as RYS on U.uid = RYS.uid and U.UriageNO = RYS.UriNo order by U.UriDate desc,U.Event,U.UriageNO desc";
 }elseif($Type=="sum_items"){
 	//商品単位で集計
-	$sql="select UriDate,UriageNO,Event,TokuisakiNM, ShouhinCD, ShouhinNM,shuppin_su,uri_su as su,zan_su, tanka,UriageKin,zei,genka,arari,icon,max_temp,min_temp from UriageDataSummary ";
+	$sql="select UriDate,UriageNO,Event,TokuisakiNM,CONCAT(IFNULL(Event,''),IFNULL(TokuisakiNM,'')) as EVorTK, ShouhinCD, ShouhinNM,shuppin_su,uri_su as su,zan_su, tanka,UriageKin,zei,genka,arari,icon,max_temp,min_temp from UriageDataSummary ";
 	$sql = $sql.$wheresql."order by UriDate desc,Event,TokuisakiNM,ShouhinNM ";
 	
 }elseif($Type=="sum_events"){
 	//イベント単位で集計
 	$_SESSION["MSG"]="";
-	$sql = "select U.UriDate,'-' as UriageNO,U.Event,U.TokuisakiNM,'-' as ShouhinCD,'-' as ShouhinNM,0 as su,0 as tanka,sum(U.UriageKin) as UriageKin,sum(U.zei) as zei,sum(U.su*U.genka_tanka) as genka,sum(U.UriageKin-(U.su*U.genka_tanka)) as arari ";
+	$sql = "select U.UriDate,'-' as UriageNO,U.Event,U.TokuisakiNM,CONCAT(IFNULL(Event,''),IFNULL(TokuisakiNM,'')) as EVorTK,'-' as ShouhinCD,'-' as ShouhinNM,0 as su,0 as tanka,sum(U.UriageKin) as UriageKin,sum(U.zei) as zei,sum(U.su*U.genka_tanka) as genka,sum(U.UriageKin-(U.su*U.genka_tanka)) as arari ";
 	$sql = $sql.",max(IFNULL(UGW.icon,'0')) as icon,max(ROUND(UGW.temp,1)) as max_temp,min(ROUND(UGW.temp,1)) as min_temp ";
 	$sql = $sql."from (select * from UriageData ".$wheresql.") as U left join UriageData_GioWeather as UGW on U.uid = UGW.uid and U.UriageNO = UGW.UriNo ";
 	$sql = $sql." group by U.UriDate,U.Event,U.TokuisakiNM order by U.UriDate desc,U.Event,U.TokuisakiNM";

@@ -357,6 +357,7 @@
 				const UriDateTo = ref('<?php echo date("Y")."-12-31"; ?>')
 				const Type = ref('rireki')
 				const btn_class = ref(['btn-view','btn-view','btn-view btn-selected'])
+
 				const get_UriageList = () => {//売上リスト取得ajax
 					console_log("get_UriageList start",'lv3');
 					let params = new URLSearchParams()
@@ -366,11 +367,13 @@
 					params.append('Type', Type.value);
 					axios
 					.post('ajax_get_Uriage2.php',params)
-					.then((response) => {UriageList.value = [...response.data]
-															//console_log('get_UriageList succsess','lv3')
+					.then((response) => {
+						UriageList.value = [...response.data]
+						//console_log('get_UriageList succsess','lv3')
 						})
 					.catch((error) => console_log(`get_UriageList ERROR:${error}`,'lv3'));
 				}//売上リスト取得ajax
+
 				const Type_changer = (Hyou_Type) => {
 					console_log(`Type_changer ${Hyou_Type}`,'lv3')
 					Type.value = Hyou_Type
