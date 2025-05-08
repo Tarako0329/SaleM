@@ -99,12 +99,12 @@
 						<th v-if='Type==="rireki"' scope='col' style='width:20px;'></th>
 					</tr>
 					</thead>
-					<tbody v-for='(list,index) in UriageList_filter' :key='list.uid + list.UriDate + list.Event + list.UriageNO + list.ShouhinCD + list.zeiKBN'>
+					<tbody v-for='(list,index) in UriageList_filter' :key='list.uid + list.UriDate + list.EVorTK + list.UriageNO + list.ShouhinCD + list.zeiKBN'>
 						<!--売上日+Event行-->
-						<tr v-if='(index===0) || (index!==0 && list.UriDate + list.Event !== UriageList_filter[index-1].UriDate + UriageList_filter[index-1].Event)' class='tr_stiky'>
+						<tr v-if='(index===0) || (index!==0 && list.UriDate + list.EVorTK !== UriageList_filter[index-1].UriDate + UriageList_filter[index-1].EVorTK)' class='tr_stiky'>
 							<td :colspan='colspan' class='tr_stiky' style='white-space:nowrap;'>
 								<span role='button' class='link' @click='set_filter("UriDate",list.UriDate,"")'> 売上日：{{list.UriDate}}</span>
-								<span style='margin-left:8px;' role='button' class='link' @click='set_filter("Event",list.Event+list.TokuisakiNM,"")'>『{{list.Event}}{{list.TokuisakiNM}}』</span>
+								<span style='margin-left:8px;' role='button' class='link' @click='set_filter("Event",list.Event+list.TokuisakiNM,"")'>『{{list.EVorTK}}』</span>
 								<img v-if='(String(list.icon).length>=5) && (Type!=="rireki")' style='height:20px;' :src='`https://openweathermap.org/img/wn/${list.icon}`'>
 								<template v-if='(Type!=="rireki")'>（<span style='color:red;'>{{list.max_temp}}</span>/<span style='color:blue;'>{{list.min_temp}}</span>）</template>
 							</td>
@@ -290,16 +290,6 @@
 							<label for='uridateto' class='control-label'>～売上日：</label>
 							<input v-model='UriDateTo' type='date' style='font-size:1.5rem;' name='UriDateTo' maxlength='10' id='uridateto' class='form-control'>
 						</div>
-						<!--
-						<div>
-							<label for='Event' class='control-label'>イベント/顧客名：</label>
-							<select v-model='Event' name='Event' style='font-size:1.5rem;padding-top:0;' id='Event' class='form-control' aria-describedby='EvHelp'>
-								<option value=''></option>
-								!--//Ajaxで取得に変更--
-							</select>
-							<small id='EvHelp' class='form-text text-muted'>売上日の期間を変更すると選択肢が更新されます。</small>
-						</div>
-						-->
 						<div>
 							<label for='Type' class='control-label'>表示：上で指定した期間中の</label>
 							<select v-model='Type' @change='get_UriageList()' name='Type' style='font-size:1.5rem;padding-top:0;' id='Type' class='form-control'>
@@ -437,7 +427,6 @@
 							serch_words = filter_Uridate.value.toString()
 						}
 						if(filter_Event.value!=='%'){
-							//serch_cols = serch_cols + row.Event.toString() + row.TokuisakiNM.toString()
 							serch_cols = serch_cols + (row.Event + row.TokuisakiNM).toString()
 							serch_words = serch_words + filter_Event.value.toString()
 						}

@@ -27,7 +27,7 @@ if($Type=="rireki"){
 	//履歴明細取得
 	$sql = "select U.*,IFNULL(UGW.icon,'0') as icon,UGW.temp,UGW.description, max(ROUND(UGW.temp,1)) OVER (PARTITION BY U.uid,U.UriDate,U.Event) as max_temp, min(ROUND(UGW.temp,1)) 
 					OVER (PARTITION BY U.uid,U.UriDate,U.Event) as min_temp,IFNULL(RYS.RNO,0) as RNO,U.zeiKBN ";
-	$sql = $sql."from (select * ,su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData ".$wheresql.") as U ";
+	$sql = $sql."from (select *,CONCAT(IFNULL(Event,''),IFNULL(TokuisakiNM,'')) as EVorTK, su*genka_tanka as genka,UriageKin-(su*genka_tanka) as arari from UriageData ".$wheresql.") as U ";
 	$sql = $sql."left join UriageData_GioWeather as UGW on U.uid = UGW.uid and U.UriageNO = UGW.UriNo ";
 	$sql = $sql."left join (select uid,UriNo,max(R_NO) as RNO from ryoushu group by uid,UriNo) as RYS on U.uid = RYS.uid and U.UriageNO = RYS.UriNo order by U.UriDate desc,U.Event,U.UriageNO desc";
 }elseif($Type=="sum_items"){
