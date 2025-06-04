@@ -12,9 +12,9 @@ INPUT{
     height:20px;
 }
 .link{
-    color:#1a1aff;
-    font-weight: 700;
-    text-decoration: underline;
+    color:#1a1aff !important;
+    font-weight: 700 !important;
+    text-decoration: underline !important;
 }
 .footer_update_area{
     position: fixed; /* ウィンドウを基準に画面に固定 */

@@ -1,12 +1,11 @@
 <?php
-define("VERSION", "ver3.18.0-000");
-define("RELEACE_DATE", "2024-11-21");
+define("VERSION", "ver3.21.0-000");
+define("RELEACE_DATE", "2025-06-04");
 
 date_default_timezone_set('Asia/Tokyo');
 require "./vendor/autoload.php";
 require_once "functions.php";
-//本番はリリースした日を指定
-//$time="20240613-00";
+
 $time=VERSION;
 
 //.envの取得
@@ -14,12 +13,6 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 define("EXEC_MODE",$_ENV["EXEC_MODE"]);
-if(EXEC_MODE==="Local" || EXEC_MODE==="TrialL"){
-    //ini_set('error_log', 'C:\xampp\htdocs\SaleM\php_error.log');
-    //define("HTTP","http://");
-}else{
-    //define("HTTP","https://");
-}
 
 define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
 if(!empty($_SERVER['SCRIPT_URI'])){
@@ -72,8 +65,6 @@ if(EXEC_MODE=="Test" || EXEC_MODE=="Local" || EXEC_MODE=="TrialL"){
     error_reporting( E_ALL );
 }else{
     //本番はリリースした日を指定
-    //$time="20240401-01";
-    //$time=date('Ymd-His');
     error_reporting( E_ALL & ~E_NOTICE );
 }
 

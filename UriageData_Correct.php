@@ -34,7 +34,7 @@
 		<div class='title' style='width: 100%;height:37px;'>
 			<a href='menu.php'><?php echo TITLE;?></a>
 		</div>
-		<div style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>期間：{{UriDateFrom}} ～ {{UriDateTo}}</div>
+		<div class='mt-3' style='font-size:1.3rem;color:var(--user-disp-color);font-weight:400;'>期間：{{UriDateFrom}} ～ {{UriDateTo}}</div>
 		<div v-if='filter_flg[0]' style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>
 			<button type='button' class='btn-view' @click='reset_filter' style='padding:1px 3px;font-size:1rem;background-color: var(--panel-bk-color);margin-right:5px;'><i class="fa-solid fa-filter fa-lg "></i>解除</button>
 			<i class="fa-solid fa-filter fa-lg awesome-color-white"></i>：{{filter_flg[1]}}
@@ -83,19 +83,19 @@
 			</template>
 			
 			<div id='uritable'>
-				<table class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
+				<table class='table table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
 					<thead>
 					<tr>
 						<th scope='col' style='width:10px;'></th>
-						<th scope='col' style='width:130px;'>商品</th>
-						<th v-if='Type==="sum_items"' scope='col' style='width:35px;'>出品数</th>
+						<th scope='col' style='min-width:130px;'>商品</th>
+						<th v-if='Type==="sum_items"' scope='col' style='min-width:35px;'>出品数</th>
 						<th scope='col' style='width:30px;'>数</th>
-						<th v-if='Type==="sum_items"' scope='col' style='width:35px;'>残数</th>
-						<th scope='col' style='width:60px;' class='d-none d-md-table-cell'>単価</th>
-						<th scope='col' style='width:60px;'>売上</th>
-						<th scope='col' style='width:60px;' class='d-none d-md-table-cell'>税</th>
-						<th scope='col' style='width:50px;'>原価</th>
-						<th scope='col' style='width:60px;'>粗利</th>
+						<th v-if='Type==="sum_items"' scope='col' style='min-width:35px;'>残数</th>
+						<th scope='col' style='min-width:60px;' class='d-none d-md-table-cell'>単価</th>
+						<th scope='col' style='min-width:60px;'>売上</th>
+						<th scope='col' style='min-width:60px;' class='d-none d-md-table-cell'>税</th>
+						<th scope='col' style='min-width:50px;' class='d-none d-md-table-cell'>原価</th>
+						<th scope='col' style='min-width:60px;'>粗利</th>
 						<th v-if='Type==="rireki"' scope='col' style='width:20px;'></th>
 					</tr>
 					</thead>
@@ -123,6 +123,7 @@
 							</td>
 							<td class='text-right d-none d-md-table-cell'></td>
 							<td class='text-right d-none d-md-table-cell'></td>
+							<td class='text-right d-none d-md-table-cell'></td>
 							<td v-if='Type==="rireki"' class='text-center align-middle'>
 								<template v-if='list.RNO==0'>
 								<a @click='delete_Uriage(list.UriageNO, "%")' href='#'>
@@ -141,7 +142,7 @@
 							<td class='text-end d-none d-md-table-cell'>{{Number(list.tanka).toLocaleString()}}</td>
 							<td class='text-end'>{{Number(list.UriageKin).toLocaleString()}}</td>
 							<td class='text-end d-none d-md-table-cell'>{{Number(list.zei).toLocaleString()}}</td>
-							<td class='text-end'>{{Number(list.genka).toLocaleString()}}</td>
+							<td class='text-end d-none d-md-table-cell'>{{Number(list.genka).toLocaleString()}}</td>
 							<td class='text-end'>{{Number(list.arari).toLocaleString()}}</td>
 							<td v-if='Type==="rireki"' class='text-center align-middle' >
 								<template v-if='list.RNO==0 && list.zeiKBN==0'><!--領収書未発行かつ非課税売上のみ削除可能-->
@@ -157,13 +158,14 @@
 			</div>
 		</div>
 	</main>
-	<footer v-if='UriageData_Correct_mode===false' class='common_footer'>
-		<div class='kaikei'>
-			合計(税込)：￥{{(sum_uriage + sum_uriage_zei).toLocaleString()}}-<br>
-			<span style='font-size:1.3rem;'>内訳(本体+税)：￥{{sum_uriage.toLocaleString()}} + {{sum_uriage_zei.toLocaleString()}}</span>
-		</div>
+	<footer v-if='UriageData_Correct_mode===false' class='common_footer' style='height:80px;'>
 		<div class='right1 item_1'>
-			<button type='button' class='btn--chk' style='border-radius:0;' data-bs-toggle='modal' data-bs-target='#UriModal'>検　索</button>
+			<button type='button' class='btn--chk' style='border-radius:0;' data-bs-toggle='modal' data-bs-target='#UriModal'>期間変更</button>
+		</div>
+		<div class='kaikei'>
+			<p class='mb-1' style='font-size:1.3rem;'>内訳(本体+税)：￥{{sum_uriage.toLocaleString()}} + {{sum_uriage_zei.toLocaleString()}}</p>
+			<p class='mb-0' style='font-size:1.5rem;'>合計：￥{{(sum_uriage + sum_uriage_zei).toLocaleString()}}-</p>
+			<p style='font-size:1.5rem;'>利益：￥{{(sum_arari).toLocaleString()}}-</p>
 		</div>
 	</footer>
 	<div class="loader-wrap" v-show='loader'>
@@ -290,14 +292,14 @@
 							<label for='uridateto' class='control-label'>～売上日：</label>
 							<input v-model='UriDateTo' type='date' style='font-size:1.5rem;' name='UriDateTo' maxlength='10' id='uridateto' class='form-control'>
 						</div>
-						<div>
+						<!--<div>
 							<label for='Type' class='control-label'>表示：上で指定した期間中の</label>
 							<select v-model='Type' @change='get_UriageList()' name='Type' style='font-size:1.5rem;padding-top:0;' id='Type' class='form-control'>
 								<option value='rireki' >売上履歴</option>
 								<option value='sum_items' >売上を日付＞イベント＞商品単位で集計</option>
 								<option value='sum_events' >売上を日付＞イベント単位で集計</option>
 							</select>
-						</div>
+						</div>-->
 					</div>
 					<div class='modal-footer'>
 						<button type='button' @click='get_UriageList()' style='font-size:1.5rem;color:#fff' class='btn btn-primary' data-bs-dismiss="modal">決　定</button>
@@ -447,11 +449,11 @@
 				})
 				const colspan = computed(()=>{//表タイプ毎の日付・イベント行のセル結合数返す
 					if(Type.value==='sum_items'){
-						return 8
+						return 8-1
 					}else if(Type.value==='sum_events'){
-						return 6
+						return 6-1
 					}else{//rireki
-						return 7-1
+						return 7-1-1
 					}
 				})
 				const sum_uriage = computed(() => {//表示売上データの売上本体合計
@@ -462,6 +464,11 @@
 				const sum_uriage_zei = computed(() => {//表示売上データの消費税合計
 					return UriageList_filter.value.reduce(function(sum, element){
   					return Number(sum) + Number(element.zei);
+					}, 0)
+				})
+				const sum_arari = computed(() => {//表示売上データの売上本体合計
+					return UriageList_filter.value.reduce(function(sum, element){
+  					return Number(sum) + Number(element.UriageKin) - Number(element.genka);
 					}, 0)
 				})
 
@@ -647,6 +654,7 @@
 					on_submit_Uriage_Update,
 					sum_uriage,
 					sum_uriage_zei,
+					sum_arari,
 					delete_Uriage,
 					loader,
 				}
