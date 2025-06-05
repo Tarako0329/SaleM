@@ -165,7 +165,7 @@
 		<div class='kaikei'>
 			<p class='mb-1' style='font-size:1.3rem;'>内訳(本体+税)：￥{{sum_uriage.toLocaleString()}} + {{sum_uriage_zei.toLocaleString()}}</p>
 			<p class='mb-0' style='font-size:1.5rem;'>合計：￥{{(sum_uriage + sum_uriage_zei).toLocaleString()}}-</p>
-			<p style='font-size:1.5rem;'>利益：￥{{(sum_arari).toLocaleString()}}-</p>
+			<p style='font-size:1.5rem;'>粗利：￥{{(sum_arari).toLocaleString()}}-</p>
 		</div>
 	</footer>
 	<div class="loader-wrap" v-show='loader'>

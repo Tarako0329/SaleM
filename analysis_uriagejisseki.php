@@ -121,7 +121,7 @@ log_writer2("test",$SLVresult,"lv3");
 				<div class='row'>
 					<div class='col-6'>
 						<select v-model='analysis_type' name='sum_tani' class='form-select form-select-lg' style='margin:5px' ><!--集計単位-->
-							<template v-for='(list,index) in bunseki_menu' :key='list.sort'>
+							<template v-for='(list,index) in bunseki_menu' :key='index'>
 								<option :value='list.val'>{{list.name}}</option>
 							</template>
 						</select>
@@ -146,17 +146,21 @@ log_writer2("test",$SLVresult,"lv3");
 			<table v-if='analysis_type!=="urikire"' class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
 				<thead>
 					<tr>
-						<template v-for='(list,index) in table_labels' :key='list'>
+						<template v-for='(list,index) in table_labels' :key='index'>
 							<th scope='col' style='width:auto;'>{{list}}</th>
 						</template>
 					</tr>
 				</thead>
-				<tbody v-for='(row,index) in table_data' :key='row.Labels'>
+				<tbody v-for='(row,index) in table_data' :key='row.UKEY'>
 					<tr>
-						<template v-for='(data,index) in row' :key='data'>
-							<td v-if='isNaN(data)==false'><div class='text-end'>{{Number(data).toLocaleString()}}</div></td>
-							<td v-else>{{data}}</td>
+						<template v-for='(data,index) in row' :key='index'>
+							<template v-if='index!=="UKEY"'>
+								<td v-if='isNaN(data)==false'>
+									<div class='text-end'>{{Number(data).toLocaleString()}}</div>
+								</td>
+								<td v-else>{{data}}</td>
 							</template>
+						</template>
 					</tr>
 				</tbody>
 			</table>
@@ -172,7 +176,7 @@ log_writer2("test",$SLVresult,"lv3");
 						<th scope='col' style='width:auto;'>完売時刻</th>
 					</tr>
 				</thead>
-				<tbody v-for='(row,index) in table_data' :key='row.UriDate+row.Event+row.ShouhinNM'>
+				<tbody v-for='(row,index) in table_data' :key='index'>
 					<tr v-if='index===0'>
 						<td colspan="4" class='link'>{{row.UriDate}}:{{row.Event}}</td>
 					</tr>
@@ -395,22 +399,25 @@ log_writer2("test",$SLVresult,"lv3");
 							document.getElementById("chart_area").style.height='100%'
 						}
 
-						console_log(document.getElementById("chart_area").style.height)
+						//console_log(document.getElementById("chart_area").style.height)
+						//console_log(response.data.xEnd)
 						
 						if(response.data.chart_type==='line'){
 							let hour = response.data.xStart
-							for(let i=0;hour<=response.data.xEnd;i++){
+							chart_x.value = [] //初期化
+							for(let i=0;hour<=Number(response.data.xEnd);i++){
 								chart_x.value[i] = hour
 								hour++
 							}
+
+							//console_log(`Xend:${response.data.xEnd}`)
+							//console_log(chart_x.value)
 							for(let i=0;i<chart_datasets.value.length;i++){
 								chart_datasets.value[i] = chart_datasets.value[i].slice(response.data.xStart,response.data.xEnd+1)
 							}
 						}
 
-						//table_labels.value = [...response.data.aryColumn]
 						table_labels.value = response.data.aryColumn
-						//table_data.value = [...response.data.result]
 						table_data.value = response.data.result
 
 						if(analysis_type.value === "Area_tanka_1"){
