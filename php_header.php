@@ -1,5 +1,5 @@
 <?php
-define("VERSION", "ver3.21.1-000");
+define("VERSION", "ver3.21.2-000");
 define("RELEACE_DATE", "2025-06-04");
 
 date_default_timezone_set('Asia/Tokyo');
