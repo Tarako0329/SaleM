@@ -29,6 +29,12 @@ $token = csrf_create();
     ?>
     <!--ページ専用CSS-->
     <link rel="stylesheet" href="css/style_menu.css?<?php echo $time; ?>" >
+    <style>
+        .tooltip-inner {
+            /* 長いコンテンツのツールチップが適切に表示されるようにします */
+            max-width: 400px;
+        }
+    </style>
     <TITLE><?php echo $title;?></TITLE>
 </head>
 
@@ -40,45 +46,49 @@ $token = csrf_create();
         <div style='color:var(--user-disp-color);font-weight:400;'>データ分析メニュー</div>
     </header>
     <main class="common_body">
-        <div class="container">
-<?php
-    $array = [
-         '売上金額ランキング'=>['analysis_uriagejisseki.php?sum_tani=4&csrf_token='.$token,'商品ごとの売上金額ランキングを表示。']
-        ,'売上個数ランキング'=>['analysis_uriagejisseki.php?sum_tani=5&csrf_token='.$token,'商品ごとの売上個数ランキングを表示。']
-        ,'ジャンル別売上集計'=>['analysis_uriagejisseki.php?sum_tani=12&csrf_token='.$token,'ジャンルごとの売上を集計し、円グラフで表示。']
-        ,'ｲﾍﾞﾝﾄ別客単価ﾗﾝｷﾝｸﾞ'=>['analysis_uriagejisseki.php?sum_tani=7&csrf_token='.$token,'イベントごとの客単価を算出し、ランキングを表示。']
-        ,'ｲﾍﾞﾝﾄ別平均来客数ﾗﾝｷﾝｸﾞ'=>['analysis_uriagejisseki.php?sum_tani=9&csrf_token='.$token,'イベントごとの平均来客数を算出し、ランキングを表示。']
-        ,'ｲﾍﾞﾝﾄ別平均総売上ﾗﾝｷﾝｸﾞ'=>['analysis_uriagejisseki.php?sum_tani=Ev_Avr_uri_rank&csrf_token='.$token,'イベントごとの平均総売上を算出し、ランキングを表示。']
-        ,'エリア(市区)別客単価RANK'=>['analysis_uriagejisseki.php?sum_tani=Area_tanka_1&csrf_token='.$token,'市区町村エリアごとの客単価を算出し、ランキングを表示。']
-        ,'エリア(市区町)別客単価RANK'=>['analysis_uriagejisseki.php?sum_tani=Area_tanka_2&csrf_token='.$token,'市区町村〇丁目エリアごとの客単価を算出し、ランキングを表示。']
-        ,'客単価実績(ｲﾍﾞﾝﾄ開催ごと)'=>['analysis_uriagejisseki.php?sum_tani=6&csrf_token='.$token,'日ごとの客単価を表示します。']
-        ,'来客数実績(ｲﾍﾞﾝﾄ開催ごと)'=>['analysis_uriagejisseki.php?sum_tani=8&csrf_token='.$token,'日ごとの来客数（会計数）を表示。']
-        ,'時間帯別売上実績'=>['analysis_uriagejisseki.php?sum_tani=10&csrf_token='.$token,'時間帯ごとに何がどれだけ売れているかを分析・グラフ化します。<br>グラフ化して見ることで商品の売れる勢いを確認出来ます。<br>例えば、開店と同時に売れる商品は人気商品なので多めに準備するといいでしょうし、地味に売れ続ける商品も根強い人気があると分析できます。']
-        ,'時間帯別来客実績'=>['analysis_uriagejisseki.php?sum_tani=11&csrf_token='.$token,'１時間ごとの来客数を集計・グラフ化します。<br>グラフがグンと伸びたところが繁忙期。なだらかなとこは凪となります。']
-        ,'期間毎売上集計'=>['analysis_uriagejisseki.php?sum_tani=2&csrf_token='.$token,'日ごと、月毎、年間の売上金額を確認<br>イベント名を指定することで過去の売上傾向を確認出来ます。']
-        ,'売切分析'=>['analysis_uriagejisseki.php?sum_tani=urikire&csrf_token='.$token,'過去イベントで売切れが発生した商品と売切れた時間をピックアップ<br>出品数を調整し、より売上を上げましょう！']
-        ,'ABC分析'=>['analysis_abc.php?sum_tani=2&csrf_token='.$token,'売上げの7割を支える商品群をAグループ、2割を支える商品群をBグループ、残り1割をCグループに分類してます。<br>Aグループは人気商品。Cグループはあまり売上げに貢献していない商品と位置づけられます。<br>取扱商品の検討材料等に利用できます。']
-        //,'バスケット分析'=>['xxxx.php?mode=1&csrf_token='.$token]
-    ];
-    echo "<div class='row' >";
-	foreach(array_merge($array) as $key=>$vals){
-        
-        echo "  <div class ='col-md-4 col-sm-6 col-12 mb-3' >\n";
-        echo "      <a href='".$vals[0]."' class='btn--topmenu btn-view' style='font-size:1.5rem;width:80%;height:50px;padding:12px 10px;'>".$key."\n";
-        echo "      </a>\n";
-        echo "      <i class='bi bi-question-circle Qicon awesome-color-panel-border-same' data-bs-placement='top' data-bs-trigger='click' data-bs-custom-class='custom-tooltip' data-bs-toggle='tooltip' data-bs-html='true' title='".$vals[1]."'></i>";
-        echo "  </div>\n";
-	}
-    echo "</div>";
-    
-	
-?> 
+        <div class="container" id='app'>
+            <div class='row'>
+            <template v-for='(list,index) in menu' :key='index'>
+                <div class ='col-md-4 col-sm-6 col-12 mb-3' >
+                    <a :href='`${list.url}${tokenValue}`' class='btn--topmenu btn-view' style='font-size:1.5rem;width:80%;height:50px;padding:12px 10px;'>{{list.name}}</a>
+                    <i class='bi bi-question-circle Qicon awesome-color-panel-border-same ms-2'
+                       data-bs-placement='top' data-bs-trigger='click' role='button'
+                       data-bs-custom-class='custom-tooltip' data-bs-toggle='tooltip' data-bs-html='true' :title='`${list.tips}`'
+                       @click="toggleFlip(list)" :class="{ 'is-flipped': list.isFlipped }"></i>
+                </div>
+            </template>
+            </div>
         </div>
     </main>
     <script>
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+        const { createApp, ref, onMounted, computed, VueCookies, watch, watchEffect } = Vue
+		createApp({
+            setup(){
+                // 各メニューアイテムに isFlipped 状態を追加して初期化します
+                const menu = ref(BUNSEKI_MENU.map(item => ({ ...item, isFlipped: false })));
+                const tokenValue = ref('<?php echo $token;?>'); // PHPのトークンをリアクティブな変数に格納
+
+                const toggleFlip = (item) => {
+                    item.isFlipped = !item.isFlipped; // アイテムのisFlipped状態を反転させます
+                    // オプション: 短時間で元に戻す場合
+                    // setTimeout(() => {
+                    //   item.isFlipped = false;
+                    // }, 800); // 0.8秒後に元に戻ります
+                };
+
+                onMounted(() => {
+                    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+                    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+                });
+                return{
+                    menu,
+                    tokenValue, // tokenValue をテンプレートで使用できるように返します
+                    toggleFlip  // toggleFlip メソッドをテンプレートで使用できるように返します
+                }
+            }
+        }).mount('#app');
     </script>
+
 </body>
 
 </html>
