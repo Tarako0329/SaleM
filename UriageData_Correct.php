@@ -66,6 +66,7 @@
 	  	  </div>
 	  	</div>
 		</nav>
+		
 		<div style='width:20%;max-width:60px;text-align:right;' class='item_2'><!--修正モードのトグルボタン-->
 			<span style='margin-bottom:0px'>修正モード</span>
 			<div class="switchArea">
@@ -83,7 +84,7 @@
 			</template>
 			
 			<div id='uritable'>
-				<table class='table table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
+				<table class='table table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
 					<thead>
 					<tr>
 						<th scope='col' style='width:10px;'></th>
@@ -101,7 +102,7 @@
 					</thead>
 					<tbody v-for='(list,index) in UriageList_filter' :key='list.uid + list.UriDate + list.EVorTK + list.UriageNO + list.ShouhinCD + list.zeiKBN'>
 						<!--売上日+Event行-->
-						<tr v-if='(index===0) || (index!==0 && list.UriDate + list.EVorTK !== UriageList_filter[index-1].UriDate + UriageList_filter[index-1].EVorTK)' class='tr_stiky'>
+						<tr v-if='(index===0) || (index!==0 && list.UriDate + list.EVorTK !== UriageList_filter[index-1].UriDate + UriageList_filter[index-1].EVorTK)' class='tr_stiky table-success'>
 							<td :colspan='colspan' class='tr_stiky' style='white-space:nowrap;'>
 								<span role='button' class='link' @click='set_filter("UriDate",list.UriDate,"")'> 売上日：{{list.UriDate}}</span>
 								<span style='margin-left:8px;' role='button' class='link' @click='set_filter("Event",list.Event+list.TokuisakiNM,"")'>『{{list.EVorTK}}』</span>
@@ -113,7 +114,7 @@
 							<td v-if='Type==="rireki"' class='text-right d-none d-md-table-cell'></td>
 							<td v-if='Type==="rireki"' class='text-right d-table-cell d-md-none'></td>
 						</tr><!--売上日+Event行-->
-						<tr v-if='(index===0 && (Type==="rireki")) || (index!==0 && list.UriageNO !== UriageList_filter[index-1].UriageNO)'><!--売上No行-->
+						<tr v-if='(index===0 && (Type==="rireki")) || (index!==0 && list.UriageNO !== UriageList_filter[index-1].UriageNO)' class='table-warning'><!--売上No行-->
 							<td :colspan='colspan' role='button' @click='set_filter("UriNO",list.UriageNO,"")'>
 								<span class='link'>
 									No.{{list.UriageNO}}
@@ -127,14 +128,13 @@
 							<td v-if='Type==="rireki"' class='text-center align-middle'>
 								<template v-if='list.RNO==0'>
 								<a @click='delete_Uriage(list.UriageNO, "%")' href='#'>
-									<!--<i class='fa-regular fa-trash-can'></i>-->
 									<i class="bi bi-trash3"></i>
 								</a>
 								</template>
 							</td>
 						</tr><!--売上No行-->
 						<tr><!--売上明細行-->
-							<td></td>
+							<td class='table-warning'></td>
 							<td role='button' class='link' @click='set_filter("ShouhinCD",list.ShouhinCD,list.ShouhinNM)'>{{list.ShouhinNM}}</td>
 							<td v-if='Type==="sum_items"' class='text-end'>{{Number(list.shuppin_su)}}</td>
 							<td class='text-end'>{{Number(list.su)}}</td>
@@ -147,7 +147,6 @@
 							<td v-if='Type==="rireki"' class='text-center align-middle' >
 								<template v-if='list.RNO==0 && list.zeiKBN==0'><!--領収書未発行かつ非課税売上のみ削除可能-->
 								<a @click='delete_Uriage(list.UriageNO, list.ShouhinCD)' href='#'>
-									<!--<i class='fa-regular fa-trash-can'></i>-->
 									<i class="bi bi-trash3"></i>
 								</a>
 								</template>
@@ -292,14 +291,6 @@
 							<label for='uridateto' class='control-label'>～売上日：</label>
 							<input v-model='UriDateTo' type='date' style='font-size:1.5rem;' name='UriDateTo' maxlength='10' id='uridateto' class='form-control'>
 						</div>
-						<!--<div>
-							<label for='Type' class='control-label'>表示：上で指定した期間中の</label>
-							<select v-model='Type' @change='get_UriageList()' name='Type' style='font-size:1.5rem;padding-top:0;' id='Type' class='form-control'>
-								<option value='rireki' >売上履歴</option>
-								<option value='sum_items' >売上を日付＞イベント＞商品単位で集計</option>
-								<option value='sum_events' >売上を日付＞イベント単位で集計</option>
-							</select>
-						</div>-->
 					</div>
 					<div class='modal-footer'>
 						<button type='button' @click='get_UriageList()' style='font-size:1.5rem;color:#fff' class='btn btn-primary' data-bs-dismiss="modal">決　定</button>
@@ -357,6 +348,7 @@
 				const UriageList = ref([])		//売上リスト
 				const UriDateFrom = ref('<?php echo date("Y")."-01-01"; ?>')
 				const UriDateTo = ref('<?php echo date("Y")."-12-31"; ?>')
+				const serch_ym = ref('Y')
 				const Type = ref('rireki')
 				const btn_class = ref(['btn-view','btn-view','btn-view btn-selected'])
 
@@ -630,6 +622,7 @@
 					get_UriageList,
 					UriDateFrom,
 					UriDateTo,
+					serch_ym,
 					Type,
 					colspan,
 					set_filter,

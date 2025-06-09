@@ -175,11 +175,6 @@ log_writer2("test",$SLVresult,"lv3");
 				</div>
 			</div>
 			<div class='row' id='chart_area_upper_row'>
-				<!--<div class='col-md-9' id='chart_area_upper_div'>
-					<div id='chart_area'> 
-						<canvas id='ChartCanvas'></canvas>
-					</div>
-				</div>-->
 				<div class='col-md-9' id='chart_area'>
 					<canvas id='ChartCanvas'></canvas>
 				</div>
