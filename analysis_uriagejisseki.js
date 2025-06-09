@@ -1,7 +1,6 @@
 const { createApp, ref, onMounted, computed, VueCookies, watch, watchEffect } = Vue
 const analysis_uriagejisseki = (p_analysis_type,p_uid,p_csrf_create,p_ym) => createApp({
 	setup(){
-		//chart_type(bar or doughnut)
 		const analysis_type = ref(p_analysis_type)
 		const bunseki_menu = ref(BUNSEKI_MENU)
 		var category_lv = 0 //商品分類ごとの売上円グラフで使用。0：大分類　1：中分類　2：小分類
@@ -12,9 +11,9 @@ const analysis_uriagejisseki = (p_analysis_type,p_uid,p_csrf_create,p_ym) => cre
 			console_log('drow_chart start','lv3')
 			if (myChart) {
 				console_log('myChart.destroy','lv3')
-				myChart.destroy();
+				myChart.destroy()
 			}
-			const ctx = document.getElementById('ChartCanvas').getContext('2d');
+			const ctx = document.getElementById('ChartCanvas').getContext('2d')
 			let params = {
 				type: chart_type,
 				data: {
@@ -43,27 +42,27 @@ const analysis_uriagejisseki = (p_analysis_type,p_uid,p_csrf_create,p_ym) => cre
 				params.data.datasets[0]['maxBarThickness'] = 20
 				params.data.datasets[0]['barPercentage'] = 0.9
 				params.options.maintainAspectRatio = false
-			
 			}else if(chart_type==='doughnut'){
+				params.options.maintainAspectRatio = false
 				params.options={events: ['click']}
 				params.options={
 					onClick: function (e, el,chart) {
-							//円グラフタップ時の子分類データ取得処理を記述
-							if (! el || el.length === 0) return;
-							console_log('onClick : label ' + chart.data.labels[el[0].index]);
-							console_log('onClick : category_lv ' + category_lv);
-							console_log('onClick : label ' + e);
-							
-							if(category_lv>=2){
-								category_lv = 0
-							}else{
-								category_lv += 1
-							}
-							over_category = chart.data.labels[el[0].index]
-							console_log('onClick : category_lv ' + category_lv);
-							console_log('onClick : over_category ' + over_category);
-							get_analysis_data()
+						//円グラフタップ時の子分類データ取得処理を記述
+						if (! el || el.length === 0) return
+						console_log('onClick : label ' + chart.data.labels[el[0].index])
+						console_log('onClick : category_lv ' + category_lv)
+						console_log('onClick : label ' + e)
+						
+						if(category_lv>=2){
+							category_lv = 0
+						}else{
+							category_lv += 1
 						}
+						over_category = chart.data.labels[el[0].index]
+						console_log('onClick : category_lv ' + category_lv)
+						console_log('onClick : over_category ' + over_category)
+						get_analysis_data()
+					}
 				}
 			}else if(chart_type==='line'){
 				params.data.labels = chart_x.value//['X軸1','X軸2','X軸3','X軸4']
@@ -81,31 +80,22 @@ const analysis_uriagejisseki = (p_analysis_type,p_uid,p_csrf_create,p_ym) => cre
 					}
 				}
 			}
-			
-			myChart = new Chart(ctx, params);
+			myChart = new Chart(ctx, params)
 		}
 		const serch_ym = ref('Y') // Y:単年 Y-Y:複数年 ym：年月範囲 ymd:日付範囲指定
-		/*
-		const change_mode_ymd = () =>{
-			serch_ym.value = false
-		}
-		const change_mode_ym = () =>{
-			serch_ym.value = true
-		}
-		*/
 
-		const today = new Date(); // 現在の日付と時刻を持つDateオブジェクトを作成
-		const year = today.getFullYear(); // Dateオブジェクトから西暦（年）を取得
-		const month = today.getMonth(); // Dateオブジェクトから月を取得 (0-11)
+		const today = new Date() // 現在の日付と時刻を持つDateオブジェクトを作成
+		const year = today.getFullYear() // Dateオブジェクトから西暦（年）を取得
+		const month = today.getMonth() // Dateオブジェクトから月を取得 (0-11)
 
 		// 今月末の日付を計算
-		const lastDayOfMonth = new Date(year, month + 1, 0);
+		const lastDayOfMonth = new Date(year, month + 1, 0)
 		const formattedLastDay = `${lastDayOfMonth.getFullYear()}-${(lastDayOfMonth.getMonth() + 1).toString().padStart(2, '0')}-${lastDayOfMonth.getDate().toString().padStart(2, '0')}`
-
-		const ev_list = ref([])
 		const ev_selected = ref('')
 		const date_from = ref(`${year}-01-01`)
 		const date_to = ref(formattedLastDay)
+		
+		const ev_list = ref()
 
 		const get_event = () => {//期間内のイベント一覧取得ajax
 			console_log("get_event start",'lv3')
@@ -123,10 +113,9 @@ const analysis_uriagejisseki = (p_analysis_type,p_uid,p_csrf_create,p_ym) => cre
 			.catch((error) => {
 				console_log(`get_event ERROR:${error}`,'lv3')
 			})
-			return 0;
-		};//イベントリスト取得ajax
-
-	
+			return 0
+		}
+		
 		const CSRF = ref(p_csrf_create)
 		const chart_type = ref('')
 		const chart_labels = ref([])
@@ -179,7 +168,7 @@ const analysis_uriagejisseki = (p_analysis_type,p_uid,p_csrf_create,p_ym) => cre
 				}
 				//グラフエリアのサイズ設定
 				document.getElementById("chart_area").style.display='block'
-				document.getElementById("chart_area_upper_div").style.display='block'
+				//document.getElementById("chart_area_upper_div").style.display='block'
 
 				if(response.data.chart_type==='bar'){//棒グラフはデータ数に応じて変える
 					//document.getElementById("chart_area").style.height='750px'
@@ -190,7 +179,13 @@ const analysis_uriagejisseki = (p_analysis_type,p_uid,p_csrf_create,p_ym) => cre
 					}
 				}else if(response.data.chart_type==='-'){//グラフ不要
 					document.getElementById("chart_area").style.display='none'
-					document.getElementById("chart_area_upper_div").style.display='none'
+					//document.getElementById("chart_area_upper_div").style.display='none'
+				}else if(response.data.chart_type==='doughnut'){//円グラフはmax-height指定
+					document.getElementById("chart_area_upper_row").style.maxHeight='500px'
+					document.getElementById("chart_area_upper_row").style.height='100%'
+					document.getElementById("chart_area").style.height='100%'
+					document.getElementById("chart_area").style.width='100%'
+					document.getElementById("chart_area").style.maxWidth='500px'
 				}else{
 					document.getElementById("chart_area").style.height='100%'
 				}
@@ -262,15 +257,15 @@ const analysis_uriagejisseki = (p_analysis_type,p_uid,p_csrf_create,p_ym) => cre
 			.finally(()=>{
 				//console_log(myChart,'lv3')
 			})
-			return 0;
-		};//売上分析データ取得ajax
+			return 0
+		}//売上分析データ取得ajax
 		
 		watch([date_from,serch_ym],() => {
 			if(serch_ym.value === 'Y'){
 				//y_listのfrom_Value=datefromとなるレコードのtoValueをdate_toにセット
-				const selected_y = y_list.value.find(item => item.fromValue === date_from.value);
+				const selected_y = y_list.value.find(item => item.fromValue === date_from.value)
 				if (selected_y) {
-					date_to.value = selected_y.toValue;
+					date_to.value = selected_y.toValue
 				}
 			}
 		})
@@ -285,64 +280,64 @@ const analysis_uriagejisseki = (p_analysis_type,p_uid,p_csrf_create,p_ym) => cre
 		//引数に年月を指定。指定されたから今月までのリストを{"display":YYYY年MM月,"fromValue":月初日(yyyy-mm-dd),"toValue":月末日(yyyy-mm-dd)}のJSONで返す関数
 		const create_ym_list = (start_ym) => {
 			console_log('create_ym_list start')
-			const today = new Date();
-			const current_year = today.getFullYear();
-			const current_month = today.getMonth() + 1; // getMonth()は0から始まるため+1
+			const today = new Date()
+			const current_year = today.getFullYear()
+			const current_month = today.getMonth() + 1 // getMonth()は0から始まるため+1
 
-			const start_year = parseInt(start_ym.substring(0, 4));
-			const start_month = parseInt(start_ym.substring(4, 6));
+			const start_year = parseInt(start_ym.substring(0, 4))
+			const start_month = parseInt(start_ym.substring(4, 6))
 
-			let year = start_year;
-			let month = start_month;
+			let year = start_year
+			let month = start_month
 			const ym_list_temp = []
 
 			while (year < current_year || (year === current_year && month <= current_month)) {
-				const display = `${year}年${month.toString().padStart(2, '0')}月`;
-				const fromValue = `${year}-${month.toString().padStart(2, '0')}-01`;
-				const lastDay = new Date(year, month, 0).getDate(); // 翌月の0日目は当月末日
-				const toValue = `${year}-${month.toString().padStart(2, '0')}-${lastDay}`;
-				ym_list_temp.push({ display, fromValue, toValue });
+				const display = `${year}年${month.toString().padStart(2, '0')}月`
+				const fromValue = `${year}-${month.toString().padStart(2, '0')}-01`
+				const lastDay = new Date(year, month, 0).getDate() // 翌月の0日目は当月末日
+				const toValue = `${year}-${month.toString().padStart(2, '0')}-${lastDay}`
+				ym_list_temp.push({ display, fromValue, toValue })
 
-				month++;
+				month++
 				if (month > 12) {
-					month = 1;
-					year++;
+					month = 1
+					year++
 				}
 			}
 			ym_list.value = ym_list_temp
-			//return ym_list_temp;
+			//return ym_list_temp
 		}
 		const y_list = ref()
 		//引数に年月を指定。指定されたから今年までのリストを{"display":YYYY年,"fromValue":年始日(yyyy-mm-dd),"toValue":年末日(yyyy-mm-dd)}のJSONで返す関数
 		const create_y_list = (start_y) => {
 			console_log('create_y_list start')
-			const today = new Date();
-			const current_year = today.getFullYear();
-			const current_month = today.getMonth(); // getMonth()は0から始まるためそのまま使用
-			const start_year = parseInt(start_y);
+			const today = new Date()
+			const current_year = today.getFullYear()
+			const current_month = today.getMonth() // getMonth()は0から始まるためそのまま使用
+			const start_year = parseInt(start_y)
 
-			let year = start_year;
+			let year = start_year
 			const y_list_temp = []
 
 			while (year <= current_year) {
-				const display = `${year}年`;
-				const fromValue = `${year}-01-01`;
+				const display = `${year}年`
+				const fromValue = `${year}-01-01`
 
-				let toValue;
+				let toValue
 				if (year === current_year) {
 					// 今年の場合は今月末日を計算
-					const lastDayOfCurrentMonth = new Date(current_year, current_month + 1, 0).getDate();
-					toValue = `${current_year}-${(current_month + 1).toString().padStart(2, '0')}-${lastDayOfCurrentMonth.toString().padStart(2, '0')}`;
+					const lastDayOfCurrentMonth = new Date(current_year, current_month + 1, 0).getDate()
+					toValue = `${current_year}-${(current_month + 1).toString().padStart(2, '0')}-${lastDayOfCurrentMonth.toString().padStart(2, '0')}`
 				} else {
 					// 過去の年の場合は12月31日
-					toValue = `${year}-12-31`;
+					toValue = `${year}-12-31`
 				}
-				y_list_temp.push({ display, fromValue, toValue });
+				y_list_temp.push({ display, fromValue, toValue })
 
-				year++;
+				year++
 			}
 			y_list.value = y_list_temp
-			//return y_list_temp;
+			//return y_list_temp
 		}
 
 		const url = computed(() =>{

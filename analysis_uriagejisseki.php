@@ -174,11 +174,14 @@ log_writer2("test",$SLVresult,"lv3");
 					</div>
 				</div>
 			</div>
-			<div class='row'>
-				<div class='col-md-9' id='chart_area_upper_div'>
-					<div id='chart_area' style='width:95%;'> 
+			<div class='row' id='chart_area_upper_row'>
+				<!--<div class='col-md-9' id='chart_area_upper_div'>
+					<div id='chart_area'> 
 						<canvas id='ChartCanvas'></canvas>
 					</div>
+				</div>-->
+				<div class='col-md-9' id='chart_area'>
+					<canvas id='ChartCanvas'></canvas>
 				</div>
 				<div class='col-md-3' style='padding:5px'>
 					<table v-if='analysis_type!=="urikire"' class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
