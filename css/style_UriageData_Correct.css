@@ -36,7 +36,9 @@ INPUT{
 }
 .header_menu{
     position: fixed; /* ウィンドウを基準に画面に固定 */
-    height: 50px;
+    min-height: 50px;
+    height: auto;
+    max-height: 100px;
     top: 75px;
     left:0;
     padding-left:10px;
@@ -44,6 +46,8 @@ INPUT{
     z-index: 101;
     background:#fff;
     display: flex;
+    border-bottom:solid var(--panel-bd-color) 0.5px;
+    padding:0;
 }
 @media (orientation: portrait){/*デバイスが縦向きの場合*/
     table{
@@ -54,6 +58,19 @@ INPUT{
     td{
         word-wrap: break-word;
     }
+    .common_body{
+        padding-top:180px;
+    }
+    th{
+        position: sticky;
+        top:170px;
+    }
+    
+    .tr_stiky{
+        position: sticky; /*スマホ古いと動作が変になるのでやめる*/
+        top:204px;
+    }
+
 }
 /*デバイスが横向きの場合*/
 @media (orientation: landscape){
@@ -88,7 +105,7 @@ th{
 .nav-tabs .nav-link.active{
     color:#fff;
 }
-@media screen and (min-width:376px) {
+@media screen and (min-width:745px) {
     th{
         position: sticky;
         top:123px;

@@ -34,7 +34,7 @@
 		<div class='title' style='width: 100%;height:37px;'>
 			<a href='menu.php'><?php echo TITLE;?></a>
 		</div>
-		<div class='mt-3' style='font-size:1.3rem;color:var(--user-disp-color);font-weight:400;'>期間：{{UriDateFrom}} ～ {{UriDateTo}}</div>
+		<div class='mt-3' style='font-size:1.5rem;color:var(--user-disp-color);font-weight:400;'>期間：{{UriDateFrom}} ～ {{UriDateTo}}</div>
 		<div v-if='filter_flg[0]' style='font-size:1rem;color:var(--user-disp-color);font-weight:400;'>
 			<button type='button' class='btn-view' @click='reset_filter' style='padding:1px 3px;font-size:1rem;background-color: var(--panel-bk-color);margin-right:5px;'><i class="fa-solid fa-filter fa-lg "></i>解除</button>
 			<i class="fa-solid fa-filter fa-lg awesome-color-white"></i>：{{filter_flg[1]}}
@@ -43,32 +43,11 @@
 				<i class="bi bi-question-circle Qicon awesome-color-white"></i>
 		</a>
 	</header>
-	<div class='header_menu' style='border-bottom:solid var(--panel-bd-color) 0.5px;padding:0;'>
-		<!--<nav class="navbar navbar-expand" style='padding:0;width:90%;'>
-			<div class="container-fluid" >
-				<div class="navbar-brand" style='padding:5px;font-weight:800;'>売上実績<br>メニュー</div>
-	  	  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" 
-	  	  aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-	  	    <span class="navbar-toggler-icon"></span>
-	  	  </button>
-	  	  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-	  	    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-	  	      <li class="nav-item">
-	  	        <button :class="btn_class[0]" @click='Type_changer("sum_events")'>イベント別集計</button>
-	  	      </li>
-	  	      <li class="nav-item">
-	  	        <button :class="btn_class[1]" @click='Type_changer("sum_items")'>商品別集計</button>
-	  	      </li>
-	  	      <li class="nav-item">
-	  	        <button :class="btn_class[2]" @click='Type_changer("rireki")'>売上明細</button>
-	  	      </li>
-	  	    </ul>
-	  	  </div>
-	  	</div>
-		</nav>-->
-		<div class='row'><!--検索条件設定エリア-->
-			<div class='col-12 d-inline-flex ' style='padding-top:3px;'>
-				<div class='input-group ms-3 pb-3' style=''>
+	<div class='header_menu' style=''>
+	<div class='container-fluid'>
+		<div class='row' id='serch_area'><!--検索条件設定エリア-->
+			<div class='col-12 d-flex  flex-wrap justify-content-start p-0 pt-1' style=''>
+				<div class='input-group ms-3 pb-3' style='width:300px;' id='serch_Type'>
 					<input type='radio' class='btn-check' name='options' autocomplete='off' id='nm' >
 					<label  class='btn btn-outline-black btn-check-label ps-0 pe-2 pt-3' for='nm' style='pointer-events:none;font-size:12px;'>売上実績</label>
 					<input type='radio' class='btn-check' name='options' autocomplete='off' id='sum_events' v-model='Type' value='sum_events'>
@@ -78,17 +57,41 @@
 					<input type='radio' class='btn-check' name='options' autocomplete='off' id='rireki' v-model='Type' value='rireki'>
 					<label  :class="`${btn_class[2]} btn-view ps-1 pe-1`" for='rireki' style='width:80px;'>売上明細</label>
 				</div>
+				<div class='input-group ms-3 pb-3' style='width:390px;'>
+					<input type='radio' class='btn-check' name='options' autocomplete='off' id='hanni' >
+					<label  class='btn btn-outline-black btn-check-label ps-0 pe-2 pt-3' for='hanni' style='pointer-events:none;font-size:12px;'>集計範囲</label>
+					<input type='radio' class='btn-check' name='options' autocomplete='off' id='today' v-model='Serch_ym' value='today'>
+					<label  :class="`${btn_class_ym[0]} btn-view ps-1 pe-1`" for='today' style='width:50px;'>本日分</label>
+					<input type='radio' class='btn-check' name='options' autocomplete='off' id='monthly' v-model='Serch_ym' value='monthly'>
+					<label  :class="`${btn_class_ym[1]} btn-view ps-1 pe-1`" for='monthly' style='width:50px;'>今月</label>
+					<input type='radio' class='btn-check' name='options' autocomplete='off' id='year' v-model='Serch_ym' value='year'>
+					<label  :class="`${btn_class_ym[2]} btn-view ps-1 pe-1`" for='year' style='width:50px;'>今年度</label>
+					<input type='radio' class='btn-check' name='options' autocomplete='off' id='1year_ago' v-model='Serch_ym' value='1year_ago'>
+					<label  :class="`${btn_class_ym[3]} btn-view ps-1 pe-1`" for='1year_ago' style='width:50px;'>昨年度</label>
+					<div style='width:60px;text-align:right;' class='ms-2 item_2'><!--修正モードのトグルボタン-->
+						<span style='margin-bottom:0px'>修正モード</span>
+						<div class="switchArea">
+							<input v-model='UriageData_Correct_mode' type="checkbox" id="switch1">
+							<label for="switch1" ><span></span></label>
+							<div id="swImg" ></div>
+						</div>
+					</div><!--修正モードのトグルボタン-->
+				</div>
+
 			</div>
 		</div><!--検索条件設定エリア-->
-		
-		<div style='width:20%;max-width:60px;text-align:right;' class='item_2'><!--修正モードのトグルボタン-->
+		<!--修正モードのトグルボタン-->
+		<!--
+		<div style='width:60px;text-align:right;' class='item_2'>
 			<span style='margin-bottom:0px'>修正モード</span>
 			<div class="switchArea">
 				<input v-model='UriageData_Correct_mode' type="checkbox" id="switch1">
 				<label for="switch1" ><span></span></label>
 				<div id="swImg" ></div>
 			</div>
-		</div><!--修正モードのトグルボタン-->
+		</div>-->
+		<!--修正モードのトグルボタン-->
+	</div>
 	</div>
 
 	<main class='common_body' id='body' :style='common_body_style'>
@@ -362,9 +365,10 @@
 				const UriageList = ref([])		//売上リスト
 				const UriDateFrom = ref('<?php echo date("Y")."-01-01"; ?>')
 				const UriDateTo = ref('<?php echo date("Y")."-12-31"; ?>')
-				const serch_ym = ref('Y')
+				const Serch_ym = ref('Y')
 				const Type = ref('rireki')
 				const btn_class = ref(['','','btn-selected'])
+				const btn_class_ym = ref(['','','btn-selected'])
 
 				const get_UriageList = () => {//売上リスト取得ajax
 					console_log("get_UriageList start",'lv3');
@@ -382,23 +386,6 @@
 					.catch((error) => console_log(`get_UriageList ERROR:${error}`,'lv3'));
 				}//売上リスト取得ajax
 
-				/*const Type_changer = (Hyou_Type) => {
-					console_log(`Type_changer ${Hyou_Type}`,'lv3')
-					Type.value = Hyou_Type
-
-					btn_class.value[0] = 'btn-view'
-					btn_class.value[1] = 'btn-view'
-					btn_class.value[2] = 'btn-view'
-					if(Hyou_Type==='sum_events'){
-						btn_class.value = ['btn-selected','','']
-					}else if(Hyou_Type==='sum_items'){
-						btn_class.value = ['','btn-selected','']
-					}else{
-						btn_class.value = ['','','btn-selected']
-					}
-					get_UriageList()
-				}*/
-
 				watch((Type),()=>{
 					if(Type.value==='sum_events'){
 						btn_class.value = ['btn-selected','','']
@@ -406,6 +393,38 @@
 						btn_class.value = ['','btn-selected','']
 					}else{
 						btn_class.value = ['','','btn-selected']
+					}
+					get_UriageList()
+				})
+
+				const today = new Date();
+				const year = today.getFullYear();
+				const month = ('0' + (today.getMonth() + 1)).slice(-2);
+				const day = ('0' + today.getDate()).slice(-2);
+				const lastDay = new Date(year, month, 0).getDate();
+				watch((Serch_ym),()=>{
+					if(Serch_ym.value==='today'){
+						//UriDateFrom UriDateto に今日をセット
+						UriDateFrom.value = `${year}-${month}-${day}`;
+						UriDateTo.value = `${year}-${month}-${day}`;
+						btn_class_ym.value = ['btn-selected','','','']
+					}else if(Serch_ym.value==='monthly'){
+						//UriDateFrom UriDateto に今月をセット
+						UriDateFrom.value = `${year}-${month}-01`;
+						UriDateTo.value = `${year}-${month}-${lastDay}`;
+						btn_class_ym.value = ['','btn-selected','','']
+					}else if(Serch_ym.value==='year'){
+						//UriDateFrom UriDateto に今年度をセット
+						UriDateFrom.value = `${year}-01-01`;
+						UriDateTo.value = `${year}-12-31`;
+						btn_class_ym.value = ['','','btn-selected','']
+					}else if(Serch_ym.value==='1year_ago'){
+						//UriDateFrom UriDateto に昨年度をセット
+						UriDateFrom.value = `${year-1}-01-01`;
+						UriDateTo.value = `${year-1}-12-31`;
+						btn_class_ym.value = ['','','','btn-selected']
+					}else{
+						btn_class_ym.value = ['','','btn-selected']
 					}
 					get_UriageList()
 				})
@@ -504,6 +523,19 @@
 					}
 					
 				})
+				watch((UriageData_Correct_mode),()=>{
+					if(UriageData_Correct_mode.value===true){
+						Type.value='rireki'
+						//id:serch_Typeの中身をロック
+						document.getElementById('serch_Type').style.pointerEvents = 'none';
+						document.getElementById('serch_Type').style.opacity = '0.5';
+					}else{
+						document.getElementById('serch_Type').style.pointerEvents = 'auto';
+						document.getElementById('serch_Type').style.opacity = '1';
+					}
+					
+				})
+
 				const upd_zei_kin = computed(() => {
 					if(upd_tanka.value!==''){
 						return return_tax(upd_tanka.value,upd_zei_kbn.value,upd_zei_kominuki.value)
@@ -647,7 +679,7 @@
 					get_UriageList,
 					UriDateFrom,
 					UriDateTo,
-					serch_ym,
+					Serch_ym,
 					Type,
 					colspan,
 					set_filter,
@@ -658,6 +690,7 @@
 					filter_UriNo,
 					//Type_changer,
 					btn_class,
+					btn_class_ym,
 					filter_flg,
 					reset_filter,
 					upd_zei_kbn,
