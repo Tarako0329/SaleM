@@ -44,7 +44,7 @@
 		</a>
 	</header>
 	<div class='header_menu' style='border-bottom:solid var(--panel-bd-color) 0.5px;padding:0;'>
-		<nav class="navbar navbar-expand" style='padding:0;width:90%;'>
+		<!--<nav class="navbar navbar-expand" style='padding:0;width:90%;'>
 			<div class="container-fluid" >
 				<div class="navbar-brand" style='padding:5px;font-weight:800;'>売上実績<br>メニュー</div>
 	  	  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" 
@@ -65,7 +65,21 @@
 	  	    </ul>
 	  	  </div>
 	  	</div>
-		</nav>
+		</nav>-->
+		<div class='row'><!--検索条件設定エリア-->
+			<div class='col-12 d-inline-flex ' style='padding-top:3px;'>
+				<div class='input-group ms-3 pb-3' style=''>
+					<input type='radio' class='btn-check' name='options' autocomplete='off' id='nm' >
+					<label  class='btn btn-outline-black btn-check-label ps-0 pe-2 pt-3' for='nm' style='pointer-events:none;font-size:12px;'>売上実績</label>
+					<input type='radio' class='btn-check' name='options' autocomplete='off' id='sum_events' v-model='Type' value='sum_events'>
+					<label  :class="`${btn_class[0]} btn-view ps-1 pe-1`" for='sum_events' style='width:80px;'>イベント別集計</label>
+					<input type='radio' class='btn-check' name='options' autocomplete='off' id='sum_items' v-model='Type' value='sum_items'>
+					<label  :class="`${btn_class[1]} btn-view ps-1 pe-1`" for='sum_items' style='width:80px;'>商品別集計</label>
+					<input type='radio' class='btn-check' name='options' autocomplete='off' id='rireki' v-model='Type' value='rireki'>
+					<label  :class="`${btn_class[2]} btn-view ps-1 pe-1`" for='rireki' style='width:80px;'>売上明細</label>
+				</div>
+			</div>
+		</div><!--検索条件設定エリア-->
 		
 		<div style='width:20%;max-width:60px;text-align:right;' class='item_2'><!--修正モードのトグルボタン-->
 			<span style='margin-bottom:0px'>修正モード</span>
@@ -338,7 +352,7 @@
 	</div><!--app-->
 	
 	<script>//vue3js
-		const { createApp, ref, onMounted, computed, VueCookies } = Vue;
+		const { createApp, ref, onMounted, computed, VueCookies, watch } = Vue;
 		createApp({
 			setup(){
 				const MSG = ref('')
@@ -350,7 +364,7 @@
 				const UriDateTo = ref('<?php echo date("Y")."-12-31"; ?>')
 				const serch_ym = ref('Y')
 				const Type = ref('rireki')
-				const btn_class = ref(['btn-view','btn-view','btn-view btn-selected'])
+				const btn_class = ref(['','','btn-selected'])
 
 				const get_UriageList = () => {//売上リスト取得ajax
 					console_log("get_UriageList start",'lv3');
@@ -368,7 +382,7 @@
 					.catch((error) => console_log(`get_UriageList ERROR:${error}`,'lv3'));
 				}//売上リスト取得ajax
 
-				const Type_changer = (Hyou_Type) => {
+				/*const Type_changer = (Hyou_Type) => {
 					console_log(`Type_changer ${Hyou_Type}`,'lv3')
 					Type.value = Hyou_Type
 
@@ -376,14 +390,25 @@
 					btn_class.value[1] = 'btn-view'
 					btn_class.value[2] = 'btn-view'
 					if(Hyou_Type==='sum_events'){
-						btn_class.value[0] = 'btn-view btn-selected'
+						btn_class.value = ['btn-selected','','']
 					}else if(Hyou_Type==='sum_items'){
-						btn_class.value[1] = 'btn-view btn-selected'
+						btn_class.value = ['','btn-selected','']
 					}else{
-						btn_class.value[2] = 'btn-view btn-selected'
+						btn_class.value = ['','','btn-selected']
 					}
 					get_UriageList()
-				}
+				}*/
+
+				watch((Type),()=>{
+					if(Type.value==='sum_events'){
+						btn_class.value = ['btn-selected','','']
+					}else if(Type.value==='sum_items'){
+						btn_class.value = ['','btn-selected','']
+					}else{
+						btn_class.value = ['','','btn-selected']
+					}
+					get_UriageList()
+				})
 
 				//フィルター関連
 				const filter_Uridate = ref('%')
@@ -631,7 +656,7 @@
 					filter_Event,
 					filter_Shouhin,
 					filter_UriNo,
-					Type_changer,
+					//Type_changer,
 					btn_class,
 					filter_flg,
 					reset_filter,
