@@ -206,7 +206,8 @@ ver3.21.2-000:売上分析の検索画面改良+bugfix-commited
 ver3.21.3-000:売上分析の検索画面改良-commited
 ver3.21.4-000:売上実績の画面改良-commited
 ver3.21.4-001:売上実績の画面改良-commited
-
+ver3.21.5-000:ジャンル別売上比の改良
+	CREATE  VIEW `uriagemeisai`  AS SELECT `ud`.`uid` AS `uid`, `ud`.`UriageNO` AS `UriageNO`, `ud`.`UriDate` AS `UriDate`, `ud`.`insDatetime` AS `insDatetime`, `ud`.`Event` AS `Event`, `ud`.`TokuisakiNM` AS `TokuisakiNM`, `ud`.`ShouhinCD` AS `ShouhinCD`, `ud`.`ShouhinNM` AS `ShouhinNM`, `ud`.`su` AS `su`, `ud`.`Utisu` AS `Utisu`, `ud`.`tanka` AS `tanka`, `ud`.`UriageKin` AS `UriageKin`, `ud`.`zei` AS `zei`, `ud`.`zeiKBN` AS `zeiKBN`, `ud`.`genka_tanka` AS `genka_tanka`, `ud`.`H_moto_UNO` AS `H_moto_UNO`, `ud`.`updDatetime` AS `updDatetime`, `ud`.`su`* `ud`.`genka_tanka` AS `genka`, if(`ms`.`bunrui1` <> '',`ms`.`bunrui1`,'未分類') AS `bunrui1`, if(`ms`.`bunrui2` <> '',`ms`.`bunrui2`,'未分類') AS `bunrui2`, if(`ms`.`bunrui3` <> '',`ms`.`bunrui3`,'未分類') AS `bunrui3`, `uw`.`address` AS `address`, `uw`.`weather` AS `weather`, `uw`.`description` AS `weather_discription`, `uw`.`temp` AS `temp`, `uw`.`feels_like` AS `feels_like` FROM ((`uriagedata` `ud` join `shouhinms` `ms` on(`ud`.`uid` = `ms`.`uid` and `ud`.`ShouhinCD` = `ms`.`shouhinCD`)) left join `uriagedata_gioweather` `uw` on(`ud`.`uid` = `uw`.`uid` and `ud`.`UriageNO` = `uw`.`UriNo`)) ;
 
 
 verA.BB.C.DDD
@@ -217,8 +218,6 @@ C ：セーブポイント
 DDD：デバッグ・リファクタリング
 【Issues】
 商品修正画面から原価の反映機能を考える
-売上修正の領収書再発行機能を考える->返品・再売上
-売上取消の領収証再発行機能を考える->実装済み
 レジの入出金機能を考える
 
 

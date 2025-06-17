@@ -27,6 +27,7 @@ $result=[];
 $labels=[];
 $data=[];
 $chart_type="";
+$grafu_discription = "";
 
 $rtn = csrf_checker(["analysis_uriagejisseki.php","analysis_abc.php"],["P","C","S"]);
 log_writer2("\$_POST",$_POST,"lv3");
@@ -118,7 +119,7 @@ if($rtn !== true){
 			
 			$tokui="xxxx";//来客数の場合は個別売りを除く
 			$top15="on";
-		}elseif($analysis_type==10){//商品の売れる勢い（時間帯別売上実績）
+		}elseif($analysis_type==10){//（時間帯別売上実績）
 			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY,concat(time_format(insDatetime,'%H'), '時') as Hour,ShouhinNM as NAME,sum(su) as COUNT from UriageData ".$sql_where_OUT." 
 				group by ShouhinNM,time_format(insDatetime,'%H') 
 				order by time_format(insDatetime,'%H'),ShouhinNM";
@@ -158,10 +159,20 @@ if($rtn !== true){
 				$sql_category_where="";
 			}
 			$sql_category_where = " AND ".$sql_category." LIKE '".$category."'";
-			$sqlstr = "SELECT ".$sql_category." as Labels,sum(UriageKin) as datasets from UriageData 
-				inner join ShouhinMS on UriageData.uid=ShouhinMS.uid and UriageData.shouhinCD=ShouhinMS.shouhinCD ".$sql_where_OUT.$sql_category_where." group by ".$sql_category." order by sum(UriageKin) desc";
-			$aryColumn = ["カテゴリー","売上"];
+			/*$sqlstr = "SELECT ".$sql_category." as Labels,sum(UriageKin) as datasets from UriageData 
+				inner join ShouhinMS 
+				on UriageData.uid=ShouhinMS.uid 
+				and UriageData.shouhinCD=ShouhinMS.shouhinCD "
+				.$sql_where_OUT.$sql_category_where." 
+				group by ".$sql_category." 
+				order by sum(UriageKin) desc";*/
+				$sqlstr = "SELECT ".$sql_category." as Labels,sum(UriageKin) as datasets,sum(UriageKin)-sum(genka) as arari from UriageMeisai as UriageData"
+				.$sql_where_OUT.$sql_category_where." 
+				group by ".$sql_category." 
+				order by sum(UriageKin) desc";
+			$aryColumn = ["カテゴリー","売上","粗利"];
 			$chart_type="doughnut";
+			$grafu_discription = "円グラフをタップすると、タップしたジャンルの下のレベルが表示されます。";
 		}elseif($analysis_type==13){//abc分析(全体)
 			$sqlstr = "SELECT tmp.* ,truncate(100 * (税抜売上 / (sum(税抜売上) over())),1) as 売上占有率 from 
 				(SELECT ShouhinNM as ShouhinNM ,sum(UriageKin) as 税抜売上 from UriageData ".$sql_where_OUT." group by ShouhinNM) tmp 
@@ -354,6 +365,7 @@ $return_sts = array(
 	,"top15" => $top15
 	,'xStart' => $xStartpoint
 	,'xEnd' => $xEndpoint
+	,'grafu_discription' => $grafu_discription
 );
 header('Content-type: application/json');
 echo json_encode($return_sts, JSON_UNESCAPED_UNICODE);

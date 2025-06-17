@@ -124,6 +124,7 @@ const analysis_uriagejisseki = (p_analysis_type,p_uid,p_csrf_create,p_ym) => cre
 		const chart_x = ref([])
 		const table_labels = ref([])
 		const table_data = ref([])
+		const grafu_discription = ref('')
 		const get_analysis_data = () => {//売上分析データ取得ajax
 			console_log("get_analysis_data start")
 			let params = new URLSearchParams()
@@ -156,6 +157,7 @@ const analysis_uriagejisseki = (p_analysis_type,p_uid,p_csrf_create,p_ym) => cre
 				chart_type.value = response.data.chart_type
 				//chart_labels.value = response.data.labels
 				chart_datasets.value = response.data.data
+				grafu_discription.value = response.data.grafu_discription
 				if(response.data.chart_type==='doughnut'){
 					chart_labels.value = response.data.labels_long
 				}else{
@@ -364,6 +366,7 @@ const analysis_uriagejisseki = (p_analysis_type,p_uid,p_csrf_create,p_ym) => cre
 			ym_list,
 			y_list,
 			analysis_type,
+			grafu_discription,
 			ev_selected,
 			CSRF,
 			url,

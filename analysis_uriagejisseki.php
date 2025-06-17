@@ -38,21 +38,6 @@ log_writer2("test",$SLVresult,"lv3");
 	$stmt->bindValue("user_id", $_SESSION["user_id"], PDO::PARAM_INT);
 	$stmt->execute();
 	$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-/*
-	$next_ymd = date('Y-m-d',strtotime($result[0]["min_uridate"]."-01"));
-	$next_ym = date('Ym',strtotime($next_ymd));
-	for($i=0;$next_ym<=date("Y")."12";$i++){
-		
-		$SLVresult[$i]["display"] = date('Y年m月',strtotime($next_ymd));
-		$SLVresult[$i]["fromValue"] = date('Y-m-d',strtotime($next_ymd));
-		$SLVresult[$i]["toValue"] = date('Y-m-d',strtotime($next_ymd." last day of this month"));
-
-		$next_ymd = date('Y-m-d',strtotime($next_ymd." +1 month"));
-		$next_ym = date('Ym',strtotime($next_ymd));
-		
-	}
-*/
-	//$_SESSION["Event"]      =(empty($_POST["list"])?"%":$_POST["list"]);
 
 }
 ?>
@@ -175,10 +160,17 @@ log_writer2("test",$SLVresult,"lv3");
 				</div>
 			</div>
 			<div class='row' id='chart_area_upper_row'>
-				<div class='col-md-9' id='chart_area'>
+				<div class='col-md-7 col-xl-6'  style='max-width:500px;'>
+							<template v-if='grafu_discription!==""'>
+								<div class='alert alert-info' role='alert' style='max-width:500px;'>
+									{{grafu_discription}}
+								</div>
+							</template>
+					<div id='chart_area'>
 					<canvas id='ChartCanvas'></canvas>
+					</div>
 				</div>
-				<div class='col-md-3' style='padding:5px'>
+				<div class='col-md-5 col-xl-6' style='padding:5px'>
 					<table v-if='analysis_type!=="urikire"' class='table-striped table-bordered result_table item_0 tour_uri1' style='margin-top:10px;margin-bottom:20px;'><!--white-space:nowrap;-->
 						<thead>
 							<tr>
