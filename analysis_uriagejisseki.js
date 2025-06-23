@@ -68,9 +68,9 @@ const analysis_uriagejisseki = (p_analysis_type,p_uid,p_csrf_create,p_ym) => cre
 				if(response.data.chart_type==='bar'){//棒グラフはデータ数に応じて変える
 					//document.getElementById("chart_area").style.height='750px'
 					console_log(chart_datasets.value['uri'].length)
-					if(Number(chart_datasets.value['uri'].length) * 30 < 150){
+					if(Number(chart_datasets.value['uri'].length) * 30 < 170){
 						console_log('chart_area height 150px')
-						document.getElementById("chart_area").style.height='150px'
+						document.getElementById("chart_area").style.height='200px'
 					}else{
 						document.getElementById("chart_area").style.height=`${Number(chart_datasets.value['uri'].length) * 30}px`
 						console_log('chart_area height not 150px')
