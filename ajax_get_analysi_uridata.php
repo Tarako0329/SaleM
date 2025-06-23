@@ -69,53 +69,63 @@ if($rtn !== true){
 			AND UriageData.uid = :user_id 
 			AND ((TokuisakiNM ='' and Event like :event) OR (Event = '' and TokuisakiNM like :tokui ))";
 
+		$chart_val_label = "売上実績"; //以外の場合は下で書き換える
 		if($analysis_type==1){//日ごと の売上実績
-			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, UriDate as Labels ,sum(UriageKin) as datasets ,sum(UriageKin)-sum(IFNULL(genka_tanka,0) * su) as arari from UriageData ".$sql_where_IN." group by UriDate order by UriDate";
+			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, UriDate as Labels ,sum(UriageKin) as 売上 ,sum(UriageKin-genka) as 粗利 
+			from UriageMeisai as UriageData ".$sql_where_IN." group by UriDate order by UriDate";
 			$aryColumn = ["計上日","売上(税抜)","粗利"];
 			$chart_type="bar";
 		}elseif($analysis_type==2){//月毎の売上実績
-			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, DATE_FORMAT(UriDate, '%Y/%m') as Labels ,sum(UriageKin) as datasets ,sum(UriageKin)-sum(IFNULL(genka_tanka,0) * su) as arari from UriageData ".$sql_where_IN." group by DATE_FORMAT(UriDate, '%Y%m') order by DATE_FORMAT(UriDate, '%Y%m')";
+			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, DATE_FORMAT(UriDate, '%Y/%m') as Labels ,sum(UriageKin) as 売上 ,sum(UriageKin-genka) as 粗利 
+			from UriageMeisai as UriageData ".$sql_where_IN." group by DATE_FORMAT(UriDate, '%Y%m') order by DATE_FORMAT(UriDate, '%Y%m')";
 			$aryColumn = ["計上年月","売上(税抜)","粗利"];
 			$chart_type="bar";
 		}elseif($analysis_type==3){//年ごとの売上実績
-			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, concat(DATE_FORMAT(UriDate, '%Y'),'年') as Labels ,sum(UriageKin) as datasets ,sum(UriageKin)-sum(IFNULL(genka_tanka,0) * su) as arari from UriageData ".$sql_where_IN." group by DATE_FORMAT(UriDate, '%Y') order by DATE_FORMAT(UriDate, '%Y')";
+			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, concat(DATE_FORMAT(UriDate, '%Y'),'年') as Labels ,sum(UriageKin) as 売上 ,sum(UriageKin-genka) as 粗利 
+			from UriageMeisai as UriageData ".$sql_where_IN." group by DATE_FORMAT(UriDate, '%Y') order by DATE_FORMAT(UriDate, '%Y')";
 			$aryColumn = ["計上年度","売上(税抜)","粗利"];
 			$chart_type="bar";
 		}elseif($analysis_type==4){//製品名ごと売上金額ランキング
-			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, ShouhinNM as Labels ,sum(UriageKin) as datasets ,sum(UriageKin)-sum(IFNULL(genka_tanka,0) * su) as arari from UriageData ".$sql_where_OUT."group by ShouhinNM order by sum(UriageKin) desc";
+			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, ShouhinNM as Labels ,sum(UriageKin) as 売上 ,sum(UriageKin-genka) as 粗利 
+			from UriageMeisai as UriageData ".$sql_where_OUT."group by ShouhinNM order by sum(UriageKin) desc";
 			$aryColumn = ["商品名","売上(税抜)","粗利"];
 			$chart_type="bar";
 			$top15="on";
 		}elseif($analysis_type==5){//製品名ごと売上数量ランキング
-			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, ShouhinNM as Labels ,sum(Su) as datasets from UriageData ".$sql_where_OUT."group by ShouhinNM order by sum(Su) desc";
+			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, ShouhinNM as Labels ,sum(Su) as 売上 from UriageData ".$sql_where_OUT."group by ShouhinNM order by sum(Su) desc";
 			$aryColumn = ["商品名","売上数"];
 			$chart_type="bar";
 			$top15="on";
+			$chart_val_label = "売上個数";
 		}elseif($analysis_type==6){//客単価推移
-			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, 計上日,Event as Labels,ROUND(avg(税抜売上)) as datasets from 
+			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, 計上日,Event as Labels,ROUND(avg(税抜売上)) as 売上 from 
 				(SELECT UriDate as 計上日 ,concat(Event,TokuisakiNM) as Event ,UriageNO ,sum(UriageKin) as 税抜売上 from UriageData ".$sql_where_IN." group by UriDate,UriageNO ) as UriageData 
 				group by 計上日 order by 計上日 desc";
 			$aryColumn = ["計上日","Event/店舗","客単価"];
 			$chart_type="bar";
+			$chart_val_label = "客単価";
 		}elseif($analysis_type==7){//イベント・店舗別客単価ランキング
-			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, KYAKU as Labels,ROUND(avg(客単価)) as datasets from 
+			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, KYAKU as Labels,ROUND(avg(客単価)) as 売上 from 
 				(SELECT UriDate as 計上日 ,concat(Event,TokuisakiNM) as KYAKU ,UriageNO ,sum(UriageKin) as 客単価 from UriageData ".$sql_where_IN." group by UriDate,concat(Event,TokuisakiNM),UriageNO ) as UriageData
 				 group by KYAKU order by avg(客単価) desc";
 			$aryColumn = ["Event/店舗","客単価"];
 			$chart_type="bar";
 			$top15="on";
+			$chart_val_label = "客単価";
 		}elseif($analysis_type==8){//イベント・店舗別来客数推移
-			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, UriDate as 計上日, Event as Labels, sum(来客カウント) as datasets from 
+			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, UriDate as 計上日, Event as Labels, sum(来客カウント) as 売上 from 
 				(SELECT uid, UriDate, Event, TokuisakiNM, UriageNO,0 as ShouhinCD, 1 as 来客カウント from UriageData where Event <>'' group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriageData".$sql_where_IN." 
 				group by UriDate,Event order by UriDate desc";
 			$aryColumn = ["計上日","Event/店舗","来客数"];
 			$chart_type="bar";
-			
+			$chart_val_label = "来客数";
+
 			$tokui="xxxx";//来客数の場合は個別売りを除く
 		}elseif($analysis_type==9){//イベント・店舗別来客数ランキング
-			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, Event as Labels,ROUND(avg(来客数)) as datasets from (SELECT UriDate,sum(来客カウント) as 来客数,Event from (SELECT uid, UriDate, Event, TokuisakiNM, UriageNO,0 as ShouhinCD, 1 as 来客カウント from UriageData where Event <>'' group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriageData ".$sql_where_IN." group by UriDate,Event) as Urisum2 group by Event order by ROUND(avg(来客数)) desc";
+			$sqlstr = "SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS UKEY, Event as Labels,ROUND(avg(来客数)) as 売上 from (SELECT UriDate,sum(来客カウント) as 来客数,Event from (SELECT uid, UriDate, Event, TokuisakiNM, UriageNO,0 as ShouhinCD, 1 as 来客カウント from UriageData where Event <>'' group by uid,UriDate,Event,TokuisakiNM,UriageNO) as UriageData ".$sql_where_IN." group by UriDate,Event) as Urisum2 group by Event order by ROUND(avg(来客数)) desc";
 			$aryColumn = ["Event/店舗","平均来客数"];
 			$chart_type="bar";
+			$chart_val_label = "来客数";
 			
 			$tokui="xxxx";//来客数の場合は個別売りを除く
 			$top15="on";
@@ -141,6 +151,7 @@ if($rtn !== true){
 				order by tmp2.Event,tmp2.Hour";
 			$aryColumn = ["イベント名","時間帯","人数"];
 			$chart_type="line";
+			$chart_val_label = "来客数";
 			
 			$tokui="xxxx";//時間別推移の場合は個別売りを除く
 		}elseif($analysis_type==12){//ジャンル別実績
@@ -159,14 +170,7 @@ if($rtn !== true){
 				$sql_category_where="";
 			}
 			$sql_category_where = " AND ".$sql_category." LIKE '".$category."'";
-			/*$sqlstr = "SELECT ".$sql_category." as Labels,sum(UriageKin) as datasets from UriageData 
-				inner join ShouhinMS 
-				on UriageData.uid=ShouhinMS.uid 
-				and UriageData.shouhinCD=ShouhinMS.shouhinCD "
-				.$sql_where_OUT.$sql_category_where." 
-				group by ".$sql_category." 
-				order by sum(UriageKin) desc";*/
-				$sqlstr = "SELECT ".$sql_category." as Labels,sum(UriageKin) as datasets,sum(UriageKin)-sum(genka) as arari from UriageMeisai as UriageData"
+				$sqlstr = "SELECT ".$sql_category." as Labels,sum(UriageKin) as 売上,sum(UriageKin-genka) as 粗利 from UriageMeisai as UriageData"
 				.$sql_where_OUT.$sql_category_where." 
 				group by ".$sql_category." 
 				order by sum(UriageKin) desc";
@@ -186,24 +190,26 @@ if($rtn !== true){
 			$aryColumn = ["商品名","売上","占有率","Rank"];
 			$chart_type="";
 		}else if($analysis_type==='Ev_Avr_uri_rank'){//ｲﾍﾞﾝﾄ別平均売上ランキング
-			$sqlstr = "SELECT Ev as Labels,ROUND(avg(TotalUri),0) as datasets ,ROUND(avg(TotalUri - TotalGenka),0) as datasets2
+			$sqlstr = "SELECT Ev as Labels,ROUND(avg(TotalUri),0) as 売上 ,ROUND(avg(TotalUri - TotalGenka),0) as datasets2
 			FROM (
 				SELECT UriDate, concat(Event,TokuisakiNM) as Ev,sum(UriageKin) as TotalUri ,sum(su * genka_tanka) as TotalGenka
 				from `UriageData` ".$sql_where_IN." 
 				group by UriDate,concat(Event,TokuisakiNM)
 				) as A 
-			group by Ev order by datasets desc";
+			group by Ev order by 売上 desc";
 			$aryColumn = ["Event/店舗","平均売上額","平均粗利"];
 			$chart_type="bar";
 		}else if($analysis_type==='Area_tanka_1'){//エリア別客単価
-			$sqlstr = "SELECT MUNI as Labels,ROUND(AVG(Uriage)) as datasets from UriageData_GioWeather A inner join ( SELECT uid ,UriageNO ,sum(UriageKin) as Uriage from UriageData ".$sql_where_IN." group by uid ,UriageNO ) B on A.uid = B.uid and A.UriNo = B.UriageNO and MUNI > 0 group by MUNI order by AVG(Uriage) desc";
+			$sqlstr = "SELECT MUNI as Labels,ROUND(AVG(Uriage)) as 売上 from UriageData_GioWeather A inner join ( SELECT uid ,UriageNO ,sum(UriageKin) as Uriage from UriageData ".$sql_where_IN." group by uid ,UriageNO ) B on A.uid = B.uid and A.UriNo = B.UriageNO and MUNI > 0 group by MUNI order by AVG(Uriage) desc";
 			$aryColumn = ["エリア","客単価"];
 			$chart_type="bar";
+			$chart_val_label = "客単価";
 			$tokui="xxxx";//エリア別客単価の場合は個別売りを除く
 		}else if($analysis_type==='Area_tanka_2'){//エリア別客単価
-			$sqlstr = "SELECT CONCAT(MUNI,',',address) AS Labels,ROUND(AVG(Uriage)) as datasets from UriageData_GioWeather A inner join ( SELECT uid ,UriageNO ,sum(UriageKin) as Uriage from UriageData ".$sql_where_IN." group by uid ,UriageNO ) B on A.uid = B.uid and A.UriNo = B.UriageNO and MUNI > 0 group by MUNI ,address order by AVG(Uriage) desc";
+			$sqlstr = "SELECT CONCAT(MUNI,',',address) AS Labels,ROUND(AVG(Uriage)) as 売上 from UriageData_GioWeather A inner join ( SELECT uid ,UriageNO ,sum(UriageKin) as Uriage from UriageData ".$sql_where_IN." group by uid ,UriageNO ) B on A.uid = B.uid and A.UriNo = B.UriageNO and MUNI > 0 group by MUNI ,address order by AVG(Uriage) desc";
 			$aryColumn = ["エリア","客単価"];
 			$chart_type="bar";
+			$chart_val_label = "客単価";
 			$tokui="xxxx";//エリア別客単価の場合は個別売りを除く
 		}else if($analysis_type==='urikire'){//売切れ実績
 			$sqlstr = "SELECT B.UriDate,B.Event,B.ShouhinNM,A.shuppin_su,B.売切日時 
@@ -244,19 +250,49 @@ if($rtn !== true){
 			$xlabels=[];
 			if($chart_type==="bar" || $chart_type==="doughnut"){
 				$i=0;
+				/*
 				if($analysis_type==6 ||$analysis_type==8){
 					foreach($result as $row){
 						$labels[$i] = [$row["計上日"],(mb_strwidth($row["Labels"])<=12)?$row["Labels"]:mb_strimwidth($row["Labels"],0,12)."…"];
-						$data[$i] = $row["datasets"];
+						$data[$i] = $row["売上"];
+
+						//chart stacked用データ
+						$data_ur[$i] = (string)($row["売上"]-$row["粗利"]===0)?$row["売上"]:$row["売上"]-$row["粗利"];	//原価未設定の場合は売上をセット
+						$data_ar[$i] = (string)($row["売上"]-$row["粗利"]===0)?0:$row["粗利"];			//原価未設定の場合は粗利0をセット
 						$i++;
 					}
 				}else{
 					foreach($result as $row){
 						$labels[$i] = (mb_strwidth($row["Labels"])<=12)?$row["Labels"]:mb_strimwidth($row["Labels"],0,12)."…";
 						$labels_long[$i] = $row["Labels"];
-						$data[$i] = $row["datasets"];
+						$data[$i] = $row["売上"];
+
+						//chart stacked用データ
+						$data_ur[$i] = (string)($row["売上"]-$row["粗利"]===0)?$row["売上"]:$row["売上"]-$row["粗利"];	//原価未設定の場合は売上をセット
+						$data_ar[$i] = (string)($row["売上"]-$row["粗利"]===0)?0:$row["粗利"];			//原価未設定の場合は粗利0をセット
 						$i++;
 					}
+				}
+				*/
+				$data_ar = null;
+				foreach($result as $row){
+					if($analysis_type==6 ||$analysis_type==8){
+						$labels[$i] = [$row["計上日"],(mb_strwidth($row["Labels"])<=12)?$row["Labels"]:mb_strimwidth($row["Labels"],0,12)."…"];
+					}else{
+						$labels[$i] = (mb_strwidth($row["Labels"])<=12)?$row["Labels"]:mb_strimwidth($row["Labels"],0,12)."…";
+						$labels_long[$i] = $row["Labels"];
+					}
+					$data[$i] = $row["売上"];
+
+					//chart stacked用データ
+					if(!empty($row["粗利"])){
+						$data_ur[$i] = (string)($row["売上"]-$row["粗利"]===0)?$row["売上"]:$row["売上"]-$row["粗利"];	//原価未設定の場合は売上をセット
+						$data_ar[$i] = (string)($row["売上"]-$row["粗利"]===0)?0:$row["粗利"];			//原価未設定の場合は粗利0をセット
+					}else{
+						$data_ur[$i] = $row["売上"];
+						//$data_ar[$i] = 0;
+					}
+					$i++;
 				}
 			}else if($chart_type==="line"){
 				$i=0;
@@ -335,7 +371,7 @@ if($rtn !== true){
 					}
 				}
 			}
-
+			log_writer2("\$labels",$labels,"lv3");
 			$msg = "取得成功。";
 			$alert_status = "alert-success";
 			$reseve_status=true;
@@ -351,6 +387,20 @@ if($rtn !== true){
 
 $token = csrf_create();
 
+if($chart_type==="bar"){
+	$data = [];
+	$data = array(
+		"uri" => $data_ur,
+		"arari" => $data_ar
+	);
+}else{
+	$data = array(
+		"uri" => $data,
+	);
+}
+
+log_writer2("\$labels",$labels,"lv3");
+
 $return_sts = array(
 	"MSG" => $msg
 	,"status" => $alert_status
@@ -360,12 +410,15 @@ $return_sts = array(
 	,"result" => $result
 	,"labels" => $labels
 	,"labels_long" => $labels_long
-	,"data" => $data
+	,"data" => $data	//グラフ用データ（売上）
+	//,"data_ur" => $data_ur	//グラフstacked用データ（売上）
+	//,"data_ar" => $data_ar	//グラフstacked用データ（粗利）
 	,"chart_type" => $chart_type
 	,"top15" => $top15
 	,'xStart' => $xStartpoint
 	,'xEnd' => $xEndpoint
 	,'grafu_discription' => $grafu_discription
+	,'chart_val_label' => $chart_val_label
 );
 header('Content-type: application/json');
 echo json_encode($return_sts, JSON_UNESCAPED_UNICODE);
