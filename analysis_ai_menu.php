@@ -54,7 +54,7 @@ $stmt->bindValue(3, '2024-12-31', PDO::PARAM_STR);
 $stmt->execute();
 $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-log_writer2("\$shouhin_rows",json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE),"lv3");
+//log_writer2("\$shouhin_rows",json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE),"lv3");
 
 $ask = "一流経営コンサルタントとして、次に渡す１年分の売上明細をもとに、今後の売上を増やすアドバイスをレポート形式で出力。出るべきイベント、地域、天気・気温との関連。注力すべき商品群とそうでない商品の選定など。売上明細は次の通り。".json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE);
 
@@ -77,9 +77,11 @@ $ask = "一流経営コンサルタントとして、次に渡す１年分の売
 		<a href="#" style='color:inherit;position:fixed;top:75px;right:5px;' onclick='help()'><i class="bi bi-question-circle Qicon awesome-color-panel-border-same"></i></a>
 	</header>
 	<main>
+		<div id='form1'>
 		<?php
 			echo gemini_api($ask,'plain');
 		?>
+		</div>
 	</main>
 	<script>
 		document.getElementById("form1").onkeypress = (e) => {
