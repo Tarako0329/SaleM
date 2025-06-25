@@ -33,7 +33,7 @@ if($rtn !== true){
 		$params["shouhinCD"]=$_POST["shouhinCD"];
 		$params["hyoujiKBN1"]=$_POST["disp_rezi"];
 
-		$sqlstr="UPDATE shouhinMS set hyoujiKBN1 = :hyoujiKBN1 where uid = :uid and shouhinCD = :shouhinCD";
+		$sqlstr="UPDATE ShouhinMS set hyoujiKBN1 = :hyoujiKBN1 where uid = :uid and shouhinCD = :shouhinCD";
 		$stmt = $pdo_h->prepare($sqlstr);
 		$stmt->bindValue("uid", $params["uid"], PDO::PARAM_INT);
 		$stmt->bindValue("shouhinCD", $params["shouhinCD"], PDO::PARAM_INT);
