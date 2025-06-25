@@ -731,10 +731,10 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         text: `<p class='tour_discription'>
             商品一覧の画面を使いやすくリニューアルしました。<br>
             ポイントは以下の通りです。<br></p>
-            <ul>
-            <li>レジの表示/非表示切換はダイレクトに反映</li>
-            <li><i class='fa-regular fa-trash-can '></i>ボタンで削除できない商品は、削除しない代わりに表示位置を一番最後に。</li>
-            <li>１商品ずつ変更・登録することで変更漏れを減らす</li>
+            <ul class='fs-3'>
+            <li class='mb-3' style='line-height:23px;'>レジの表示/非表示切換はダイレクトに反映</li>
+            <li class='mb-3' style='line-height:23px;'><i class='fa-regular fa-trash-can '></i>ボタンで削除できない商品は、削除しない代わりに表示位置を一番最後に。</li>
+            <li class='mb-3' style='line-height:23px;'>１商品ずつ変更・登録することで変更漏れを減らす</li>
             </ul>
             <br>
             <p class='tour_discription'>もし操作方法がわからなかったら、商品一覧画面の右上<i class="bi bi-question-circle Qicon"></i>マークをタップしてください。
