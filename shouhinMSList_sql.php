@@ -1,7 +1,7 @@
 <?php
 //POST ONLY
+/*
 require "php_header.php";
-log_writer2("shouhinMSList_sql.php > \$_POST","test","lv3");
 log_writer2("shouhinMSList_sql.php > \$_POST",$_POST,"lv3");
 
 //$rtn = csrf_checker(["shouhinMSList.php"],["P","C","S"]);
@@ -120,6 +120,6 @@ $msg = array(
 header('Content-type: application/json');
 echo json_encode($msg, JSON_UNESCAPED_UNICODE);
 
+*/
 exit();
-
 ?>

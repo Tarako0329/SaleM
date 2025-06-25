@@ -39,45 +39,7 @@ try{
 	$stmt->execute();
 	$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	$new_shouhinCD = $row[0]["MCD"]+1;
-/*	
-	$params[0]=$_SESSION['user_id'];
-	$params[1]=$new_shouhinCD;
-	$params[2]=$_POST["shouhinNM"];
-	$params[3]=$_POST["tanka"]; 
-	$params[4]=$_POST["shouhizei"];
-	$params[5]=$zeiritu;
-	$params[6]=$zeikbn;
-	$params[7]=$_POST["utisu"];
-	$params[8]=$_POST["tani"];
-	$params[9]=$_POST["genka"];
-	$params[10]=$_POST["bunrui1"];
-	$params[11]=$_POST["bunrui2"];
-	$params[12]=$_POST["bunrui3"];
-	$params[13]=$_POST["hyoujiKBN1"];
-	$params[14]=$_POST["hyoujiKBN2"];
-	$params[15]=$_POST["hyoujiKBN3"];
-	$params[16]=$_POST["hyoujiNO"];
-	
-	$sqlstr="insert into ShouhinMS values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-	$stmt = $pdo_h->prepare($sqlstr);
-	$stmt->bindValue(1,  $params[0], PDO::PARAM_INT);
-	$stmt->bindValue(2,  $params[1], PDO::PARAM_INT);
-	$stmt->bindValue(3,  $params[2], PDO::PARAM_STR);
-	$stmt->bindValue(4,  $params[3], PDO::PARAM_INT);
-	$stmt->bindValue(5,  $params[4], PDO::PARAM_INT);
-	$stmt->bindValue(6,  $params[5], PDO::PARAM_INT);
-	$stmt->bindValue(7,  $params[6], PDO::PARAM_INT);
-	$stmt->bindValue(8,  $params[7], PDO::PARAM_INT);
-	$stmt->bindValue(9,  $params[8], PDO::PARAM_STR);
-	$stmt->bindValue(10, $params[9], PDO::PARAM_INT);
-	$stmt->bindValue(11, $params[10], PDO::PARAM_STR);
-	$stmt->bindValue(12, $params[11], PDO::PARAM_STR);
-	$stmt->bindValue(13, $params[12], PDO::PARAM_STR);
-	$stmt->bindValue(14, $params[13], PDO::PARAM_STR);
-	$stmt->bindValue(15, $params[14], PDO::PARAM_STR);
-	$stmt->bindValue(16, $params[15], PDO::PARAM_STR);
-	$stmt->bindValue(17, $params[16], PDO::PARAM_INT);
-*/
+
 	$params["uid"]=$_SESSION['user_id'];
 	$params["shouhinCD"]=$new_shouhinCD;
 	$params["shouhinNM"]=$_POST["shouhinNM"];

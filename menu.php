@@ -129,7 +129,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     
         
         //新機能リリース通知
-        $sqlstr="SELECT uid, insdate,JSON_VALUE(ToursLog,'$.new_releace_005') as ToursLog FROM Users_webrez WHERE uid=?";
+        $sqlstr="SELECT uid, insdate,JSON_VALUE(ToursLog,'$.new_releace_006') as ToursLog FROM Users_webrez WHERE uid=?";
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
         $stmt->execute();
@@ -142,7 +142,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             $bell_action="blink";
             $bell_size="fa-2x";
             $bell_msg="お知らせ";
-            $version = "new_releace_005";
+            $version = "new_releace_006";
         }else{
             //新機能リリース通知 確認済み
             $version="";
@@ -574,106 +574,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
 <script>
     const new_releace = '<?php echo $version;?>'
     const new_releace_name = sessionStorage.getItem('tourname');
-/*
-    const new_releace_002 = new Shepherd.Tour({
-        useModalOverlay: true,
-        defaultStepOptions: {
-            classes: 'tour_modal',
-            scrollTo: true,
-            cancelIcon:{
-                enabled:true
-            }
-        },
-        tourName:'new_releace_002'
-    });
-    new_releace_002.addStep({
-        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
-        text: `<p class='tour_discription'>売上時の天気、気温を記録できるようになりました。
-            <br>
-            <br>この機能により、将来的に売上分析の指標として、天気・気温と売上の相関関係を提供できるようになります。</p>`,
-        buttons: [
-            {
-                text: 'Next',
-                action: new_releace_002.nextAndSave
-            }
-        ],
-        cancelIcon:{
-            enabled:false
-        }
-    });
-    new_releace_002.addStep({
-        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
-        text: `<p class='tour_discription'>端末のGPS機能を使用します。
-                <br>レジ画面を開く際に「位置情報を・・・」と聞かれますので「有効」にしてください。
-                <br>
-                <br>それでは「レジ」をタップしてください。</p>`,
-       attachTo: {
-            element: '.menu_rez',
-            on: 'auto'
-        },
-        cancelIcon:{
-            enabled:false
-        }
-    });
-*/
-/*
-    const new_releace_003 = new Shepherd.Tour({
-        useModalOverlay: true,
-        defaultStepOptions: {
-            classes: 'tour_modal',
-            scrollTo: true,
-            cancelIcon:{
-                enabled:true
-            }
-        },
-        tourName:'new_releace_003'
-    });
-    new_releace_003.addStep({
-        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
-        text: `<p class='tour_discription'>売上分析メニューに<span style='color:blue'>「イベント別平均総売上ランキング」</span>を追加しました。
-            <br>
-            <br>出店イベントの取捨選択の参考にしてください。</p>`,
-        buttons: [
-			{
-				text: 'OK',
-				action: new_releace_003.next
-			}
-        ],
-        cancelIcon:{
-            enabled:false
-        }
-    });
-*/
-/*    const new_releace_004 = new Shepherd.Tour({
-        useModalOverlay: true,
-        defaultStepOptions: {
-            classes: 'tour_modal',
-            scrollTo: true,
-            cancelIcon:{
-                enabled:true
-            }
-        },
-        tourName:'new_releace_004'
-    });
-    new_releace_004.addStep({
-        title: `<p class='tour_header'>新規機能追加のお知らせ</p>`,
-        text: `<p class='tour_discription'>売上分析メニューに<span style='color:blue'>「売切分析」</span>を追加しました。
-            <br>
-            <br>完売した商品の出品数と完売時間を確認できます。
-            <br>早い時間に完売している商品は出品数を増やすと、より儲かるかもしれません。
-            <br>
-            <br><span style='color:red'>※</span>使用するには<span style='color:red'>出品在庫登録</span>を行う必要があります。</p>`,
-        buttons: [
-			{
-				text: 'OK',
-				action: new_releace_004.next
-			}
-        ],
-        cancelIcon:{
-            enabled:false
-        }
-    });
-*/
+
     const new_releace_005 = new Shepherd.Tour({
         useModalOverlay: true,
         defaultStepOptions: {
@@ -813,12 +714,54 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             enabled:false
         }
     });
+
+    const new_releace_006 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'new_releace_006'
+    });
+    new_releace_006.addStep({
+        title: `<p class='tour_header'>「商品一覧」リニューアルのお知らせ</p>`,
+        text: `<p class='tour_discription'>
+            商品一覧の画面を使いやすくリニューアルしました。<br>
+            ポイントは以下の通りです。<br></p>
+            <ul>
+            <li>レジの表示/非表示切換はダイレクトに反映</li>
+            <li><i class='fa-regular fa-trash-can '></i>ボタンで削除できない商品は、削除しない代わりに表示位置を一番最後に。</li>
+            <li>１商品ずつ変更・登録することで変更漏れを減らす</li>
+            </ul>
+            <br>
+            <p class='tour_discription'>もし操作方法がわからなかったら、商品一覧画面の右上<i class="bi bi-question-circle Qicon"></i>マークをタップしてください。
+
+            </p>`,
+        buttons: [
+            /*{
+                text: '後で見る',
+                action: new_releace_006.cancel
+            },*/
+ 			{
+				text: 'Finish',
+				action: new_releace_006.complete
+			}
+        ],
+        cancelIcon:{
+            enabled:false
+        }
+    });
+
     const new_releace_start = async() => {
         //新機能のリリース通知はこの関数で呼び出すツアーを更新する
         //shuppin_zaiko_help1.start(tourFinish,'new_releace_001','');
         //new_releace_002.start(tourFinish,'new_releace_002',''); 
         //new_releace_003.start(tourFinish,'new_releace_003','finish'); 
         //new_releace_004.start(tourFinish,'new_releace_004','finish'); 
+        /*
         const devices = await navigator.mediaDevices.enumerateDevices();
         const cam_dev = devices.filter((device) => device.kind === "videoinput")
         if(cam_dev.length!==0){
@@ -828,6 +771,8 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             console_log("cant use camera")
             new_releace_005_2.start(tourFinish,'new_releace_005','finish'); 
         }
+        */
+        new_releace_006.start(tourFinish,'new_releace_006','finish'); 
     }
     
     if(new_releace && !new_releace_name){

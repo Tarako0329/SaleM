@@ -228,14 +228,6 @@ $_SESSION["MSG"]=null;
 				onMounted(() => {
 					//console_log(get_value(1000,0.1,'IN'),'lv3')
 					console_log('onMounted','lv3')
-					/*
-					const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-					const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-					
-					const exampleEl = document.getElementById('test99')
-					const tooltip = new bootstrap.Tooltip(exampleEl,{boundary: document.body,title:'test99'})
-					console_log(tooltip,)
-					*/
 				})
 				return{
 					tanka,
