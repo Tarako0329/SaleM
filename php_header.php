@@ -1,6 +1,6 @@
 <?php
-define("VERSION", "ver3.21.5-000");
-define("RELEACE_DATE", "2025-06-10");
+define("VERSION", "ver3.21.6-000");
+define("RELEACE_DATE", "2025-06-25");
 
 date_default_timezone_set('Asia/Tokyo');
 require "./vendor/autoload.php";
