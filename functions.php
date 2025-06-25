@@ -613,7 +613,175 @@ function rtn_sqllog($sql,$params){//(sql,パラメータ[],phpファイル名)w:
     return date("Y-m-d H:i:s")."\t".$userid."\t".$phpname."\t".$logsql."\n";
 }
 
+// =========================================================
+// GeminiAPI
+// =========================================================
+function gemini_api($p_ask,$p_type, $response_schema = null){
+	//$p_type: 'json' (decode response to PHP array) or 'plain' (raw text response)
+	//$response_schema: An object describing the expected JSON schema for the model's response.
+	/*$response_schemaサンプル
+	  $response_schema = [
+        'type' => 'object',
+        'properties' => [
+            'check_results' => [
+                'type' => 'object',
+                'properties' => [
+                    '自動返信' => ['type' => 'string', 'description' => '自動返信メールのチェック結果'],
+                    '受付確認' => ['type' => 'string', 'description' => '受付確認メールのチェック結果'],
+                    '支払確認' => ['type' => 'string', 'description' => '支払確認メールのチェック結果'],
+                    '発送連絡' => ['type' => 'string', 'description' => '発送連絡メールのチェック結果'],
+                    'キャンセル受付' => ['type' => 'string', 'description' => 'キャンセル受付メールのチェック結果'],
+                ],
+                'required' => ['自動返信', '受付確認', '支払確認', '発送連絡', 'キャンセル受付']	//必須項目
+            ]
+        ],
+        'required' => ['check_results']	//必須項目
+    ];
+	*/
+	$url = GEMINI_URL.GEMINI;
+	$request_payload =  [
+		'contents' => [
+			[
+				'parts' => [
+					['text' => $p_ask]
+				]
+			]
+		]
+	];
+	if ($response_schema !== null) {
+		// Ensure generationConfig exists
+		if (!isset($request_payload['generationConfig'])) {
+			$request_payload['generationConfig'] = [];
+		}
+		$request_payload['generationConfig']['responseMimeType'] = 'application/json';
+		$request_payload['generationConfig']['responseSchema'] = $response_schema;
+	}
+		
+	$options = [
+		'http' => [
+			'method' => 'POST',
+			'header' => [
+				'Content-Type: application/json',
+			],
+			'content' => json_encode($request_payload),
+		],
+	];
+	
+	$context = stream_context_create($options);
+	$response = file_get_contents($url, false, $context);
+	
+	$emsg = "";
+	$result = "";
+	if ($response === false) {
+		$emsg = 'Gemini呼び出しに失敗しました。時間をおいて、再度実行してみてください。';
+	}else{
+		$result_decoded = json_decode($response, true);
+		log_writer2(" [gemini_api \$result_decoded] =>",$result_decoded,"lv3");
+		if (isset($result_decoded['candidates'][0]['content']['parts'][0]['text'])) {
+			$result = $result_decoded['candidates'][0]['content']['parts'][0]['text'];
+		} elseif (isset($result_decoded['error'])) {
+			$emsg = "Gemini API Error: " . $result_decoded['error']['message'];
+			$result = json_encode($result_decoded['error']); // Store error details as JSON string
+		} else {
+			$emsg = 'Geminiからの予期しない応答形式です。';
+			$result = $response; // Store raw response
+		}
+	}
 
+    
+	if($p_type==="json"){
+		$result = str_replace('```json','',$result);
+		$result = str_replace('```','',$result);
+		$result = str_replace("\r\n","",$result);
+		$result = str_replace("\n","",$result);
+		$result = str_replace("\r","",$result);
+		$result = str_replace(" ","",$result);
+		
+		// Only decode if there's no pre-existing error message from the API call itself
+		if (empty($emsg)) {
+			$decoded_json = json_decode($result, true);
+			if (json_last_error() !== JSON_ERROR_NONE) {
+				$emsg = 'Geminiが返したテキストのJSONデコードに失敗しました: ' . json_last_error_msg() . ". Raw text: " . $result;
+			}
+			$result = $decoded_json;
+		}	
+	}
+	$rtn = array(
+		'emsg' => $emsg,
+		'result' => $result
+	);
+	
+	return $rtn;
+}
+function gemini_api_kaiwa($p_ask,$p_type,$p_subject){
+	//$p_type:json or plain
+	//$_SESSION[$p_subject][] に会話履歴を格納
+	log_writer2(" [gemini_api_kaiwa \$p_ask] =>",$p_ask,"lv3");
+	
+	$url = GEMINI_URL.GEMINI;
+
+	// 現在のユーザー入力を会話履歴に追加
+	$_SESSION[$p_subject][] = [
+		'role' => 'user',
+		'parts' => [
+			['text' => $p_ask]
+		]
+	];
+	$data = [
+		'contents' => $_SESSION[$p_subject]
+		// 必要に応じて safety_settings や generation_config もここに追加
+	];
+	
+	$options = [
+		'http' => [
+			'method' => 'POST',
+			'header' => [
+				'Content-Type: application/json',
+			],
+			'content' => json_encode($data),
+		],
+	];
+	
+	$context = stream_context_create($options);
+	$response = file_get_contents($url, false, $context);
+	
+	$emsg = "";
+	$result = "";
+	if ($response === false) {
+		$emsg = 'Gemini呼び出しに失敗しました。時間をおいて、再度実行してみてください。';
+	}else{
+		$result = json_decode($response, true);
+		$result = $result['candidates'][0]['content']['parts'][0]['text'];
+	}
+
+	// Geminiの応答を会話履歴に追加
+	$_SESSION['chat_history'][] = [
+		'role' => 'model',
+		'parts' => [
+			['text' => $result]
+		]
+	];
+
+	if($p_type==="json"){
+		$result = str_replace('```json','',$result);
+		$result = str_replace('```','',$result);
+		$result = str_replace("\r\n","",$result);
+		$result = str_replace("\n","",$result);
+		$result = str_replace("\r","",$result);
+		$result = str_replace(" ","",$result);
+		
+		$result = json_decode($result, true);
+	}else{
+		//$result = $response;
+	}
+
+	$rtn = array(
+		'emsg' => $emsg,
+		'result' => $result
+	);
+	//log_writer2(" [gemini_api_kaiwa \$rtn] =>",$rtn,"lv3");
+	return $rtn;
+}
 
 
 ?>

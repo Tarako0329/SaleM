@@ -58,6 +58,10 @@ $title = $_ENV["TITLE"];
 define("KEY", $_ENV["KEY"]);
 $key = $_ENV["KEY"];
 
+//GEMINI
+define("GEMINI",$_ENV["GOOGLE_API"]);
+define("GEMINI_URL",$_ENV["GEMINI_URL"]);
+
 if(EXEC_MODE=="Test" || EXEC_MODE=="Local" || EXEC_MODE=="TrialL"){
     //テスト環境はミリ秒単位
     //$time="8";

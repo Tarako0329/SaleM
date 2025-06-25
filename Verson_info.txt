@@ -211,7 +211,8 @@ ver3.21.5-000:ジャンル別売上比の改良-commited
 ver3.21.6-000:商品一覧メンテ画面の改良-commited
 	ALTER TABLE `ShouhinMS` ADD `upd_datetime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `hyoujiNO`;
 	ALTER TABLE ShouhinMS MODIFY `upd_datetime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
-ver3.21.6-001:商品一覧メンテ画面の改良
+ver3.21.6-001:商品一覧メンテ画面の改良-commited
+ver3.21.7-000:A.Iレポート機能
 
 verA.BB.C.DDD
 カウントアップ条件

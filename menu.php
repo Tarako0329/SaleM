@@ -183,6 +183,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         ,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko&csrf_token='.$token,'z_rez']
         ,'売上実績'=>['UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where&csrf_token='.$token,'uri']
         ,'売上分析'=>['analysis_menu.php?csrf_token='.$token,'bunseki']
+        ,'A.I分析レポート'=>['analysis_ai_menu.php?csrf_token='.$token,'bunseki_ai']
         ,'領収書<p style="font-size:11px;margin:0;">再発行・返品処理</p>'=>['ryoushu_menu.php?csrf_token='.$token,'ryoushu']
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token,'user']
         ,'確定申告'=>['output_menu.php?csrf_token='.$token,'kaikei']
@@ -541,36 +542,6 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     
 </script><!--チュートリアル-->
 <!--チュートリアル以外のヘルプ・出品在庫-->
-<script>
-    const shuppin_zaiko_help1 = new Shepherd.Tour({
-        useModalOverlay: true,
-        defaultStepOptions: {
-            classes: 'tour_modal',
-            scrollTo: true,
-            cancelIcon:{
-                enabled:true
-            }
-        },
-        tourName:'shuppin_zaiko_help1'
-    });
-    shuppin_zaiko_help1.addStep({
-        title: `<p class='tour_header'>出品在庫機能</p>`,
-        text: `<p class='tour_discription'>各イベントの出品数を登録できます。
-                <br>出品数を登録する事で、完売したのか、何が売れ残ったのかを把握できます。
-                <br>また、イベント終了時の在庫確認・レジ打ち漏れの確認も簡単になります。</p>`,
-       attachTo: {
-            element: '.menu_z_rez',
-            on: 'auto'
-        },
-        cancelIcon:{
-            enabled:false
-        }
-    });
-    function shuppin_zaiko_help_start(){
-        //start(ajax関数名(固定値),ツアー名称(チュートリアル等),ステータス(finish;完了,save;保存(次回途中から始まる),'空白：$_SESSION["tour"]にnewで指定しtourNameをセット)'
-        shuppin_zaiko_help1.start(tourFinish,'',''); 
-    }
-</script>
 <script>
     const new_releace = '<?php echo $version;?>'
     const new_releace_name = sessionStorage.getItem('tourname');
