@@ -145,7 +145,6 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 									<div class="mb-3">
 										<label for="Next_year_goals" class="form-label">来年度の目標</label>
 										<textarea class="form-control" id="Next_year_goals" v-model="your_bussiness.来年度の目標" rows="3"></textarea>
-										
 									</div>
 									<div class="mb-3">
 										<label for="Ideal_years" class="form-label">5年後の理想</label>
@@ -158,15 +157,20 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 								</div>
 								<div class="card-footer text-end">
 									<button type="button" class="btn btn-primary me-3" @click="ins_bussiness" >ビジネス情報登録</button>
-									</div>
 								</div>
-							</div><!-- accordion-item -->
-						</div><!-- accordion -->
-					</div>
+							</div>
+						</div><!-- accordion-item -->
+					</div><!-- accordion -->
 					<div class="row mt-3">
-						<div class="col-12 ms-3">
-							<label for="Product_categories" class="form-label">レポート作成依頼</label>
-							<textarea class="form-control" id="Product_categories" v-model="your_ask" rows="20"></textarea>
+						<div class="col-12 ">
+							<div class="mb-3">
+								<label for='ai_role' class='form-label'>AIの役割</label>
+								<input type='text' class='form-control' v-model='ai_role' id='ai_role'>
+							</div>
+							<div class="mb-3">
+								<label for="Product_categories" class="form-label">レポート作成依頼</label>
+								<textarea class="form-control" id="Product_categories" v-model="your_ask" rows="20"></textarea>
+							</div>
 						</div>
 						<div class="col-12 ms-3">
 							<button type="button" class="btn btn-primary" @click="get_gemini_response" :disabled="loading">
@@ -175,6 +179,7 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 							</button>
 						</div>
 					</div>
+				</div>
 			</form>
 
 		</div>
@@ -197,7 +202,8 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			setup(){
 				const your_bussiness = ref(<?php echo json_encode($business_info[0],JSON_UNESCAPED_UNICODE); ?>);
 				const your_sales_data = ref(<?php echo json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE); ?>);
-				const your_ask = ref(`あなたは一流の経営コンサルタントです。\n次に渡す売上明細と私のビジネス情報をもとに、今後の売上を増やすためのレポートを作成してください。類似したイベント名は同じイベントとして集計してください。\n分析のポイント/知りたいことを以下に羅列\n・出るべきイベント\n・地域、天気・気温との関連。\n・注力すべき商品群とそうでない商品の選定。\n・取扱商品から見る業種の傾向と今後のトレンド。\n
+				const ai_role = ref('データアナリスト')
+				const your_ask = ref(`次に渡す売上明細と私のビジネス情報をもとに、今後の売上を増やすためのレポートを作成してください。類似したイベント名は同じイベントとして集計してください。\n分析のポイント/知りたいことを以下に羅列\n・出るべきイベント\n・地域、天気・気温との関連。\n・注力すべき商品群とそうでない商品の選定。\n・取扱商品から見る業種の傾向と今後のトレンド。\n
 				`);
 				const gemini_response = ref('');
 				const loading = ref(false);
@@ -209,7 +215,7 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 					try {
 						//console_log(your_ask.value)
 						const form = new FormData();
-						form.append('Article', `${your_ask.value}\nレポートはhtmlを利用してビジュアルを整えてください。\nhtmlのみを出力してください。\n読みやすさを重視し、口語体で作成してください。\n売上明細は次の通り。\n${JSON.stringify(your_sales_data.value)}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
+						form.append('Article', `あなたは${ai_role.value}です。\n${your_ask.value}\nレポートはhtmlを利用してビジュアルを整えてください。\nhtmlのみを出力してください。\n読みやすさを重視し、口語体で作成してください。\n売上明細は次の通り。\n${JSON.stringify(your_sales_data.value)}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
 						form.append('type', 'one');
 						form.append('answer_type', 'html');
 
@@ -264,6 +270,7 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 				return {
 					your_bussiness,
 					your_sales_data,
+					ai_role,
 					your_ask,
 					gemini_response,
 					loading,
