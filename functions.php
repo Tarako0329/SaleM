@@ -356,7 +356,7 @@ function get_pdo_options() {
 // =========================================================
 // メール送信 
 // =========================================================
-function send_mail($to,$subject,$body){
+function send_mail($to,$subject,$body,$html=false){
 	//$to		: 送信先アドレス
 	//$subject	: 件名
 	//$body		: 本文

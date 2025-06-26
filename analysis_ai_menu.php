@@ -87,24 +87,6 @@ $stmt->bindValue(3, '2025-12-31', PDO::PARAM_STR);
 $stmt->execute();
 $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-//log_writer2("\$shouhin_rows",json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE),"lv3");
-
-$ask = "
-	一流経営コンサルタントとして、
-	次に渡す１年分の売上明細をもとに、今後の売上を増やすためのレポートを出力。
-	レポートはhtmlを利用してグラフ、表などを駆使しビジュアルを整える。
-	htmlのみを出力してください。
-	分析のポイントとして
-	・出るべきイベント、
-	・地域、天気・気温との関連。
-	・注力すべき商品群とそうでない商品の選定。
-	・競合他社との比較。
-	・取扱商品から見る業種の傾向と今後のトレンド。
-	・類似のイベント名は同じイベントとしてとらえる。
-	売上明細は次の通り。".json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE);
-//$answer = gemini_api($ask,'plain');
-//log_writer2("\$result gemini",$result,"lv3");
-
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -120,62 +102,73 @@ $ask = "
 	<header class="header-color common_header" style="flex-wrap:wrap">
 		<div class="title" style="width: 100%;"><a href="menu.php" class='item_15'><?php echo secho($title);?></a></div>
 		<p style="font-size:1rem;color:var(--user-disp-color);font-weight:400;">  A.I分析レポート</p>
-		<a href="#" style='color:inherit;position:fixed;top:45px;right:5px;' onclick='help()'><i class="bi bi-question-circle logoff-color"></i></a>
+		<a href="#" style='color:inherit;position:fixed;top:45px;right:5px;' onclick='help()'><i class="bi bi-question-circle logoff-color"></i></a>	
 	</header>
 	<main>
 		<div id='app'>
 			<!--your_bussinessの入力フォーム-->
 			<form id="form1" method="post" action="#">
 				<div class="container">
-					<div class="row">
-						<div class="col-12">
-							<div class="card">
-								<div class="card-header">
-									<h5 class="card-title">あなたのビジネス情報</h5>
-								</div>
-								<div class="card-body">
+					<div class="accordion mt-3" id="accordionExample">
+						<div class="accordion-item">
+							<h2 class="accordion-header">
+								<button class="accordion-button fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+									<p>ビジネス情報を入力してください<br><span class='fs-5'>入力することでより具体的なレポートとなります。</span></p>
+								</button>
+							</h2>
+							<div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+								<div class="card-body mt-3">
+									<div class="mb-3 text-primary">
+										<p>hint:文章作成が苦手な人は、句読点や・などを利用した箇条書きでも大丈夫です。</p>
+										
+									</div>
 									<div class="mb-3">
 										<label for="Product_categories" class="form-label">取扱商品のジャンル</label>
-										<input type="text" class="form-control" id="Product_categories" v-model="your_bussiness.取扱商品のジャンル">
+										<textarea class="form-control" id="Product_categories" v-model="your_bussiness.取扱商品のジャンル" rows="3"></textarea>
 									</div>
 									<div class="mb-3">
 										<label for="Sales_methods" class="form-label">販売方法</label>
-										<input type="text" class="form-control" id="Sales_methods" v-model="your_bussiness.販売方法">
+										<textarea class="form-control" id="Sales_methods" v-model="your_bussiness.販売方法" rows="3"></textarea>
 									</div>
 									<div class="mb-3">
-										<label for="Brand_image" class="form-label">ブランドイメージ</label>
-										<input type="text" class="form-control" id="Brand_image" v-model="your_bussiness.ブランドイメージ">
+										<label for="Brand_image" class="form-label">ブランドイメージ/コンセプト</label>
+										<textarea class="form-control" id="Brand_image" v-model="your_bussiness.ブランドイメージ" rows="3"></textarea>
 									</div>
 									<div class="mb-3">
 										<label for="Monthly_goals" class="form-label">月毎の目標</label>
-										<input type="text" class="form-control" id="Monthly_goals" v-model="your_bussiness.月毎の目標">
+										<textarea class="form-control" id="Monthly_goals" v-model="your_bussiness.月毎の目標" rows="3"></textarea>
 									</div>
 									<div class="mb-3">
 										<label for="This_year_goals" class="form-label">今年度の目標</label>
-										<input type="text" class="form-control" id="This_year_goals" v-model="your_bussiness.今年度の目標">
+										<textarea class="form-control" id="This_year_goals" v-model="your_bussiness.今年度の目標" rows="3"></textarea>
 									</div>
 									<div class="mb-3">
 										<label for="Next_year_goals" class="form-label">来年度の目標</label>
-										<input type="text" class="form-control" id="Next_year_goals" v-model="your_bussiness.来年度の目標">
+										<textarea class="form-control" id="Next_year_goals" v-model="your_bussiness.来年度の目標" rows="3"></textarea>
 										
 									</div>
 									<div class="mb-3">
 										<label for="Ideal_years" class="form-label">5年後の理想</label>
-										<input type="text" class="form-control" id="Ideal_years" v-model="your_bussiness.年後の理想">
+										<textarea class="form-control" id="Ideal_years" v-model="your_bussiness.年後の理想" rows="3"></textarea>
 									</div>
 									<div class="mb-3">
 										<label for="Customer_targets" class="form-label">顧客ターゲット</label>
-										<input type="text" class="form-control" id="Customer_targets" v-model="your_bussiness.顧客ターゲット">
+										<textarea class="form-control" id="Customer_targets" v-model="your_bussiness.顧客ターゲット" rows="3"></textarea>
 									</div>
 								</div>
 								<div class="card-footer text-end">
 									<button type="button" class="btn btn-primary me-3" @click="ins_bussiness" >ビジネス情報登録</button>
-									<button type="button" class="btn btn-primary" @click="get_gemini_response" :disabled="loading">
-										<span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-										{{ loading ? '生成中...' : 'レポート生成' }}
-									</button>
+									</div>
 								</div>
-							</div>
+							</div><!-- accordion-item -->
+						</div><!-- accordion -->
+					</div>
+					<div class="row mt-3">
+						<div class="col-12">
+							<button type="button" class="btn btn-primary" @click="get_gemini_response" :disabled="loading">
+								<span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+								{{ loading ? '生成中...' : 'レポート生成' }}
+							</button>
 						</div>
 					</div>
 			</form>
@@ -202,7 +195,7 @@ $ask = "
 				const your_sales_data = ref(<?php echo json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE); ?>);
 				const your_ask = ref(`
 					あなたは一流の経営コンサルタントです。
-					次に渡す売上明細と、私のビジネス情報をもとに、今後の売上を増やすためのレポートを提案してください。
+					次に渡す売上明細と、私のビジネス情報をもとに、同業他社の成功事例などを踏まえたうえで、今後の売上を増やすためのレポートを提案してください。
 					レポートはhtmlを利用してビジュアルを整えてください。
 					htmlのみを出力してください。
 					読みやすさを重視し、口語体で作成してください。
@@ -210,7 +203,6 @@ $ask = "
 					・出るべきイベント、
 					・地域、天気・気温との関連。
 					・注力すべき商品群とそうでない商品の選定。
-					・競合他社との比較。
 					・取扱商品から見る業種の傾向と今後のトレンド。
 					・類似のイベント名は同じイベントとしてとらえる。
 					売上明細は次の通り。${JSON.stringify(your_sales_data.value)}
@@ -298,21 +290,3 @@ $ask = "
 $stmt  = null;
 $pdo_h = null;
 ?>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
