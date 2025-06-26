@@ -19,7 +19,7 @@ $rtn=check_session_userid($pdo_h);
 $csrf_token=csrf_create();
 
 //ユーザ情報取得
-$sql="SELECT yuukoukigen,ZeiHasu from Users_webrez where uid=?";
+$sql="SELECT * from Users_webrez where uid=?";
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
@@ -164,7 +164,11 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 						</div><!-- accordion -->
 					</div>
 					<div class="row mt-3">
-						<div class="col-12">
+						<div class="col-12 ms-3">
+							<label for="Product_categories" class="form-label">レポート作成依頼</label>
+							<textarea class="form-control" id="Product_categories" v-model="your_ask" rows="20"></textarea>
+						</div>
+						<div class="col-12 ms-3">
 							<button type="button" class="btn btn-primary" @click="get_gemini_response" :disabled="loading">
 								<span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 								{{ loading ? '生成中...' : 'レポート生成' }}
@@ -193,20 +197,7 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			setup(){
 				const your_bussiness = ref(<?php echo json_encode($business_info[0],JSON_UNESCAPED_UNICODE); ?>);
 				const your_sales_data = ref(<?php echo json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE); ?>);
-				const your_ask = ref(`
-					あなたは一流の経営コンサルタントです。
-					次に渡す売上明細と、私のビジネス情報をもとに、同業他社の成功事例などを踏まえたうえで、今後の売上を増やすためのレポートを提案してください。
-					レポートはhtmlを利用してビジュアルを整えてください。
-					htmlのみを出力してください。
-					読みやすさを重視し、口語体で作成してください。
-					分析のポイントとして
-					・出るべきイベント、
-					・地域、天気・気温との関連。
-					・注力すべき商品群とそうでない商品の選定。
-					・取扱商品から見る業種の傾向と今後のトレンド。
-					・類似のイベント名は同じイベントとしてとらえる。
-					売上明細は次の通り。${JSON.stringify(your_sales_data.value)}
-					私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}
+				const your_ask = ref(`あなたは一流の経営コンサルタントです。\n次に渡す売上明細と私のビジネス情報をもとに、今後の売上を増やすためのレポートを作成してください。類似したイベント名は同じイベントとして集計してください。\n分析のポイント/知りたいことを以下に羅列\n・出るべきイベント\n・地域、天気・気温との関連。\n・注力すべき商品群とそうでない商品の選定。\n・取扱商品から見る業種の傾向と今後のトレンド。\n
 				`);
 				const gemini_response = ref('');
 				const loading = ref(false);
@@ -218,7 +209,7 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 					try {
 						//console_log(your_ask.value)
 						const form = new FormData();
-						form.append('Article', your_ask.value);
+						form.append('Article', `${your_ask.value}\nレポートはhtmlを利用してビジュアルを整えてください。\nhtmlのみを出力してください。\n読みやすさを重視し、口語体で作成してください。\n売上明細は次の通り。\n${JSON.stringify(your_sales_data.value)}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
 						form.append('type', 'one');
 						form.append('answer_type', 'html');
 
