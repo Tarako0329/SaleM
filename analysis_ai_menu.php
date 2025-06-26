@@ -181,8 +181,8 @@ $ask = "
 								<div class="card-header">
 									<h5 class="card-title">AI分析レポート</h5>
 								</div>
-								<div class="card-body" v-html="gemini_response">
-								</div>
+								<iframe class="card-body" :src="gemini_response">
+								</iframe>
 							</div>
 						</div>
 					</div>
