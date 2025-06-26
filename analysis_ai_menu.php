@@ -81,8 +81,8 @@ $sql="SELECT
 	where uid=? and UriDate between ? and ?";
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-$stmt->bindValue(2, '2024-01-01', PDO::PARAM_STR);
-$stmt->bindValue(3, '2024-12-31', PDO::PARAM_STR);
+$stmt->bindValue(2, '2023-01-01', PDO::PARAM_STR);
+$stmt->bindValue(3, '2025-12-31', PDO::PARAM_STR);
 //$stmt->bindValue(2, date("Y-m-d"), PDO::PARAM_STR);
 $stmt->execute();
 $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -202,9 +202,10 @@ $ask = "
 				const your_sales_data = ref(<?php echo json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE); ?>);
 				const your_ask = ref(`
 					あなたは一流の経営コンサルタントです。
-					次に渡す１年分の売上明細と、私のビジネス情報をもとに、今後の売上を増やすためのレポートを提案してください。
-					レポートはhtmlを利用してグラフ、表などを駆使しビジュアルを整えてください。
+					次に渡す売上明細と、私のビジネス情報をもとに、今後の売上を増やすためのレポートを提案してください。
+					レポートはhtmlを利用してビジュアルを整えてください。
 					htmlのみを出力してください。
+					読みやすさを重視し、口語体で作成してください。
 					分析のポイントとして
 					・出るべきイベント、
 					・地域、天気・気温との関連。
