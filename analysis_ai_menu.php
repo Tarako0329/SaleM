@@ -34,6 +34,7 @@ $sql_bi = "SELECT
 	, Next_year_goals as 来年度の目標
 	, Ideal_5_years as 年後の理想
 	, Customer_targets as 顧客ターゲット
+	, uid
 	from business_info where uid=?";
 $stmt = $pdo_h->prepare($sql_bi);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
@@ -181,7 +182,7 @@ $ask = "
 								<div class="card-header">
 									<h5 class="card-title">AI分析レポート</h5>
 								</div>
-								<iframe class="card-body" :src="gemini_response">
+								<iframe class="card-body" :src="iframe_url">
 								</iframe>
 							</div>
 						</div>
@@ -229,10 +230,11 @@ $ask = "
 				const gemini_response = ref('');
 				const loading = ref(false);
 
+
 				const get_gemini_response = async () => {
 					loading.value = true;
 					try {
-						console_log(your_ask.value)
+						//console_log(your_ask.value)
 						const form = new FormData();
 						form.append('Article', your_ask.value);
 						form.append('type', 'one');
@@ -249,6 +251,7 @@ $ask = "
 				};
 
 				onMounted(() => {
+					const iframe_url = `${your_sales_data.value[0].uid}_gemini_report.html`
 					//get_gemini_response();
 				});
 

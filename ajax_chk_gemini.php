@@ -65,6 +65,13 @@ if($rtn !== true){
 		$msg = gemini_api($user_input,$answer_type,$response_schema);
 	}
 
+	//$answer_type=htmlの場合、$msg["result"]をファイルに上書きで出力する。ファイル名は$_SESSION["user_id"]+_gemini_report.html
+	if($answer_type==="html"){
+		$report_file = $_SESSION["user_id"]."_gemini_report.html";
+		file_put_contents($report_file, $msg["result"]);
+		$msg["result"] = $report_file;
+	}
+	
 }
 //log_writer2("\$msg",$msg,"lv3");
 //$token = csrf_create();
