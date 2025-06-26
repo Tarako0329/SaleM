@@ -262,6 +262,7 @@ $ask = "
 					gemini_response,
 					loading,
 					get_gemini_response,
+					iframe_url,
 				};
 			}
 		}).mount('#app');
