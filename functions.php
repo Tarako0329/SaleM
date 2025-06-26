@@ -614,10 +614,42 @@ function rtn_sqllog($sql,$params){//(sql,パラメータ[],phpファイル名)w:
 }
 
 // =========================================================
+// fatal error　実行関数
+// =========================================================
+function shutdown_ajax($filename){
+	// シャットダウン関数
+	// スクリプトの処理が完了する前に
+	// ここで何らかの操作をすることができます
+	// トランザクション中のエラー停止時は自動rollbackされる。
+	  $lastError = error_get_last();
+	  
+	  //直前でエラーあり、かつ、catch処理出来ていない場合に実行
+	  if($lastError!==null && $GLOBALS["reseve_status"] === false){
+		log_writer2($filename,"shutdown","lv3");
+		log_writer2($filename,$lastError,"lv1");
+		  
+		$emsg = "uid::".$_SESSION['user_id']." ERROR_MESSAGE::予期せぬエラー".$lastError['message'];
+		if(EXEC_MODE!=="Local"){
+			send_mail(SYSTEM_NOTICE_MAIL,"【".TITLE." - WARNING】".$filename."でシステム停止",$emsg,"","");
+		}
+		log_writer2($filename." [Exception \$lastError] =>",$lastError,"lv0");
+	
+		$token = csrf_create();
+		$return_sts = array(
+			"MSG" => "システムエラーによる更新失敗。管理者へ通知しました。"
+			,"status" => "danger"
+			,"csrf_create" => $token
+			,"timeout" => false
+		);
+		header('Content-type: application/json');
+		echo json_encode($return_sts, JSON_UNESCAPED_UNICODE);
+	  }
+  }
+// =========================================================
 // GeminiAPI
 // =========================================================
 function gemini_api($p_ask,$p_type, $response_schema = null){
-	//$p_type: 'json' (decode response to PHP array) or 'plain' (raw text response)
+	//$p_type: 'json' (decode response to PHP array) or 'plain' (raw text response) or 'html'
 	//$response_schema: An object describing the expected JSON schema for the model's response.
 	/*$response_schemaサンプル
 	  $response_schema = [
@@ -705,6 +737,9 @@ function gemini_api($p_ask,$p_type, $response_schema = null){
 			}
 			$result = $decoded_json;
 		}	
+	}else if($p_type==="html"){
+		$result = str_replace('```html','',$result);
+		$result = str_replace('```','',$result);
 	}
 	$rtn = array(
 		'emsg' => $emsg,

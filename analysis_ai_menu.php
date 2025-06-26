@@ -18,11 +18,42 @@ if($rtn !== true){
 $rtn=check_session_userid($pdo_h);
 
 //ユーザ情報取得
-$sql="select yuukoukigen,ZeiHasu from Users_webrez where uid=?";
+$sql="SELECT yuukoukigen,ZeiHasu from Users_webrez where uid=?";
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
 $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//ビジネスインフォを取得
+$sql_bi = "SELECT 
+	Product_categories as 取扱商品のジャンル
+	, Sales_methods as 販売方法
+	, Brand_image as ブランドイメージ
+	, Monthly_goals as 月毎の目標
+	, This_year_goals as 今年度の目標
+	, Next_year_goals as 来年度の目標
+	, Ideal_5_years as 年後の理想
+	, Customer_targets as 顧客ターゲット
+	from business_info where uid=?";
+$stmt = $pdo_h->prepare($sql_bi);
+$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+$stmt->execute();
+$business_info = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//$business_infoが0件だった場合、business_infoにuidとapp=webrezを挿入
+if(count($business_info) === 0){
+	$stmt = $pdo_h->prepare("insert into business_info (uid,app) values (?,?)");
+	$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+	$stmt->bindValue(2, "webrez", PDO::PARAM_STR);
+	$stmt->execute();
+
+	$stmt = $pdo_h->prepare($sql_bi);
+	$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+	$stmt->execute();
+	$business_info = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
 
 //売上データの取得をUriageMeisaiから行う
 $sql="SELECT 
@@ -67,8 +98,10 @@ $ask = "
 	・注力すべき商品群とそうでない商品の選定。
 	・競合他社との比較。
 	・取扱商品から見る業種の傾向と今後のトレンド。
+	・類似のイベント名は同じイベントとしてとらえる。
 	売上明細は次の通り。".json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE);
-$answer = gemini_api($ask,'plain');
+//$answer = gemini_api($ask,'plain');
+//log_writer2("\$result gemini",$result,"lv3");
 
 ?>
 <!DOCTYPE html>
@@ -85,14 +118,81 @@ $answer = gemini_api($ask,'plain');
 	<header class="header-color common_header" style="flex-wrap:wrap">
 		<div class="title" style="width: 100%;"><a href="menu.php" class='item_15'><?php echo secho($title);?></a></div>
 		<p style="font-size:1rem;color:var(--user-disp-color);font-weight:400;">  A.I分析レポート</p>
-		<a href="#" style='color:inherit;position:fixed;top:75px;right:5px;' onclick='help()'><i class="bi bi-question-circle Qicon awesome-color-panel-border-same"></i></a>
+		<a href="#" style='color:inherit;position:fixed;top:45px;right:5px;' onclick='help()'><i class="bi bi-question-circle logoff-color"></i></a>
 	</header>
 	<main>
-		<div id='form1'>
-		<?php
-			echo $answer["result"];
-		?>
+		<div id='app'>
+			<!--your_bussinessの入力フォーム-->
+			<form id="form1" method="post" action="#">
+				<div class="container">
+					<div class="row">
+						<div class="col-12">
+							<div class="card">
+								<div class="card-header">
+									<h5 class="card-title">あなたのビジネス情報</h5>
+								</div>
+								<div class="card-body">
+									<div class="mb-3">
+										<label for="Product_categories" class="form-label">取扱商品のジャンル</label>
+										<input type="text" class="form-control" id="Product_categories" v-model="your_bussiness.取扱商品のジャンル">
+									</div>
+									<div class="mb-3">
+										<label for="Sales_methods" class="form-label">販売方法</label>
+										<input type="text" class="form-control" id="Sales_methods" v-model="your_bussiness.販売方法">
+									</div>
+									<div class="mb-3">
+										<label for="Brand_image" class="form-label">ブランドイメージ</label>
+										<input type="text" class="form-control" id="Brand_image" v-model="your_bussiness.ブランドイメージ">
+									</div>
+									<div class="mb-3">
+										<label for="Monthly_goals" class="form-label">月毎の目標</label>
+										<input type="text" class="form-control" id="Monthly_goals" v-model="your_bussiness.月毎の目標">
+									</div>
+									<div class="mb-3">
+										<label for="This_year_goals" class="form-label">今年度の目標</label>
+										<input type="text" class="form-control" id="This_year_goals" v-model="your_bussiness.今年度の目標">
+									</div>
+									<div class="mb-3">
+										<label for="Next_year_goals" class="form-label">来年度の目標</label>
+										<input type="text" class="form-control" id="Next_year_goals" v-model="your_bussiness.来年度の目標">
+										
+									</div>
+									<div class="mb-3">
+										<label for="Ideal_years" class="form-label">5年後の理想</label>
+										<input type="text" class="form-control" id="Ideal_years" v-model="your_bussiness.年後の理想">
+									</div>
+									<div class="mb-3">
+										<label for="Customer_targets" class="form-label">顧客ターゲット</label>
+										<input type="text" class="form-control" id="Customer_targets" v-model="your_bussiness.顧客ターゲット">
+									</div>
+								</div>
+								<div class="card-footer text-end">
+									<button type="button" class="btn btn-primary" @click="get_gemini_response" :disabled="loading">
+										<span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+										{{ loading ? '生成中...' : 'レポート生成' }}
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row mt-4">
+						<div class="col-12">
+							<div class="card">
+								<div class="card-header">
+									<h5 class="card-title">AI分析レポート</h5>
+								</div>
+								<div class="card-body" v-html="gemini_response">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+			<div class="loader-wrap" v-show='loading'>
+				<div class="loader">Loading...</div>
+			</div>
 		</div>
+
 	</main>
 	<script>
 		document.getElementById("form1").onkeypress = (e) => {
@@ -109,379 +209,59 @@ $answer = gemini_api($ask,'plain');
 		const { createApp, ref, onMounted, computed, VueCookies, watch,nextTick  } = Vue;
 		createApp({
 			setup(){
-				const tanka = ref(0)
-				const new_tanka = ref('')
-				const shouhizei = ref(0)
-				const zkomitanka = ref(0)
-				const kominuki = ref('IN')
-				const zeikbn = ref('')
+				const your_bussiness = ref(<?php echo json_encode($business_info[0],JSON_UNESCAPED_UNICODE); ?>);
+				const your_sales_data = ref(<?php echo json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE); ?>);
+				const your_ask = ref(`
+					あなたは一流の経営コンサルタントです。
+					次に渡す１年分の売上明細と、私のビジネス情報をもとに、今後の売上を増やすためのレポートを提案してください。
+					レポートはhtmlを利用してグラフ、表などを駆使しビジュアルを整えてください。
+					htmlのみを出力してください。
+					分析のポイントとして
+					・出るべきイベント、
+					・地域、天気・気温との関連。
+					・注力すべき商品群とそうでない商品の選定。
+					・競合他社との比較。
+					・取扱商品から見る業種の傾向と今後のトレンド。
+					・類似のイベント名は同じイベントとしてとらえる。
+					売上明細は次の通り。${JSON.stringify(your_sales_data.value)}
+					私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}
+				`);
+				const gemini_response = ref('');
+				const loading = ref(false);
 
-				watch([zeikbn,new_tanka,kominuki],() => {
-					console_log(new_tanka.value,)
-					if(new_tanka.value===''){
-						console_log('watch skip')
-						return
+				const get_gemini_response = async () => {
+					loading.value = true;
+					try {
+						const response = await axios.post('ajax_chk_gemini.php', {
+							Article: your_ask.value,
+							type: 'one',
+							answer_type: 'html'
+						});
+						gemini_response.value = response.data.result;
+					} catch (error) {
+						console.error('Error fetching Gemini response:', error);
+						gemini_response.value = '<p style="color:red;">レポートの取得中にエラーが発生しました。</p>';
+					} finally {
+						loading.value = false;
 					}
-					let zmrec = ([])
-					zmrec = ZEIM.filter((list)=>{
-						return list.税区分 == zeikbn.value
-					})
-					const values = get_value(Number(new_tanka.value),Number(zmrec[0]["税率"]),kominuki.value)
-					tanka.value = values[0]["本体価格"]
-					shouhizei.value = values[0].消費税
-					zkomitanka.value = values[0].税込価格
-					if(values[0].E !== 'OK'){
-						alert('指定の税込額は税率計算で端数が発生するため実現できません')
-					}
-				})
+				};
+
 				onMounted(() => {
-					//console_log(get_value(1000,0.1,'IN'),'lv3')
-					console_log('onMounted','lv3')
-				})
-				return{
-					tanka,
-					new_tanka,
-					shouhizei,
-					zkomitanka,
-					kominuki,
-					zeikbn,
-				}                
+					//get_gemini_response();
+				});
+
+				return {
+					your_bussiness,
+					your_sales_data,
+					your_ask,
+					gemini_response,
+					loading,
+					get_gemini_response,
+				};
 			}
-		}).mount('#form1');
+		}).mount('#app');
 	</script>
 </body>
-<!--シェパードナビ
-<script src="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/js/shepherd.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@9.1.1/dist/css/shepherd.css"/>
--->
-<script src="shepherd/shepherd.min.js?<?php echo $time; ?>"></script>
-<link rel="stylesheet" href="shepherd/shepherd.css?<?php echo $time; ?>"/>
-<?php require "ajax_func_tourFinish.php";?>
-<script>
-	const TourMilestone = '<?php echo $_SESSION["tour"];?>';
-	
-	const tutorial_2 = new Shepherd.Tour({
-		useModalOverlay: true,
-		defaultStepOptions: {
-			classes: 'tour_modal',
-			scrollTo: false,
-			cancelIcon:{
-				enabled:true
-			}
-		},
-		tourName:'tutorial_2'
-	});
-	<?php if(!empty($_SESSION["tour"])){?>
-	tutorial_2.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>レジに表示する商品の登録画面について説明します。</p>`,
-		buttons: [
-			{
-				text: 'Next',
-				action: tutorial_2.next
-			}
-		]
-	});
-	<?php }?>
-	/*
-	tutorial_2.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>「商品名」の入力欄です。<br><br><span style='color:red;'>「商品名」のみ、一度登録すると変更できません。</span><p>`,
-		attachTo: {
-			element: '.item_1',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_2.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_2.next
-			}
-		]
-	});
-	*/
-	tutorial_2.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>「商品単価」の入力欄です。<br><br>「商品単価」は税込・税抜のどちらでも入力可能です。</p>`,
-		attachTo: {
-			element: '.item_2',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_2.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_2.next
-			}
-		]
-	});
-	tutorial_2.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>「商品単価」に入力した金額が『税込』か『税抜』かを選択します。<br><br>「非課税」の場合は「税込」のままで大丈夫です。</p>`,
-		attachTo: {
-			element: '.item_3',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_2.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_2.next
-			}
-		]
-	});
-	/*
-	tutorial_2.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>「消費税率」の入力欄です。</p>`,
-		attachTo: {
-			element: '.item_4',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_2.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_2.next
-			}
-		]
-	});
-	*/
-	tutorial_2.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>選択した「消費税率」から消費税が自動計算されます。</p>`,
-		attachTo: {
-			element: '#item_5',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_2.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_2.next
-			}
-		]
-	});
-	tutorial_2.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>商品製作費(概算でOK)の入力欄です。<br><br>入力しておくと、売上実績等で利益が算出されます。<br><span style='color:red;'>※確定申告のソフトには連携しません。</span></p>`,
-		attachTo: {
-			element: '.item_6',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_2.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_2.next
-			}
-		]
-	});
-	tutorial_2.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>纏め売り商品の内訳数入力欄です。<br>箱詰め等で纏め売りしてる場合、何個入りもしくは何グラム入りなど、内容量を入力できます。<br><br>※売上分析に利用する予定。</p>`,
-		attachTo: {
-			element: '.item_7',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_2.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_2.next
-			}
-		]
-	});
-	tutorial_2.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>内容量の単位の入力欄です。<br>例：枚、個、グラムなど</p>`,
-		attachTo: {
-			element: '.item_8',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_2.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_2.next
-			}
-		]
-	});
-	/*
-	tutorial_2.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>商品の大カテゴリー入力欄です。（<span style='font-weight:bold;'>大</span>>中>小）
-		<br>入力すると、以下のメリットがあります。
-		<br>・レジ画面：カテゴリーで纏めて表示され、商品を探しやすくなります
-		<br>・売上分析：カテゴリーごとの集計・分析ができます</p>`,
-		attachTo: {
-			element: '.item_9',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_2.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_2.next
-			}
-		]
-	});
-   */
-	tutorial_2.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>チェックを外すと「レジ画面」の表示対象外となります。</p>`,
-		attachTo: {
-			element: '.item_12',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_2.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_2.nextAndSave
-			}
-		]
-	});
-	tutorial_2.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>「登録」ボタンを押すと、登録されます。
-				<br><br><span style='color:red;'>※登録した内容は削除可能ですが、1件でも売上登録されると削除不可となります</span></p>`,
-		attachTo: {
-			element: '.item_13',
-			on: 'top'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_2.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_2.next
-			}
-		]
-	});
-
-	<?php if(!empty($_SESSION["tour"])){?>
-	tutorial_2.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>まずは１件、登録してみましょう。<br><br><span style='color:red;'>チュートリアルの最後に削除できますので仮の商品でも可です。</span></p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_2.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_2.next //complete
-			}
-		]
-	});
-	
-	<?php }?>
-
-	const tutorial_3 = new Shepherd.Tour({
-		useModalOverlay: true,
-		defaultStepOptions: {
-			classes: 'tour_modal',
-			scrollTo: false,
-			cancelIcon:{
-				enabled:true
-			}
-		},
-		tourName:'tutorial_3'
-	});
-	tutorial_3.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>登録が成功すると、画面上部に緑色のバーでメッセージが表示されます。</p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_3.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_3.next //complete
-			}
-		]
-	});
-	tutorial_3.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>余裕があったら追加で何件か商品を登録してみてください。
-				<br>
-				<br><span style='font-size:1rem;color:green;'>※進捗を保存しました。</span></p>`,
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_3.back
-			},
-			{
-				text: 'Next',
-				action: tutorial_3.nextAndSave //complete
-			}
-		]
-	});
-	tutorial_3.addStep({
-		title: `<p class='tour_header'>チュートリアル</p>`,
-		text: `<p class='tour_discription'>ココをタップすると、ひとつ前のメニューに戻ります。<br>登録作業が終わったらタップしてください。<br><br><span style='color:red;'>※全画面共通の操作なので覚えてくださいね</span></p>`,
-		attachTo: {
-			element: '.item_15',
-			on: 'bottom'
-		},
-		buttons: [
-			{
-				text: 'Back',
-				action: tutorial_3.back
-			},
-		   {
-				text: 'Next',
-				action: tutorial_3.complete //complete
-			}
-		]
-	});
-
-	
-	if(TourMilestone=='tutorial_1'){
-		tutorial_2.start(tourFinish,'tutorial','');
-	}else if(TourMilestone=='tutorial_2'){
-		tutorial_3.start(tourFinish,'tutorial','save');
-	}
-
-	function help(){
-		tutorial_2.start(tourFinish,'help','');
-	}
-</script>
-
 </html>
 
 <?php
