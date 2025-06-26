@@ -16,6 +16,7 @@ if($rtn !== true){
 
 //セッションのIDがクリアされた場合の再取得処理。
 $rtn=check_session_userid($pdo_h);
+$csrf_token=csrf_create();
 
 //ユーザ情報取得
 $sql="SELECT yuukoukigen,ZeiHasu from Users_webrez where uid=?";
@@ -168,6 +169,7 @@ $ask = "
 									</div>
 								</div>
 								<div class="card-footer text-end">
+									<button type="button" class="btn btn-primary me-3" @click="ins_bussiness" >ビジネス情報登録</button>
 									<button type="button" class="btn btn-primary" @click="get_gemini_response" :disabled="loading">
 										<span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 										{{ loading ? '生成中...' : 'レポート生成' }}
@@ -176,22 +178,8 @@ $ask = "
 							</div>
 						</div>
 					</div>
-					<div class="row mt-4">
-						<div class="col-12">
-							<div class="card">
-								<div class="card-header">
-									<h5 class="card-title">AI分析レポート</h5>
-								</div>
-								<iframe class="card-body" :src="iframe_url">
-								</iframe>
-							</div>
-						</div>
-					</div>
-				</div>
 			</form>
-			<div class="loader-wrap" v-show='loading'>
-				<div class="loader">Loading...</div>
-			</div>
+
 		</div>
 
 	</main>
@@ -229,7 +217,8 @@ $ask = "
 				`);
 				const gemini_response = ref('');
 				const loading = ref(false);
-
+				const iframe_url = ref(`${your_bussiness.value.uid}_gemini_report.html`)
+				let csrf_token = '<?php echo $csrf_token;?>'
 
 				const get_gemini_response = async () => {
 					loading.value = true;
@@ -250,8 +239,41 @@ $ask = "
 					}
 				};
 
+				const ins_bussiness = () =>{
+					//your_bussinessをaxios.postでajax_delins_business_info.phpに送信
+					let params = new URLSearchParams()
+					params.append('app', 'webrez')
+					params.append('Product_categories', your_bussiness.value.取扱商品のジャンル)
+					params.append('Sales_methods', your_bussiness.value.販売方法)
+					params.append('Brand_image', your_bussiness.value.ブランドイメージ)
+					params.append('Monthly_goals', your_bussiness.value.月毎の目標)
+					params.append('This_year_goals', your_bussiness.value.今年度の目標)
+					params.append('Next_year_goals', your_bussiness.value.来年度の目標)
+					params.append('Ideal_5_years', your_bussiness.value.年後の理想)
+					params.append('Customer_targets', your_bussiness.value.顧客ターゲット)
+					params.append('csrf_token', csrf_token)
+					
+					axios
+					.post('ajax_delins_business_info.php',params)
+					.then((response) => {
+						console_log(response.data,'lv3')
+						csrf_token = response.data.csrf_create
+						if(response.data.status!=="success"){
+							alert(response.data.MSG)
+						}
+					})
+					.catch((error) => {
+						console_log(`ins_bussiness ERROR:${error}`,'lv3')
+					})
+					.finally(()=>{
+						//console_log(myChart,'lv3')
+					})
+					return 0;
+					
+				}
+
 				onMounted(() => {
-					const iframe_url = `${your_sales_data.value[0].uid}_gemini_report.html`
+					
 					//get_gemini_response();
 				});
 
@@ -263,6 +285,7 @@ $ask = "
 					loading,
 					get_gemini_response,
 					iframe_url,
+					ins_bussiness,
 				};
 			}
 		}).mount('#app');
