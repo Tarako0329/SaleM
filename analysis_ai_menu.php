@@ -56,8 +56,18 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 //log_writer2("\$shouhin_rows",json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE),"lv3");
 
-$ask = "一流経営コンサルタントとして、次に渡す１年分の売上明細をもとに、今後の売上を増やすためのレポートを口語体で出力。htmlを利用してビジュアルを整える。グラフも使う。
-出るべきイベント、地域、天気・気温との関連。注力すべき商品群とそうでない商品の選定など。売上明細は次の通り。".json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE);
+$ask = "
+	一流経営コンサルタントとして、
+	次に渡す１年分の売上明細をもとに、今後の売上を増やすためのレポートを出力。
+	レポートはhtmlを利用してグラフ、表などを駆使しビジュアルを整える。
+	htmlのみを出力してください。
+	分析のポイントとして
+	・出るべきイベント、
+	・地域、天気・気温との関連。
+	・注力すべき商品群とそうでない商品の選定。
+	・競合他社との比較。
+	・取扱商品から見る業種の傾向と今後のトレンド。
+	売上明細は次の通り。".json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE);
 $answer = gemini_api($ask,'plain');
 
 ?>
@@ -74,7 +84,7 @@ $answer = gemini_api($ask,'plain');
 <body class='common_body'>
 	<header class="header-color common_header" style="flex-wrap:wrap">
 		<div class="title" style="width: 100%;"><a href="menu.php" class='item_15'><?php echo secho($title);?></a></div>
-		<p style="font-size:1rem;color:var(--user-disp-color);font-weight:400;">  取扱商品登録画面</p>
+		<p style="font-size:1rem;color:var(--user-disp-color);font-weight:400;">  A.I分析レポート</p>
 		<a href="#" style='color:inherit;position:fixed;top:75px;right:5px;' onclick='help()'><i class="bi bi-question-circle Qicon awesome-color-panel-border-same"></i></a>
 	</header>
 	<main>
