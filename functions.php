@@ -356,7 +356,7 @@ function get_pdo_options() {
 // =========================================================
 // メール送信 
 // =========================================================
-function send_mail($to,$subject,$body,$html=false){
+function send_mail($to,$subject,$body){
 	//$to		: 送信先アドレス
 	//$subject	: 件名
 	//$body		: 本文
@@ -395,6 +395,55 @@ function send_mail($to,$subject,$body,$html=false){
     $mail ->from(FROM , 'WEBREZ-info');
     $mail ->subject($subject);
     $mail ->text($body);
+
+    //送信
+    $return_flag = $mail ->send();
+    return $return_flag;
+}
+// =========================================================
+// メール送信 
+// =========================================================
+function send_htmlmail($to,$subject,$body){
+	//$to		: 送信先アドレス
+	//$subject	: 件名
+	//$body		: 本文
+
+	//SMTP送信
+    if(EXEC_MODE==="Local"){
+        log_writer2("\$body",$body,"lv3");
+        return true;
+    }
+
+    require_once('qdmail.php');
+    require_once('qdsmtp.php');
+
+    $mail = new Qdmail();
+    $mail -> smtp(true);
+    mb_language('ja');
+    mb_internal_encoding('UTF-8');
+    $param = array(
+        'host'=> HOST,
+        'port'=> PORT ,
+        'from'=> FROM,
+        'protocol'=>PROTOCOL,
+    	'pop_host'=>POP_HOST,
+    	'pop_user'=>POP_USER,
+    	'pop_pass'=>POP_PASS,
+    );
+    $mail->smtpServer($param);
+    $mail->charsetBody('UTF-8','base64');
+    $mail->kana(true);
+    $mail->errorDisplay(false);
+    $mail->smtpObject()->error_display = false;
+    $mail->logLevel(1);
+	//$mail->logPath('./log/');
+	//$mail->logFilename('anpi.log');
+	//$smtp ->timeOut(10);
+	
+    $mail ->to($to);
+    $mail ->from(FROM , 'WEBREZ-info');
+    $mail ->subject($subject);
+    $mail ->html($body);
 
     //送信
     $return_flag = $mail ->send();
