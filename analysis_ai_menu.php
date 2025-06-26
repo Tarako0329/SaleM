@@ -56,8 +56,9 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 //log_writer2("\$shouhin_rows",json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE),"lv3");
 
-$ask = "一流経営コンサルタントとして、次に渡す１年分の売上明細をもとに、今後の売上を増やすアドバイスをレポート形式で出力。出るべきイベント、地域、天気・気温との関連。注力すべき商品群とそうでない商品の選定など。売上明細は次の通り。".json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE);
-
+$ask = "一流経営コンサルタントとして、次に渡す１年分の売上明細をもとに、今後の売上を増やすためのレポートを口語体で出力。htmlを利用してビジュアルを整える。グラフも使う。
+出るべきイベント、地域、天気・気温との関連。注力すべき商品群とそうでない商品の選定など。売上明細は次の通り。".json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE);
+$answer = gemini_api($ask,'plain');
 
 ?>
 <!DOCTYPE html>
@@ -79,7 +80,7 @@ $ask = "一流経営コンサルタントとして、次に渡す１年分の売
 	<main>
 		<div id='form1'>
 		<?php
-			echo gemini_api($ask,'plain');
+			echo $answer["result"];
 		?>
 		</div>
 	</main>
