@@ -69,7 +69,6 @@ if($rtn !== true){
 	if($answer_type==="html"){
 		$report_file = $_SESSION["user_id"]."_gemini_report.html";
 		file_put_contents($report_file, $msg["result"]);
-		$msg["result"] = $report_file;
 		send_htmlmail("green.green.midori@gmail.com","report",$msg["result"]);
 	}
 	
