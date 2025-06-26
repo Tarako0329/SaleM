@@ -232,11 +232,13 @@ $ask = "
 				const get_gemini_response = async () => {
 					loading.value = true;
 					try {
-						const response = await axios.post('ajax_chk_gemini.php', {
-							Article: your_ask.value,
-							type: 'one',
-							answer_type: 'html'
-						});
+						console_log(your_ask.value)
+						const form = new FormData();
+						form.append('Article', your_ask.value);
+						form.append('type', 'one');
+						form.append('answer_type', 'html');
+
+						const response = await axios.post('ajax_chk_gemini.php', form, {headers: {'Content-Type': 'multipart/form-data'}});
 						gemini_response.value = response.data.result;
 					} catch (error) {
 						console.error('Error fetching Gemini response:', error);
