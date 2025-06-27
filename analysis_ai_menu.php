@@ -58,35 +58,6 @@ if(count($business_info) === 0){
 
 
 
-//売上データの取得をUriageMeisaiから行う
-$sql="SELECT 
-		UriageNO as 売上番号
-		,UriDate as 売上計上日
-		,Event as 売上計上イベント名
-		,TokuisakiNM as イベント以外の売上先
-		,ShouhinNM as 商品名
-		,su as 売上個数
-		,tanka as 売上単価
-		,UriageKin as 売上金額
-		,genka_tanka as 原価単価
-		,genka as 売上原価
-		,IFNULL(bunrui1,'未設定') as 商品分類大
-		,IFNULL(bunrui2,'未設定') as 商品分類中
-		,IFNULL(bunrui3,'未設定') as 商品分類小
-		,address as イベント開催住所
-		,weather as 売上時の天気
-		,weather_discription as 売上時の天気詳細
-		,temp as 売上時の気温
-		,feels_like as 売上時の体感温度
-	from UriageMeisai 
-	where uid=? and UriDate between ? and ?";
-$stmt = $pdo_h->prepare($sql);
-$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-$stmt->bindValue(2, '2024-01-01', PDO::PARAM_STR);
-$stmt->bindValue(3, '2024-12-31', PDO::PARAM_STR);
-//$stmt->bindValue(2, date("Y-m-d"), PDO::PARAM_STR);
-$stmt->execute();
-$shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 <!DOCTYPE html>
@@ -195,9 +166,21 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 				</div><!-- accordion -->
 				<div class="row mt-3">
 					<div class="col-12 ">
-						<div class="mb-3">
+					<div class="mb-3">
 							<label for='ai_role' class='form-label'>AIの役割</label>
 							<input type='text' class='form-control' v-model='ai_role' id='ai_role'>
+						</div>
+						<div class="mb-3">
+							<label for='data_range' class='form-label'>AIに与えるデータ範囲</label>
+							<select class='form-select form-select-lg' v-model='data_range' id='data_range'>
+								<option value="">選択してください</option>
+								<option value="今年の売上データをもとに">今年の売上データ</option>
+								<option value="直近１２ヵ月の売上データをもとに">直近１２ヵ月の売上データ"></option>
+								<option value="過去５年の売上データをもとに">過去５年の売上データ</option>
+								<option value=""></option>
+								<option value=""></option>
+								<option value=""></option>
+							</select>
 						</div>
 						<div class="mb-3">
 							<label for="Product_categories" class="form-label">レポート作成依頼</label>
@@ -240,13 +223,15 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		createApp({
 			setup(){
 				const your_bussiness = ref(<?php echo json_encode($business_info[0],JSON_UNESCAPED_UNICODE); ?>);
-				const your_sales_data = ref(<?php echo json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE); ?>);
+				//const your_sales_data = ref(<?php echo json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE); ?>);
 
 				const ai_role = ref('データアナリスト')
-				const your_ask = ref(`次に渡す売上明細と私のビジネス情報をもとに、今後の売上を増やすためのレポートを作成してください。類似したイベント名は同じイベントとして集計してください。\n分析のポイント/知りたいことを以下に羅列\n・出るべきイベント\n・地域、天気・気温との関連。\n・注力すべき商品群とそうでない商品の選定。\n・取扱商品から見る業種の傾向と今後のトレンド。\n
+				const data_range = ref('今年の売上データをもとに')
+				const your_ask = ref(`今後の売上を増やすためのレポートを作成してください。同じようなイベント名は同イベントとして集計してください。\n分析のポイント/知りたいことを以下に羅列\n・出るべきイベント\n・地域、天気・気温との関連。\n・注力すべき商品群とそうでない商品の選定。\n・取扱商品から見る業種の傾向と今後のトレンド。\n
 				`);
 				const report_type = ref('レポートはhtmlメールとして送付します。\nhtmlのみを出力してください。\n読みやすさを重視し、口語体で作成してください。\n')
-				const save_setting = ref(true)
+
+				const save_setting = ref(true)	//プロンプト・ビジネス情報の保存可否
 
 				const gemini_response = ref('');
 				const loading = ref(false);
@@ -258,11 +243,17 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 					try {
 						//console_log(your_ask.value)
 						const form = new FormData();
-						form.append('Article', `あなたは${ai_role.value}です。\n${your_ask.value}\n${report_type.value}\n売上明細は次の通り。\n${JSON.stringify(your_sales_data.value)}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
+						form.append('Article', `あなたは${ai_role.value}です。\n${data_range.value}、${your_ask.value}\n${report_type.value}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
 						form.append('type', 'one');
 						form.append('answer_type', 'html');
+						form.append('data_range', data_range.value);
+						form.append('save_setting', save_setting.value);
+						form.append('ai_role', ai_role.value);
+						form.append('your_ask', your_ask.value);
+						form.append('report_type', report_type.value);
+						
 
-						const response = await axios.post('ajax_chk_gemini.php', form, {headers: {'Content-Type': 'multipart/form-data'}});
+						const response = await axios.post('ajax_gemini_make_report.php', form, {headers: {'Content-Type': 'multipart/form-data'}});
 						gemini_response.value = response.data.result;
 					} catch (error) {
 						console.error('Error fetching Gemini response:', error);
@@ -306,14 +297,20 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 				}
 
+				const make_report = () =>{
+					if(save_setting.value===true){
+						ins_bussiness()
+					}
+					get_gemini_response()
+				}
+
 				onMounted(() => {
-					
 					//get_gemini_response();
 				});
 
 				return {
 					your_bussiness,
-					your_sales_data,
+					//your_sales_data,
 					ai_role,
 					your_ask,
 					gemini_response,
@@ -323,6 +320,8 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 					ins_bussiness,
 					report_type,
 					save_setting,
+					make_report,
+					data_range,
 				};
 			}
 		}).mount('#app');
