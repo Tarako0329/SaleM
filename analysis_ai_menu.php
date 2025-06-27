@@ -30,6 +30,7 @@ $sql_bi = "SELECT
 	Product_categories as 取扱商品のジャンル
 	, Sales_methods as 販売方法
 	, Brand_image as ブランドイメージ
+	, Instagram
 	, Monthly_goals as 月毎の目標
 	, This_year_goals as 今年度の目標
 	, Next_year_goals as 来年度の目標
@@ -104,87 +105,125 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		<p style="font-size:1rem;color:var(--user-disp-color);font-weight:400;">  A.I分析レポート</p>
 		<a href="#" style='color:inherit;position:fixed;top:45px;right:5px;' onclick='help()'><i class="bi bi-question-circle logoff-color"></i></a>	
 	</header>
-	<main>
-		<div id='app'>
+	<div id='app'>
+		<main>
 			<!--your_bussinessの入力フォーム-->
-			<form id="form1" method="post" action="#">
-				<div class="container">
-					<div class="accordion mt-3" id="accordionExample">
-						<div class="accordion-item">
-							<h2 class="accordion-header">
-								<button class="accordion-button fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-									<p>ビジネス情報を入力してください<br><span class='fs-5'>入力することでより具体的なレポートとなります。</span></p>
-								</button>
-							</h2>
-							<div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-								<div class="card-body mt-3">
-									<div class="mb-3 text-primary">
-										<p>hint:文章作成が苦手な人は、句読点や・などを利用した箇条書きでも大丈夫です。</p>
-										
-									</div>
-									<div class="mb-3">
-										<label for="Product_categories" class="form-label">取扱商品のジャンル</label>
-										<textarea class="form-control" id="Product_categories" v-model="your_bussiness.取扱商品のジャンル" rows="3"></textarea>
-									</div>
-									<div class="mb-3">
-										<label for="Sales_methods" class="form-label">販売方法</label>
-										<textarea class="form-control" id="Sales_methods" v-model="your_bussiness.販売方法" rows="3"></textarea>
-									</div>
-									<div class="mb-3">
-										<label for="Brand_image" class="form-label">ブランドイメージ/コンセプト</label>
-										<textarea class="form-control" id="Brand_image" v-model="your_bussiness.ブランドイメージ" rows="3"></textarea>
-									</div>
-									<div class="mb-3">
-										<label for="Monthly_goals" class="form-label">月毎の目標</label>
-										<textarea class="form-control" id="Monthly_goals" v-model="your_bussiness.月毎の目標" rows="3"></textarea>
-									</div>
-									<div class="mb-3">
-										<label for="This_year_goals" class="form-label">今年度の目標</label>
-										<textarea class="form-control" id="This_year_goals" v-model="your_bussiness.今年度の目標" rows="3"></textarea>
-									</div>
-									<div class="mb-3">
-										<label for="Next_year_goals" class="form-label">来年度の目標</label>
-										<textarea class="form-control" id="Next_year_goals" v-model="your_bussiness.来年度の目標" rows="3"></textarea>
-									</div>
-									<div class="mb-3">
-										<label for="Ideal_years" class="form-label">5年後の理想</label>
-										<textarea class="form-control" id="Ideal_years" v-model="your_bussiness.年後の理想" rows="3"></textarea>
-									</div>
-									<div class="mb-3">
-										<label for="Customer_targets" class="form-label">顧客ターゲット</label>
-										<textarea class="form-control" id="Customer_targets" v-model="your_bussiness.顧客ターゲット" rows="3"></textarea>
-									</div>
+			<div class="container">
+				<div class="accordion mt-3" id="accordionExample">
+					<div class="accordion-item">
+						<h2 class="accordion-header">
+							<button class="accordion-button collapsed fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+								<p class='m-0'>ビジネス情報を入力してください<br><span class='fs-5'>入力することでより具体的なレポートとなります。</span></p>
+							</button>
+						</h2>
+						<div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+							<div class="card-body mt-3">
+								<div class="mb-3 text-primary">
+									<p class='m-0'>hint:文章作成が苦手な人は、箇条書きでも大丈夫です。</p>
 								</div>
-								<div class="card-footer text-end">
-									<button type="button" class="btn btn-primary me-3" @click="ins_bussiness" >ビジネス情報登録</button>
+								<div class="mb-3">
+									<label for="Product_categories" class="form-label">取扱商品のジャンル</label>
+									<textarea class="form-control" id="Product_categories" v-model="your_bussiness.取扱商品のジャンル" rows="3"></textarea>
+								</div>
+								<div class="mb-3">
+									<label for="Sales_methods" class="form-label">販売方法</label>
+									<textarea class="form-control" id="Sales_methods" v-model="your_bussiness.販売方法" rows="3"></textarea>
+								</div>
+								<div class="mb-3">
+									<label for="Brand_image" class="form-label">ブランドイメージ/コンセプト</label>
+									<textarea class="form-control" id="Brand_image" v-model="your_bussiness.ブランドイメージ" rows="3"></textarea>
+								</div>
+								<div class="mb-3">
+									<label for="Customer_targets" class="form-label">顧客ターゲット/ペルソナ</label>
+									<textarea class="form-control" id="Customer_targets" v-model="your_bussiness.顧客ターゲット" rows="3"></textarea>
+								</div>
+								<div class="mb-3">
+									<label for="Instagram" class="form-label">InstagramアカウントID</label>
+									<input class="form-control" id="Instagram" v-model="your_bussiness.Instagram" >
+								</div>
+								<div class="mb-3">
+									<label for="Customer_targets" class="form-label">顧客ターゲット/ペルソナ</label>
+									<textarea class="form-control" id="Customer_targets" v-model="your_bussiness.顧客ターゲット" rows="3"></textarea>
+								</div>
+								<div class="mb-3">
+									<label for="Monthly_goals" class="form-label">月毎の目標</label>
+									<textarea class="form-control" id="Monthly_goals" v-model="your_bussiness.月毎の目標" rows="3"></textarea>
+								</div>
+								<div class="mb-3">
+									<label for="This_year_goals" class="form-label">今年度の目標</label>
+									<textarea class="form-control" id="This_year_goals" v-model="your_bussiness.今年度の目標" rows="3"></textarea>
+								</div>
+								<div class="mb-3">
+									<label for="Next_year_goals" class="form-label">来年度の目標</label>
+									<textarea class="form-control" id="Next_year_goals" v-model="your_bussiness.来年度の目標" rows="3"></textarea>
+								</div>
+								<div class="mb-3">
+									<label for="Ideal_years" class="form-label">5年後の理想</label>
+									<textarea class="form-control" id="Ideal_years" v-model="your_bussiness.年後の理想" rows="3"></textarea>
 								</div>
 							</div>
-						</div><!-- accordion-item -->
-					</div><!-- accordion -->
-					<div class="row mt-3">
-						<div class="col-12 ">
-							<div class="mb-3">
-								<label for='ai_role' class='form-label'>AIの役割</label>
-								<input type='text' class='form-control' v-model='ai_role' id='ai_role'>
-							</div>
-							<div class="mb-3">
-								<label for="Product_categories" class="form-label">レポート作成依頼</label>
-								<textarea class="form-control" id="Product_categories" v-model="your_ask" rows="20"></textarea>
+							<div class="card-footer text-end pt-3 pb-3">
+								<button type="button" class="btn btn-primary me-3" @click="ins_bussiness" >ビジネス情報登録</button>
 							</div>
 						</div>
-						<div class="col-12 ms-3">
-							<button type="button" class="btn btn-primary" @click="get_gemini_response" :disabled="loading">
-								<span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-								{{ loading ? '生成中...' : 'レポート生成' }}
+					</div><!-- accordion-item -->
+					<div class="accordion-item">
+						<h2 class="accordion-header">
+							<button class="accordion-button collapsed fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+								<p class='m-0'>レポートの体裁など<br><span class='fs-5 '>AIプロンプトに多少理解がある方はいじってみてください</span></p>
 							</button>
+						</h2>
+						<div id="collapseTwo" class="collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+							<div class="card-body mt-3">
+								<div class="mb-3 text-primary">
+									<p class='m-0'>hint:文章作成が苦手な人は、箇条書きでも大丈夫です。</p>
+								</div>
+								<div class="mb-3">
+									<label for="Product_categories" class="form-label">レポート体裁</label>
+									<textarea class="form-control" id="Product_categories" v-model="report_type" rows="5"></textarea>
+								</div>
+								<!--<div class="mb-3">
+									<label for="Sales_methods" class="form-label">販売方法</label>
+									<textarea class="form-control" id="Sales_methods" v-model="your_bussiness.販売方法" rows="3"></textarea>
+								</div>
+							</div>
+							<div class="card-footer text-end">
+								<button type="button" class="btn btn-primary me-3" @click="ins_bussiness" >ビジネス情報登録</button>
+							</div>-->
+						</div>
+					</div><!-- accordion-item -->
+				</div><!-- accordion -->
+				<div class="row mt-3">
+					<div class="col-12 ">
+						<div class="mb-3">
+							<label for='ai_role' class='form-label'>AIの役割</label>
+							<input type='text' class='form-control' v-model='ai_role' id='ai_role'>
+						</div>
+						<div class="mb-3">
+							<label for="Product_categories" class="form-label">レポート作成依頼</label>
+							<textarea class="form-control" id="Product_categories" v-model="your_ask" rows="20"></textarea>
 						</div>
 					</div>
 				</div>
-			</form>
-
-		</div>
-
-	</main>
+			</div>
+		</main>
+		<footer class='fixed-bottom ' style='background-color: #f5f5f5;'>
+			<div class='container' style='height: 100px;'>
+				<div class="col-12 pt-3">
+					<div class="form-check">
+					  <input class="form-check-input" type="checkbox" v-model='save_setting' id="flexCheckDefault">
+					  <label class="form-check-label" for="flexCheckDefault">
+					    上記設定を保存してレポート作成
+					  </label>
+					</div>
+					<button type="button" class="btn btn-primary" @click="get_gemini_response" :disabled="loading">
+						<span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+						{{ loading ? '生成中...' : 'レポート生成' }}
+					</button>
+				</div>
+			</div>
+		</footer>
+	</div><!--#app-->
 	<script>
 		document.getElementById("form1").onkeypress = (e) => {
 			// form1に入力されたキーを取得
@@ -202,9 +241,13 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			setup(){
 				const your_bussiness = ref(<?php echo json_encode($business_info[0],JSON_UNESCAPED_UNICODE); ?>);
 				const your_sales_data = ref(<?php echo json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE); ?>);
+
 				const ai_role = ref('データアナリスト')
 				const your_ask = ref(`次に渡す売上明細と私のビジネス情報をもとに、今後の売上を増やすためのレポートを作成してください。類似したイベント名は同じイベントとして集計してください。\n分析のポイント/知りたいことを以下に羅列\n・出るべきイベント\n・地域、天気・気温との関連。\n・注力すべき商品群とそうでない商品の選定。\n・取扱商品から見る業種の傾向と今後のトレンド。\n
 				`);
+				const report_type = ref('レポートはhtmlメールとして送付します。\nhtmlのみを出力してください。\n読みやすさを重視し、口語体で作成してください。\n')
+				const save_setting = ref(true)
+
 				const gemini_response = ref('');
 				const loading = ref(false);
 				const iframe_url = ref(`${your_bussiness.value.uid}_gemini_report.html`)
@@ -215,7 +258,7 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 					try {
 						//console_log(your_ask.value)
 						const form = new FormData();
-						form.append('Article', `あなたは${ai_role.value}です。\n${your_ask.value}\nレポートはhtmlを利用してビジュアルを整えてください。\nhtmlのみを出力してください。\n読みやすさを重視し、口語体で作成してください。\n売上明細は次の通り。\n${JSON.stringify(your_sales_data.value)}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
+						form.append('Article', `あなたは${ai_role.value}です。\n${your_ask.value}\n${report_type.value}\n売上明細は次の通り。\n${JSON.stringify(your_sales_data.value)}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
 						form.append('type', 'one');
 						form.append('answer_type', 'html');
 
@@ -227,7 +270,7 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 					} finally {
 						loading.value = false;
 					}
-				};
+				}
 
 				const ins_bussiness = () =>{
 					//your_bussinessをaxios.postでajax_delins_business_info.phpに送信
@@ -241,8 +284,9 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 					params.append('Next_year_goals', your_bussiness.value.来年度の目標)
 					params.append('Ideal_5_years', your_bussiness.value.年後の理想)
 					params.append('Customer_targets', your_bussiness.value.顧客ターゲット)
+					params.append('Instagram', your_bussiness.value.Instagram)
 					params.append('csrf_token', csrf_token)
-					
+
 					axios
 					.post('ajax_delins_business_info.php',params)
 					.then((response) => {
@@ -259,7 +303,7 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 						//console_log(myChart,'lv3')
 					})
 					return 0;
-					
+
 				}
 
 				onMounted(() => {
@@ -277,6 +321,8 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 					get_gemini_response,
 					iframe_url,
 					ins_bussiness,
+					report_type,
+					save_setting,
 				};
 			}
 		}).mount('#app');

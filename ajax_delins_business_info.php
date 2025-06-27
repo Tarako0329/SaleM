@@ -39,6 +39,7 @@ if($rtn !== true){
 		$params["Next_year_goals"]=$_POST["Next_year_goals"];
 		$params["Ideal_5_years"]=$_POST["Ideal_5_years"];
 		$params["Customer_targets"]=$_POST["Customer_targets"];
+		$params["Instagram"]=$_POST["Instagram"];
 
 		//delete
 		$sqlstr="DELETE from business_info where uid=:uid and app=:app";
@@ -50,7 +51,7 @@ if($rtn !== true){
 		$sqllog .= rtn_sqllog("--execute():正常終了",[]);
 
 		//INSERT
-		$sqlstr="INSERT into business_info(uid,app,Product_categories,Sales_methods,Brand_image,Monthly_goals,This_year_goals,Next_year_goals,Ideal_5_years,Customer_targets) values(:uid,:app,:Product_categories,:Sales_methods,:Brand_image,:Monthly_goals,:This_year_goals,:Next_year_goals,:Ideal_5_years,:Customer_targets)";
+		$sqlstr="INSERT into business_info(uid,app,Product_categories,Sales_methods,Brand_image,Monthly_goals,This_year_goals,Next_year_goals,Ideal_5_years,Customer_targets,Instagram) values(:uid,:app,:Product_categories,:Sales_methods,:Brand_image,:Monthly_goals,:This_year_goals,:Next_year_goals,:Ideal_5_years,:Customer_targets,:Instagram)";
 		$stmt = $pdo_h->prepare($sqlstr);
 		$stmt->bindValue("uid", $params["uid"], PDO::PARAM_INT);
 		$stmt->bindValue("app", $params["app"], PDO::PARAM_STR);
@@ -62,6 +63,7 @@ if($rtn !== true){
 		$stmt->bindValue("Next_year_goals", $params["Next_year_goals"], PDO::PARAM_STR);
 		$stmt->bindValue("Ideal_5_years", $params["Ideal_5_years"], PDO::PARAM_STR);
 		$stmt->bindValue("Customer_targets", $params["Customer_targets"], PDO::PARAM_STR);
+		$stmt->bindValue("Instagram", $params["Instagram"], PDO::PARAM_STR);
 
 		$sqllog .= rtn_sqllog($sqlstr,$params);
 		$stmt->execute();
