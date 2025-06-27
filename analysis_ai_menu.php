@@ -113,10 +113,6 @@ if(count($business_info) === 0){
 									<input class="form-control" id="Instagram" v-model="your_bussiness.Instagram" >
 								</div>
 								<div class="mb-3">
-									<label for="Customer_targets" class="form-label">顧客ターゲット/ペルソナ</label>
-									<textarea class="form-control" id="Customer_targets" v-model="your_bussiness.顧客ターゲット" rows="3"></textarea>
-								</div>
-								<div class="mb-3">
 									<label for="Monthly_goals" class="form-label">月毎の目標</label>
 									<textarea class="form-control" id="Monthly_goals" v-model="your_bussiness.月毎の目標" rows="3"></textarea>
 								</div>

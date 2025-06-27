@@ -213,6 +213,16 @@ ver3.21.6-000:商品一覧メンテ画面の改良-commited
 	ALTER TABLE ShouhinMS MODIFY `upd_datetime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 ver3.21.6-001:商品一覧メンテ画面の改良-commited
 ver3.21.7-000:A.Iレポート機能
+	CREATE TABLE `analysis_ai_setting` (
+  `uid` int(11) NOT NULL,
+  `ai_role` varchar(255) DEFAULT NULL,
+  `data_range` varchar(255) DEFAULT NULL,
+  `your_ask` text DEFAULT NULL,
+  `report_type` text DEFAULT NULL,
+  `upd_datetime` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+	ALTER TABLE `analysis_ai_setting`
+  	ADD PRIMARY KEY (`uid`);
 
 verA.BB.C.DDD
 カウントアップ条件
