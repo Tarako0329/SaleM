@@ -19,7 +19,7 @@ $rtn=check_session_userid($pdo_h);
 $csrf_token=csrf_create();
 
 //ユーザ情報取得
-$sql="SELECT * from Users_webrez where uid=?";
+$sql="SELECT * from Users where uid=?";
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
@@ -56,8 +56,47 @@ if(count($business_info) === 0){
 	$business_info = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+//analysis_ai_settingを取得
+$sql_ai_setting = "SELECT 
+	ai_role
+	,data_range
+	,your_ask
+	,report_type
+	from analysis_ai_setting where uid=?";
+$stmt = $pdo_h->prepare($sql_ai_setting);
+$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+$stmt->execute();
+$ai_setting = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$ai_setting_def = [
+	'ai_role' => 'データアナリスト',
+	'data_range' => '今年の売上データをもとに',
+	'your_ask' => "売上分析レポートを作成してください。同じようなイベント名は同イベントとして集計してください。
+		分析のポイント/知りたいことを以下に羅列
+		・出るべきイベント
+		・地域、天気・気温との関連。
+		・注力すべき商品群とそうでない商品の選定。
+		・取扱商品から見る業種の傾向と今後のトレンド。
+		・目標が設定されている場合は現状とのギャップの確認とギャップを埋めるための提案を。
+		・インスタのアカウント設定がある場合はインスタもチェック。活用方法のアドバイスを下さい。",
+	'report_type' => "レポートはhtmlメールとして送付します。
+		htmlのみを出力してください。
+		読みやすさを重視し、口語体で作成してください。"
+];
+//$ai_setting_def["your_ask"]から空白、tabを削除,改行は残す
+$ai_setting_def["your_ask"] = str_replace([" ", "　","\t"], "", $ai_setting_def["your_ask"]);
+$ai_setting_def["your_ask"] = trim($ai_setting_def["your_ask"]);
+
+$ai_setting_def["report_type"] = str_replace([" ", "　","\t"], "", $ai_setting_def["report_type"]);
+$ai_setting_def["report_type"] = trim($ai_setting_def["report_type"]);
 
 
+if(count($ai_setting) > 0){
+	$ai_setting = $ai_setting[0];
+} else {
+	$ai_setting = $ai_setting_def;
+}
+log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 
 ?>
 <!DOCTYPE html>
@@ -179,6 +218,10 @@ if(count($business_info) === 0){
 							</select>
 						</div>
 						<div class="mb-3">
+							<label for='mail' class='form-label'>レポート送付先メールアドレス</label>
+							<input type='text' class='form-control' v-model='mail' id='mail'>
+						</div>
+						<div class="mb-3">
 							<label for="Product_categories" class="form-label">レポート作成依頼</label>
 							<textarea class="form-control" id="Product_categories" v-model="your_ask" rows="20"></textarea>
 						</div>
@@ -187,7 +230,7 @@ if(count($business_info) === 0){
 			</div>
 		</main>
 		<footer class='fixed-bottom ' style='background-color: #f5f5f5;'>
-			<div class='container' style='height: 100px;'>
+			<div class='container' style='height: 120px;'>
 				<div class="col-12 pt-3">
 					<div class="form-check">
 					  <input class="form-check-input" type="checkbox" v-model='save_setting' id="flexCheckDefault">
@@ -195,10 +238,13 @@ if(count($business_info) === 0){
 					    上記設定を保存してレポート作成
 					  </label>
 					</div>
-					<button type="button" class="btn btn-primary" @click="get_gemini_response" :disabled="loading">
-						<span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-						{{ loading ? '生成中...' : 'レポート生成' }}
-					</button>
+					<div class='d-flex'>
+						<button type="button" class="btn btn-primary me-3" @click="get_gemini_response" :disabled="loading">
+							<span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+							{{ loading ? '生成中...' : 'レポート生成' }}
+						</button>
+						<button type="button" class='btn btn-warning' @click='ai_setting_modosu'>初期値に戻す</button>
+					</div>
 				</div>
 			</div>
 		</footer>
@@ -219,13 +265,22 @@ if(count($business_info) === 0){
 		createApp({
 			setup(){
 				const your_bussiness = ref(<?php echo json_encode($business_info[0],JSON_UNESCAPED_UNICODE); ?>);
-				//const your_sales_data = ref(<?php echo json_encode($shouhin_rows,JSON_UNESCAPED_UNICODE); ?>);
+				
+				const ai_setting_def = <?php echo json_encode($ai_setting_def,JSON_UNESCAPED_UNICODE); ?>;
 
-				const ai_role = ref('データアナリスト')
-				const data_range = ref('今年の売上データをもとに')
-				const your_ask = ref(`今後の売上を増やすためのレポートを作成してください。同じようなイベント名は同イベントとして集計してください。\n分析のポイント/知りたいことを以下に羅列\n・出るべきイベント\n・地域、天気・気温との関連。\n・注力すべき商品群とそうでない商品の選定。\n・取扱商品から見る業種の傾向と今後のトレンド。\n・目標が設定されている場合は現状とのギャップの確認とギャップを埋めるための提案を。\n・インスタのアカウント設定がある場合はインスタもチェック。活用方法のアドバイスを下さい。\n
-				`);
-				const report_type = ref('レポートはhtmlメールとして送付します。\nhtmlのみを出力してください。\n読みやすさを重視し、口語体で作成してください。\n')
+				const ai_role = ref('<?php echo $ai_setting["ai_role"]; ?>')
+				const data_range = ref('<?php echo $ai_setting["data_range"]; ?>')
+				const your_ask = ref(`<?php echo $ai_setting["your_ask"]; ?>`);
+				const report_type = ref(`<?php echo $ai_setting["report_type"]; ?>`)
+
+				const ai_setting_modosu = () =>{
+					//ai_roleなどをデフォルトに戻す
+					ai_role.value = ai_setting_def.ai_role;
+					data_range.value = ai_setting_def.data_range;
+					your_ask.value = ai_setting_def.your_ask;
+					report_type.value = ai_setting_def.report_type;
+				}
+				const mail = ref('<?php echo $row[0]["mail"]; ?>')
 
 				const save_setting = ref(true)	//プロンプト・ビジネス情報の保存可否
 
@@ -247,6 +302,7 @@ if(count($business_info) === 0){
 						form.append('ai_role', ai_role.value);
 						form.append('your_ask', your_ask.value);
 						form.append('report_type', report_type.value);
+						form.append('mail', mail.value);
 						
 
 						const response = await axios.post('ajax_gemini_make_report.php', form, {headers: {'Content-Type': 'multipart/form-data'}});
@@ -318,6 +374,8 @@ if(count($business_info) === 0){
 					save_setting,
 					make_report,
 					data_range,
+					ai_setting_modosu,
+					mail,
 				};
 			}
 		}).mount('#app');
