@@ -81,8 +81,8 @@ $sql="SELECT
 	where uid=? and UriDate between ? and ?";
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-$stmt->bindValue(2, '2023-01-01', PDO::PARAM_STR);
-$stmt->bindValue(3, '2025-12-31', PDO::PARAM_STR);
+$stmt->bindValue(2, '2024-01-01', PDO::PARAM_STR);
+$stmt->bindValue(3, '2024-12-31', PDO::PARAM_STR);
 //$stmt->bindValue(2, date("Y-m-d"), PDO::PARAM_STR);
 $stmt->execute();
 $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
