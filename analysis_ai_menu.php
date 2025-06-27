@@ -77,7 +77,7 @@ if(count($business_info) === 0){
 		<a href="#" style='color:inherit;position:fixed;top:45px;right:5px;' onclick='help()'><i class="bi bi-question-circle logoff-color"></i></a>	
 	</header>
 	<div id='app'>
-		<main>
+		<main style='padding-bottom:200px;'>
 			<!--your_bussinessの入力フォーム-->
 			<div class="container">
 				<div class="accordion mt-3" id="accordionExample">
@@ -171,7 +171,7 @@ if(count($business_info) === 0){
 							<select class='form-select form-select-lg' v-model='data_range' id='data_range'>
 								<option value="">選択してください</option>
 								<option value="今年の売上データをもとに">今年の売上データ</option>
-								<option value="直近１２ヵ月の売上データをもとに">直近１２ヵ月の売上データ"></option>
+								<option value="直近１２ヵ月の売上データをもとに">直近１２ヵ月の売上データ</option>
 								<option value="過去５年の売上データをもとに">過去５年の売上データ</option>
 								<option value=""></option>
 								<option value=""></option>
@@ -223,7 +223,7 @@ if(count($business_info) === 0){
 
 				const ai_role = ref('データアナリスト')
 				const data_range = ref('今年の売上データをもとに')
-				const your_ask = ref(`今後の売上を増やすためのレポートを作成してください。同じようなイベント名は同イベントとして集計してください。\n分析のポイント/知りたいことを以下に羅列\n・出るべきイベント\n・地域、天気・気温との関連。\n・注力すべき商品群とそうでない商品の選定。\n・取扱商品から見る業種の傾向と今後のトレンド。\n
+				const your_ask = ref(`今後の売上を増やすためのレポートを作成してください。同じようなイベント名は同イベントとして集計してください。\n分析のポイント/知りたいことを以下に羅列\n・出るべきイベント\n・地域、天気・気温との関連。\n・注力すべき商品群とそうでない商品の選定。\n・取扱商品から見る業種の傾向と今後のトレンド。\n・目標が設定されている場合は現状とのギャップの確認とギャップを埋めるための提案を。\n・インスタのアカウント設定がある場合はインスタもチェック。活用方法のアドバイスを下さい。\n
 				`);
 				const report_type = ref('レポートはhtmlメールとして送付します。\nhtmlのみを出力してください。\n読みやすさを重視し、口語体で作成してください。\n')
 
