@@ -55,23 +55,45 @@ if($rtn !== true){
 		,TokuisakiNM as イベント以外の売上先
 		,ShouhinNM as 商品名
 		,sum(su) as 合計売上個数
-		--,avg(tanka) as 平均売上単価
+		,avg(tanka) as 平均売上単価
 		,sum(UriageKin) as 合計売上金額
-		--,avg(genka_tanka) as 平均原価単価
+		,avg(genka_tanka) as 平均原価単価
 		,sum(genka) as 合計売上原価
 		,IFNULL(bunrui1,'未設定') as 商品分類大
 		,IFNULL(bunrui2,'未設定') as 商品分類中
 		,IFNULL(bunrui3,'未設定') as 商品分類小
 		,address as イベント開催住所
 		, (SELECT weather FROM UriageMeisai WHERE UriDate = U.UriDate GROUP BY weather ORDER BY COUNT(*) DESC LIMIT 1) AS 売上時の天気
-		--, (SELECT weather_discription FROM UriageMeisai WHERE UriDate = U.UriDate GROUP BY weather_discription ORDER BY COUNT(*) DESC LIMIT 1) AS 売上時の天気詳細
+		, (SELECT weather_discription FROM UriageMeisai WHERE UriDate = U.UriDate GROUP BY weather_discription ORDER BY COUNT(*) DESC LIMIT 1) AS 売上時の天気詳細
 		,CAST(ROUND(avg(temp),1) as CHAR) as 売上時の平均気温
-		--,CAST(ROUND(avg(feels_like),1) as CHAR) as 売上時の平均体感温度
+		,CAST(ROUND(avg(feels_like),1) as CHAR) as 売上時の平均体感温度
 		from UriageMeisai U
 		where uid=:uid and UriDate between :from_d and :to_d
 		group by UriDate,Event,TokuisakiNM,ShouhinNM,bunrui1,bunrui2,bunrui3,address
 		order by UriDate desc
 	";
+
+	$sql = "SELECT
+	DATE_FORMAT(UriDate, '%Y') as 売上計上年
+	,DATE_FORMAT(UriDate, '%Y-%m') as 売上計上年月
+	,UriDate as 売上計上年月日
+	,Event as 売上計上イベント名
+	,TokuisakiNM as イベント以外の売上先
+	,ShouhinNM as 商品名
+	,sum(su) as 合計売上個数
+	,sum(UriageKin) as 合計売上金額
+	,sum(genka) as 合計売上原価
+	,IFNULL(bunrui1,'未設定') as 商品分類大
+	,IFNULL(bunrui2,'未設定') as 商品分類中
+	,IFNULL(bunrui3,'未設定') as 商品分類小
+	,address as イベント開催住所
+	, (SELECT weather FROM UriageMeisai WHERE UriDate = U.UriDate GROUP BY weather ORDER BY COUNT(*) DESC LIMIT 1) AS 売上時の天気
+	,CAST(ROUND(avg(temp),1) as CHAR) as 売上時の平均気温
+	from UriageMeisai U
+	where uid=:uid and UriDate between :from_d and :to_d
+	group by UriDate,Event,TokuisakiNM,ShouhinNM,bunrui1,bunrui2,bunrui3,address
+	order by UriDate desc
+";
 
 	
 	$params["uid"]=$_SESSION['user_id'];
