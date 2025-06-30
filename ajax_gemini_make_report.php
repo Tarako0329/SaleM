@@ -151,8 +151,10 @@ if($rtn !== true){
 		$report_file = $_SESSION["user_id"]."_gemini_report.html";
 		file_put_contents($report_file, $msg["result"]);
 		send_htmlmail($_POST["mail"],"report",$msg["result"]);
+		if(EXEC_MODE==="Test"){
+			send_htmlmail($_POST["mail"],"user_input",$user_input);
+		}
 	}
-	
 }
 //log_writer2("\$msg",$msg,"lv3");
 //$token = csrf_create();
