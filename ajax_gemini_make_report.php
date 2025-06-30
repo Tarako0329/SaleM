@@ -20,8 +20,8 @@ if($rtn !== true){
 	//売上明細データを取得
 	$sql="SELECT 
 		DATE_FORMAT(UriDate, '%Y') as 売上計上年
-		,DATE_FORMAT(UriDate, '%Y-%m') as 売上計上月
-		,UriDate as 売上計上日
+		,DATE_FORMAT(UriDate, '%Y-%m') as 売上計上年月
+		,UriDate as 売上計上年月日
 		,Event as 売上計上イベント名
 		,TokuisakiNM as イベント以外の売上先
 		,UriageNO as 売上番号
@@ -49,8 +49,8 @@ if($rtn !== true){
 	//気温は平均。天気は最大カウントを取る天気
 	$sql_sum = "SELECT
 		DATE_FORMAT(UriDate, '%Y') as 売上計上年
-		,DATE_FORMAT(UriDate, '%Y-%m') as 売上計上月
-		,UriDate as 売上計上日
+		,DATE_FORMAT(UriDate, '%Y-%m') as 売上計上年月
+		,UriDate as 売上計上年月日
 		,Event as 売上計上イベント名
 		,TokuisakiNM as イベント以外の売上先
 		,ShouhinNM as 商品名
@@ -100,10 +100,24 @@ if($rtn !== true){
 
 	$stmt->execute();
 	$shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-	log_writer2("\$shouhin_rows",$shouhin_rows,"lv3");
+	//log_writer2("\$shouhin_rows",$shouhin_rows,"lv3");
 
 	//$user_inputに売上明細をJSONで追記
-	$user_input .= "\n売上明細は次の通り。\n" . json_encode($shouhin_rows, JSON_UNESCAPED_UNICODE);
+	//$user_input .= "\n売上明細は次の通り。\n" . json_encode($shouhin_rows, JSON_UNESCAPED_UNICODE);
+
+	//$shouhin_rowsをヘッダー付きのCSVに変換し$CSVに格納
+	$CSV = "";
+	if (!empty($shouhin_rows)) {
+		// ヘッダー行を追加
+		$CSV .= implode(",", array_keys($shouhin_rows[0])) . "\n";
+		// データ行を追加
+		foreach ($shouhin_rows as $row) {
+			$CSV .= implode(",", array_values($row)) . "\n";
+		}
+	}
+	$user_input .= "\n売上明細をCSVで提供します。\n\n" . $CSV;
+	
+
 	
 	if($_POST["save_setting"]==="true"){
 		//ajax_delins_business_info.phpに保存
