@@ -37,8 +37,8 @@ if($rtn !== true){
 		,address as イベント開催住所
 		,weather as 売上時の天気
 		,weather_discription as 売上時の天気詳細
-		,ROUND(temp,1) as 売上時の気温
-		,ROUND(feels_like,1) as 売上時の体感温度
+		,CAST(ROUND(temp,1) as CHAR) as 売上時の気温
+		,CAST(ROUND(feels_like,1) as CHAR) as 売上時の体感温度
 		from UriageMeisai 
 		where uid=:uid and UriDate between :from_d and :to_d
 		order by UriDate desc,CONCAT(Event,TokuisakiNM) desc,UriageNO,ShouhinNM
@@ -65,8 +65,8 @@ if($rtn !== true){
 		,address as イベント開催住所
 		, (SELECT weather FROM UriageMeisai WHERE UriDate = U.UriDate GROUP BY weather ORDER BY COUNT(*) DESC LIMIT 1) AS 売上時の天気
 		, (SELECT weather_discription FROM UriageMeisai WHERE UriDate = U.UriDate GROUP BY weather_discription ORDER BY COUNT(*) DESC LIMIT 1) AS 売上時の天気詳細
-		,ROUND(avg(temp),1) as 売上時の平均気温
-		,ROUND(avg(feels_like),1) as 売上時の平均体感温度
+		,CAST(ROUND(avg(temp),1) as CHAR) as 売上時の平均気温
+		,CAST(ROUND(avg(feels_like),1) as CHAR) as 売上時の平均体感温度
 		from UriageMeisai U
 		where uid=:uid and UriDate between :from_d and :to_d
 		group by UriDate,Event,TokuisakiNM,ShouhinNM,bunrui1,bunrui2,bunrui3,address
