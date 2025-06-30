@@ -100,6 +100,7 @@ if($rtn !== true){
 
 	$stmt->execute();
 	$shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	log_writer2("\$shouhin_rows",$shouhin_rows,"lv3");
 
 	//$user_inputに売上明細をJSONで追記
 	$user_input .= "\n売上明細は次の通り。\n" . json_encode($shouhin_rows, JSON_UNESCAPED_UNICODE);
@@ -150,7 +151,7 @@ if($rtn !== true){
 	if($answer_type==="html"){
 		$report_file = $_SESSION["user_id"]."_gemini_report.html";
 		file_put_contents($report_file, $msg["result"]);
-		send_htmlmail($_POST["mail"],"report",$msg["result"]);
+		//send_htmlmail($_POST["mail"],"report",$msg["result"]);
 		if(EXEC_MODE==="Test"){
 			send_htmlmail($_POST["mail"],"user_input",$user_input);
 		}
