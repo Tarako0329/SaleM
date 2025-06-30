@@ -37,8 +37,8 @@ if($rtn !== true){
 		,address as イベント開催住所
 		,weather as 売上時の天気
 		,weather_discription as 売上時の天気詳細
-		,temp as 売上時の気温
-		,feels_like as 売上時の体感温度
+		,ROUND(temp,1) as 売上時の気温
+		,ROUND(feels_like,1) as 売上時の体感温度
 		from UriageMeisai 
 		where uid=:uid and UriDate between :from_d and :to_d
 		order by UriDate desc,CONCAT(Event,TokuisakiNM) desc,UriageNO,ShouhinNM
