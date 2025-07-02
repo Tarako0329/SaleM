@@ -17,7 +17,7 @@ if($rtn !== true){
 	$answer_type = $_POST["answer_type"] ?? 'plain';   //json or html or plain(そのまま)
 	$subject = $_POST["subject"] ?? ''; //会話のテーマ($_SESSION[$subject]に会話履歴を保存)
 
-	
+	$params['uid'] = $_SESSION['user_id'];
 
 	if($_POST["data_range"]==="過去５年の売上データをもとに"){
 		$sqlstr = $sql_sum;
