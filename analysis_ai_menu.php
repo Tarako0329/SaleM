@@ -83,7 +83,9 @@ $ai_setting_def = [
 	'report_type' => "何らかのフレームワークを使う。
 		htmlのみを出力。
 		レスポンシブデザインを採用。
-		読みやすさを重視し、口語体で作成。"
+		読みやすさを重視し、口語体で作成。
+		金額はカンマ区切り。
+		小数第一位まで"
 ];
 //$ai_setting_def["your_ask"]から空白、tabを削除,改行は残す
 $ai_setting_def["your_ask"] = str_replace([" ", "　","\t"], "", $ai_setting_def["your_ask"]);
