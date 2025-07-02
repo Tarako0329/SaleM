@@ -296,6 +296,19 @@ foreach ($grouped_temp_sales as $temp_zone => $products) {
 
 
 //すべての統計データをまとめる
+$all_stats = [
+    '月ごとの売上・粗利の集計' => $monthly_sales,
+    '商品分類ごとの売上・粗利の集計' => $category_sales,
+    'ABC分析' => $abc_data,
+    'イベントごとの売上・粗利の集計（トップ10）' => $event_sales,
+    'イベントごとの売上・粗利の集計（ワースト5）' => $event_sales_worst,
+    '商品ごとの売上・粗利の集計（トップ10）' => $product_sales,
+    '商品ごとの売上・粗利の集計（ワースト10）' => $product_sales_worst,
+    'イベント開催住所ごとの売上・粗利の集計（トップ10）' => $address_sales,
+    'イベント開催住所ごとの売上・粗利の集計（ワースト5）' => $address_sales_worst,
+    '天気ごとの売上・粗利の集計' => $weather_sales,
+    '気温帯ごとの商品別売上・粗利の集計（トップ5）' => $temp_sales_top5,
+];
 
 
 
