@@ -1,7 +1,7 @@
 <?php
 require "php_header.php";
 
-/*売上明細を取得し、AIで売上分析するために必要な統計データを何種類か表で作成する。
+/*売上明細を取得し、AIで売上分析するために必要な統計データをウェブサイトに表形式で表示する。
 売上明細を取得するSQL文は
   "SELECT 
 		DATE_FORMAT(UriDate, '%Y') as 売上計上年
@@ -59,138 +59,89 @@ $stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
 $stmt->execute();
 $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// $shouhin_rowsをヘッダー付きのCSVに変換し$CSVに格納
-$CSV = "";
-if (!empty($shouhin_rows)) {
-    // ヘッダー行を追加
-    $CSV .= implode(",", array_keys($shouhin_rows[0])) . "<br>";
-    // データ行を追加
-    foreach ($shouhin_rows as $row) {
-        $CSV .= implode(",", array_values($row)) . "<br>";
-    }
-}
+// 統計データの生成
+$total_sales = 0;
+$total_cost = 0;
+$sales_by_month = [];
+$sales_by_event = [];
+$sales_by_product = [];
+$sales_by_weather = [];
 
-// CSVデータを表示
-echo $CSV;
-
-//以下、統計データ作成
-// 1. 月別売上集計
-$monthly_sales = [];
 foreach ($shouhin_rows as $row) {
-    $month = substr($row['売上計上年月'], 0, 7);
-    if (!isset($monthly_sales[$month])) {
-        $monthly_sales[$month] = ['売上個数' => 0, '売上金額' => 0, '売上原価' => 0];
-    }
-    $monthly_sales[$month]['売上個数'] += $row['売上個数'];
-    $monthly_sales[$month]['売上金額'] += $row['売上金額'];
-    $monthly_sales[$month]['売上原価'] += $row['売上原価'];
-}
-echo "<br><br>月別売上集計:<br>";
-echo "年月,売上個数,売上金額,売上原価<br>";
-foreach ($monthly_sales as $month => $data) {
-    echo "{$month},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}<br>";
-}
+    $total_sales += $row['売上金額'];
+    $total_cost += $row['売上原価'];
 
-// 2. 商品別売上集計
-$product_sales = [];
-foreach ($shouhin_rows as $row) {
+    // 月ごとの売上
+    $month = $row['売上計上年月'];
+    $sales_by_month[$month] = ($sales_by_month[$month] ?? 0) + $row['売上金額'];
+
+    // イベントごとの売上
+    $event = !empty($row['売上計上イベント名']) ? $row['売上計上イベント名'] : $row['イベント以外の売上先'];
+    $sales_by_event[$event] = ($sales_by_event[$event] ?? 0) + $row['売上金額'];
+
+    // 商品ごとの売上
     $product = $row['商品名'];
-    if (!isset($product_sales[$product])) {
-        $product_sales[$product] = ['売上個数' => 0, '売上金額' => 0, '売上原価' => 0];
-    }
-    $product_sales[$product]['売上個数'] += $row['売上個数'];
-    $product_sales[$product]['売上金額'] += $row['売上金額'];
-    $product_sales[$product]['売上原価'] += $row['売上原価'];
-}
-echo "<br><br>商品別売上集計:<br>";
-echo "商品名,売上個数,売上金額,売上原価<br>";
-foreach ($product_sales as $product => $data) {
-    echo "{$product},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}<br>";  
+    $sales_by_product[$product] = ($sales_by_product[$product] ?? 0) + $row['売上金額'];
 
-}
-
-// 3. イベント別売上集計
-$event_sales = [];
-foreach ($shouhin_rows as $row) {
-    $event = $row['売上計上イベント名'];
-    if (empty($event)) {
-        $event = $row['イベント以外の売上先'];
-    }
-    if (!isset($event_sales[$event])) {
-        $event_sales[$event] = ['売上個数' => 0, '売上金額' => 0, '売上原価' => 0];
-    }
-    $event_sales[$event]['売上個数'] += $row['売上個数'];
-    $event_sales[$event]['売上金額'] += $row['売上金額'];
-    $event_sales[$event]['売上原価'] += $row['売上原価'];
-}
-echo "<br><br>イベント別売上集計:<br>";
-echo "イベント名,売上個数,売上金額,売上原価<br>";
-foreach ($event_sales as $event => $data) {
-    echo "{$event},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}<br>";
-}
-
-// 4. 商品分類別売上集計
-$category_sales = [];
-foreach ($shouhin_rows as $row) {
-    $category = $row['商品分類'];
-    if (!isset($category_sales[$category])) {
-        $category_sales[$category] = ['売上個数' => 0, '売上金額' => 0, '売上原価' => 0];
-    }
-    $category_sales[$category]['売上個数'] += $row['売上個数'];
-    $category_sales[$category]['売上金額'] += $row['売上金額'];
-    $category_sales[$category]['売上原価'] += $row['売上原価'];
-}
-echo "<br><br>商品分類別売上集計:<br>";
-echo "商品分類,売上個数,売上金額,売上原価<br>";
-foreach ($category_sales as $category => $data) {
-    echo "{$category},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}<br>";
-}
-
-// 5. 天気別売上集計
-$weather_sales = [];
-foreach ($shouhin_rows as $row) {
+    // 天気ごとの売上
     $weather = $row['売上時の天気'];
-    if (!isset($weather_sales[$weather])) {
-        $weather_sales[$weather] = ['売上個数' => 0, '売上金額' => 0, '売上原価' => 0];
-    }
-    $weather_sales[$weather]['売上個数'] += $row['売上個数'];
-    $weather_sales[$weather]['売上金額'] += $row['売上金額'];
-    $weather_sales[$weather]['売上原価'] += $row['売上原価'];
-}
-echo "<br><br>天気別売上集計:<br>";
-echo "天気,売上個数,売上金額,売上原価<br>";
-foreach ($weather_sales as $weather => $data) {
-    echo "{$weather},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}<br>";
+    $sales_by_weather[$weather] = ($sales_by_weather[$weather] ?? 0) + $row['売上金額'];
 }
 
-// 6. 気温別売上集計 (気温を範囲で区切る)
-$temperature_sales = [];
+// 利益の計算
+$profit = $total_sales - $total_cost;
+
+// HTML出力
+echo "<h1>売上分析レポート</h1>";
+echo "<h2>期間: " . htmlspecialchars($from_d) . " から " . htmlspecialchars($to_d) . "</h2>";
+
+echo "<h3>概要</h3>";
+echo "<p><strong>総売上金額:</strong> " . number_format($total_sales) . " 円</p>";
+echo "<p><strong>総売上原価:</strong> " . number_format($total_cost) . " 円</p>";
+echo "<p><strong>総利益:</strong> " . number_format($profit) . " 円</p>";
+
+echo "<h3>月ごとの売上</h3>";
+echo "<table border='1'><tr><th>年月</th><th>売上金額</th></tr>";
+foreach ($sales_by_month as $month => $sales) {
+    echo "<tr><td>" . htmlspecialchars($month) . "</td><td>" . number_format($sales) . " 円</td></tr>";
+}
+echo "</table>";
+
+echo "<h3>イベントごとの売上</h3>";
+echo "<table border='1'><tr><th>イベント名/売上先</th><th>売上金額</th></tr>";
+foreach ($sales_by_event as $event => $sales) {
+    echo "<tr><td>" . htmlspecialchars($event) . "</td><td>" . number_format($sales) . " 円</td></tr>";
+}
+echo "</table>";
+
+echo "<h3>商品ごとの売上</h3>";
+echo "<table border='1'><tr><th>商品名</th><th>売上金額</th></tr>";
+foreach ($sales_by_product as $product => $sales) {
+    echo "<tr><td>" . htmlspecialchars($product) . "</td><td>" . number_format($sales) . " 円</td></tr>";
+}
+echo "</table>";
+
+echo "<h3>天気ごとの売上</h3>";
+echo "<table border='1'><tr><th>天気</th><th>売上金額</th></tr>";
+foreach ($sales_by_weather as $weather => $sales) {
+    echo "<tr><td>" . htmlspecialchars($weather) . "</td><td>" . number_format($sales) . " 円</td></tr>";
+}
+echo "</table>";
+
+echo "<h3>詳細データ</h3>";
+echo "<table border='1'><tr>";
+foreach (array_keys($shouhin_rows[0]) as $header) {
+    echo "<th>" . htmlspecialchars($header) . "</th>";
+}
+echo "</tr>";
 foreach ($shouhin_rows as $row) {
-    $temp = (float)$row['売上時の気温'];
-    $temp_range = '';
-    if ($temp < 0) {
-        $temp_range = '0度未満';
-    } elseif ($temp >= 0 && $temp < 10) {
-        $temp_range = '0-9度';
-    } elseif ($temp >= 10 && $temp < 20) {
-        $temp_range = '10-19度';
-    } elseif ($temp >= 20 && $temp < 30) {
-        $temp_range = '20-29度';
-    } else {
-        $temp_range = '30度以上';
+    echo "<tr>";
+    foreach ($row as $value) {
+        echo "<td>" . htmlspecialchars($value) . "</td>";
     }
-
-    if (!isset($temperature_sales[$temp_range])) {
-        $temperature_sales[$temp_range] = ['売上個数' => 0, '売上金額' => 0, '売上原価' => 0];
-    }
-    $temperature_sales[$temp_range]['売上個数'] += $row['売上個数'];
-    $temperature_sales[$temp_range]['売上金額'] += $row['売上金額'];
-    $temperature_sales[$temp_range]['売上原価'] += $row['売上原価'];
+    echo "</tr>";
 }
-echo "<br><br>気温別売上集計:<br>";
-echo "気温範囲,売上個数,売上金額,売上原価<br>";
-foreach ($temperature_sales as $range => $data) {
-    echo "{$range},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}<br>";
-}
+echo "</table>";
+echo "<p>データは以上です。</p>";
 
 ?>
