@@ -16,87 +16,8 @@ if($rtn !== true){
 	$type = $_POST["type"] ?? 'kaiwa';   //連続会話(kaiwa) or 一問一答(one)
 	$answer_type = $_POST["answer_type"] ?? 'plain';   //json or html or plain(そのまま)
 	$subject = $_POST["subject"] ?? ''; //会話のテーマ($_SESSION[$subject]に会話履歴を保存)
-	
-	//売上明細データを取得
-	$sql="SELECT 
-		DATE_FORMAT(UriDate, '%Y') as 売上計上年
-		,DATE_FORMAT(UriDate, '%Y-%m') as 売上計上年月
-		,UriDate as 売上計上年月日
-		,Event as 売上計上イベント名
-		,TokuisakiNM as イベント以外の売上先
-		,UriageNO as 売上番号
-		,ShouhinNM as 商品名
-		,su as 売上個数
-		,tanka as 売上単価
-		,UriageKin as 売上金額
-		,genka_tanka as 原価単価
-		,genka as 売上原価
-		,IFNULL(bunrui1,'未設定') as 商品分類大
-		,IFNULL(bunrui2,'未設定') as 商品分類中
-		,IFNULL(bunrui3,'未設定') as 商品分類小
-		,address as イベント開催住所
-		,weather as 売上時の天気
-		,weather_discription as 売上時の天気詳細
-		,CAST(ROUND(temp,1) as CHAR) as 売上時の気温
-		,CAST(ROUND(feels_like,1) as CHAR) as 売上時の体感温度
-		from UriageMeisai 
-		where uid=:uid and UriDate between :from_d and :to_d
-		order by UriDate desc,CONCAT(Event,TokuisakiNM) desc,UriageNO,ShouhinNM
-	";
-	
-
-	//UriageMeisaiから売上計上日、イベント、得意先、商品を集計キーとした売上集計データを取得するSQL文
-	//気温は平均。天気は最大カウントを取る天気
-	$sql = "SELECT
-		DATE_FORMAT(UriDate, '%Y') as 売上計上年
-		,DATE_FORMAT(UriDate, '%Y-%m') as 売上計上年月
-		,UriDate as 売上計上年月日
-		,Event as 売上計上イベント名
-		,TokuisakiNM as イベント以外の売上先
-		,ShouhinNM as 商品名
-		,sum(su) as 合計売上個数
-		,avg(tanka) as 平均売上単価
-		,sum(UriageKin) as 合計売上金額
-		,avg(genka_tanka) as 平均原価単価
-		,sum(genka) as 合計売上原価
-		,IFNULL(bunrui1,'未設定') as 商品分類大
-		,IFNULL(bunrui2,'未設定') as 商品分類中
-		,IFNULL(bunrui3,'未設定') as 商品分類小
-		,address as イベント開催住所
-		, (SELECT weather FROM UriageMeisai WHERE UriDate = U.UriDate GROUP BY weather ORDER BY COUNT(*) DESC LIMIT 1) AS 売上時の天気
-		, (SELECT weather_discription FROM UriageMeisai WHERE UriDate = U.UriDate GROUP BY weather_discription ORDER BY COUNT(*) DESC LIMIT 1) AS 売上時の天気詳細
-		,CAST(ROUND(avg(temp),1) as CHAR) as 売上時の平均気温
-		,CAST(ROUND(avg(feels_like),1) as CHAR) as 売上時の平均体感温度
-		from UriageMeisai U
-		where uid=:uid and UriDate between :from_d and :to_d
-		group by UriDate,Event,TokuisakiNM,ShouhinNM,bunrui1,bunrui2,bunrui3,address
-		order by UriDate desc
-	";
-
-	$sql = "SELECT
-	DATE_FORMAT(UriDate, '%Y') as 売上計上年
-	,DATE_FORMAT(UriDate, '%Y-%m') as 売上計上年月
-	,UriDate as 売上計上年月日
-	,Event as 売上計上イベント名
-	,TokuisakiNM as イベント以外の売上先
-	,ShouhinNM as 商品名
-	,sum(su) as 合計売上個数
-	,sum(UriageKin) as 合計売上金額
-	,sum(genka) as 合計売上原価
-	,IFNULL(bunrui1,'未設定') as 商品分類大
-	,IFNULL(bunrui2,'未設定') as 商品分類中
-	,IFNULL(bunrui3,'未設定') as 商品分類小
-	,address as イベント開催住所
-	, (SELECT weather FROM UriageMeisai WHERE UriDate = U.UriDate GROUP BY weather ORDER BY COUNT(*) DESC LIMIT 1) AS 売上時の天気
-	,CAST(ROUND(avg(temp),1) as CHAR) as 売上時の平均気温
-	from UriageMeisai U
-	where uid=:uid and UriDate between :from_d and :to_d
-	group by UriDate,Event,TokuisakiNM,ShouhinNM,bunrui1,bunrui2,bunrui3,address
-	order by UriDate desc
-";
 
 	
-	$params["uid"]=$_SESSION['user_id'];
 
 	if($_POST["data_range"]==="過去５年の売上データをもとに"){
 		$sqlstr = $sql_sum;
@@ -111,33 +32,14 @@ if($rtn !== true){
 		$params['from_d'] = date('Y-01-01');
 		$params['to_d'] = date('Y-12-31');
 	}
-	//$sqlstrから改行を削除
-	$sqlstr = str_replace(array("\r\n", "\r", "\n"), ' ', $sqlstr);
 
-	$stmt = $pdo_h->prepare($sqlstr);
-	$stmt->bindValue("uid", $params['uid'], PDO::PARAM_INT);
-	$stmt->bindValue("from_d", $params['from_d'], PDO::PARAM_STR);
-	$stmt->bindValue("to_d", $params['to_d'], PDO::PARAM_STR);
-	$sqllog .= rtn_sqllog($sqlstr,$params);
+	//Feed_Gemini_Report.phpからデータを取得
+	$url = ROOT_URL."Feed_Gemini_Report.php?uid=" . $_SESSION['user_id'] . "&from_d=" . $params['from_d'] . "&to_d=" . $params['to_d'];
+	$json = file_get_contents($url);
+	$data = json_decode($json, true);
 
-	$stmt->execute();
-	$shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-	//log_writer2("\$shouhin_rows",$shouhin_rows,"lv3");
 
-	//$user_inputに売上明細をJSONで追記
-	//$user_input .= "\n売上明細は次の通り。\n" . json_encode($shouhin_rows, JSON_UNESCAPED_UNICODE);
-
-	//$shouhin_rowsをヘッダー付きのCSVに変換し$CSVに格納
-	$CSV = "";
-	if (!empty($shouhin_rows)) {
-		// ヘッダー行を追加
-		$CSV .= implode(",", array_keys($shouhin_rows[0])) . "\n";
-		// データ行を追加
-		foreach ($shouhin_rows as $row) {
-			$CSV .= implode(",", array_values($row)) . "\n";
-		}
-	}
-	$user_input .= "\n売上明細をCSVで提供します。\n\n" . $CSV;
+	$user_input .= "\売上分析用データをJSONで提供します。\n\n" . $json;
 	
 
 	
