@@ -113,18 +113,22 @@ foreach ($abc_data as $key => $row) {
         $abc_data[$key]['ABCランク'] = 'C';
     }
 }
+//$abc_dataの累積構成比を文字列にキャスト
+foreach ($abc_data as $key => $row) {
+    $abc_data[$key]['累積構成比'] = (string)$row['累積構成比'];
+}
 
 
 //イベントごとの平均売上金額トップ１０を取得。順位もつける
 $sql = "SELECT 
 	ROW_NUMBER() OVER (ORDER BY sum(UriageKin) DESC) as 順位
 	,Event as イベント名
-	,avg(UriageKin) as 売上金額
-	,avg(genka) as 売上原価
+	,CAST(ROUND(avg(UriageKin), 1) as CHAR) as 売上金額
+	,CAST(ROUND(avg(genka), 1) as CHAR) as 売上原価
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
 	group by イベント名
-	order by 売上金額 desc
+	order by avg(UriageKin) desc
 	limit 10";
 
 $stmt = $pdo_h->prepare($sql);
@@ -139,12 +143,12 @@ $event_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT 
 	ROW_NUMBER() OVER (ORDER BY sum(UriageKin) ASC) as 順位
 	,Event as イベント名
-	,avg(UriageKin) as 売上金額
-	,avg(genka) as 売上原価
+	,CAST(ROUND(avg(UriageKin), 1) as CHAR) as 売上金額
+	,CAST(ROUND(avg(genka), 1) as CHAR) as 売上原価
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
 	group by イベント名
-	order by 売上金額 asc
+	order by avg(UriageKin) asc
 	limit 5";
 
 $stmt = $pdo_h->prepare($sql);
@@ -198,12 +202,12 @@ $product_sales_worst = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT 
 	ROW_NUMBER() OVER (ORDER BY sum(UriageKin) DESC) as 順位
 	,address as イベント開催住所
-	,avg(UriageKin) as 売上金額
-	,avg(genka) as 売上原価
+	,CAST(ROUND(avg(UriageKin), 1) as CHAR) as 売上金額
+	,CAST(ROUND(avg(genka), 1) as CHAR) as 売上原価
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d and address<>''
 	group by イベント開催住所
-	order by 売上金額 desc
+	order by avg(UriageKin) desc
 	limit 10";
 
 $stmt = $pdo_h->prepare($sql);
@@ -217,12 +221,12 @@ $address_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT 
 	ROW_NUMBER() OVER (ORDER BY sum(UriageKin) ASC) as 順位
 	,address as イベント開催住所
-	,avg(UriageKin) as 売上金額
-	,avg(genka) as 売上原価
+	,CAST(ROUND(avg(UriageKin), 1) as CHAR) as 売上金額
+	,CAST(ROUND(avg(genka), 1) as CHAR) as 売上原価
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d and address<>''
 	group by イベント開催住所
-	order by 売上金額 asc
+	order by avg(UriageKin) asc
 	limit 5";
 
 $stmt = $pdo_h->prepare($sql);
@@ -237,8 +241,8 @@ $address_sales_worst = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT
 	ROW_NUMBER() OVER (ORDER BY sum(UriageKin) DESC) as 順位
 	,CASE WHEN weather = '' THEN '未計測' ELSE weather END as 天気
-	,avg(UriageKin) as 売上金額
-	,avg(genka) as 売上原価
+	,CAST(ROUND(avg(UriageKin), 1) as CHAR) as 売上金額
+	,CAST(ROUND(avg(genka), 1) as CHAR) as 売上原価
 	from UriageMeisai
 	where uid=:uid and UriDate between :from_d and :to_d
 	group by 天気
@@ -247,7 +251,7 @@ $sql = "SELECT
 			WHEN weather = '' THEN 1
 			ELSE 0
 		END,
-		売上金額 desc";
+		avg(UriageKin) desc";
 
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue("uid", $uid, PDO::PARAM_INT);
