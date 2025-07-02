@@ -115,12 +115,12 @@ foreach ($abc_data as $key => $row) {
 }
 
 
-//イベントごとの売上・粗利の集計。売上金額トップ１０件降順でソート。順位もつける
+//イベントごとの平均売上金額トップ１０を取得。順位もつける
 $sql = "SELECT 
 	ROW_NUMBER() OVER (ORDER BY sum(UriageKin) DESC) as 順位
 	,Event as イベント名
-	,sum(UriageKin) as 売上金額
-	,sum(genka) as 売上原価
+	,avg(UriageKin) as 売上金額
+	,avg(genka) as 売上原価
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
 	group by イベント名
@@ -134,12 +134,13 @@ $stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
 $stmt->execute();
 $event_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-//イベントごとの売上・粗利の集計。売上金額ワースト５件。順位もつける
+
+//イベントごとの平均売上金額ワースト５件。順位もつける
 $sql = "SELECT 
 	ROW_NUMBER() OVER (ORDER BY sum(UriageKin) ASC) as 順位
 	,Event as イベント名
-	,sum(UriageKin) as 売上金額
-	,sum(genka) as 売上原価
+	,avg(UriageKin) as 売上金額
+	,avg(genka) as 売上原価
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
 	group by イベント名
@@ -193,12 +194,12 @@ $stmt->execute();
 $product_sales_worst = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
-//イベント開催住所ごとの売上・粗利の集計。売上金額を降順でソート。トップ１０件昇順でソート。順位もつける
+//イベント開催住所ごとの平均売上金額を降順でソート。トップ１０件昇順でソート。順位もつける
 $sql = "SELECT 
 	ROW_NUMBER() OVER (ORDER BY sum(UriageKin) DESC) as 順位
 	,address as イベント開催住所
-	,sum(UriageKin) as 売上金額
-	,sum(genka) as 売上原価
+	,avg(UriageKin) as 売上金額
+	,avg(genka) as 売上原価
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d and address<>''
 	group by イベント開催住所
@@ -212,12 +213,12 @@ $stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
 $stmt->execute();
 $address_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-//イベント開催住所ごとの売上・粗利の集計。売上金額ワースト５件。順位もつける。
+//イベント開催住所ごとの平均売上金額ワースト５件。順位もつける。
 $sql = "SELECT 
 	ROW_NUMBER() OVER (ORDER BY sum(UriageKin) ASC) as 順位
 	,address as イベント開催住所
-	,sum(UriageKin) as 売上金額
-	,sum(genka) as 売上原価
+	,avg(UriageKin) as 売上金額
+	,avg(genka) as 売上原価
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d and address<>''
 	group by イベント開催住所
@@ -232,12 +233,12 @@ $stmt->execute();
 $address_sales_worst = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
-//天気ごとの売上・粗利の集計。売上金額を降順でソート。weatherが空白の場合は"未計測"と表示し最後尾に表示
+//天気ごとの平均売上金額を降順でソート。weatherが空白の場合は"未計測"と表示し最後尾に表示
 $sql = "SELECT
 	ROW_NUMBER() OVER (ORDER BY sum(UriageKin) DESC) as 順位
 	,CASE WHEN weather = '' THEN '未計測' ELSE weather END as 天気
-	,sum(UriageKin) as 売上金額
-	,sum(genka) as 売上原価
+	,avg(UriageKin) as 売上金額
+	,avg(genka) as 売上原価
 	from UriageMeisai
 	where uid=:uid and UriDate between :from_d and :to_d
 	group by 天気
@@ -297,17 +298,17 @@ foreach ($grouped_temp_sales as $temp_zone => $products) {
 
 //すべての統計データをまとめる
 $all_stats = [
-    '月ごとの売上・粗利の集計' => $monthly_sales,
-    '商品分類ごとの売上・粗利の集計' => $category_sales,
-    'ABC分析' => $abc_data,
-    'イベントごとの売上・粗利の集計（トップ10）' => $event_sales,
-    'イベントごとの売上・粗利の集計（ワースト5）' => $event_sales_worst,
-    '商品ごとの売上・粗利の集計（トップ10）' => $product_sales,
-    '商品ごとの売上・粗利の集計（ワースト10）' => $product_sales_worst,
-    'イベント開催住所ごとの売上・粗利の集計（トップ10）' => $address_sales,
-    'イベント開催住所ごとの売上・粗利の集計（ワースト5）' => $address_sales_worst,
-    '天気ごとの売上・粗利の集計' => $weather_sales,
-    '気温帯ごとの商品別売上・粗利の集計（トップ5）' => $temp_sales_top5,
+    '月ごとの売上データ' => $monthly_sales,
+    '商品分類ごとの売上データ' => $category_sales,
+    'ABC分析データ' => $abc_data,
+    'イベント別平均売上トップ10' => $event_sales,
+    'イベント別平均売上ワースト5' => $event_sales_worst,
+    '商品別売上トップ10' => $product_sales,
+    '商品別売上ワースト10' => $product_sales_worst,
+    'イベント開催住所別平均売上トップ10' => $address_sales,
+    'イベント開催住所別平均売上ワースト5' => $address_sales_worst,
+    '天気別平均売上データ' => $weather_sales,
+    '気温帯別商品売上トップ5' => $temp_sales_top5,
 ];
 
 
