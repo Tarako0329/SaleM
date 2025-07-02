@@ -63,10 +63,10 @@ $shouhin_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $CSV = "";
 if (!empty($shouhin_rows)) {
     // ヘッダー行を追加
-    $CSV .= implode(",", array_keys($shouhin_rows[0])) . "\n";
+    $CSV .= implode(",", array_keys($shouhin_rows[0])) . "<br>";
     // データ行を追加
     foreach ($shouhin_rows as $row) {
-        $CSV .= implode(",", array_values($row)) . "\n";
+        $CSV .= implode(",", array_values($row)) . "<br>";
     }
 }
 
@@ -85,10 +85,10 @@ foreach ($shouhin_rows as $row) {
     $monthly_sales[$month]['売上金額'] += $row['売上金額'];
     $monthly_sales[$month]['売上原価'] += $row['売上原価'];
 }
-echo "\n\n月別売上集計:\n";
-echo "年月,売上個数,売上金額,売上原価\n";
+echo "<br><br>月別売上集計:<br>";
+echo "年月,売上個数,売上金額,売上原価<br>";
 foreach ($monthly_sales as $month => $data) {
-    echo "{$month},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}\n";
+    echo "{$month},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}<br>";
 }
 
 // 2. 商品別売上集計
@@ -102,10 +102,10 @@ foreach ($shouhin_rows as $row) {
     $product_sales[$product]['売上金額'] += $row['売上金額'];
     $product_sales[$product]['売上原価'] += $row['売上原価'];
 }
-echo "\n\n商品別売上集計:\n";
-echo "商品名,売上個数,売上金額,売上原価\n";
+echo "<br><br>商品別売上集計:<br>";
+echo "商品名,売上個数,売上金額,売上原価<br>";
 foreach ($product_sales as $product => $data) {
-    echo "{$product},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}\n";  
+    echo "{$product},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}<br>";  
 
 }
 
@@ -123,10 +123,10 @@ foreach ($shouhin_rows as $row) {
     $event_sales[$event]['売上金額'] += $row['売上金額'];
     $event_sales[$event]['売上原価'] += $row['売上原価'];
 }
-echo "\n\nイベント別売上集計:\n";
-echo "イベント名,売上個数,売上金額,売上原価\n";
+echo "<br><br>イベント別売上集計:<br>";
+echo "イベント名,売上個数,売上金額,売上原価<br>";
 foreach ($event_sales as $event => $data) {
-    echo "{$event},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}\n";
+    echo "{$event},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}<br>";
 }
 
 // 4. 商品分類別売上集計
@@ -140,10 +140,10 @@ foreach ($shouhin_rows as $row) {
     $category_sales[$category]['売上金額'] += $row['売上金額'];
     $category_sales[$category]['売上原価'] += $row['売上原価'];
 }
-echo "\n\n商品分類別売上集計:\n";
-echo "商品分類,売上個数,売上金額,売上原価\n";
+echo "<br><br>商品分類別売上集計:<br>";
+echo "商品分類,売上個数,売上金額,売上原価<br>";
 foreach ($category_sales as $category => $data) {
-    echo "{$category},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}\n";
+    echo "{$category},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}<br>";
 }
 
 // 5. 天気別売上集計
@@ -157,10 +157,10 @@ foreach ($shouhin_rows as $row) {
     $weather_sales[$weather]['売上金額'] += $row['売上金額'];
     $weather_sales[$weather]['売上原価'] += $row['売上原価'];
 }
-echo "\n\n天気別売上集計:\n";
-echo "天気,売上個数,売上金額,売上原価\n";
+echo "<br><br>天気別売上集計:<br>";
+echo "天気,売上個数,売上金額,売上原価<br>";
 foreach ($weather_sales as $weather => $data) {
-    echo "{$weather},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}\n";
+    echo "{$weather},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}<br>";
 }
 
 // 6. 気温別売上集計 (気温を範囲で区切る)
@@ -187,10 +187,10 @@ foreach ($shouhin_rows as $row) {
     $temperature_sales[$temp_range]['売上金額'] += $row['売上金額'];
     $temperature_sales[$temp_range]['売上原価'] += $row['売上原価'];
 }
-echo "\n\n気温別売上集計:\n";
-echo "気温範囲,売上個数,売上金額,売上原価\n";
+echo "<br><br>気温別売上集計:<br>";
+echo "気温範囲,売上個数,売上金額,売上原価<br>";
 foreach ($temperature_sales as $range => $data) {
-    echo "{$range},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}\n";
+    echo "{$range},{$data['売上個数']},{$data['売上金額']},{$data['売上原価']}<br>";
 }
 
 ?>
