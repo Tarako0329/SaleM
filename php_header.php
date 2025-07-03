@@ -61,6 +61,7 @@ $key = $_ENV["KEY"];
 //GEMINI
 define("GEMINI",$_ENV["GOOGLE_API"]);
 define("GEMINI_URL",$_ENV["GEMINI_URL"]);
+define("GEMINI_URL_TOKEN",$_ENV["GEMINI_URL_TOKEN"]);
 
 if(EXEC_MODE=="Test" || EXEC_MODE=="Local" || EXEC_MODE=="TrialL"){
     //テスト環境はミリ秒単位

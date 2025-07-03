@@ -867,5 +867,66 @@ function gemini_api_kaiwa($p_ask,$p_type,$p_subject){
 	return $rtn;
 }
 
+function countGeminiTokensWithCurl(array $parts): ?int
+{
+    /*
+        echo "--- テキストのみのトークンカウント (cURL) ---\n";
+        $textParts = [
+            ['text' => 'こんにちは、Gemini APIについて質問があります。']
+        ];
+        $tokenCountText = countGeminiTokensWithCurl($textParts);
+
+        if ($tokenCountText !== null) {
+            echo "テキストのトークン数: " . $tokenCountText . "\n\n";
+        }
+    */
+
+    $url = GEMINI_URL_TOKEN.GEMINI;
+           
+
+    $payload = [
+        'contents' => [
+            [
+                'parts' => $parts
+            ]
+        ]
+    ];
+
+    $jsonPayload = json_encode($payload);
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // レスポンスを文字列として取得
+    curl_setopt($ch, CURLOPT_POST, true);           // POSTリクエスト
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonPayload); // POSTデータの指定
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'Content-Length: ' . strlen($jsonPayload)
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+
+    curl_close($ch);
+
+    if ($response === false) {
+        echo "cURLエラー: " . $curlError . "\n";
+        return null;
+    }
+
+    if ($httpCode !== 200) {
+        echo "APIエラー（HTTPコード: {$httpCode}）: " . $response . "\n";
+        return null;
+    }
+
+    $body = json_decode($response, true);
+
+    if (isset($body['totalTokens'])) {
+        return $body['totalTokens'];
+    } else {
+        echo "エラー: レスポンスに 'totalTokens' が見つかりません。\n";
+        return null;
+    }
+}
 
 ?>

@@ -82,7 +82,13 @@ if($rtn !== true){
 	}
 	
 	if(EXEC_MODE<>"Local"){
+		$textParts = [
+			['text' => $user_input]
+		];
+		$token_count = countGeminiTokensWithCurl($textParts);
 		$msg = gemini_api($user_input,$answer_type,$response_schema);
+		//$msgに$token_countを追加
+		$msg["token_count"] = $token_count;
 	}
 
 	//$answer_type=htmlの場合、$msg["result"]をファイルに上書きで出力する。ファイル名は$_SESSION["user_id"]+_gemini_report.html
