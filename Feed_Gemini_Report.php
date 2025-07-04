@@ -166,7 +166,7 @@ $sql = "SELECT
 	,sum(UriageKin)-sum(genka) as 粗利
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
-	group by 商品分類
+	group by 大中分類,小分類
 	order by 
 		CASE 
 			WHEN bunrui1 = '' THEN 1 
