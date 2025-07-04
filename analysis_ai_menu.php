@@ -259,7 +259,7 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 								</div>
 								<div class="mb-3">
 									<label for="Product_categories" class="form-label">レポート体裁</label>
-									<textarea class="form-control" id="Product_categories" v-model="report_type" rows="5"></textarea>
+									<textarea class="form-control" id="Product_categories" v-model="report_type" rows="20"></textarea>
 								</div>
 						</div>
 					</div><!-- accordion-item -->

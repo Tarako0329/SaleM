@@ -339,38 +339,50 @@ if($rtn !== true){
 			}
 			
 			if($analysis_type==13){//ABC分析
-				$par = 0;
-				$i = 0;
-				foreach($result as $row){
-					if($par < 70){
-						$result[$i]["rank"]="A";
-					}elseif($par < 90){
-						$result[$i]["rank"]="B";
-					}else{
-						$result[$i]["rank"]="C";
-					}
-					$par += $row["売上占有率"];
-					$i++;
-				}
-			}
-			if($analysis_type==14){//ABC分析
-				$par = 0;
-				$i = 0;
-				foreach($result as $row){
-					if($par < 70){
-						$result[$i]["rank"]="A";
-					}elseif($par < 90){
-						$result[$i]["rank"]="B";
-					}else{
-						$result[$i]["rank"]="C";
-					}
-					$par += $row["売上占有率"];
-					$i++;
-					if($result[$i]["Event"] !== $result[$i-1]["Event"]){
-						$par = 0;
-					}
-				}
-			}
+                $par = 0;
+                $i = 0;
+                foreach($result as $row){
+                    if($par < 30){
+                        $result[$i]["rank"]="A+";
+                    }elseif($par < 50){
+                        $result[$i]["rank"]="A";
+                    }elseif($par < 70){
+                        $result[$i]["rank"]="A-";
+                    }elseif($par < 80){
+                        $result[$i]["rank"]="B+";
+                    }elseif($par < 90){
+                        $result[$i]["rank"]="B-";
+                    }else{
+                        $result[$i]["rank"]="C";
+                    }
+                    $par += $row["売上占有率"];
+                    $i++;
+                }
+            }
+            if($analysis_type==14){//ABC分析
+                $par = 0;
+                $i = 0;
+                foreach($result as $row){
+                    if($par < 30){
+                        $result[$i]["rank"]="A+";
+                    }elseif($par < 50){
+                        $result[$i]["rank"]="A";
+                    }elseif($par < 70){
+                        $result[$i]["rank"]="A-";
+                    }elseif($par < 80){
+                        $result[$i]["rank"]="B+";
+                    }elseif($par < 90){
+                        $result[$i]["rank"]="B-";
+                    }else{
+                        $result[$i]["rank"]="C";
+                    }
+                    $par += $row["売上占有率"];
+                    $i++;
+                    if(isset($result[$i]) && $result[$i]["Event"] !== $result[$i-1]["Event"]){
+                        $par = 0;
+                    }
+                }
+            }
 			log_writer2("\$labels",$labels,"lv3");
 			$msg = "取得成功。";
 			$alert_status = "alert-success";
