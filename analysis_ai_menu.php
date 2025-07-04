@@ -113,7 +113,8 @@ $ai_setting_def = [
 		・レポート名に適した範囲の売上実績表のみを作成する。
 		・読みやすさを重視し、口語体で作成。
 		・金額はカンマ区切り。
-		・小数以下は無視する。"
+		・小数以下は無視する。
+		・金額は正確に集計する。"
 ];
 //$ai_setting_def["your_ask"]から空白、tabを削除,改行は残す
 $ai_setting_def["your_ask"] = str_replace([" ", "　","\t"], "", $ai_setting_def["your_ask"]);
