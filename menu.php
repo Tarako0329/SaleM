@@ -188,7 +188,6 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token,'user']
         ,'確定申告'=>['output_menu.php?csrf_token='.$token,'kaikei']
         ,'ｱﾌﾟﾘを紹介する'=>['shoukai.php?csrf_token='.$token,'shoukai']
-        //,'機能テスト'=>['sample.php']
     ];
     
     //契約・解約関連は各時で実装したファイルを指定する
