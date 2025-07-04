@@ -698,7 +698,7 @@ function shutdown_ajax($filename){
 // GeminiAPI
 // =========================================================
 function gemini_api($p_ask,$p_type, $response_schema = null){
-	//$p_type: 'json' (decode response to PHP array) or 'plain' (raw text response) or 'html'
+	//$p_type: 'json' (decode response to PHP array) or 'plain' (raw text response) or 'html' or 'php'
 	//$response_schema: An object describing the expected JSON schema for the model's response.
 	/*$response_schemaサンプル
 	  $response_schema = [
@@ -760,6 +760,10 @@ function gemini_api($p_ask,$p_type, $response_schema = null){
 		//log_writer2(" [gemini_api \$result_decoded] =>",$result_decoded,"lv3");
 		if (isset($result_decoded['candidates'][0]['content']['parts'][0]['text'])) {
 			$result = $result_decoded['candidates'][0]['content']['parts'][0]['text'];
+			// finishReasonのチェックを追加
+			if (isset($result_decoded['candidates'][0]['finishReason']) && $result_decoded['candidates'][0]['finishReason'] !== 'STOP') {
+				$emsg .= 'Geminiの応答が途中で終了した可能性があります。理由: ' . $result_decoded['candidates'][0]['finishReason'];
+			}
 		} elseif (isset($result_decoded['error'])) {
 			$emsg = "Gemini API Error: " . $result_decoded['error']['message'];
 			$result = json_encode($result_decoded['error']); // Store error details as JSON string
@@ -788,6 +792,9 @@ function gemini_api($p_ask,$p_type, $response_schema = null){
 		}	
 	}else if($p_type==="html"){
 		$result = str_replace('```html','',$result);
+		$result = str_replace('```','',$result);
+	}else if($p_type==="php"){
+		$result = str_replace('```php','',$result);
 		$result = str_replace('```','',$result);
 	}
 	$rtn = array(
@@ -834,8 +841,17 @@ function gemini_api_kaiwa($p_ask,$p_type,$p_subject){
 	if ($response === false) {
 		$emsg = 'Gemini呼び出しに失敗しました。時間をおいて、再度実行してみてください。';
 	}else{
-		$result = json_decode($response, true);
-		$result = $result['candidates'][0]['content']['parts'][0]['text'];
+		$result_decoded = json_decode($response, true);
+		if (isset($result_decoded['candidates'][0]['content']['parts'][0]['text'])) {
+			$result = $result_decoded['candidates'][0]['content']['parts'][0]['text'];
+			// finishReasonのチェックを追加
+			if (isset($result_decoded['candidates'][0]['finishReason']) && $result_decoded['candidates'][0]['finishReason'] !== 'STOP') {
+				$emsg .= 'Geminiの応答が途中で終了した可能性があります。理由: ' . $result_decoded['candidates'][0]['finishReason'];
+			}
+		} else {
+			$emsg = 'Geminiからの予期しない応答形式です。';
+			$result = $response; // Store raw response
+		}
 	}
 
 	// Geminiの応答を会話履歴に追加

@@ -32,11 +32,47 @@ $to_d = $_GET["to_d"];
 //DB接続
 //$pdo_h = new PDO("mysql:host=localhost;dbname=SaleM;charset=utf8", "root", "");
 
+//期間中の総売上を取得
+$sql = "SELECT sum(UriageKin) as total_sales, sum(genka) as total_cost from UriageMeisai where uid=:uid and UriDate between :from_d and :to_d";
+$stmt = $pdo_h->prepare($sql);
+$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
+$stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
+$stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
+$stmt->execute();
+$total_sales_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//期間中の総売上と総粗利
+$total_sales_summary = [
+    '総売上金額' => $total_sales_data[0]['total_sales'],
+    '総売上原価' => $total_sales_data[0]['total_cost'],
+    '総粗利金額' => $total_sales_data[0]['total_sales'] - $total_sales_data[0]['total_cost']
+];
+
+//年毎の売上粗利を集計し年度昇順でソート
+$sql = "SELECT 
+	DATE_FORMAT(UriDate, '%Y') as 売上計上年
+	,sum(UriageKin) as 売上金額
+	,sum(genka) as 売上原価
+	,sum(UriageKin)-sum(genka) as 粗利
+	from UriageMeisai 
+	where uid=:uid and UriDate between :from_d and :to_d
+	group by 売上計上年
+	order by 売上計上年 asc";
+
+$stmt = $pdo_h->prepare($sql);
+$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
+$stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
+$stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
+$stmt->execute();
+$yearly_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
 //月ごとの売上・粗利の集計。売上計上年月を昇順でソート
 $sql = "SELECT 
 	DATE_FORMAT(UriDate, '%Y-%m') as 売上計上年月
 	,sum(UriageKin) as 売上金額
 	,sum(genka) as 売上原価
+	,sum(UriageKin)-sum(genka) as 粗利
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
 	group by 売上計上年月
@@ -49,11 +85,31 @@ $stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
 $stmt->execute();
 $monthly_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+//日ごとの売上・粗利の集計。売上計上年月日を昇順でソート
+$sql = "SELECT 
+	UriDate as 売上計上年月日
+	,sum(UriageKin) as 売上金額
+	,sum(genka) as 売上原価
+	,sum(UriageKin)-sum(genka) as 粗利
+	from UriageMeisai 
+	where uid=:uid and UriDate between :from_d and :to_d
+	group by 売上計上年月日
+	order by 売上計上年月日 asc";
+
+$stmt = $pdo_h->prepare($sql);
+$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
+$stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
+$stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
+$stmt->execute();
+$daily_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
 //商品分類ごとの売上・粗利の集計。商品分類を昇順でソート。未分類は最後尾に表示。
 $sql = "SELECT 
 	CONCAT(IFNULL(bunrui1,'未設定'),'>',IFNULL(bunrui2,'未設定'),'>',IFNULL(bunrui3,'未設定')) as 商品分類
 	,sum(UriageKin) as 売上金額
 	,sum(genka) as 売上原価
+	,sum(UriageKin)-sum(genka) as 粗利
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
 	group by 商品分類
@@ -86,6 +142,7 @@ $sql = "SELECT
 	ShouhinNM as 商品名
 	,sum(UriageKin) as 売上金額
 	,sum(genka) as 売上原価
+	,sum(UriageKin)-sum(genka) as 粗利
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
 	group by 商品名
@@ -123,9 +180,10 @@ foreach ($abc_data as $key => $row) {
 $sql = "SELECT 
 	ROW_NUMBER() OVER (ORDER BY avg(売上金額) DESC) as 順位
 	,Event as イベント名
-	,CAST(ROUND(avg(売上金額), 1) as CHAR) as 売上金額
-	,CAST(ROUND(avg(売上原価), 1) as CHAR) as 売上原価
-	from (SELECT Event,UriDate,sum(UriageKin) as 売上金額,sum(genka) as 売上原価 from UriageMeisai where uid=:uid and UriDate between :from_d and :to_d group by Event,UriDate) as A 
+	,CAST(ROUND(avg(売上金額), 0) as CHAR) as 平均売上
+	,CAST(ROUND(avg(売上原価), 0) as CHAR) as 平均原価
+	,CAST(ROUND(avg(粗利), 0) as CHAR) as 平均粗利
+	from (SELECT Event,UriDate,sum(UriageKin) as 売上金額,sum(genka) as 売上原価,sum(UriageKin)-sum(genka) as 粗利 from UriageMeisai where uid=:uid and UriDate between :from_d and :to_d group by Event,UriDate) as A 
 	group by イベント名
 	order by avg(売上金額) desc
 	limit 10";
@@ -143,9 +201,10 @@ $event_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT 
 	ROW_NUMBER() OVER (ORDER BY avg(売上金額) ASC) as 順位
 	,Event as イベント名
-	,CAST(ROUND(avg(売上金額), 1) as CHAR) as 売上金額
-	,CAST(ROUND(avg(売上原価), 1) as CHAR) as 売上原価
-	from (SELECT Event,UriDate,sum(UriageKin) as 売上金額,sum(genka) as 売上原価 from UriageMeisai where uid=:uid and UriDate between :from_d and :to_d group by Event,UriDate) as A 
+	,CAST(ROUND(avg(売上金額), 0) as CHAR) as 平均売上
+	,CAST(ROUND(avg(売上原価), 0) as CHAR) as 平均原価
+	,CAST(ROUND(avg(粗利), 0) as CHAR) as 平均粗利
+	from (SELECT Event,UriDate,sum(UriageKin) as 売上金額,sum(genka) as 売上原価,sum(UriageKin)-sum(genka) as 粗利 from UriageMeisai where uid=:uid and UriDate between :from_d and :to_d group by Event,UriDate) as A 
 	group by イベント名
 	order by avg(売上金額) asc
 	limit 5";
@@ -164,6 +223,7 @@ $sql = "SELECT
 	,ShouhinNM as 商品名
 	,sum(UriageKin) as 売上金額
 	,sum(genka) as 売上原価
+	,sum(UriageKin)-sum(genka) as 粗利
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
 	group by 商品名
@@ -183,6 +243,7 @@ $sql = "SELECT
 	,ShouhinNM as 商品名
 	,sum(UriageKin) as 売上金額
 	,sum(genka) as 売上原価
+	,sum(UriageKin)-sum(genka) as 粗利
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
 	group by 商品名
@@ -201,9 +262,10 @@ $product_sales_worst = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT 
 	ROW_NUMBER() OVER (ORDER BY avg(売上金額) DESC) as 順位
 	,address as イベント開催住所
-	,CAST(ROUND(avg(売上金額), 1) as CHAR) as 売上金額
-	,CAST(ROUND(avg(売上原価), 1) as CHAR) as 売上原価
-	from (SELECT address ,UriDate,sum(UriageKin) as 売上金額,sum(genka) as 売上原価 from UriageMeisai where uid=:uid and UriDate between :from_d and :to_d group by address,UriDate) as A 
+	,CAST(ROUND(avg(売上金額), 0) as CHAR) as 平均売上
+	,CAST(ROUND(avg(売上原価), 0) as CHAR) as 平均原価
+	,CAST(ROUND(avg(粗利), 0) as CHAR) as 平均粗利
+	from (SELECT address ,UriDate,sum(UriageKin) as 売上金額,sum(genka) as 売上原価,sum(UriageKin)-sum(genka) as 粗利 from UriageMeisai where uid=:uid and UriDate between :from_d and :to_d group by address,UriDate) as A 
 	group by イベント開催住所
 	order by avg(売上金額) desc
 	limit 10";
@@ -220,9 +282,10 @@ $address_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT 
 	ROW_NUMBER() OVER (ORDER BY avg(売上金額) ASC) as 順位
 	,address as イベント開催住所
-	,CAST(ROUND(avg(売上金額), 1) as CHAR) as 売上金額
-	,CAST(ROUND(avg(売上原価), 1) as CHAR) as 売上原価
-	from (SELECT address ,UriDate,sum(UriageKin) as 売上金額,sum(genka) as 売上原価 from UriageMeisai where uid=:uid and UriDate between :from_d and :to_d group by address,UriDate) as A 
+	,CAST(ROUND(avg(売上金額), 0) as CHAR) as 平均売上
+	,CAST(ROUND(avg(売上原価), 0) as CHAR) as 平均原価
+	,CAST(ROUND(avg(粗利), 0) as CHAR) as 平均粗利
+	from (SELECT address ,UriDate,sum(UriageKin) as 売上金額,sum(genka) as 売上原価,sum(UriageKin)-sum(genka) as 粗利 from UriageMeisai where uid=:uid and UriDate between :from_d and :to_d group by address,UriDate) as A 
 	group by イベント開催住所
 	order by avg(売上金額) asc
 	limit 5";
@@ -239,10 +302,11 @@ $address_sales_worst = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT
 	ROW_NUMBER() OVER (ORDER BY avg(売上金額) DESC) as 順位
 	, 天気
-	,CAST(ROUND(avg(売上金額), 1) as CHAR) as 売上金額
-	,CAST(ROUND(avg(売上原価), 1) as CHAR) as 売上原価
+	,CAST(ROUND(avg(売上金額), 0) as CHAR) as 平均売上
+	,CAST(ROUND(avg(売上原価), 0) as CHAR) as 平均原価
+	,CAST(ROUND(avg(粗利), 0) as CHAR) as 平均粗利
 	from (
-		SELECT CASE WHEN weather = '' THEN '未計測' ELSE weather END as 天気 ,UriDate,sum(UriageKin) as 売上金額,sum(genka) as 売上原価 
+		SELECT CASE WHEN weather = '' THEN '未計測' ELSE weather END as 天気 ,UriDate,sum(UriageKin) as 売上金額,sum(genka) as 売上原価 ,sum(UriageKin)-sum(genka) as 粗利
 		from UriageMeisai where uid=:uid and UriDate between :from_d and :to_d group by 天気,UriDate) as A 
 	group by 天気
 	order by
@@ -263,6 +327,7 @@ $weather_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 //気温10℃単位ごとの商品別売上・粗利の集計。気温帯ごとの売上トップ５
 $sql = "SELECT 
 	CASE 
+		WHEN IFNULL(temp,99) = 99 THEN '未計測'
 		WHEN temp < 0 THEN '0度未満'
 		WHEN temp >= 0 AND temp < 10 THEN '0度以上10度未満'
 		WHEN temp >= 10 AND temp < 20 THEN '10度以上20度未満'
@@ -275,7 +340,12 @@ $sql = "SELECT
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
 	group by 気温帯, 商品名
-	order by 気温帯, 売上金額 desc";
+	order by 
+		CASE
+			WHEN 気温帯 = '未計測' THEN 1
+			ELSE 0
+		END,
+		気温帯, 売上金額 desc";
 
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue("uid", $uid, PDO::PARAM_INT);
@@ -301,17 +371,20 @@ foreach ($grouped_temp_sales as $temp_zone => $products) {
 
 //すべての統計データをまとめる
 $all_stats = [
-    '月ごとの売上データ' => $monthly_sales,
-    '商品分類ごとの売上データ' => $category_sales,
-    'ABC分析データ' => $abc_data,
+    '期間中の総売上概要' => $total_sales_summary,
+    '年次売上データ' => $yearly_sales,
+    '月次売上データ' => $monthly_sales,
+    '日次売上データ' => $daily_sales,
+    '商品分類別売上データ' => $category_sales,
+    '商品別ABC分析データ' => $abc_data,
     'イベント別平均売上トップ10' => $event_sales,
     'イベント別平均売上ワースト5' => $event_sales_worst,
     '商品別売上トップ10' => $product_sales,
     '商品別売上ワースト10' => $product_sales_worst,
-    'イベント開催住所別平均売上トップ10' => $address_sales,
-    'イベント開催住所別平均売上ワースト5' => $address_sales_worst,
+    '住所別平均売上トップ10' => $address_sales,
+    '住所別平均売上ワースト5' => $address_sales_worst,
     '天気別平均売上データ' => $weather_sales,
-    '気温帯別商品売上トップ5' => $temp_sales_top5,
+    '気温帯別商品売上トップ5' => $temp_sales_top5
 ];
 
 

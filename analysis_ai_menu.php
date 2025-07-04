@@ -68,25 +68,52 @@ $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
 $ai_setting = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+//売上分析に最適なロール集を$ai_roleにセット
+$ai_roles = [
+	'データアナリスト',
+	'経営コンサルタント',
+	'売上戦略コンサルタント',
+	'マーケティング戦略家',
+	'商品ポートフォリオマネージャー',
+	'ビジネスアドバイザー',
+	'財務分析官',
+	'市場調査員',
+	'事業開発コンサルタント',
+	'データサイエンティスト',
+	'成長戦略アドバイザー',
+	'イノベーションコンサルタント'
+];
+
+//レポート種類
+$report_types = [
+	'ウィークリーレポート (先週)',
+	'月次レポート (先月)',
+	'月次レポート (先月と今月)', 
+	'年次レポート (昨年)', 
+	'年次レポート (昨年と今年)',
+	'直近１２ヵ月レポート', 
+	'過去５年と今後の見通し', 
+];
+
 $ai_setting_def = [
 	'ai_role' => 'データアナリスト',
-	'data_range' => '今年の売上データをもとに',
-	'your_ask' => "売上分析レポートを作成してください。
-		売上分析用のJSONデータをもとに表を作成。
-		レポートで知りたいことは次の通り。
-		・注力すべき商品群とそうでない商品の選定。
+	'data_range' => '直近１２ヵ月レポート',
+	'your_ask' => "レポートで知りたいことは次の通り。
+		・目標と現状とのギャップの確認及び、ギャップを埋めるための提案。
+		・注力すべき商品とそうでない商品の選定。
 		・出るべきイベント
 		・地域、天気と売上の関連。
-		・取扱商品から見る業種の傾向と今後のトレンド。
 		・売上が期待できる住所エリア
-		・目標が設定されている場合は現状とのギャップの確認とギャップを埋めるための提案を。
+		・取扱商品から見る業種の傾向と今後のトレンド。
 		・インスタのアカウント設定がある場合はインスタもチェック。活用方法のアドバイスを下さい。",
-	'report_type' => "何らかのフレームワークを使う。
-		htmlのみを出力。
-		レスポンシブデザインを採用。
-		読みやすさを重視し、口語体で作成。
-		金額はカンマ区切り。
-		小数第一位まで"
+	'report_type' => "・何らかのフレームワークを使う。
+		・売上分析用のJSONデータをもとに表を作成。
+		・レポート名に適した範囲の売上実績表のみを作成する。
+		・必要に応じてphp,html,javascriptを利用する。
+		・レスポンシブデザインを採用。
+		・読みやすさを重視し、口語体で作成。
+		・金額はカンマ区切り。
+		・小数以下は無視する。"
 ];
 //$ai_setting_def["your_ask"]から空白、tabを削除,改行は残す
 $ai_setting_def["your_ask"] = str_replace([" ", "　","\t"], "", $ai_setting_def["your_ask"]);
@@ -111,6 +138,11 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 	//共通部分、bootstrap設定、フォントCND、ファビコン等
 	include "head_bs5.php" 
 	?>
+	<style>
+		.accordion{
+			--bs-accordion-btn-bg:#c0fbff ; 
+		}
+		</style>
 	<!--ページ専用CSS--><link rel="stylesheet" href="css/style_ShouhinMSedit.css?<?php echo $time; ?>" >
 	<TITLE><?php echo secho($title)." 取扱商品登録画面";?></TITLE>
 </head>
@@ -128,7 +160,7 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 					<div class="accordion-item">
 						<h2 class="accordion-header">
 							<button class="accordion-button collapsed fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-								<p class='m-0'>ビジネス情報を入力してください<br><span class='fs-5'>入力することでより具体的なレポートとなります。</span></p>
+								<p class='m-0'>ビジネス情報を入力（タップすると開きます）<br><span class='fs-5'>入力することでより具体的なレポートとなります。</span></p>
 							</button>
 						</h2>
 						<div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
@@ -207,19 +239,18 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 				<div class="row mt-3">
 					<div class="col-12 ">
 					<div class="mb-3">
-							<label for='ai_role' class='form-label'>AIの役割</label>
-							<input type='text' class='form-control' v-model='ai_role' id='ai_role'>
+							<label for='ai_role' class='form-label'>AIに求める役割</label>
+							<select class='form-select' v-model='ai_role' id='ai_role'>
+								<option v-for="role in ai_roles" :key="role" :value="role">{{ role }}</option>
+							</select>
 						</div>
 						<div class="mb-3">
-							<label for='data_range' class='form-label'>AIに与えるデータ範囲</label>
+							<label for='data_range' class='form-label'>レポート種類</label>
 							<select class='form-select form-select-lg' v-model='data_range' id='data_range'>
 								<option value="">選択してください</option>
-								<option value="今年の売上データをもとに">今年の売上データ</option>
-								<option value="直近１２ヵ月の売上データをもとに">直近１２ヵ月の売上データ</option>
-								<option value="過去５年の売上データをもとに">過去５年の売上データ</option>
-								<option value=""></option>
-								<option value=""></option>
-								<option value=""></option>
+								<template v-for='item in report_types' :key='item.value' >
+									<option :value="item">{{item}}</option>
+								</template>
 							</select>
 						</div>
 						<div class="mb-3">
@@ -255,8 +286,7 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 		</footer>
 	</div><!--#app-->
 	<script>
-		document.getElementById("form1").onkeypress = (e) => {
-			// form1に入力されたキーを取得
+		document.getElementById("app").onkeypress = (e) => {
 			const key = e.keyCode || e.charCode || 0;
 			// 13はEnterキーのキーコード
 			if (key == 13) {
@@ -272,6 +302,8 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 				const your_bussiness = ref(<?php echo json_encode($business_info[0],JSON_UNESCAPED_UNICODE); ?>);
 				
 				const ai_setting_def = <?php echo json_encode($ai_setting_def,JSON_UNESCAPED_UNICODE); ?>;
+				const ai_roles = ref(<?php echo json_encode($ai_roles, JSON_UNESCAPED_UNICODE); ?>);
+				const report_types = ref(<?php echo json_encode($report_types, JSON_UNESCAPED_UNICODE); ?>);
 
 				const ai_role = ref('<?php echo $ai_setting["ai_role"]; ?>')
 				const data_range = ref('<?php echo $ai_setting["data_range"]; ?>')
@@ -299,18 +331,18 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 					try {
 						//console_log(your_ask.value)
 						const form = new FormData();
-						form.append('Article', `あなたは${ai_role.value}です。\n${data_range.value}、${your_ask.value}\n${report_type.value}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
+						form.append('Article', `あなたはベテランの${ai_role.value}です。\n最後に提示する売上分析用のJSONデータをもとに、次の売上分析レポートを作成してください。レポート名：『${data_range.value}』、${your_ask.value}\n\n出力様式について\n${report_type.value}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
 						form.append('type', 'one');
-						form.append('answer_type', 'html');
+						//form.append('answer_type', 'html');
 						form.append('data_range', data_range.value);
 						form.append('save_setting', save_setting.value);
 						form.append('ai_role', ai_role.value);
 						form.append('your_ask', your_ask.value);
 						form.append('report_type', report_type.value);
 						form.append('mail', mail.value);
-						
 
 						const response = await axios.post('ajax_gemini_make_report.php', form, {headers: {'Content-Type': 'multipart/form-data'}});
+						console_log(response.data)
 						gemini_response.value = response.data.result;
 					} catch (error) {
 						console.error('Error fetching Gemini response:', error);
@@ -368,6 +400,7 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 				return {
 					your_bussiness,
 					//your_sales_data,
+					ai_roles,
 					ai_role,
 					your_ask,
 					gemini_response,
@@ -379,6 +412,7 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 					save_setting,
 					make_report,
 					data_range,
+					report_types,
 					ai_setting_modosu,
 					mail,
 				};
