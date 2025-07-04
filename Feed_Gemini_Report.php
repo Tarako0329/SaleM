@@ -208,15 +208,27 @@ $total_sales = array_sum(array_column($abc_data, '売上金額'));
 $cumulative_sales = 0;
 foreach ($abc_data as $key => $row) {
     $cumulative_sales += $row['売上金額'];
-    $percentage = ($cumulative_sales / $total_sales) * 100;
+    $percentage = ($total_sales > 0) ? ($cumulative_sales / $total_sales) * 100 : 0;
     //$abc_data[$key]['累積売上金額'] = $cumulative_sales;
     $abc_data[$key]['累積構成比'] = round($percentage, 2);
-    if ($percentage <= 70) {
+    if ($percentage <= 40) {
+        $abc_data[$key]['ABCランク'] = 'A+';
+    } elseif ($percentage <= 60) {
         $abc_data[$key]['ABCランク'] = 'A';
-    } elseif ($percentage <= 90) {
+    } elseif ($percentage <= 70) {
+        $abc_data[$key]['ABCランク'] = 'A-';
+    } elseif ($percentage <= 80) {
+        $abc_data[$key]['ABCランク'] = 'B+';
+    } elseif ($percentage <= 85) {
         $abc_data[$key]['ABCランク'] = 'B';
-    } else {
+    } elseif ($percentage <= 90) {
+        $abc_data[$key]['ABCランク'] = 'B-';
+    } elseif ($percentage <= 95) {
+        $abc_data[$key]['ABCランク'] = 'C+';
+    } elseif ($percentage <= 98) {
         $abc_data[$key]['ABCランク'] = 'C';
+    } else {
+        $abc_data[$key]['ABCランク'] = 'C-';
     }
 }
 //$abc_dataの累積構成比を文字列にキャスト
