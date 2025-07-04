@@ -112,7 +112,7 @@ $ai_setting_def = [
 		・取扱商品から見る業種の傾向と今後のトレンド。
 		・SNSを利用している場合、ビジネス情報を元にSNS毎の活用方法について。
 		・売上分析用データとビジネス情報を元に今後の成長戦略の立案",
-	'report_type' => "・レポートはHTMLで作成し、改行インデントなしのHTMLのみを出力する。
+	'report_type' => "・レポートはHTMLで作成し、ミニファイされたHTMLのみを出力する。
 		・最適なHTMLフレームワークを使う。
 		・レスポンシブデザインを採用。
 		・売上分析用のJSONデータをもとにtableタグを使用して表を作成。
@@ -310,16 +310,6 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 			</div>
 		</footer>
 	</div><!--#app-->
-	<script>
-		document.getElementById("app").onkeypress = (e) => {
-			const key = e.keyCode || e.charCode || 0;
-			// 13はEnterキーのキーコード
-			if (key == 13) {
-				// アクションを行わない
-				e.preventDefault();
-			}
-		}    
-	</script>
 	<script>
 		const { createApp, ref, onMounted, computed, VueCookies, watch,nextTick  } = Vue;
 		createApp({
