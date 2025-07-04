@@ -159,7 +159,7 @@ $category_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);*/
 
 //商品分類ごとの売上・粗利の集計。商品分類を昇順でソート。未分類は最後尾に表示。
 $sql = "SELECT 
-	CONCAT(IFNULL(bunrui1,'未設定'),'>',IFNULL(bunrui2,'未設定'),'>',) as 大中分類
+	CONCAT(IFNULL(bunrui1,'未設定'),'>',IFNULL(bunrui2,'未設定')) as 大中分類
 	,IFNULL(bunrui3,'未設定') as 小分類
 	,sum(UriageKin) as 売上金額
 	,sum(genka) as 売上原価
