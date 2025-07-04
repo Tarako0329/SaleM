@@ -161,7 +161,6 @@ $category_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT 
 	ShouhinNM as 商品名
 	,sum(UriageKin) as 売上金額
-	,sum(genka) as 売上原価
 	,sum(UriageKin)-sum(genka) as 粗利
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
@@ -180,7 +179,7 @@ $cumulative_sales = 0;
 foreach ($abc_data as $key => $row) {
     $cumulative_sales += $row['売上金額'];
     $percentage = ($cumulative_sales / $total_sales) * 100;
-    $abc_data[$key]['累積売上金額'] = $cumulative_sales;
+    //$abc_data[$key]['累積売上金額'] = $cumulative_sales;
     $abc_data[$key]['累積構成比'] = round($percentage, 2);
     if ($percentage <= 70) {
         $abc_data[$key]['ABCランク'] = 'A';
