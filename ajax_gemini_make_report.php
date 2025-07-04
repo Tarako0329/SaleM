@@ -125,7 +125,13 @@ if($rtn !== true){
 	//$answer_type=htmlの場合、$msg["result"]をファイルに上書きで出力する。ファイル名は$_SESSION["user_id"]+_gemini_report.html
 	$report_file = $_SESSION["user_id"]."_gemini_report.html";
 	file_put_contents($report_file, $msg["result"]);
-	send_htmlmail($_POST["mail"],$_POST['data_range'],$msg["result"]);
+	//レポートのURLを$urlにセット
+	$url = ROOT_URL.$report_file;
+
+	//レポートを作成しました。こちらから確認してください。のHTMLメール用データを$mail_bodyにセット
+	$mail_body = "レポートを作成しました。こちらから確認してください。<br><a href='". $url ."'>".$url."</a>";
+	
+	send_htmlmail($_POST["mail"],$_POST['data_range'],$mail_body);
 	if(EXEC_MODE==="Test"){
 		send_htmlmail($_POST["mail"],"user_input",$user_input);
 	}
