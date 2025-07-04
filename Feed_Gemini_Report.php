@@ -29,6 +29,11 @@ $uid = $_GET["uid"];
 $from_d = $_GET["from_d"];
 $to_d = $_GET["to_d"];
 
+//$from_d $to_d の日付差分を計算
+$diff = date_diff(date_create($from_d), date_create($to_d));
+$diff_days = $diff->days;
+
+
 //DB接続
 //$pdo_h = new PDO("mysql:host=localhost;dbname=SaleM;charset=utf8", "root", "");
 
@@ -49,59 +54,74 @@ $total_sales_summary = [
 ];
 
 //年毎の売上粗利を集計し年度昇順でソート
-$sql = "SELECT 
-	DATE_FORMAT(UriDate, '%Y') as 売上計上年
-	,sum(UriageKin) as 売上金額
-	,sum(genka) as 売上原価
-	,sum(UriageKin)-sum(genka) as 粗利
-	from UriageMeisai 
-	where uid=:uid and UriDate between :from_d and :to_d
-	group by 売上計上年
-	order by 売上計上年 asc";
+if ($diff_days >= 365) {
+	//期間が365日以上の場合、年次売上データを取得
+	$sql = "SELECT 
+		DATE_FORMAT(UriDate, '%Y') as 売上計上年
+		,sum(UriageKin) as 売上金額
+		,sum(genka) as 売上原価
+		,sum(UriageKin)-sum(genka) as 粗利
+		from UriageMeisai 
+		where uid=:uid and UriDate between :from_d and :to_d
+		group by 売上計上年
+		order by 売上計上年 asc";
 
-$stmt = $pdo_h->prepare($sql);
-$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
-$stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
-$stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
-$stmt->execute();
-$yearly_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	$stmt = $pdo_h->prepare($sql);
+	$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
+	$stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
+	$stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
+	$stmt->execute();
+	$yearly_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}else{
+	$yearly_sales = "なし";
+}
 
 
 //月ごとの売上・粗利の集計。売上計上年月を昇順でソート
-$sql = "SELECT 
-	DATE_FORMAT(UriDate, '%Y-%m') as 売上計上年月
-	,sum(UriageKin) as 売上金額
-	,sum(genka) as 売上原価
-	,sum(UriageKin)-sum(genka) as 粗利
-	from UriageMeisai 
-	where uid=:uid and UriDate between :from_d and :to_d
-	group by 売上計上年月
-	order by 売上計上年月 asc";
+if ($diff_days < 730) {
+	//期間が730日未満の場合、月次売上データを取得
+	$sql = "SELECT 
+		DATE_FORMAT(UriDate, '%Y-%m') as 売上計上年月
+		,sum(UriageKin) as 売上金額
+		,sum(genka) as 売上原価
+		,sum(UriageKin)-sum(genka) as 粗利
+		from UriageMeisai 
+		where uid=:uid and UriDate between :from_d and :to_d
+		group by 売上計上年月
+		order by 売上計上年月 asc";
 
-$stmt = $pdo_h->prepare($sql);
-$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
-$stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
-$stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
-$stmt->execute();
-$monthly_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	$stmt = $pdo_h->prepare($sql);
+	$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
+	$stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
+	$stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
+	$stmt->execute();
+	$monthly_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}else{
+	$monthly_sales = "なし";
+}
 
 //日ごとの売上・粗利の集計。売上計上年月日を昇順でソート
-$sql = "SELECT 
-	UriDate as 売上計上年月日
-	,sum(UriageKin) as 売上金額
-	,sum(genka) as 売上原価
-	,sum(UriageKin)-sum(genka) as 粗利
-	from UriageMeisai 
-	where uid=:uid and UriDate between :from_d and :to_d
-	group by 売上計上年月日
-	order by 売上計上年月日 asc";
+if ($diff_days <= 31) {
+	//期間が31日以下の場合、日次売上データを取得
+	$sql = "SELECT 
+		UriDate as 売上計上年月日
+		,sum(UriageKin) as 売上金額
+		,sum(genka) as 売上原価
+		,sum(UriageKin)-sum(genka) as 粗利
+		from UriageMeisai 
+		where uid=:uid and UriDate between :from_d and :to_d
+		group by 売上計上年月日
+		order by 売上計上年月日 asc";
 
-$stmt = $pdo_h->prepare($sql);
-$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
-$stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
-$stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
-$stmt->execute();
-$daily_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	$stmt = $pdo_h->prepare($sql);
+	$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
+	$stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
+	$stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
+	$stmt->execute();
+	$daily_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}else{
+	$daily_sales = "なし";
+}
 
 
 //商品分類ごとの売上・粗利の集計。商品分類を昇順でソート。未分類は最後尾に表示。
