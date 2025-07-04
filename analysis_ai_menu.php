@@ -31,6 +31,11 @@ $sql_bi = "SELECT
 	, Sales_methods as 販売方法
 	, Brand_image as ブランドイメージ
 	, Instagram
+	, X_com
+	, facebook
+	, Threads
+	, tiktok
+	, other_SNS
 	, Monthly_goals as 月毎の目標
 	, This_year_goals as 今年度の目標
 	, Next_year_goals as 来年度の目標
@@ -105,11 +110,12 @@ $ai_setting_def = [
 		・地域、天気と売上の関連。
 		・売上が期待できる住所エリア
 		・取扱商品から見る業種の傾向と今後のトレンド。
-		・インスタのアカウント設定がある場合はインスタもチェック。活用方法のアドバイスを下さい。",
+		・SNSを利用している場合、ビジネス情報を元にSNS毎の活用方法について。
+		・売上分析用データとビジネス情報を元に今後の成長戦略の立案",
 	'report_type' => "・レポートはHTMLで作成し、HTMLのみを出力する。
 		・最適なHTMLフレームワークを使う。
 		・レスポンシブデザインを採用。
-		・売上分析用のJSONデータをもとに表を作成。
+		・売上分析用のJSONデータをもとにtableタグを使用して表を作成。
 		・表と分析結果を織り交ぜる。
 		・読みやすさを重視し、口語体で作成。
 		・金額はカンマ区切り。
@@ -186,24 +192,50 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 									<textarea class="form-control" id="Customer_targets" v-model="your_bussiness.顧客ターゲット" rows="3"></textarea>
 								</div>
 								<div class="mb-3">
-									<label for="Instagram" class="form-label">InstagramアカウントID</label>
-									<input class="form-control" id="Instagram" v-model="your_bussiness.Instagram" >
+									<!--利用しているSNSの種類をinput type checkboxで選択。選択肢は[Instagram,X.com,facebook,Threads,tiktok-->
+									<label for="sns_type" class="form-label">利用しているSNSの種類</label>
+									<div>
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="checkbox" id="sns_instagram" value="use" v-model="your_bussiness.Instagram">
+											<label class="form-check-label" for="sns_instagram">Instagram</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="checkbox" id="sns_x" value="use" v-model="your_bussiness.X_com">
+											<label class="form-check-label" for="sns_x">X.com</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="checkbox" id="sns_facebook" value="use" v-model="your_bussiness.facebook">
+											<label class="form-check-label" for="sns_facebook">Facebook</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="checkbox" id="sns_threads" value="use" v-model="your_bussiness.Threads">
+											<label class="form-check-label" for="sns_threads">Threads</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="checkbox" id="sns_tiktok" value="use" v-model="your_bussiness.tiktok">
+											<label class="form-check-label" for="sns_tiktok">TikTok</label>
+										</div>
+										<div class="">
+											<label class="form-label" for="other_SNS">その他のSNS</label>
+											<input class="form-control" type="text" id="other_SNS" v-model="your_bussiness.other_SNS">
+										</div>
+									</div>
 								</div>
 								<div class="mb-3">
 									<label for="Monthly_goals" class="form-label">月毎の目標</label>
-									<textarea class="form-control" id="Monthly_goals" v-model="your_bussiness.月毎の目標" rows="3"></textarea>
+									<textarea class="form-control" id="Monthly_goals" v-model="your_bussiness.月毎の目標" rows="2"></textarea>
 								</div>
 								<div class="mb-3">
 									<label for="This_year_goals" class="form-label">今年度の目標</label>
-									<textarea class="form-control" id="This_year_goals" v-model="your_bussiness.今年度の目標" rows="3"></textarea>
+									<textarea class="form-control" id="This_year_goals" v-model="your_bussiness.今年度の目標" rows="2"></textarea>
 								</div>
 								<div class="mb-3">
 									<label for="Next_year_goals" class="form-label">来年度の目標</label>
-									<textarea class="form-control" id="Next_year_goals" v-model="your_bussiness.来年度の目標" rows="3"></textarea>
+									<textarea class="form-control" id="Next_year_goals" v-model="your_bussiness.来年度の目標" rows="2"></textarea>
 								</div>
 								<div class="mb-3">
 									<label for="Ideal_years" class="form-label">5年後の理想</label>
-									<textarea class="form-control" id="Ideal_years" v-model="your_bussiness.年後の理想" rows="3"></textarea>
+									<textarea class="form-control" id="Ideal_years" v-model="your_bussiness.年後の理想" rows="2"></textarea>
 								</div>
 							</div>
 							<div class="card-footer text-end pt-3 pb-3">
@@ -226,14 +258,6 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 									<label for="Product_categories" class="form-label">レポート体裁</label>
 									<textarea class="form-control" id="Product_categories" v-model="report_type" rows="5"></textarea>
 								</div>
-								<!--<div class="mb-3">
-									<label for="Sales_methods" class="form-label">販売方法</label>
-									<textarea class="form-control" id="Sales_methods" v-model="your_bussiness.販売方法" rows="3"></textarea>
-								</div>
-							</div>
-							<div class="card-footer text-end">
-								<button type="button" class="btn btn-primary me-3" @click="ins_bussiness" >ビジネス情報登録</button>
-							</div>-->
 						</div>
 					</div><!-- accordion-item -->
 				</div><!-- accordion -->
@@ -329,6 +353,9 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 
 				const get_gemini_response = async () => {
 					loading.value = true;
+					if(save_setting.value){
+						ins_bussiness()
+					}
 					try {
 						//console_log(your_ask.value)
 						const form = new FormData();
@@ -366,6 +393,11 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 					params.append('Ideal_5_years', your_bussiness.value.年後の理想)
 					params.append('Customer_targets', your_bussiness.value.顧客ターゲット)
 					params.append('Instagram', your_bussiness.value.Instagram)
+					params.append('X_com', your_bussiness.value.X_com)
+					params.append('facebook', your_bussiness.value.facebook)
+					params.append('Threads', your_bussiness.value.Threads)
+					params.append('tiktok', your_bussiness.value.tiktok)
+					params.append('other_SNS', your_bussiness.value.other_SNS)
 					params.append('csrf_token', csrf_token)
 
 					axios

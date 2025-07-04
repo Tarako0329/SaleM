@@ -40,6 +40,11 @@ if($rtn !== true){
 		$params["Ideal_5_years"]=$_POST["Ideal_5_years"];
 		$params["Customer_targets"]=$_POST["Customer_targets"];
 		$params["Instagram"]=$_POST["Instagram"];
+		$params["X_com"]=$_POST["X_com"];
+		$params["facebook"]=$_POST["facebook"];
+		$params["Threads"]=$_POST["Threads"];
+		$params["tiktok"]=$_POST["tiktok"];
+		$params["other_SNS"]=$_POST["other_SNS"];
 
 		//delete
 		$sqlstr="DELETE from business_info where uid=:uid and app=:app";
@@ -51,7 +56,7 @@ if($rtn !== true){
 		$sqllog .= rtn_sqllog("--execute():正常終了",[]);
 
 		//INSERT
-		$sqlstr="INSERT into business_info(uid,app,Product_categories,Sales_methods,Brand_image,Monthly_goals,This_year_goals,Next_year_goals,Ideal_5_years,Customer_targets,Instagram) values(:uid,:app,:Product_categories,:Sales_methods,:Brand_image,:Monthly_goals,:This_year_goals,:Next_year_goals,:Ideal_5_years,:Customer_targets,:Instagram)";
+		$sqlstr="INSERT into business_info(uid,app,Product_categories,Sales_methods,Brand_image,Monthly_goals,This_year_goals,Next_year_goals,Ideal_5_years,Customer_targets,Instagram,X_com,facebook,Threads,tiktok,other_SNS) values(:uid,:app,:Product_categories,:Sales_methods,:Brand_image,:Monthly_goals,:This_year_goals,:Next_year_goals,:Ideal_5_years,:Customer_targets,:Instagram,:X_com,:facebook,:Threads,:tiktok,:other_SNS)";
 		$stmt = $pdo_h->prepare($sqlstr);
 		$stmt->bindValue("uid", $params["uid"], PDO::PARAM_INT);
 		$stmt->bindValue("app", $params["app"], PDO::PARAM_STR);
@@ -64,6 +69,11 @@ if($rtn !== true){
 		$stmt->bindValue("Ideal_5_years", $params["Ideal_5_years"], PDO::PARAM_STR);
 		$stmt->bindValue("Customer_targets", $params["Customer_targets"], PDO::PARAM_STR);
 		$stmt->bindValue("Instagram", $params["Instagram"], PDO::PARAM_STR);
+		$stmt->bindValue("X_com", $params["X_com"], PDO::PARAM_STR);
+		$stmt->bindValue("facebook", $params["facebook"], PDO::PARAM_STR);
+		$stmt->bindValue("Threads", $params["Threads"], PDO::PARAM_STR);
+		$stmt->bindValue("tiktok", $params["tiktok"], PDO::PARAM_STR);
+		$stmt->bindValue("other_SNS", $params["other_SNS"], PDO::PARAM_STR);
 
 		$sqllog .= rtn_sqllog($sqlstr,$params);
 		$stmt->execute();
