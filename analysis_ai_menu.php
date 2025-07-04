@@ -106,11 +106,11 @@ $ai_setting_def = [
 		・売上が期待できる住所エリア
 		・取扱商品から見る業種の傾向と今後のトレンド。
 		・インスタのアカウント設定がある場合はインスタもチェック。活用方法のアドバイスを下さい。",
-	'report_type' => "・何らかのフレームワークを使う。
+	'report_type' => "・レポートはHTMLで作成し、HTMLのみを出力する。
+		・最適なHTMLフレームワークを使う。
+		・レスポンシブデザインを採用。
 		・売上分析用のJSONデータをもとに表を作成。
 		・レポート名に適した範囲の売上実績表のみを作成する。
-		・必要に応じてphp,html,javascriptを利用する。
-		・レスポンシブデザインを採用。
 		・読みやすさを重視し、口語体で作成。
 		・金額はカンマ区切り。
 		・小数以下は無視する。"
@@ -331,7 +331,7 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 					try {
 						//console_log(your_ask.value)
 						const form = new FormData();
-						form.append('Article', `あなたはベテランの${ai_role.value}です。\n最後に提示する売上分析用のJSONデータをもとに、次の売上分析レポートを作成してください。レポート名：『${data_range.value}』、${your_ask.value}\n\n出力様式について\n${report_type.value}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
+						form.append('Article', `あなたはベテランの${ai_role.value}です。\n最後に提示する売上分析用のJSONデータをもとに、次の売上分析レポートを作成してください。レポート名：『${data_range.value}』、${your_ask.value}\n\n次の出力様式にを守ってください。\n${report_type.value}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
 						form.append('type', 'one');
 						//form.append('answer_type', 'html');
 						form.append('data_range', data_range.value);
