@@ -125,8 +125,42 @@ if ($diff_days <= 31) {
 
 
 //商品分類ごとの売上・粗利の集計。商品分類を昇順でソート。未分類は最後尾に表示。
-$sql = "SELECT 
+/*$sql = "SELECT 
 	CONCAT(IFNULL(bunrui1,'未設定'),'>',IFNULL(bunrui2,'未設定'),'>',IFNULL(bunrui3,'未設定')) as 商品分類
+	,sum(UriageKin) as 売上金額
+	,sum(genka) as 売上原価
+	,sum(UriageKin)-sum(genka) as 粗利
+	from UriageMeisai 
+	where uid=:uid and UriDate between :from_d and :to_d
+	group by 商品分類
+	order by 
+		CASE 
+			WHEN bunrui1 = '' THEN 1 
+			ELSE 0 
+		END,
+		bunrui1 ASC,
+		CASE 
+			WHEN bunrui2 = '' THEN 1 
+			ELSE 0 
+		END,
+		bunrui2 ASC,
+		CASE 
+			WHEN bunrui3 = '' THEN 1 
+			ELSE 0 
+		END,
+		bunrui3 ASC";
+
+$stmt = $pdo_h->prepare($sql);
+$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
+$stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
+$stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
+$stmt->execute();
+$category_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);*/
+
+//商品分類ごとの売上・粗利の集計。商品分類を昇順でソート。未分類は最後尾に表示。
+$sql = "SELECT 
+	CONCAT(IFNULL(bunrui1,'未設定'),'>',IFNULL(bunrui2,'未設定'),'>',) as 大中分類
+	,IFNULL(bunrui3,'未設定') as 小分類
 	,sum(UriageKin) as 売上金額
 	,sum(genka) as 売上原価
 	,sum(UriageKin)-sum(genka) as 粗利
