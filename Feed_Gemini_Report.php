@@ -59,7 +59,6 @@ if ($diff_days >= 365) {
 	$sql = "SELECT 
 		DATE_FORMAT(UriDate, '%Y') as 売上計上年
 		,sum(UriageKin) as 売上金額
-		,sum(genka) as 売上原価
 		,sum(UriageKin)-sum(genka) as 粗利
 		from UriageMeisai 
 		where uid=:uid and UriDate between :from_d and :to_d
@@ -83,7 +82,6 @@ if ($diff_days < 730) {
 	$sql = "SELECT 
 		DATE_FORMAT(UriDate, '%Y-%m') as 売上計上年月
 		,sum(UriageKin) as 売上金額
-		,sum(genka) as 売上原価
 		,sum(UriageKin)-sum(genka) as 粗利
 		from UriageMeisai 
 		where uid=:uid and UriDate between :from_d and :to_d
@@ -106,7 +104,6 @@ if ($diff_days <= 31) {
 	$sql = "SELECT 
 		UriDate as 売上計上年月日
 		,sum(UriageKin) as 売上金額
-		,sum(genka) as 売上原価
 		,sum(UriageKin)-sum(genka) as 粗利
 		from UriageMeisai 
 		where uid=:uid and UriDate between :from_d and :to_d
@@ -162,7 +159,6 @@ $sql = "SELECT
 	CONCAT(IFNULL(bunrui1,'未設定'),'>',IFNULL(bunrui2,'未設定')) as 大中分類
 	,IFNULL(bunrui3,'未設定') as 小分類
 	,sum(UriageKin) as 売上金額
-	,sum(genka) as 売上原価
 	,sum(UriageKin)-sum(genka) as 粗利
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
@@ -234,7 +230,6 @@ $sql = "SELECT
 	ROW_NUMBER() OVER (ORDER BY avg(売上金額) DESC) as 順位
 	,Event as イベント名
 	,CAST(ROUND(avg(売上金額), 0) as CHAR) as 平均売上
-	,CAST(ROUND(avg(売上原価), 0) as CHAR) as 平均原価
 	,CAST(ROUND(avg(粗利), 0) as CHAR) as 平均粗利
 	from (SELECT Event,UriDate,sum(UriageKin) as 売上金額,sum(genka) as 売上原価,sum(UriageKin)-sum(genka) as 粗利 from UriageMeisai where uid=:uid and UriDate between :from_d and :to_d group by Event,UriDate) as A 
 	group by イベント名
@@ -255,7 +250,6 @@ $sql = "SELECT
 	ROW_NUMBER() OVER (ORDER BY avg(売上金額) ASC) as 順位
 	,Event as イベント名
 	,CAST(ROUND(avg(売上金額), 0) as CHAR) as 平均売上
-	,CAST(ROUND(avg(売上原価), 0) as CHAR) as 平均原価
 	,CAST(ROUND(avg(粗利), 0) as CHAR) as 平均粗利
 	from (SELECT Event,UriDate,sum(UriageKin) as 売上金額,sum(genka) as 売上原価,sum(UriageKin)-sum(genka) as 粗利 from UriageMeisai where uid=:uid and UriDate between :from_d and :to_d group by Event,UriDate) as A 
 	group by イベント名
@@ -275,6 +269,7 @@ $sql = "SELECT
 	ROW_NUMBER() OVER (ORDER BY sum(UriageKin) DESC) as 順位
 	,ShouhinNM as 商品名
 	,sum(UriageKin) as 売上金額
+	,sum(su) as 売上個数
 	,sum(genka) as 売上原価
 	,sum(UriageKin)-sum(genka) as 粗利
 	from UriageMeisai 
@@ -295,6 +290,7 @@ $sql = "SELECT
 	ROW_NUMBER() OVER (ORDER BY sum(UriageKin) ASC) as 順位
 	,ShouhinNM as 商品名
 	,sum(UriageKin) as 売上金額
+	,sum(su) as 売上個数
 	,sum(genka) as 売上原価
 	,sum(UriageKin)-sum(genka) as 粗利
 	from UriageMeisai 
@@ -316,7 +312,6 @@ $sql = "SELECT
 	ROW_NUMBER() OVER (ORDER BY avg(売上金額) DESC) as 順位
 	,address as イベント開催住所
 	,CAST(ROUND(avg(売上金額), 0) as CHAR) as 平均売上
-	,CAST(ROUND(avg(売上原価), 0) as CHAR) as 平均原価
 	,CAST(ROUND(avg(粗利), 0) as CHAR) as 平均粗利
 	from (SELECT address ,UriDate,sum(UriageKin) as 売上金額,sum(genka) as 売上原価,sum(UriageKin)-sum(genka) as 粗利 from UriageMeisai where uid=:uid and UriDate between :from_d and :to_d group by address,UriDate) as A 
 	group by イベント開催住所
@@ -336,7 +331,6 @@ $sql = "SELECT
 	ROW_NUMBER() OVER (ORDER BY avg(売上金額) ASC) as 順位
 	,address as イベント開催住所
 	,CAST(ROUND(avg(売上金額), 0) as CHAR) as 平均売上
-	,CAST(ROUND(avg(売上原価), 0) as CHAR) as 平均原価
 	,CAST(ROUND(avg(粗利), 0) as CHAR) as 平均粗利
 	from (SELECT address ,UriDate,sum(UriageKin) as 売上金額,sum(genka) as 売上原価,sum(UriageKin)-sum(genka) as 粗利 from UriageMeisai where uid=:uid and UriDate between :from_d and :to_d group by address,UriDate) as A 
 	group by イベント開催住所
@@ -356,7 +350,6 @@ $sql = "SELECT
 	ROW_NUMBER() OVER (ORDER BY avg(売上金額) DESC) as 順位
 	, 天気
 	,CAST(ROUND(avg(売上金額), 0) as CHAR) as 平均売上
-	,CAST(ROUND(avg(売上原価), 0) as CHAR) as 平均原価
 	,CAST(ROUND(avg(粗利), 0) as CHAR) as 平均粗利
 	from (
 		SELECT CASE WHEN weather = '' THEN '未計測' ELSE weather END as 天気 ,UriDate,sum(UriageKin) as 売上金額,sum(genka) as 売上原価 ,sum(UriageKin)-sum(genka) as 粗利
@@ -389,7 +382,7 @@ $sql = "SELECT
 	END as 気温帯
 	,ShouhinNM as 商品名
 	,sum(UriageKin) as 売上金額
-	,sum(genka) as 売上原価
+	,sum(UriageKin)-sum(genka) as 粗利
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
 	group by 気温帯, 商品名
