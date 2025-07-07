@@ -121,17 +121,17 @@ if($rtn !== true){
 		$msg = gemini_api_kaiwa($user_input,"html","AI_report");
 		//$msgに$token_countを追加
 		$msg["token_count"] = $token_count;
+		$html_code = $msg["result"];
 		//$msg["finishReason"]!=="finished"の場合、$user_inputに"続きを出力してください"をセットし、"finished"が返ってくるまでgemini_api_kaiwa($user_input,"html","AI_report")を繰り返す
 		//繰り返しの上限は3回まで
 		$retry_count = 0;
-		/*while ($msg["finishReason"] !== "STOP" && $retry_count < 3) {
+		while ($msg["finishReason"] !== "STOP" && $retry_count < 3) {
 			$user_input = "続きを出力してください";
-			$additional_msg = gemini_api_kaiwa($user_input, "html", "AI_report");
-			$msg["result"] .= $additional_msg["result"];
-			$msg["finishReason"] = $additional_msg["finishReason"];
+			$msg = gemini_api_kaiwa($user_input, "html", "AI_report");
+			$html_code .= $msg["result"];
 			$retry_count++;
-		}*/
-		
+		}
+		$msg["retry_times"] = $retry_count;
 	}
 
 	//$answer_type=htmlの場合、$msg["result"]をファイルに上書きで出力する。ファイル名は$_SESSION["user_id"]+_gemini_report.html
@@ -148,7 +148,6 @@ if($rtn !== true){
 		send_htmlmail($_POST["mail"],"user_input",$user_input);
 	}
 }
-//log_writer2("\$msg",$msg,"lv3");
 //$token = csrf_create();
 
 header('Content-type: application/json');
