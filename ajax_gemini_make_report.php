@@ -117,9 +117,21 @@ if($rtn !== true){
 			['text' => $user_input]
 		];
 		$token_count = countGeminiTokensWithCurl($textParts);
-		$msg = gemini_api($user_input,"html",$response_schema);
+		//$msg = gemini_api($user_input,"html",$response_schema);
+		$msg = gemini_api_kaiwa($user_input,"html","AI_report");
 		//$msgに$token_countを追加
 		$msg["token_count"] = $token_count;
+		//$msg["finishReason"]!=="finished"の場合、$user_inputに"続きを出力してください"をセットし、"finished"が返ってくるまでgemini_api_kaiwa($user_input,"html","AI_report")を繰り返す
+		//繰り返しの上限は3回まで
+		$retry_count = 0;
+		/*while ($msg["finishReason"] !== "STOP" && $retry_count < 3) {
+			$user_input = "続きを出力してください";
+			$additional_msg = gemini_api_kaiwa($user_input, "html", "AI_report");
+			$msg["result"] .= $additional_msg["result"];
+			$msg["finishReason"] = $additional_msg["finishReason"];
+			$retry_count++;
+		}*/
+		
 	}
 
 	//$answer_type=htmlの場合、$msg["result"]をファイルに上書きで出力する。ファイル名は$_SESSION["user_id"]+_gemini_report.html

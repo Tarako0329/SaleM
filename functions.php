@@ -739,15 +739,13 @@ function gemini_api($p_ask,$p_type, $response_schema = null){
 		$request_payload['generationConfig']['responseSchema'] = $response_schema;
 	}
 	
-    $_SESSION["talk_id_".$_SESSION["user_id"]][] = $request_payload;
-
 	$options = [
 		'http' => [
 			'method' => 'POST',
 			'header' => [
 				'Content-Type: application/json',
 			],
-			'content' => json_encode($_SESSION["talk_id_".$_SESSION["user_id"]]),
+			'content' => json_encode($request_payload),
 		],
 	];
 	
@@ -841,6 +839,8 @@ function gemini_api_kaiwa($p_ask,$p_type,$p_subject){
 	
 	$emsg = "";
 	$result = "";
+    $finishReason = "finished";
+
 	if ($response === false) {
 		$emsg = 'Gemini呼び出しに失敗しました。時間をおいて、再度実行してみてください。';
 	}else{
@@ -850,6 +850,7 @@ function gemini_api_kaiwa($p_ask,$p_type,$p_subject){
 			// finishReasonのチェックを追加
 			if (isset($result_decoded['candidates'][0]['finishReason']) && $result_decoded['candidates'][0]['finishReason'] !== 'STOP') {
 				$emsg .= 'Geminiの応答が途中で終了した可能性があります。理由: ' . $result_decoded['candidates'][0]['finishReason'];
+                $finishReason = $result_decoded['candidates'][0]['finishReason'];
 			}
 		} else {
 			$emsg = 'Geminiからの予期しない応答形式です。';
@@ -874,12 +875,16 @@ function gemini_api_kaiwa($p_ask,$p_type,$p_subject){
 		$result = str_replace(" ","",$result);
 		
 		$result = json_decode($result, true);
+	}else if($p_type==="html"){
+		$result = str_replace('```html','',$result);
+		$result = str_replace('```','',$result);
 	}else{
 		//$result = $response;
 	}
 
 	$rtn = array(
 		'emsg' => $emsg,
+        'finishReason' => $finishReason,
 		'result' => $result
 	);
 	//log_writer2(" [gemini_api_kaiwa \$rtn] =>",$rtn,"lv3");
