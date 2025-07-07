@@ -808,7 +808,7 @@ function gemini_api($p_ask,$p_type, $response_schema = null){
 function gemini_api_kaiwa($p_ask,$p_type,$p_subject){
 	//$p_type:json or plain
 	//$_SESSION[$p_subject][] に会話履歴を格納
-	log_writer2(" [gemini_api_kaiwa \$p_ask] =>",$p_ask,"lv3");
+	//log_writer2(" [gemini_api_kaiwa \$p_ask] =>",$p_ask,"lv3");
 	
 	$url = GEMINI_URL.GEMINI;
 
