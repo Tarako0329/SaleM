@@ -723,6 +723,7 @@ function gemini_api($p_ask,$p_type, $response_schema = null){
 	$request_payload =  [
 		'contents' => [
 			[
+                'role' => 'user',
 				'parts' => [
 					['text' => $p_ask]
 				]
@@ -737,14 +738,16 @@ function gemini_api($p_ask,$p_type, $response_schema = null){
 		$request_payload['generationConfig']['responseMimeType'] = 'application/json';
 		$request_payload['generationConfig']['responseSchema'] = $response_schema;
 	}
-		
+	
+    $_SESSION["talk_id_".$_SESSION["user_id"]][] = $request_payload;
+
 	$options = [
 		'http' => [
 			'method' => 'POST',
 			'header' => [
 				'Content-Type: application/json',
 			],
-			'content' => json_encode($request_payload),
+			'content' => json_encode($_SESSION["talk_id_".$_SESSION["user_id"]]),
 		],
 	];
 	
@@ -855,7 +858,7 @@ function gemini_api_kaiwa($p_ask,$p_type,$p_subject){
 	}
 
 	// Geminiの応答を会話履歴に追加
-	$_SESSION['chat_history'][] = [
+	$_SESSION[$p_subject][] = [
 		'role' => 'model',
 		'parts' => [
 			['text' => $result]
