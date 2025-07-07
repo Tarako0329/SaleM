@@ -66,6 +66,7 @@ if($rtn !== true){
 
 	//Feed_Gemini_Report.phpからデータを取得
 	$url = ROOT_URL."Feed_Gemini_Report.php?uid=" . $_SESSION['user_id'] . "&from_d=" . $params['from_d'] . "&to_d=" . $params['to_d'];
+	log_writer2("\$url",$url,"lv3");
 	$json = file_get_contents($url);
 	$data = json_decode($json, true);
 
@@ -122,12 +123,15 @@ if($rtn !== true){
 		//$msgに$token_countを追加
 		$msg["token_count"] = $token_count;
 		$html_code = $msg["result"];
+		log_writer2("\$msg['result']",$msg["emsg"],"lv3");
+
 		//$msg["finishReason"]!=="finished"の場合、$user_inputに"続きを出力してください"をセットし、"finished"が返ってくるまでgemini_api_kaiwa($user_input,"html","AI_report")を繰り返す
 		//繰り返しの上限は3回まで
 		$retry_count = 0;
 		while ($msg["finishReason"] !== "finished" && $retry_count < 3) {
 			$user_input = "続きを出力してください";
 			$msg = gemini_api_kaiwa($user_input, "html", "AI_report");
+			log_writer2("\$msg['result']",$msg["emsg"],"lv3");
 			$html_code .= $msg["result"];
 			$retry_count++;
 		}
@@ -136,7 +140,8 @@ if($rtn !== true){
 
 	//$answer_type=htmlの場合、$msg["result"]をファイルに上書きで出力する。ファイル名は$_SESSION["user_id"]+_gemini_report.html
 	$report_file = $_SESSION["user_id"]."_gemini_report.html";
-	file_put_contents($report_file, $msg["result"]);
+	//file_put_contents($report_file, $msg["result"]);
+	file_put_contents($report_file, $html_code);
 	//レポートのURLを$urlにセット
 	$url = ROOT_URL.$report_file;
 
