@@ -127,6 +127,7 @@ if($rtn !== true){
 
 		//$msg["finishReason"]!=="finished"の場合、$user_inputに"続きを出力してください"をセットし、"finished"が返ってくるまでgemini_api_kaiwa($user_input,"html","AI_report")を繰り返す
 		//繰り返しの上限は3回まで
+		/*
 		$retry_count = 0;
 		while ($msg["finishReason"] !== "finished" && $retry_count < 3) {
 			$user_input = "続きを出力してください";
@@ -136,6 +137,7 @@ if($rtn !== true){
 			$retry_count++;
 		}
 		$msg["retry_times"] = $retry_count;
+		*/
 	}
 
 	//$answer_type=htmlの場合、$msg["result"]をファイルに上書きで出力する。ファイル名は$_SESSION["user_id"]+_gemini_report.html
@@ -148,9 +150,9 @@ if($rtn !== true){
 	//レポートを作成しました。こちらから確認してください。のHTMLメール用データを$mail_bodyにセット
 	$mail_body = "レポートを作成しました。こちらから確認してください。<br><a href='". $url ."'>".$url."</a>";
 	
-	send_htmlmail($_POST["mail"],$_POST['data_range'],$mail_body);
+	//send_htmlmail($_POST["mail"],$_POST['data_range'],$mail_body);
 	if(EXEC_MODE==="Test"){
-		send_htmlmail($_POST["mail"],"user_input",$user_input);
+		//send_htmlmail($_POST["mail"],"user_input",$user_input);
 	}
 }
 //$token = csrf_create();
