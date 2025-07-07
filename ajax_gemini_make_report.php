@@ -125,7 +125,7 @@ if($rtn !== true){
 		//$msg["finishReason"]!=="finished"の場合、$user_inputに"続きを出力してください"をセットし、"finished"が返ってくるまでgemini_api_kaiwa($user_input,"html","AI_report")を繰り返す
 		//繰り返しの上限は3回まで
 		$retry_count = 0;
-		while ($msg["finishReason"] !== "STOP" && $retry_count < 3) {
+		while ($msg["finishReason"] !== "finished" && $retry_count < 3) {
 			$user_input = "続きを出力してください";
 			$msg = gemini_api_kaiwa($user_input, "html", "AI_report");
 			$html_code .= $msg["result"];
