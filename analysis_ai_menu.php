@@ -62,7 +62,7 @@ if(count($business_info) === 0){
 }
 
 //最後に登録したanalysis_ai_settingを取得
-$sql_ai = "SELECT * from analysis_ai_setting where uid=? order by upd_datetime desc limit 1";
+$sql_ai = "SELECT * from analysis_ai_setting where uid=? order by upd_datetime desc";
 $stmt = $pdo_h->prepare($sql_ai);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
@@ -95,19 +95,7 @@ $report_types = [
 	["name" =>'過去５年と今後の見通し', "value" =>'5years']
 ];
 
-$ai_setting_def = [
-	'ai_role' => 'データアナリスト',
-	'report_name' => 'monthly2',
-	'your_ask' => "レポートで知りたいことは次の通り。
-		・目標と現状とのギャップの確認及び、ギャップを埋めるための提案。
-		・注力すべき商品とそうでない商品の選定。
-		・出るべきイベント
-		・地域、天気と売上の関連。
-		・売上が期待できる住所エリア
-		・取扱商品から見る業種の傾向と今後のトレンド。
-		・SNSを利用している場合、ビジネス情報を元にSNS毎の活用方法について。
-		・売上分析用データとビジネス情報を元に今後の成長戦略の立案",
-	'report_type' => "・レポートはHTMLで作成し、ミニファイされたHTMLのみを出力する。
+$report_type = "・レポートはHTMLで作成し、ミニファイされたHTMLのみを出力する。
 		・最適なHTMLフレームワークを使う。
 		・スマートホンでも見やすいようにレスポンシブデザインで作成。
 		・売上分析用のJSONデータをもとにtableタグを使用して表を作成。
@@ -126,9 +114,9 @@ $ai_setting_def = [
 		'ai_role' => 'データアナリスト',
 		'report_name' => 'weekly',
 		'your_ask' => "レポートで知りたいことは次の通り。
-			・目標と現状とのギャップの確認及び、ギャップを埋めるための提案。
-			・注力すべき商品とそうでない商品の選定。
-			・出るべきイベント
+			・今週の商品別売上実績
+			・1日ごとの売上をグラフと表で
+			・イベントごとの売上実績
 			・地域、天気と売上の関連。
 			・売上が期待できる住所エリア
 			・取扱商品から見る業種の傾向と今後のトレンド。
@@ -216,11 +204,13 @@ $ai_setting_def = [
 	]
 ];
 //$ai_setting_def["your_ask"]から空白、tabを削除,改行は残す
-$ai_setting_def["your_ask"] = str_replace([" ", "　","\t"], "", $ai_setting_def["your_ask"]);
-$ai_setting_def["your_ask"] = trim($ai_setting_def["your_ask"]);
+foreach($ai_setting_def as $row){
+	$row["your_ask"] = str_replace([" ", "　","\t"], "", $row["your_ask"]);
+	$row["your_ask"] = trim($row["your_ask"]);
 
-$ai_setting_def["report_type"] = str_replace([" ", "　","\t"], "", $ai_setting_def["report_type"]);
-$ai_setting_def["report_type"] = trim($ai_setting_def["report_type"]);
+	$row["report_type"] = str_replace([" ", "　","\t"], "", $row["report_type"]);
+	$row["report_type"] = trim($row["report_type"]);
+}
 
 
 if(count($ai_setting) > 0){
