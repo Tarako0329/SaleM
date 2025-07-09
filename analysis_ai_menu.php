@@ -61,14 +61,9 @@ if(count($business_info) === 0){
 	$business_info = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-//analysis_ai_settingを取得
-$sql_ai_setting = "SELECT 
-	ai_role
-	,data_range
-	,your_ask
-	,report_type
-	from analysis_ai_setting where uid=?";
-$stmt = $pdo_h->prepare($sql_ai_setting);
+//最後に登録したanalysis_ai_settingを取得
+$sql_ai = "SELECT * from analysis_ai_setting where uid=? order by upd_datetime desc limit 1";
+$stmt = $pdo_h->prepare($sql_ai);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
 $ai_setting = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -91,18 +86,18 @@ $ai_roles = [
 
 //レポート種類
 $report_types = [
-	'ウィークリーレポート (先週)',
-	'月次レポート (先月)',
-	'月次レポート (先月と今月)', 
-	'年次レポート (昨年)', 
-	'年次レポート (昨年と今年)',
-	'直近１２ヵ月レポート', 
-	'過去５年と今後の見通し', 
+	["name" =>'ウィークリーレポート (先週)', "value" =>'weekly'],
+	["name" =>'月次レポート (先月)', "value" =>'monthly'],
+	["name" =>'月次レポート (先月と今月)', "value" =>'monthly2'],
+	["name" =>'年次レポート (昨年)', "value" =>'yearly'],
+	["name" =>'年次レポート (昨年と今年)', "value" =>'yearly2'],
+	["name" =>'直近１２ヵ月レポート', "value" =>'12month'],
+	["name" =>'過去５年と今後の見通し', "value" =>'5years']
 ];
 
 $ai_setting_def = [
 	'ai_role' => 'データアナリスト',
-	'data_range' => '直近１２ヵ月レポート',
+	'report_name' => 'monthly2',
 	'your_ask' => "レポートで知りたいことは次の通り。
 		・目標と現状とのギャップの確認及び、ギャップを埋めるための提案。
 		・注力すべき商品とそうでない商品の選定。
@@ -274,11 +269,11 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 							</select>
 						</div>
 						<div class="mb-3">
-							<label for='data_range' class='form-label'>レポート種類</label>
-							<select class='form-select form-select-lg' v-model='data_range' id='data_range'>
+							<label for='report_name' class='form-label'>レポート種類</label>
+							<select class='form-select form-select-lg' v-model='report_name' id='report_name'>
 								<option value="">選択してください</option>
-								<template v-for='item in report_types' :key='item.value' >
-									<option :value="item">{{item}}</option>
+								<template v-for='list in report_types' :key='list.value' >
+									<option :value="list.value">{{list.name}}</option>
 								</template>
 							</select>
 						</div>
@@ -325,14 +320,14 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 				const report_types = ref(<?php echo json_encode($report_types, JSON_UNESCAPED_UNICODE); ?>);
 
 				const ai_role = ref('<?php echo $ai_setting["ai_role"]; ?>')
-				const data_range = ref('<?php echo $ai_setting["data_range"]; ?>')
+				const report_name = ref('<?php echo $ai_setting["report_name"]; ?>')
 				const your_ask = ref(`<?php echo $ai_setting["your_ask"]; ?>`);
 				const report_type = ref(`<?php echo $ai_setting["report_type"]; ?>`)
 
 				const ai_setting_modosu = () =>{
 					//ai_roleなどをデフォルトに戻す
 					ai_role.value = ai_setting_def.ai_role;
-					data_range.value = ai_setting_def.data_range;
+					report_name.value = ai_setting_def.report_name;
 					your_ask.value = ai_setting_def.your_ask;
 					report_type.value = ai_setting_def.report_type;
 				}
@@ -353,10 +348,10 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 					try {
 						//console_log(your_ask.value)
 						const form = new FormData();
-						form.append('Article', `あなたはベテランの${ai_role.value}です。\n最後に提示する売上分析用のJSONデータをもとに、次の売上分析レポートを作成してください。レポート名：『${data_range.value}』、${your_ask.value}\n\n次の出力様式にを守ってください。\n${report_type.value}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
+						form.append('Article', `あなたはベテランの${ai_role.value}です。\n最後に提示する売上分析用のJSONデータをもとに、次の売上分析レポートを作成してください。レポート名：『${report_name.value}』、${your_ask.value}\n\n次の出力様式にを守ってください。\n${report_type.value}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
 						form.append('type', 'one');
 						//form.append('answer_type', 'html');
-						form.append('data_range', data_range.value);
+						form.append('report_name', report_name.value);
 						form.append('save_setting', save_setting.value);
 						form.append('ai_role', ai_role.value);
 						form.append('your_ask', your_ask.value);
@@ -438,7 +433,7 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 					report_type,
 					save_setting,
 					make_report,
-					data_range,
+					report_name,
 					report_types,
 					ai_setting_modosu,
 					mail,

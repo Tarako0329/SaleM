@@ -216,7 +216,7 @@ ver3.21.7-000:A.Iレポート機能
 	CREATE TABLE `analysis_ai_setting` (
   `uid` int(11) NOT NULL,
   `ai_role` varchar(255) DEFAULT NULL,
-  `data_range` varchar(255) DEFAULT NULL,
+  `report_name` varchar(255) DEFAULT NULL,
   `your_ask` text DEFAULT NULL,
   `report_type` text DEFAULT NULL,
   `upd_datetime` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()

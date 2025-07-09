@@ -9,7 +9,7 @@ csrf_create()：SESSIONとCOOKIEに同一トークンをセットし、同内容
 */
 
 require "php_header.php";
-log_writer("\$_POST",$_POST,"lv3");
+//log_writer("\$_POST",$_POST,"lv3");
 
 //セッションのIDがクリアされた場合の再取得処理。
 $rtn=check_session_userid($pdo_h);

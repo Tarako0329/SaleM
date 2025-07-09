@@ -26,16 +26,52 @@ require "php_header.php";
 */
 //GET変数取得
 $uid = $_GET["uid"];
-$from_d = $_GET["from_d"];
-$to_d = $_GET["to_d"];
+//$from_d = $_GET["from_d"];
+//$to_d = $_GET["to_d"];
+$report_type = $_GET["report_type"];
 
-//$from_d $to_d の日付差分を計算
-$diff = date_diff(date_create($from_d), date_create($to_d));
-$diff_days = $diff->days;
-
-
-//DB接続
-//$pdo_h = new PDO("mysql:host=localhost;dbname=SaleM;charset=utf8", "root", "");
+switch ($report_type) {
+	case 'weekly':
+		$from_d = date('Y-m-d', strtotime('last week monday'));
+		$to_d = date('Y-m-d', strtotime('last week sunday'));
+		$report_type = "weekly";
+		break;
+	case 'monthly':
+		$from_d = date('Y-m-01', strtotime('first day of last month'));
+		$to_d = date('Y-m-t', strtotime('last day of last month'));
+		$report_type = "monthly";
+		break;
+	case 'monthly2':
+		$from_d = date('Y-m-01', strtotime('first day of last month'));
+		$to_d = date('Y-m-t');
+		$report_type = "monthly2";
+		break;
+	case 'yearly':
+		$from_d = date('Y-01-01', strtotime('-1 year'));
+		$to_d = date('Y-12-31', strtotime('-1 year'));
+		$report_type = "yearly";
+		break;
+	case 'yearly2':
+		$from_d = date('Y-01-01', strtotime('-1 year'));
+		$to_d = date('Y-12-31');
+		$report_type = "yearly2";
+		break;
+	case '12month':
+		$from_d = date('Y-m-01', strtotime('-11 months'));
+		$to_d = date('Y-m-t');
+		$report_type = "12month";
+		break;
+	case '5years':
+		$from_d = date('Y-01-01', strtotime('-4 years'));
+		$to_d = date('Y-12-31', strtotime('+1 year')); // 来年末まで
+		$report_type = "5years";
+		break;
+	default:
+		// デフォルトは直近12ヶ月
+		$from_d = date('Y-m-01', strtotime('-11 months'));
+		$to_d= date('Y-m-t');
+		break;
+}
 
 //期間中の総売上を取得
 $sql = "SELECT sum(UriageKin) as total_sales, sum(genka) as total_cost from UriageMeisai where uid=:uid and UriDate between :from_d and :to_d";
@@ -54,8 +90,8 @@ $total_sales_summary = [
 ];
 
 //年毎の売上粗利を集計し年度昇順でソート
-if ($diff_days >= 365) {
-	//期間が365日以上の場合、年次売上データを取得
+if ($report_type ==="5years") {
+	//昨年末までの年間売上
 	$sql = "SELECT 
 		DATE_FORMAT(UriDate, '%Y') as 売上計上年
 		,sum(UriageKin) as 売上金額
@@ -68,17 +104,35 @@ if ($diff_days >= 365) {
 	$stmt = $pdo_h->prepare($sql);
 	$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
 	$stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
-	$stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
+	$stmt->bindValue("to_d", date('Y-12-31', strtotime('-1 year'), PDO::PARAM_STR));
 	$stmt->execute();
 	$yearly_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	//今年の月別売上
+	$sql = "SELECT 
+		DATE_FORMAT(UriDate, '%Y-%m') as 売上計上年月
+		,sum(UriageKin) as 売上金額
+		,sum(UriageKin)-sum(genka) as 粗利
+		from UriageMeisai 
+		where uid=:uid and UriDate between :from_d and :to_d
+		group by 売上計上年月
+		order by 売上計上年月 asc";
+
+	$stmt = $pdo_h->prepare($sql);
+	$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
+	$stmt->bindValue("from_d", date('Y-01-01'), PDO::PARAM_STR);
+	$stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
+	$stmt->execute();
+	$monthly_sales_this_year = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 }else{
 	$yearly_sales = "なし";
+	$monthly_sales_this_year = "なし";
 }
 
-
 //月ごとの売上・粗利の集計。売上計上年月を昇順でソート
-if ($diff_days < 730) {
-	//期間が730日未満の場合、月次売上データを取得
+if (in_array($report_type,["yearly","yearly2","12month"])) {
+	
 	$sql = "SELECT 
 		DATE_FORMAT(UriDate, '%Y-%m') as 売上計上年月
 		,sum(UriageKin) as 売上金額
@@ -99,8 +153,7 @@ if ($diff_days < 730) {
 }
 
 //日ごとの売上・粗利の集計。売上計上年月日を昇順でソート
-if ($diff_days <= 31) {
-	//期間が31日以下の場合、日次売上データを取得
+if (in_array($report_type,["weekly","monthly","monthly2"])) {
 	$sql = "SELECT 
 		UriDate as 売上計上年月日
 		,sum(UriageKin) as 売上金額
@@ -119,40 +172,6 @@ if ($diff_days <= 31) {
 }else{
 	$daily_sales = "なし";
 }
-
-
-//商品分類ごとの売上・粗利の集計。商品分類を昇順でソート。未分類は最後尾に表示。
-/*$sql = "SELECT 
-	CONCAT(IFNULL(bunrui1,'未設定'),'>',IFNULL(bunrui2,'未設定'),'>',IFNULL(bunrui3,'未設定')) as 商品分類
-	,sum(UriageKin) as 売上金額
-	,sum(genka) as 売上原価
-	,sum(UriageKin)-sum(genka) as 粗利
-	from UriageMeisai 
-	where uid=:uid and UriDate between :from_d and :to_d
-	group by 商品分類
-	order by 
-		CASE 
-			WHEN bunrui1 = '' THEN 1 
-			ELSE 0 
-		END,
-		bunrui1 ASC,
-		CASE 
-			WHEN bunrui2 = '' THEN 1 
-			ELSE 0 
-		END,
-		bunrui2 ASC,
-		CASE 
-			WHEN bunrui3 = '' THEN 1 
-			ELSE 0 
-		END,
-		bunrui3 ASC";
-
-$stmt = $pdo_h->prepare($sql);
-$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
-$stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
-$stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
-$stmt->execute();
-$category_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);*/
 
 //商品分類ごとの売上・粗利の集計。商品分類を昇順でソート。未分類は最後尾に表示。
 $sql = "SELECT 

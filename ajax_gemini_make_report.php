@@ -3,7 +3,7 @@ require "php_header.php";
 register_shutdown_function('shutdown_ajax',basename(__FILE__));
 
 $msg["result"] = "ローカルテストは空よん";                          //ユーザー向け処理結果メッセージ
-log_writer2("\$_POST",$_POST,"lv3");
+//log_writer2("\$_POST",$_POST,"lv3");
 
 
 $rtn = csrf_checker(["analysis_ai_menu.php"]);
@@ -28,34 +28,42 @@ if($rtn !== true){
 	'直近１２ヵ月レポート', 
 	'過去５年と今後の見通し', 
 	*/
-	switch ($_POST['data_range']) {
+	$report_type = "";
+	switch ($_POST['report_name']) {
 		case 'ウィークリーレポート (先週)':
 			$params['from_d'] = date('Y-m-d', strtotime('last week monday'));
 			$params['to_d'] = date('Y-m-d', strtotime('last week sunday'));
+			$report_type = "weekly";
 			break;
 		case '月次レポート (先月)':
 			$params['from_d'] = date('Y-m-01', strtotime('first day of last month'));
 			$params['to_d'] = date('Y-m-t', strtotime('last day of last month'));
+			$report_type = "monthly";
 			break;
 		case '月次レポート (先月と今月)':
 			$params['from_d'] = date('Y-m-01', strtotime('first day of last month'));
 			$params['to_d'] = date('Y-m-t');
+			$report_type = "monthly2";
 			break;
 		case '年次レポート (昨年)':
 			$params['from_d'] = date('Y-01-01', strtotime('-1 year'));
 			$params['to_d'] = date('Y-12-31', strtotime('-1 year'));
+			$report_type = "yearly";
 			break;
 		case '年次レポート (昨年と今年)':
 			$params['from_d'] = date('Y-01-01', strtotime('-1 year'));
 			$params['to_d'] = date('Y-12-31');
+			$report_type = "yearly2";
 			break;
 		case '直近１２ヵ月レポート':
 			$params['from_d'] = date('Y-m-01', strtotime('-11 months'));
 			$params['to_d'] = date('Y-m-t');
+			$report_type = "12month";
 			break;
 		case '過去５年と今後の見通し':
 			$params['from_d'] = date('Y-01-01', strtotime('-4 years'));
 			$params['to_d'] = date('Y-12-31', strtotime('+1 year')); // 来年末まで
+			$report_type = "5years";
 			break;
 		default:
 			// デフォルトは直近12ヶ月
@@ -65,7 +73,8 @@ if($rtn !== true){
 	}
 
 	//Feed_Gemini_Report.phpからデータを取得
-	$url = ROOT_URL."Feed_Gemini_Report.php?uid=" . $_SESSION['user_id'] . "&from_d=" . $params['from_d'] . "&to_d=" . $params['to_d'];
+	//$url = ROOT_URL."Feed_Gemini_Report.php?uid=" . $_SESSION['user_id'] . "&from_d=" . $params['from_d'] . "&to_d=" . $params['to_d'];
+	$url = ROOT_URL."Feed_Gemini_Report.php?uid=" . $_SESSION['user_id'] . "&report_type=" . $report_type ;
 	log_writer2("\$url",$url,"lv3");
 	$json = file_get_contents($url);
 	$data = json_decode($json, true);
@@ -83,22 +92,23 @@ if($rtn !== true){
 
 			//$params["uid"]=$_SESSION['user_id'];
 			$params["ai_role"]=$_POST['ai_role'];
-			$params["data_range"]=$_POST['data_range'];
+			$params["report_name"]=$_POST['report_name'];
 			$params["your_ask"]=TRIM($_POST['your_ask']);
 			$params["report_type"]=TRIM($_POST['report_type']);
 			
-			$sqlstr="DELETE from analysis_ai_setting where uid=:uid";
+			$sqlstr="DELETE from analysis_ai_setting where uid=:uid and report_name=:report_name";
 			$stmt = $pdo_h->prepare($sqlstr);
 			$stmt->bindValue("uid", $params['uid'], PDO::PARAM_INT);
+			$stmt->bindValue("report_name", $params['report_name'], PDO::PARAM_STR);
 			$sqllog .= rtn_sqllog($sqlstr,$params);
 			$stmt->execute();
 			$sqllog .= rtn_sqllog("--execute():正常終了",[]);
 	
-			$sqlstr="INSERT into analysis_ai_setting(uid,ai_role,data_range,your_ask,report_type) values(:uid,:ai_role,:data_range,:your_ask,:report_type)";
+			$sqlstr="INSERT into analysis_ai_setting(uid,ai_role,report_name,your_ask,report_type) values(:uid,:ai_role,:report_name,:your_ask,:report_type)";
 			$stmt = $pdo_h->prepare($sqlstr);
 			$stmt->bindValue("uid", $params['uid'], PDO::PARAM_INT);
 			$stmt->bindValue("ai_role", $params["ai_role"], PDO::PARAM_STR);
-			$stmt->bindValue("data_range", $params["data_range"], PDO::PARAM_STR);
+			$stmt->bindValue("report_name", $params["report_name"], PDO::PARAM_STR);
 			$stmt->bindValue("your_ask", $params["your_ask"], PDO::PARAM_STR);
 			$stmt->bindValue("report_type", $params["report_type"], PDO::PARAM_STR);
 			$sqllog .= rtn_sqllog($sqlstr,$params);
@@ -118,7 +128,7 @@ if($rtn !== true){
 			['text' => $user_input]
 		];
 		$token_count = countGeminiTokensWithCurl($textParts);
-		//$msg = gemini_api($user_input,"html",$response_schema);
+		
 		$msg = gemini_api_kaiwa($user_input,"html","AI_report");
 		//$msgに$token_countを追加
 		$msg["token_count"] = $token_count;
@@ -127,17 +137,26 @@ if($rtn !== true){
 
 		//$msg["finishReason"]!=="finished"の場合、$user_inputに"続きを出力してください"をセットし、"finished"が返ってくるまでgemini_api_kaiwa($user_input,"html","AI_report")を繰り返す
 		//繰り返しの上限は3回まで
-		/*
+		
 		$retry_count = 0;
-		while ($msg["finishReason"] !== "finished" && $retry_count < 3) {
+		while ($msg["finishReason"] <> "finished" && $retry_count < 3) {
 			$user_input = "続きを出力してください";
 			$msg = gemini_api_kaiwa($user_input, "html", "AI_report");
 			log_writer2("\$msg['result']",$msg["emsg"],"lv3");
 			$html_code .= $msg["result"];
 			$retry_count++;
 		}
+		//gemini_api_kaiwaでhtmlのチェック
+		
+
+
+
+		//log_writer2("\$_SESSION['AI_report']",$_SESSION["AI_report"],"lv3");
+		//会話履歴をリセット
+		$_SESSION["AI_report"] = [];
+		//log_writer2("\$_SESSION['AI_report']",$_SESSION["AI_report"],"lv3");
 		$msg["retry_times"] = $retry_count;
-		*/
+		
 	}
 
 	//$answer_type=htmlの場合、$msg["result"]をファイルに上書きで出力する。ファイル名は$_SESSION["user_id"]+_gemini_report.html
@@ -150,7 +169,7 @@ if($rtn !== true){
 	//レポートを作成しました。こちらから確認してください。のHTMLメール用データを$mail_bodyにセット
 	$mail_body = "レポートを作成しました。こちらから確認してください。<br><a href='". $url ."'>".$url."</a>";
 	
-	//send_htmlmail($_POST["mail"],$_POST['data_range'],$mail_body);
+	send_htmlmail($_POST["mail"],$_POST['report_name'],$mail_body);
 	if(EXEC_MODE==="Test"){
 		//send_htmlmail($_POST["mail"],"user_input",$user_input);
 	}
