@@ -465,14 +465,14 @@ if(count($ai_settings) > 0){
 					try {
 						//console_log(your_ask.value)
 						const form = new FormData();
-						form.append('Article', `あなたはベテランの${ai_setting.ai_role.value}です。\n最後に提示する売上分析用のJSONデータをもとに、次の売上分析レポートを作成してください。レポート名：『${report_name.value}』、${ai_setting.your_ask.value}\n\n次の出力様式にを守ってください。\n${ai_setting.report_type.value}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
+						form.append('Article', `あなたはベテランの${ai_settings[ai_setting_i.value].ai_role.value}です。\n最後に提示する売上分析用のJSONデータをもとに、次の売上分析レポートを作成してください。レポート名：『${report_name.value}』、${ai_settings[ai_setting_i.value].your_ask.value}\n\n次の出力様式を守ってください。\n${ai_settings[ai_setting_i.value].report_type.value}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
 						form.append('type', 'one');
 						//form.append('answer_type', 'html');
 						form.append('report_name', report_name.value);
 						form.append('save_setting', save_setting.value);
-						form.append('ai_role', ai_setting.ai_role.value);
-						form.append('your_ask', ai_setting.your_ask.value);
-						form.append('report_type', ai_setting.report_type.value);
+						form.append('ai_role', ai_settings[ai_setting_i.value].ai_role.value);
+						form.append('your_ask', ai_settings[ai_setting_i.value].your_ask.value);
+						form.append('report_type', ai_settings[ai_setting_i.value].report_type.value);
 						form.append('mail', mail.value);
 
 						const response = await axios.post('ajax_gemini_make_report.php', form, {headers: {'Content-Type': 'multipart/form-data'}});
