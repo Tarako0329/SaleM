@@ -368,7 +368,7 @@ if (!empty($event_sales_top10_names)) {
 		,sum(UriageKin)-sum(genka) as 粗利
 		from UriageMeisai 
 		where uid=? and UriDate between ? and ? AND Event IN (?)
-		group by イベント名, 商品名
+		group by  商品名
 		order by 売上金額 desc limit 10";
 
 	$stmt = $pdo_h->prepare($sql);
