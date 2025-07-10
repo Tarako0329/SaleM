@@ -369,14 +369,14 @@ if (!empty($event_sales_top10_names)) {
         ,sum(UriageKin) as 売上金額
         ,sum(UriageKin)-sum(genka) as 粗利
         from UriageMeisai 
-        where uid=:uid and UriDate between :from_d and :to_d AND Event IN ($placeholders)
+        where uid=? and UriDate between ? and ? AND Event IN ($placeholders)
         group by イベント名, 商品名
         order by イベント名, 売上金額 desc";
-
+		
     $stmt = $pdo_h->prepare($sql);
-    $stmt->bindValue("uid", $uid, PDO::PARAM_INT);
-    $stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
-    $stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
+    $stmt->bindValue(1, $uid, PDO::PARAM_INT);
+    $stmt->bindValue(2, $from_d, PDO::PARAM_STR);
+    $stmt->bindValue(3, $to_d, PDO::PARAM_STR);
     foreach ($event_sales_top10_names as $key => $event_name) {
         $stmt->bindValue(($key + 4), $event_name, PDO::PARAM_STR); // +4 because of uid, from_d, to_d
     }
