@@ -174,7 +174,7 @@ $ai_settings_def = [
 		'ai_role' => 'データアナリスト',
 		'report_name' => '12month',
 		'your_ask' => "レポートの構成は次の通り。
-			・月ごとの売上推移を棒グラフで表示
+			・月ごとの売上推移を棒グラフと表で表示
 			・目標と現状とのギャップの確認及び、ギャップを埋めるための提案。
 			・ABC分析をもとに、注力すべき商品とそうでない商品の選定。
 			・イベント毎の平均売上から、出るべきイベントの取捨選択
@@ -465,14 +465,14 @@ if(count($ai_settings) > 0){
 					try {
 						//console_log(your_ask.value)
 						const form = new FormData();
-						form.append('Article', `あなたはベテランの${ai_settings[ai_setting_i.value].ai_role.value}です。\n最後に提示する売上分析用のJSONデータをもとに、次の売上分析レポートを作成してください。レポート名：『${report_name.value}』、${ai_settings[ai_setting_i.value].your_ask.value}\n\n次の出力様式を守ってください。\n${ai_settings[ai_setting_i.value].report_type.value}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
+						form.append('Article', `あなたはベテランの${ai_settings.value[ai_setting_i.value].ai_role}です。\n最後に提示する売上分析用のJSONデータをもとに、次の売上分析レポートを作成してください。レポート名：『${report_name.value}』、${ai_settings.value[ai_setting_i.value].your_ask}\n\n次の出力様式を守ってください。\n${ai_settings.value[ai_setting_i.value].report_type}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
 						form.append('type', 'one');
 						//form.append('answer_type', 'html');
 						form.append('report_name', report_name.value);
 						form.append('save_setting', save_setting.value);
-						form.append('ai_role', ai_settings[ai_setting_i.value].ai_role.value);
-						form.append('your_ask', ai_settings[ai_setting_i.value].your_ask.value);
-						form.append('report_type', ai_settings[ai_setting_i.value].report_type.value);
+						form.append('ai_role', ai_settings.value[ai_setting_i.value].ai_role);
+						form.append('your_ask', ai_settings.value[ai_setting_i.value].your_ask);
+						form.append('report_type', ai_settings.value[ai_setting_i.value].report_type);
 						form.append('mail', mail.value);
 
 						const response = await axios.post('ajax_gemini_make_report.php', form, {headers: {'Content-Type': 'multipart/form-data'}});
