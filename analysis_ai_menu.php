@@ -79,13 +79,13 @@ $ai_roles = [
 
 //レポート種類
 $report_types = [
-	["name" =>'ウィークリーレポート (先週)', "value" =>'weekly'],
-	["name" =>'月次レポート (先月)', "value" =>'monthly'],
-	["name" =>'月次レポート (先月と今月)', "value" =>'monthly2'],
-	["name" =>'年次レポート (昨年)', "value" =>'yearly'],
-	["name" =>'年次レポート (昨年と今年)', "value" =>'yearly2'],
+	//["name" =>'ウィークリーレポート (先週)', "value" =>'weekly'],
+	//["name" =>'月次レポート (先月)', "value" =>'monthly'],
+	//["name" =>'月次レポート (先月と今月)', "value" =>'monthly2'],
+	//["name" =>'年次レポート (昨年)', "value" =>'yearly'],
+	//["name" =>'年次レポート (昨年と今年)', "value" =>'yearly2'],
 	["name" =>'直近１２ヵ月レポート', "value" =>'12month'],
-	["name" =>'過去５年と今後の見通し', "value" =>'5years']
+	//["name" =>'過去５年と今後の見通し', "value" =>'5years']
 ];
 
 $report_type = "・レポートはHTMLで作成し、ミニファイされたHTMLのみを出力する。
@@ -173,15 +173,17 @@ $ai_settings_def = [
 	],[
 		'ai_role' => 'データアナリスト',
 		'report_name' => '12month',
-		'your_ask' => "レポートで知りたいことは次の通り。
+		'your_ask' => "レポートの構成は次の通り。
+			・月ごとの売上推移を棒グラフで表示
 			・目標と現状とのギャップの確認及び、ギャップを埋めるための提案。
-			・注力すべき商品とそうでない商品の選定。
-			・出るべきイベント
+			・ABC分析をもとに、注力すべき商品とそうでない商品の選定。
+			・イベント毎の平均売上から、出るべきイベントの取捨選択
 			・地域、天気と売上の関連。
 			・売上が期待できる住所エリア
 			・取扱商品から見る業種の傾向と今後のトレンド。
 			・SNSを利用している場合、ビジネス情報を元にSNS毎の活用方法について。
-			・売上分析用データとビジネス情報を元に今後の成長戦略の立案",
+			・売上分析用データとビジネス情報を元に今後の成長戦略の立案
+			・最後に商品ごとの売上ランキング表TOP10とワースト10を表示",
 		'report_type' => $report_type
 	],[
 		'ai_role' => 'データアナリスト',
@@ -214,6 +216,7 @@ $ai_settings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if(count($ai_settings) > 0){
 	//登録済のanalysis_ai_settingを取得
+	$last_report = $ai_settings[0]["report_name"] ?? "12month";
 } else {
 	//$ai_settings_defをanalysis_ai_settingに挿入
 	$stmt = $pdo_h->prepare("insert into analysis_ai_setting (uid,ai_role,report_name,your_ask,report_type) values (?,?,?,?,?)");
@@ -227,8 +230,8 @@ if(count($ai_settings) > 0){
 	}
 
 	$ai_settings = $ai_settings_def;
+	$last_report = "12month";
 }
-$last_report = $ai_settings[0]["report_name"] ?? "monthly2";
 //log_writer2("\$ai_settings", $ai_settings, "lv3");
 
 ?>
@@ -350,7 +353,7 @@ $last_report = $ai_settings[0]["report_name"] ?? "monthly2";
 								</div>
 								<div class="mb-3">
 									<label for="Product_categories" class="form-label">レポート体裁</label>
-									<textarea class="form-control" id="Product_categories" v-model="ai_setting.report_type" rows="20"></textarea>
+									<textarea class="form-control" id="Product_categories" v-model="ai_settings[ai_setting_i].report_type" rows="20"></textarea>
 								</div>
 						</div>
 					</div><!-- accordion-item -->
@@ -359,7 +362,7 @@ $last_report = $ai_settings[0]["report_name"] ?? "monthly2";
 					<div class="col-12 ">
 					<div class="mb-3">
 							<label for='ai_role' class='form-label'>AIに求める役割</label>
-							<select class='form-select'  id='ai_role' v-model='ai_setting.ai_role'>
+							<select class='form-select'  id='ai_role' v-model='ai_settings[ai_setting_i].ai_role'>
 								<option v-for="role in ai_roles" :key="role" :value="role">{{ role }}</option>
 							</select>
 						</div>
@@ -378,7 +381,7 @@ $last_report = $ai_settings[0]["report_name"] ?? "monthly2";
 						</div>
 						<div class="mb-3">
 							<label for="Product_categories" class="form-label">レポート作成依頼</label>
-							<textarea class="form-control" id="Product_categories" v-model="ai_setting.your_ask" rows="20"></textarea>
+							<textarea class="form-control" id="Product_categories" v-model="ai_settings[ai_setting_i].your_ask" rows="20"></textarea>
 						</div>
 					</div>
 				</div>
@@ -410,14 +413,14 @@ $last_report = $ai_settings[0]["report_name"] ?? "monthly2";
 			setup(){
 				const your_bussiness = ref(<?php echo json_encode($business_info[0],JSON_UNESCAPED_UNICODE); ?>);
 				
-				const ai_settings_def = <?php echo json_encode($ai_settings_def,JSON_UNESCAPED_UNICODE); ?>;
+				const ai_settings_def = ref(<?php echo json_encode($ai_settings_def,JSON_UNESCAPED_UNICODE); ?>);
 				const ai_settings = ref(<?php echo json_encode($ai_settings,JSON_UNESCAPED_UNICODE); ?>);
 				const ai_roles = ref(<?php echo json_encode($ai_roles, JSON_UNESCAPED_UNICODE); ?>);
 				const report_types = ref(<?php echo json_encode($report_types, JSON_UNESCAPED_UNICODE); ?>);
 				
 				const report_name = ref('<?php echo $last_report; ?>')
 
-				const ai_setting = computed(() => {
+				const ai_setting_i = computed(() => {
 					//ai_settings[][report_name]=report_name.valueとなるai_settingsを返す
 					let index = 0
 					ai_settings.value.forEach((list,i) => {
@@ -425,11 +428,25 @@ $last_report = $ai_settings[0]["report_name"] ?? "monthly2";
 							index = i
 						}
 					});
-					return ai_settings.value[index]
+					//return ai_settings.value[index]
+					return index
+				})
+
+				const ai_setting_def_i = computed(() => {
+					//ai_settings[][report_name]=report_name.valueとなるai_settingsを返す
+					let index = 0
+					ai_settings_def.value.forEach((list,i) => {
+						if(list.report_name === report_name.value){
+							index = i
+						}
+					});
+					//return ai_settings_def.value[index]
+					return index
 				})
 
 				const ai_setting_modosu = () =>{
 					//ai_roleなどをデフォルトに戻す
+					ai_settings.value[ai_setting_i.value] = ai_settings_def.value[ai_setting_def_i.value]
 				}
 				const mail = ref('<?php echo $user_info[0]["mail"]; ?>')
 
@@ -537,9 +554,10 @@ $last_report = $ai_settings[0]["report_name"] ?? "monthly2";
 					report_types,
 					ai_setting_modosu,
 					mail,
-					//ai_setting_def,
 					ai_settings,
-					ai_setting
+					ai_settings_def,
+					ai_setting_i,
+					ai_setting_def_i,
 				};
 			}
 		}).mount('#app');

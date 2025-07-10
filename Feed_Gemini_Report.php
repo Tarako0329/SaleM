@@ -1,70 +1,52 @@
 <?php
 require "php_header.php";
 
-/*売上明細を取得し、AIで売上分析するために必要な統計データを連想配列で提供します。
-
-	売上明細を取得するSQL文は
-	  "SELECT 
-		DATE_FORMAT(UriDate, '%Y') as 売上計上年
-		,DATE_FORMAT(UriDate, '%Y-%m') as 売上計上年月
-		,UriDate as 売上計上年月日
-		,Event as 売上計上イベント名
-		,TokuisakiNM as イベント以外の売上先
-		,UriageNO as 売上番号
-		,ShouhinNM as 商品名
-		,su as 売上個数
-		,UriageKin as 売上金額
-		,genka as 売上原価
-		,CONCAT(IFNULL(bunrui1,'未設定'),IFNULL(bunrui2,'未設定') ,IFNULL(bunrui3,'未設定')) as 商品分類
-		,address as イベント開催住所
-		,weather as 売上時の天気
-		,CAST(ROUND(temp,1) as CHAR) as 売上時の気温
-		from UriageMeisai 
-		where uid=:uid and UriDate between :from_d and :to_d";
-	です。uidとfrom_dとto_dは$_GETから取得します。
-
-*/
 //GET変数取得
 $uid = $_GET["uid"];
-//$from_d = $_GET["from_d"];
-//$to_d = $_GET["to_d"];
 $report_type = $_GET["report_type"];
+//weekly:先週						=>総売上、１日ごとの売上、イベントごとの売上、商品の売上ランキング、ジャンル別円グラフ
+//monthly:今月          =>総売上、目標までのギャップ、１日ごとの売上、イベントごとの売上、商品の売上ランキング、ジャンル別円グラフ
+//monthly2:先月と今月
+//yearly:今年
+//yearly2:去年と今年
+//12month:直近１２ヵ月
+//5years:過去五年と今年
 
 switch ($report_type) {
 	case 'weekly':
 		$from_d = date('Y-m-d', strtotime('last week monday'));
 		$to_d = date('Y-m-d', strtotime('last week sunday'));
-		$report_type = "weekly";
+		//$report_type = "weekly";
 		break;
 	case 'monthly':
 		$from_d = date('Y-m-01', strtotime('first day of last month'));
 		$to_d = date('Y-m-t', strtotime('last day of last month'));
-		$report_type = "monthly";
+		//$report_type = "monthly";
 		break;
 	case 'monthly2':
 		$from_d = date('Y-m-01', strtotime('first day of last month'));
 		$to_d = date('Y-m-t');
-		$report_type = "monthly2";
+		//$report_type = "monthly2";
 		break;
 	case 'yearly':
 		$from_d = date('Y-01-01', strtotime('-1 year'));
 		$to_d = date('Y-12-31', strtotime('-1 year'));
-		$report_type = "yearly";
+		//$report_type = "yearly";
 		break;
 	case 'yearly2':
 		$from_d = date('Y-01-01', strtotime('-1 year'));
 		$to_d = date('Y-12-31');
-		$report_type = "yearly2";
+		//$report_type = "yearly2";
 		break;
 	case '12month':
 		$from_d = date('Y-m-01', strtotime('-11 months'));
 		$to_d = date('Y-m-t');
-		$report_type = "12month";
+		//$report_type = "12month";
 		break;
 	case '5years':
 		$from_d = date('Y-01-01', strtotime('-4 years'));
 		$to_d = date('Y-12-31', strtotime('+1 year')); // 来年末まで
-		$report_type = "5years";
+		//$report_type = "5years";
 		break;
 	default:
 		// デフォルトは直近12ヶ月
@@ -450,6 +432,7 @@ foreach ($grouped_temp_sales as $temp_zone => $products) {
 $all_stats = [
     '期間中の総売上概要' => $total_sales_summary,
     '年次売上データ' => $yearly_sales,
+		'今年の月次売上データ' => $monthly_sales_this_year,
     '月次売上データ' => $monthly_sales,
     '日次売上データ' => $daily_sales,
     '商品分類別売上データ' => $category_sales,
