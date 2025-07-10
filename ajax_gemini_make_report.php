@@ -165,8 +165,11 @@ if($rtn !== true){
 	$url = ROOT_URL.$report_file;
 
 	//レポートを作成しました。こちらから確認してください。のHTMLメール用データを$mail_bodyにセット
-	$mail_body = "レポートを作成しました。こちらから確認してください。<br><a href='". $url ."'>".$url."</a>";
-	
+	if($msg["emsg"]<>""){
+		$mail_body = $msg["emsg"];
+	}else{
+		$mail_body = "レポートを作成しました。こちらから確認してください。<br><a href='". $url ."'>".$url."</a>";
+	}
 	send_htmlmail($_POST["mail"],$_POST['report_name'],$mail_body);
 	if(EXEC_MODE==="Test"){
 		//send_htmlmail($_POST["mail"],"user_input",$user_input);
