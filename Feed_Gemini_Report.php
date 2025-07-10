@@ -361,6 +361,29 @@ $event_sales_top10_names = array_column($event_sales, 'イベント名');
 $event_product_sales_top10 = [];
 
 if (!empty($event_sales_top10_names)) {
+	$sql = "SELECT 
+		ShouhinNM as 商品名
+		,sum(su) as 売上個数
+		,sum(UriageKin) as 売上金額
+		,sum(UriageKin)-sum(genka) as 粗利
+		from UriageMeisai 
+		where uid=? and UriDate between ? and ? AND Event IN (?)
+		group by イベント名, 商品名
+		order by 売上金額 desc limit 10";
+
+	$stmt = $pdo_h->prepare($sql);
+	$i=0;
+	foreach($event_sales_top10_names as $item){
+		$stmt->bindValue(1, $uid, PDO::PARAM_INT);
+    $stmt->bindValue(2, $from_d, PDO::PARAM_STR);
+    $stmt->bindValue(3, $to_d, PDO::PARAM_STR);
+    $stmt->bindValue(4, $item, PDO::PARAM_STR);
+		$stmt->execute();
+		$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$event_product_sales_top10[$i] = array("イベント名" => $item, "商品売上トップ10" => $result);
+		$i++;
+	}
+/*
     $placeholders = implode(',', array_fill(0, count($event_sales_top10_names), '?'));
     $sql = "SELECT 
         Event as イベント名
@@ -396,6 +419,7 @@ if (!empty($event_sales_top10_names)) {
     foreach ($grouped_event_product_sales as $event_name => $products) {
         $event_product_sales_top10[$event_name] = array_slice($products, 0, 10);
     }
+		*/
 } else {
     $event_product_sales_top10 = "なし";
 }
