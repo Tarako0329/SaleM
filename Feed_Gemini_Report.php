@@ -157,13 +157,12 @@ if (in_array($report_type,["weekly","monthly","monthly2"])) {
 
 //商品分類ごとの売上・粗利の集計。商品分類を昇順でソート。未分類は最後尾に表示。
 $sql = "SELECT 
-	CONCAT(IFNULL(bunrui1,'未設定'),'>',IFNULL(bunrui2,'未設定')) as 大中分類
-	,IFNULL(bunrui3,'未設定') as 小分類
+	IFNULL(bunrui1,'未設定') as 大分類
 	,sum(UriageKin) as 売上金額
 	,sum(UriageKin)-sum(genka) as 粗利
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
-	group by 大中分類,小分類
+	group by 大中分類
 	order by 
 		CASE 
 			WHEN bunrui1 = '' THEN 1 
@@ -186,11 +185,76 @@ $stmt->bindValue("uid", $uid, PDO::PARAM_INT);
 $stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
 $stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
 $stmt->execute();
-$category_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$category_sales1 = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//商品分類ごとの売上・粗利の集計。商品分類を昇順でソート。未分類は最後尾に表示。
+$sql = "SELECT 
+	CONCAT(IFNULL(bunrui1,'未設定'),'>',IFNULL(bunrui2,'未設定')) as 大中分類
+	,sum(UriageKin) as 売上金額
+	,sum(UriageKin)-sum(genka) as 粗利
+	from UriageMeisai 
+	where uid=:uid and UriDate between :from_d and :to_d
+	group by 大中分類
+	order by 
+		CASE 
+			WHEN bunrui1 = '' THEN 1 
+			ELSE 0 
+		END,
+		bunrui1 ASC,
+		CASE 
+			WHEN bunrui2 = '' THEN 1 
+			ELSE 0 
+		END,
+		bunrui2 ASC,
+		CASE 
+			WHEN bunrui3 = '' THEN 1 
+			ELSE 0 
+		END,
+		bunrui3 ASC";
+
+$stmt = $pdo_h->prepare($sql);
+$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
+$stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
+$stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
+$stmt->execute();
+$category_sales2 = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//商品分類ごとの売上・粗利の集計。商品分類を昇順でソート。未分類は最後尾に表示。
+$sql = "SELECT 
+	CONCAT(IFNULL(bunrui1,'未設定'),'>',IFNULL(bunrui2,'未設定'),'>',IFNULL(bunrui3,'未設定')) as 大中小分類
+	,sum(UriageKin) as 売上金額
+	,sum(UriageKin)-sum(genka) as 粗利
+	from UriageMeisai 
+	where uid=:uid and UriDate between :from_d and :to_d
+	group by 大中小分類
+	order by 
+		CASE 
+			WHEN bunrui1 = '' THEN 1 
+			ELSE 0 
+		END,
+		bunrui1 ASC,
+		CASE 
+			WHEN bunrui2 = '' THEN 1 
+			ELSE 0 
+		END,
+		bunrui2 ASC,
+		CASE 
+			WHEN bunrui3 = '' THEN 1 
+			ELSE 0 
+		END,
+		bunrui3 ASC";
+
+$stmt = $pdo_h->prepare($sql);
+$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
+$stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
+$stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
+$stmt->execute();
+$category_sales3 = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 //ABC分析
 $sql = "SELECT 
 	ShouhinNM as 商品名
+	,sum(su) as 売上個数
 	,sum(UriageKin) as 売上金額
 	,sum(UriageKin)-sum(genka) as 粗利
 	from UriageMeisai 
@@ -435,7 +499,9 @@ $all_stats = [
 		'今年の月次売上データ' => $monthly_sales_this_year,
     '月次売上データ' => $monthly_sales,
     '日次売上データ' => $daily_sales,
-    '商品分類別売上データ' => $category_sales,
+    '商品大分類別売上グラフ用データ' => $category_sales1,
+    '商品大中分類別売上グラフ用データ' => $category_sales2,
+    '商品大中小分類別売上グラフ用データ' => $category_sales3,
     '商品別ABC分析データ' => $abc_data,
     'イベント別平均売上トップ10' => $event_sales,
     'イベント別平均売上ワースト5' => $event_sales_worst,
