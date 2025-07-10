@@ -125,7 +125,8 @@ if($rtn !== true){
 	if($msg["emsg"]<>""){
 		$mail_body = $msg["emsg"];
 	}else{
-		$mail_body = "レポートを作成しました。こちらから確認してください。<br><a href='". $url ."'>".$url."</a>";
+		//$mail_body = "レポートを作成しました。こちらから確認してください。<br><a href='". $url ."'>".$url."</a>";
+		$mail_body = $html_code;
 	}
 	send_htmlmail($_POST["mail"],$_POST['report_name'],$mail_body);
 	if(EXEC_MODE==="Test"){
