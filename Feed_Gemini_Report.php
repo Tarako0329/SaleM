@@ -258,7 +258,7 @@ $sql = "SELECT
 	where uid=:uid and UriDate between :from_d and :to_d
 	group by 大中小分類
 	order by 
-	売上金額 ASC";
+	売上金額 DESC";
 
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue("uid", $uid, PDO::PARAM_INT);
