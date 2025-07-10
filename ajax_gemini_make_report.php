@@ -28,7 +28,8 @@ if($rtn !== true){
 	'直近１２ヵ月レポート', 
 	'過去５年と今後の見通し', 
 	*/
-	$report_type = "";
+	$report_type = $_POST['report_name'];
+	/*
 	switch ($_POST['report_name']) {
 		case 'ウィークリーレポート (先週)':
 			$params['from_d'] = date('Y-m-d', strtotime('last week monday'));
@@ -71,7 +72,7 @@ if($rtn !== true){
 			$params['to_d']= date('Y-m-t');
 			break;
 	}
-
+	*/
 	//Feed_Gemini_Report.phpからデータを取得
 	//$url = ROOT_URL."Feed_Gemini_Report.php?uid=" . $_SESSION['user_id'] . "&from_d=" . $params['from_d'] . "&to_d=" . $params['to_d'];
 	$url = ROOT_URL."Feed_Gemini_Report.php?uid=" . $_SESSION['user_id'] . "&report_type=" . $report_type ;
@@ -148,9 +149,6 @@ if($rtn !== true){
 		}
 		//gemini_api_kaiwaでhtmlのチェック
 		
-
-
-
 		//log_writer2("\$_SESSION['AI_report']",$_SESSION["AI_report"],"lv3");
 		//会話履歴をリセット
 		$_SESSION["AI_report"] = [];

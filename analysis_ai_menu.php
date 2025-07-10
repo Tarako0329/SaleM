@@ -206,7 +206,7 @@ foreach($ai_settings_def as $row){
 	$ai_settings_def[$i]["your_ask"] = trim(str_replace([" ", "　","\t"], "", $row["your_ask"]));
 	$i++;
 }
-log_writer2("\$ai_settings_def", $ai_settings_def, "lv3");
+//log_writer2("\$ai_settings_def", $ai_settings_def, "lv3");
 
 $sql_ai = "SELECT * from analysis_ai_setting where uid=? order by upd_datetime desc";
 $stmt = $pdo_h->prepare($sql_ai);
@@ -214,9 +214,12 @@ $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
 $ai_settings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+//初期値は直近１２ヵ月
+$last_report = "12month";
 if(count($ai_settings) > 0){
 	//登録済のanalysis_ai_settingを取得
-	$last_report = $ai_settings[0]["report_name"] ?? "12month";
+	//複数レポートに対応出来たら直近出力したレポート種類をセットする　を有効にする
+	//$last_report = $ai_settings[0]["report_name"] ?? "12month";
 } else {
 	//$ai_settings_defをanalysis_ai_settingに挿入
 	$stmt = $pdo_h->prepare("insert into analysis_ai_setting (uid,ai_role,report_name,your_ask,report_type) values (?,?,?,?,?)");
@@ -230,7 +233,6 @@ if(count($ai_settings) > 0){
 	}
 
 	$ai_settings = $ai_settings_def;
-	$last_report = "12month";
 }
 //log_writer2("\$ai_settings", $ai_settings, "lv3");
 
@@ -419,6 +421,16 @@ if(count($ai_settings) > 0){
 				const report_types = ref(<?php echo json_encode($report_types, JSON_UNESCAPED_UNICODE); ?>);
 				
 				const report_name = ref('<?php echo $last_report; ?>')
+				const report_i = computed(() => {
+					//report_nameの値
+					let index = 0
+					report_types.value.forEach((list,i) => {
+						if(list.value === report_name.value){
+							index = i
+						}
+					});
+					return index
+				})
 
 				const ai_setting_i = computed(() => {
 					//ai_settings[][report_name]=report_name.valueとなるai_settingsを返す
@@ -465,7 +477,7 @@ if(count($ai_settings) > 0){
 					try {
 						//console_log(your_ask.value)
 						const form = new FormData();
-						form.append('Article', `あなたはベテランの${ai_settings.value[ai_setting_i.value].ai_role}です。\n最後に提示する売上分析用のJSONデータをもとに、次の売上分析レポートを作成してください。レポート名：『${report_name.value}』、${ai_settings.value[ai_setting_i.value].your_ask}\n\n次の出力様式を守ってください。\n${ai_settings.value[ai_setting_i.value].report_type}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
+						form.append('Article', `あなたはベテランの${ai_settings.value[ai_setting_i.value].ai_role}です。\n最後に提示する売上分析用のJSONデータをもとに、次の売上分析レポートを作成してください。レポート名：『${report_types.value[report_i.value].name}』、${ai_settings.value[ai_setting_i.value].your_ask}\n\n次の出力様式を守ってください。\n${ai_settings.value[ai_setting_i.value].report_type}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
 						form.append('type', 'one');
 						//form.append('answer_type', 'html');
 						form.append('report_name', report_name.value);
