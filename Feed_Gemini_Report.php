@@ -356,6 +356,50 @@ $stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
 $stmt->execute();
 $event_sales_worst = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+//平均売上トップ10のイベントにおける商品の売り上げトップ10
+$event_sales_top10_names = array_column($event_sales, 'イベント名');
+$event_product_sales_top10 = [];
+
+if (!empty($event_sales_top10_names)) {
+    $placeholders = implode(',', array_fill(0, count($event_sales_top10_names), '?'));
+    $sql = "SELECT 
+        Event as イベント名
+        ,ShouhinNM as 商品名
+        ,sum(su) as 売上個数
+        ,sum(UriageKin) as 売上金額
+        ,sum(UriageKin)-sum(genka) as 粗利
+        from UriageMeisai 
+        where uid=:uid and UriDate between :from_d and :to_d AND Event IN ($placeholders)
+        group by イベント名, 商品名
+        order by イベント名, 売上金額 desc";
+
+    $stmt = $pdo_h->prepare($sql);
+    $stmt->bindValue("uid", $uid, PDO::PARAM_INT);
+    $stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
+    $stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
+    foreach ($event_sales_top10_names as $key => $event_name) {
+        $stmt->bindValue(($key + 4), $event_name, PDO::PARAM_STR); // +4 because of uid, from_d, to_d
+    }
+    $stmt->execute();
+    $raw_event_product_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // グループ化して各イベントのトップ10を抽出
+    $grouped_event_product_sales = [];
+    foreach ($raw_event_product_sales as $row) {
+        $event_name = $row['イベント名'];
+        if (!isset($grouped_event_product_sales[$event_name])) {
+            $grouped_event_product_sales[$event_name] = [];
+        }
+        $grouped_event_product_sales[$event_name][] = $row;
+    }
+
+    foreach ($grouped_event_product_sales as $event_name => $products) {
+        $event_product_sales_top10[$event_name] = array_slice($products, 0, 10);
+    }
+} else {
+    $event_product_sales_top10 = "なし";
+}
+
 
 //商品ごとの売上・粗利の集計。売上金額をトップ１０件降順でソート。順位もつける
 $sql = "SELECT 
@@ -521,6 +565,7 @@ $all_stats = [
     '商品大中小分類別売上ランキングデータ' => $category_sales3,
     '商品別ABC分析データ' => $abc_data,
     'イベント別平均売上トップ10' => $event_sales,
+		'平均売上トップ10のイベントにおける商品の売上トップ10' => $event_product_sales_top10,
     'イベント別平均売上ワースト5' => $event_sales_worst,
     '商品別売上トップ10' => $product_sales,
     '商品別売上ワースト10' => $product_sales_worst,

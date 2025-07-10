@@ -29,52 +29,7 @@ if($rtn !== true){
 	'過去５年と今後の見通し', 
 	*/
 	$report_type = $_POST['report_name'];
-	/*
-	switch ($_POST['report_name']) {
-		case 'ウィークリーレポート (先週)':
-			$params['from_d'] = date('Y-m-d', strtotime('last week monday'));
-			$params['to_d'] = date('Y-m-d', strtotime('last week sunday'));
-			$report_type = "weekly";
-			break;
-		case '月次レポート (先月)':
-			$params['from_d'] = date('Y-m-01', strtotime('first day of last month'));
-			$params['to_d'] = date('Y-m-t', strtotime('last day of last month'));
-			$report_type = "monthly";
-			break;
-		case '月次レポート (先月と今月)':
-			$params['from_d'] = date('Y-m-01', strtotime('first day of last month'));
-			$params['to_d'] = date('Y-m-t');
-			$report_type = "monthly2";
-			break;
-		case '年次レポート (昨年)':
-			$params['from_d'] = date('Y-01-01', strtotime('-1 year'));
-			$params['to_d'] = date('Y-12-31', strtotime('-1 year'));
-			$report_type = "yearly";
-			break;
-		case '年次レポート (昨年と今年)':
-			$params['from_d'] = date('Y-01-01', strtotime('-1 year'));
-			$params['to_d'] = date('Y-12-31');
-			$report_type = "yearly2";
-			break;
-		case '直近１２ヵ月レポート':
-			$params['from_d'] = date('Y-m-01', strtotime('-11 months'));
-			$params['to_d'] = date('Y-m-t');
-			$report_type = "12month";
-			break;
-		case '過去５年と今後の見通し':
-			$params['from_d'] = date('Y-01-01', strtotime('-4 years'));
-			$params['to_d'] = date('Y-12-31', strtotime('+1 year')); // 来年末まで
-			$report_type = "5years";
-			break;
-		default:
-			// デフォルトは直近12ヶ月
-			$params['from_d'] = date('Y-m-01', strtotime('-11 months'));
-			$params['to_d']= date('Y-m-t');
-			break;
-	}
-	*/
-	//Feed_Gemini_Report.phpからデータを取得
-	//$url = ROOT_URL."Feed_Gemini_Report.php?uid=" . $_SESSION['user_id'] . "&from_d=" . $params['from_d'] . "&to_d=" . $params['to_d'];
+	
 	$url = ROOT_URL."Feed_Gemini_Report.php?uid=" . $_SESSION['user_id'] . "&report_type=" . $report_type ;
 	log_writer2("\$url",$url,"lv3");
 	$json = file_get_contents($url);
@@ -133,7 +88,9 @@ if($rtn !== true){
 		$msg = gemini_api_kaiwa($user_input,"html","AI_report");
 		//$msgに$token_countを追加
 		$msg["token_count"] = $token_count;
-		$html_code = $msg["result"];
+		//$msg["result"]の最後の改行を削除して$html_codeにセット
+		$html_code = rtrim($msg["result"]);
+		
 		log_writer2("\$msg['result']",$msg["emsg"],"lv3");
 
 		//$msg["finishReason"]!=="finished"の場合、$user_inputに"続きを出力してください"をセットし、"finished"が返ってくるまでgemini_api_kaiwa($user_input,"html","AI_report")を繰り返す
@@ -144,7 +101,7 @@ if($rtn !== true){
 			$user_input = "続きを出力してください";
 			$msg = gemini_api_kaiwa($user_input, "html", "AI_report");
 			log_writer2("\$msg['result']",$msg["emsg"],"lv3");
-			$html_code .= $msg["result"];
+			$html_code .= rtrim($msg["result"]);
 			$retry_count++;
 		}
 		//gemini_api_kaiwaでhtmlのチェック
