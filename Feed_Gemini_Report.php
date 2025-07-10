@@ -114,7 +114,6 @@ if ($report_type ==="5years") {
 
 //月ごとの売上・粗利の集計。売上計上年月を昇順でソート
 if (in_array($report_type,["yearly","yearly2","12month"])) {
-	
 	$sql = "SELECT 
 		DATE_FORMAT(UriDate, '%Y-%m') as 売上計上年月
 		,sum(UriageKin) as 売上金額
@@ -154,6 +153,52 @@ if (in_array($report_type,["weekly","monthly","monthly2"])) {
 }else{
 	$daily_sales = "なし";
 }
+
+//月ごとの売上・粗利の集計。売上計上年月を昇順でソート
+if (in_array($report_type,["yearly","yearly2","12month","5years"])) {
+	//四季ごとの商品売上高トップ５を取得
+	$sql = "SELECT 
+		CASE 
+			WHEN MONTH(UriDate) BETWEEN 3 AND 5 THEN '春'
+			WHEN MONTH(UriDate) BETWEEN 6 AND 8 THEN '夏'
+			WHEN MONTH(UriDate) BETWEEN 9 AND 11 THEN '秋'
+			ELSE '冬'
+		END as 季節
+		,ShouhinNM as 商品名
+		,sum(su) as 売上数
+		,sum(UriageKin) as 売上金額
+		,sum(UriageKin)-sum(genka) as 粗利
+		from UriageMeisai 
+		where uid=:uid and UriDate between :from_d and :to_d
+		group by 季節, 商品名
+		order by 季節, 売上金額 desc";
+
+	$stmt = $pdo_h->prepare($sql);
+	$stmt->bindValue("uid", $uid, PDO::PARAM_INT);
+	$stmt->bindValue("from_d", $from_d, PDO::PARAM_STR);
+	$stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
+	$stmt->execute();
+	$seasonal_product_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	// $seasonal_product_salesを季節ごとのトップ5のみに
+	$grouped_seasonal_sales = [];
+	foreach ($seasonal_product_sales as $row) {
+		$season = $row['季節'];
+		if (!isset($grouped_seasonal_sales[$season])) {
+			$grouped_seasonal_sales[$season] = [];
+		}
+		$grouped_seasonal_sales[$season][] = $row;
+	}
+
+	$seasonal_product_sales_top5 = [];
+	foreach ($grouped_seasonal_sales as $season => $products) {
+		$seasonal_product_sales_top5[$season] = array_slice($products, 0, 5);
+	}
+}else{
+	$seasonal_product_sales_top5 = "なし";
+}
+
+
 
 //商品分類ごとの売上・粗利の集計。商品分類を昇順でソート。未分類は最後尾に表示。
 $sql = "SELECT 
@@ -213,21 +258,7 @@ $sql = "SELECT
 	where uid=:uid and UriDate between :from_d and :to_d
 	group by 大中小分類
 	order by 
-		CASE 
-			WHEN bunrui1 = '' THEN 1 
-			ELSE 0 
-		END,
-		bunrui1 ASC,
-		CASE 
-			WHEN bunrui2 = '' THEN 1 
-			ELSE 0 
-		END,
-		bunrui2 ASC,
-		CASE 
-			WHEN bunrui3 = '' THEN 1 
-			ELSE 0 
-		END,
-		bunrui3 ASC";
+	売上金額 ASC";
 
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue("uid", $uid, PDO::PARAM_INT);
@@ -484,9 +515,10 @@ $all_stats = [
 		'今年の月次売上データ' => $monthly_sales_this_year,
     '月次売上データ' => $monthly_sales,
     '日次売上データ' => $daily_sales,
+		'季節別売上トップ５' =>$seasonal_product_sales_top5,
     '商品大分類別売上グラフ用データ' => $category_sales1,
     '商品大中分類別売上グラフ用データ' => $category_sales2,
-    '商品大中小分類別売上グラフ用データ' => $category_sales3,
+    '商品大中小分類別売上ランキングデータ' => $category_sales3,
     '商品別ABC分析データ' => $abc_data,
     'イベント別平均売上トップ10' => $event_sales,
     'イベント別平均売上ワースト5' => $event_sales_worst,
