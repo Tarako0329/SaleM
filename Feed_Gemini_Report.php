@@ -162,23 +162,13 @@ $sql = "SELECT
 	,sum(UriageKin)-sum(genka) as 粗利
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
-	group by 大中分類
+	group by 大分類
 	order by 
 		CASE 
 			WHEN bunrui1 = '' THEN 1 
 			ELSE 0 
 		END,
-		bunrui1 ASC,
-		CASE 
-			WHEN bunrui2 = '' THEN 1 
-			ELSE 0 
-		END,
-		bunrui2 ASC,
-		CASE 
-			WHEN bunrui3 = '' THEN 1 
-			ELSE 0 
-		END,
-		bunrui3 ASC";
+		bunrui1 ASC";
 
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue("uid", $uid, PDO::PARAM_INT);
@@ -205,12 +195,7 @@ $sql = "SELECT
 			WHEN bunrui2 = '' THEN 1 
 			ELSE 0 
 		END,
-		bunrui2 ASC,
-		CASE 
-			WHEN bunrui3 = '' THEN 1 
-			ELSE 0 
-		END,
-		bunrui3 ASC";
+		bunrui2 ASC";
 
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue("uid", $uid, PDO::PARAM_INT);
