@@ -23,7 +23,7 @@ $sql="SELECT * from Users where uid=?";
 $stmt = $pdo_h->prepare($sql);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
-$row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$user_info = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 //ビジネスインフォを取得
 $sql_bi = "SELECT 
@@ -61,13 +61,6 @@ if(count($business_info) === 0){
 	$business_info = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-//最後に登録したanalysis_ai_settingを取得
-$sql_ai = "SELECT * from analysis_ai_setting where uid=? order by upd_datetime desc";
-$stmt = $pdo_h->prepare($sql_ai);
-$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
-$stmt->execute();
-$ai_setting = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 //売上分析に最適なロール集を$ai_roleにセット
 $ai_roles = [
 	'データアナリスト',
@@ -96,20 +89,22 @@ $report_types = [
 ];
 
 $report_type = "・レポートはHTMLで作成し、ミニファイされたHTMLのみを出力する。
-		・最適なHTMLフレームワークを使う。
-		・スマートホンでも見やすいようにレスポンシブデザインで作成。
-		・売上分析用のJSONデータをもとにtableタグを使用して表を作成。
-		・表と分析結果を織り交ぜる。
-		・表はTableタグを使用する
-		・商品分類別売上データは大中分類を円グラフにする。
-		・商品分類別売上データの小分類は大中分類を毎の内訳表にする。
-		・読みやすさを重視し、口語体で作成。
-		・金額はカンマ区切り。
-		・小数以下は無視する。
-		・金額は正確に集計する。
-		・一切の改行と余分なスペースを含まない最小限のHTMLコードを生成してください。インデントは使用しないでください。";
+	・最適なHTMLフレームワークを使う。
+	・スマートホンでも見やすいようにレスポンシブデザインで作成。
+	・売上分析用のJSONデータをもとにtableタグを使用して表を作成。
+	・表と分析結果を織り交ぜる。
+	・表はTableタグを使用する
+	・商品分類別売上データは大中分類を円グラフにする。
+	・商品分類別売上データの小分類は大中分類を毎の内訳表にする。
+	・読みやすさを重視し、口語体で作成。
+	・金額はカンマ区切り。
+	・小数以下は無視する。
+	・金額は正確に集計する。
+	";
+	//・一切の改行と余分なスペースを含まない最小限のHTMLコードを生成してください。インデントは使用しないでください。
+$report_type = str_replace([" ", "　","\t"], "", $report_type);
 
-$ai_setting_def = [
+$ai_settings_def = [
 	[
 		'ai_role' => 'データアナリスト',
 		'report_name' => 'weekly',
@@ -203,22 +198,38 @@ $ai_setting_def = [
 		'report_type' => $report_type
 	]
 ];
-//$ai_setting_def["your_ask"]から空白、tabを削除,改行は残す
-foreach($ai_setting_def as $row){
-	$row["your_ask"] = str_replace([" ", "　","\t"], "", $row["your_ask"]);
-	$row["your_ask"] = trim($row["your_ask"]);
-
-	$row["report_type"] = str_replace([" ", "　","\t"], "", $row["report_type"]);
-	$row["report_type"] = trim($row["report_type"]);
+//$ai_settings_def["your_ask"]から空白、tabを削除,改行は残す
+$i=0;
+foreach($ai_settings_def as $row){
+	$ai_settings_def[$i]["your_ask"] = trim(str_replace([" ", "　","\t"], "", $row["your_ask"]));
+	$i++;
 }
+log_writer2("\$ai_settings_def", $ai_settings_def, "lv3");
 
+$sql_ai = "SELECT * from analysis_ai_setting where uid=? order by upd_datetime desc";
+$stmt = $pdo_h->prepare($sql_ai);
+$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+$stmt->execute();
+$ai_settings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-if(count($ai_setting) > 0){
-	$ai_setting = $ai_setting[0];
+if(count($ai_settings) > 0){
+	//登録済のanalysis_ai_settingを取得
 } else {
-	$ai_setting = $ai_setting_def;
+	//$ai_settings_defをanalysis_ai_settingに挿入
+	$stmt = $pdo_h->prepare("insert into analysis_ai_setting (uid,ai_role,report_name,your_ask,report_type) values (?,?,?,?,?)");
+	foreach($ai_settings_def as $row){
+		$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+		$stmt->bindValue(2, $row["ai_role"], PDO::PARAM_STR);
+		$stmt->bindValue(3, $row["report_name"], PDO::PARAM_STR);
+		$stmt->bindValue(4, $row["your_ask"], PDO::PARAM_STR);
+		$stmt->bindValue(5, $row["report_type"], PDO::PARAM_STR);
+		$stmt->execute();
+	}
+
+	$ai_settings = $ai_settings_def;
 }
-log_writer2("analysis_ai_setting", $ai_setting, "lv3");
+$last_report = $ai_settings[0]["report_name"] ?? "monthly2";
+//log_writer2("\$ai_settings", $ai_settings, "lv3");
 
 ?>
 <!DOCTYPE html>
@@ -339,7 +350,7 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 								</div>
 								<div class="mb-3">
 									<label for="Product_categories" class="form-label">レポート体裁</label>
-									<textarea class="form-control" id="Product_categories" v-model="report_type" rows="20"></textarea>
+									<textarea class="form-control" id="Product_categories" v-model="ai_setting.report_type" rows="20"></textarea>
 								</div>
 						</div>
 					</div><!-- accordion-item -->
@@ -348,7 +359,7 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 					<div class="col-12 ">
 					<div class="mb-3">
 							<label for='ai_role' class='form-label'>AIに求める役割</label>
-							<select class='form-select' v-model='ai_role' id='ai_role'>
+							<select class='form-select'  id='ai_role' v-model='ai_setting.ai_role'>
 								<option v-for="role in ai_roles" :key="role" :value="role">{{ role }}</option>
 							</select>
 						</div>
@@ -367,7 +378,7 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 						</div>
 						<div class="mb-3">
 							<label for="Product_categories" class="form-label">レポート作成依頼</label>
-							<textarea class="form-control" id="Product_categories" v-model="your_ask" rows="20"></textarea>
+							<textarea class="form-control" id="Product_categories" v-model="ai_setting.your_ask" rows="20"></textarea>
 						</div>
 					</div>
 				</div>
@@ -399,23 +410,28 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 			setup(){
 				const your_bussiness = ref(<?php echo json_encode($business_info[0],JSON_UNESCAPED_UNICODE); ?>);
 				
-				const ai_setting_def = <?php echo json_encode($ai_setting_def,JSON_UNESCAPED_UNICODE); ?>;
+				const ai_settings_def = <?php echo json_encode($ai_settings_def,JSON_UNESCAPED_UNICODE); ?>;
+				const ai_settings = ref(<?php echo json_encode($ai_settings,JSON_UNESCAPED_UNICODE); ?>);
 				const ai_roles = ref(<?php echo json_encode($ai_roles, JSON_UNESCAPED_UNICODE); ?>);
 				const report_types = ref(<?php echo json_encode($report_types, JSON_UNESCAPED_UNICODE); ?>);
+				
+				const report_name = ref('<?php echo $last_report; ?>')
 
-				const ai_role = ref('<?php echo $ai_setting["ai_role"]; ?>')
-				const report_name = ref('<?php echo $ai_setting["report_name"]; ?>')
-				const your_ask = ref(`<?php echo $ai_setting["your_ask"]; ?>`);
-				const report_type = ref(`<?php echo $ai_setting["report_type"]; ?>`)
+				const ai_setting = computed(() => {
+					//ai_settings[][report_name]=report_name.valueとなるai_settingsを返す
+					let index = 0
+					ai_settings.value.forEach((list,i) => {
+						if(list.report_name === report_name.value){
+							index = i
+						}
+					});
+					return ai_settings.value[index]
+				})
 
 				const ai_setting_modosu = () =>{
 					//ai_roleなどをデフォルトに戻す
-					ai_role.value = ai_setting_def.ai_role;
-					report_name.value = ai_setting_def.report_name;
-					your_ask.value = ai_setting_def.your_ask;
-					report_type.value = ai_setting_def.report_type;
 				}
-				const mail = ref('<?php echo $row[0]["mail"]; ?>')
+				const mail = ref('<?php echo $user_info[0]["mail"]; ?>')
 
 				const save_setting = ref(true)	//プロンプト・ビジネス情報の保存可否
 
@@ -432,14 +448,14 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 					try {
 						//console_log(your_ask.value)
 						const form = new FormData();
-						form.append('Article', `あなたはベテランの${ai_role.value}です。\n最後に提示する売上分析用のJSONデータをもとに、次の売上分析レポートを作成してください。レポート名：『${report_name.value}』、${your_ask.value}\n\n次の出力様式にを守ってください。\n${report_type.value}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
+						form.append('Article', `あなたはベテランの${ai_setting.ai_role.value}です。\n最後に提示する売上分析用のJSONデータをもとに、次の売上分析レポートを作成してください。レポート名：『${report_name.value}』、${ai_setting.your_ask.value}\n\n次の出力様式にを守ってください。\n${ai_setting.report_type.value}\n私のビジネス情報は次の通り。${JSON.stringify(your_bussiness.value)}`);
 						form.append('type', 'one');
 						//form.append('answer_type', 'html');
 						form.append('report_name', report_name.value);
 						form.append('save_setting', save_setting.value);
-						form.append('ai_role', ai_role.value);
-						form.append('your_ask', your_ask.value);
-						form.append('report_type', report_type.value);
+						form.append('ai_role', ai_setting.ai_role.value);
+						form.append('your_ask', ai_setting.your_ask.value);
+						form.append('report_type', ai_setting.report_type.value);
 						form.append('mail', mail.value);
 
 						const response = await axios.post('ajax_gemini_make_report.php', form, {headers: {'Content-Type': 'multipart/form-data'}});
@@ -507,20 +523,23 @@ log_writer2("analysis_ai_setting", $ai_setting, "lv3");
 					your_bussiness,
 					//your_sales_data,
 					ai_roles,
-					ai_role,
-					your_ask,
+					//ai_role,
+					//your_ask,
 					gemini_response,
 					loading,
 					get_gemini_response,
 					iframe_url,
 					ins_bussiness,
-					report_type,
+					//report_type,
 					save_setting,
 					make_report,
 					report_name,
 					report_types,
 					ai_setting_modosu,
 					mail,
+					//ai_setting_def,
+					ai_settings,
+					ai_setting
 				};
 			}
 		}).mount('#app');
