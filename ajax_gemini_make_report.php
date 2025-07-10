@@ -97,7 +97,7 @@ if($rtn !== true){
 		//繰り返しの上限は3回まで
 		
 		$retry_count = 0;
-		while ($msg["finishReason"] <> "finished" && $retry_count < 3) {
+		while ($msg["finishReason"] <> "finished" && $retry_count < 5) {
 			$user_input = "続きを出力してください";
 			$msg = gemini_api_kaiwa($user_input, "html", "AI_report");
 			log_writer2("\$msg['result']",$msg["emsg"],"lv3");
@@ -125,10 +125,9 @@ if($rtn !== true){
 	if($msg["emsg"]<>""){
 		$mail_body = $msg["emsg"];
 	}else{
-		//$mail_body = "レポートを作成しました。こちらから確認してください。<br><a href='". $url ."'>".$url."</a>";
-		$mail_body = $html_code;
+		$mail_body = "レポートを作成しました。こちらから確認してください。<br><a href='". $url ."'>".$url."</a>";
 	}
-	send_htmlmail($_POST["mail"],$_POST['report_name'],$mail_body);
+	send_htmlmail($_POST["mail"],$_POST['title'],$mail_body);
 	if(EXEC_MODE==="Test"){
 		//send_htmlmail($_POST["mail"],"user_input",$user_input);
 	}

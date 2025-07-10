@@ -491,6 +491,7 @@ if(count($ai_settings) > 0){
 						form.append('type', 'one');
 						//form.append('answer_type', 'html');
 						form.append('report_name', report_name.value);
+						form.append('title', report_types.value[report_i.value].name);
 						form.append('save_setting', save_setting.value);
 						form.append('ai_role', ai_settings.value[ai_setting_i.value].ai_role);
 						form.append('your_ask', ai_settings.value[ai_setting_i.value].your_ask);
