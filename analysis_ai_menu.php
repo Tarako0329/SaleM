@@ -464,6 +464,8 @@ if(count($ai_settings) > 0){
 
 				const ai_setting_modosu = () =>{
 					//ai_roleなどをデフォルトに戻す
+					console_log(`ai_setting_modosu start`)
+					console_log(`${ai_settings_def.value[ai_setting_def_i.value]}`)
 					ai_settings.value[ai_setting_i.value] = ai_settings_def.value[ai_setting_def_i.value]
 				}
 				const mail = ref('<?php echo $user_info[0]["mail"]; ?>')
