@@ -129,7 +129,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
     
         
         //新機能リリース通知
-        $sqlstr="SELECT uid, insdate,JSON_VALUE(ToursLog,'$.new_releace_006') as ToursLog FROM Users_webrez WHERE uid=?";
+        $sqlstr="SELECT uid, insdate,JSON_VALUE(ToursLog,'$.new_releace_007') as ToursLog FROM Users_webrez WHERE uid=?";
         $stmt = $pdo_h->prepare($sqlstr);
         $stmt->bindValue(1, $_SESSION["user_id"], PDO::PARAM_INT);
         $stmt->execute();
@@ -139,10 +139,10 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         if(empty($row[0]["ToursLog"]) && $row[0]["insdate"] < RELEACE_DATE){
             //新機能リリース通知 未確認
             //新機能リリース日より前に登録したユーザを対象とする
-            $bell_action="blink";
-            $bell_size="fa-2x";
-            $bell_msg="お知らせ";
-            $version = "new_releace_006";
+            //$bell_action="blink";
+            //$bell_size="fa-2x";
+            //$bell_msg="お知らせ";
+            $version = "new_releace_007";
         }else{
             //新機能リリース通知 確認済み
             $version="";
@@ -183,7 +183,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
         ,'出品在庫登録'=>['EVregi.php?mode=shuppin_zaiko&csrf_token='.$token,'z_rez']
         ,'売上実績'=>['UriageData_Correct.php?mode=select&first=first&Type=rireki&diplay=where&csrf_token='.$token,'uri']
         ,'売上分析'=>['analysis_menu.php?csrf_token='.$token,'bunseki']
-        ,'A.I分析レポート'=>['analysis_ai_menu.php?csrf_token='.$token,'bunseki_ai']
+        ,'A.I分析ﾚﾎﾟｰﾄ'=>['analysis_ai_menu.php?csrf_token='.$token,'bunseki_ai']
         ,'領収書<p style="font-size:11px;margin:0;">再発行・返品処理</p>'=>['ryoushu_menu.php?csrf_token='.$token,'ryoushu']
         ,'ユーザ情報'=>['account_create.php?mode=1&csrf_token='.$token,'user']
         ,'確定申告'=>['output_menu.php?csrf_token='.$token,'kaikei']
@@ -684,7 +684,6 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             enabled:false
         }
     });
-
     const new_releace_006 = new Shepherd.Tour({
         useModalOverlay: true,
         defaultStepOptions: {
@@ -724,6 +723,49 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             enabled:false
         }
     });
+    const new_releace_007 = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'tour_modal',
+            scrollTo: true,
+            cancelIcon:{
+                enabled:true
+            }
+        },
+        tourName:'new_releace_007'
+    });
+    new_releace_007.addStep({
+        title: `<p class='tour_header'>「A.I分析ﾚﾎﾟｰﾄ」を追加しました</p>`,
+        text: `<p class='tour_discription'>
+            A.Iによる分析レポート作成機能をリリースしました。<br>
+            使い方は以下の通りです。<br></p>
+            <ol class='fs-3'>
+            <li class='mb-3' style='line-height:23px;'>ご自身のビジネス情報や目標などを入力</li>
+            <li class='mb-3' style='line-height:23px;'>A.Iの役割を選択</li>
+            <li class='mb-3' style='line-height:23px;'>A.Iに聞きたいことを記入する。</li>
+            </ol>
+            <br>
+            <p class='tour_discription'>おススメの初期値が入力済みですので、まずはそのままレポート作成してみてください。</p>
+            <br>
+            `,
+        buttons: [
+            /*{
+                text: '後で見る',
+                action: new_releace_006.cancel
+            },*/
+ 			{
+				text: 'Finish',
+				action: new_releace_007.complete
+			}
+        ],
+        attachTo: {
+            element: '#menu_bunseki_ai',
+            on: 'bottom'
+        },
+        cancelIcon:{
+            enabled:true
+        }
+    });
 
     const new_releace_start = async() => {
         //新機能のリリース通知はこの関数で呼び出すツアーを更新する
@@ -742,7 +784,8 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             new_releace_005_2.start(tourFinish,'new_releace_005','finish'); 
         }
         */
-        new_releace_006.start(tourFinish,'new_releace_006','finish'); 
+        //new_releace_006.start(tourFinish,'new_releace_006','finish'); 
+        new_releace_007.start(tourFinish,'new_releace_007','finish'); 
     }
     
     if(new_releace && !new_releace_name){
