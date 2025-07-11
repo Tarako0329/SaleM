@@ -417,7 +417,7 @@ if (!empty($event_sales_top10_names)) {
 					$result[$key]['ABCランク'] = 'C';
 				} */else {
 					//$result[$key]['ABCランク'] = 'C-';
-					$result[$key]=[];
+					unset($result[$key]);
 				}
 				$j++;
 		}
