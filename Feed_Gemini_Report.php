@@ -407,18 +407,18 @@ if (!empty($event_sales_top10_names)) {
 					$result[$key]['ABCランク'] = 'A-';
 				} elseif ($percentage <= 80) {
 					$result[$key]['ABCランク'] = 'B+';
-				} elseif ($percentage <= 85) {
-					//$result[$key]['ABCランク'] = 'B';
-					$result[$key]=[];
-				} /*elseif ($percentage <= 90) {
-					//$result[$key]['ABCランク'] = 'B-';
+				} /*elseif ($percentage <= 85) {
+					$result[$key]['ABCランク'] = 'B';
+				} elseif ($percentage <= 90) {
+					$result[$key]['ABCランク'] = 'B-';
 				} elseif ($percentage <= 95) {
-					//$result[$key]['ABCランク'] = 'C+';
+					$result[$key]['ABCランク'] = 'C+';
 				} elseif ($percentage <= 98) {
-					//$result[$key]['ABCランク'] = 'C';
-				} else {
+					$result[$key]['ABCランク'] = 'C';
+				} */else {
 					//$result[$key]['ABCランク'] = 'C-';
-				}*/
+					$result[$key]=[];
+				}
 				$j++;
 		}
 				
