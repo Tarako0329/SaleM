@@ -182,12 +182,16 @@ if (in_array($report_type,["yearly","yearly2","12month","5years"])) {
 
 	// $seasonal_product_salesを季節ごとのトップ5のみに
 	$grouped_seasonal_sales = [];
+	$juni=1;
 	foreach ($seasonal_product_sales as $row) {
 		$season = $row['季節'];
 		if (!isset($grouped_seasonal_sales[$season])) {
 			$grouped_seasonal_sales[$season] = [];
+			$juni=1;
 		}
 		$grouped_seasonal_sales[$season][] = $row;
+		$grouped_seasonal_sales[$season][$juni-1]['rank'] = $juni;
+		$juni++;
 	}
 
 	$seasonal_product_sales_top5 = [];
@@ -251,12 +255,13 @@ $category_sales2 = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 //商品分類ごとの売上・粗利の集計。商品分類を昇順でソート。未分類は最後尾に表示。
 $sql = "SELECT 
-	CONCAT(IFNULL(bunrui1,'未設定'),'>',IFNULL(bunrui2,'未設定'),'>',IFNULL(bunrui3,'未設定')) as 大中小分類
+	rank() OVER ( ORDER BY sum(UriageKin) DESC) as rank
+	,CONCAT(IFNULL(bunrui1,'未設定'),'>',IFNULL(bunrui2,'未設定'),'>',IFNULL(bunrui3,'未設定')) as 小分類
 	,sum(UriageKin) as 売上金額
 	,sum(UriageKin)-sum(genka) as 粗利
 	from UriageMeisai 
 	where uid=:uid and UriDate between :from_d and :to_d
-	group by 大中小分類
+	group by 小分類
 	order by 
 	売上金額 DESC";
 
@@ -318,9 +323,9 @@ foreach ($abc_data as $key => $row) {
 }
 
 
-//イベント１日ごとの売上を集計し、平均売上金額トップ１０を取得。順位もつける
+//イベント１日ごとの売上を集計し、平均売上金額トップ１０を取得。rankもつける
 $sql = "SELECT 
-	ROW_NUMBER() OVER (ORDER BY avg(売上金額) DESC) as 順位
+	ROW_NUMBER() OVER (ORDER BY avg(売上金額) DESC) as rank
 	,Event as イベント名
 	,CAST(ROUND(avg(売上金額), 0) as CHAR) as 平均売上
 	,CAST(ROUND(avg(粗利), 0) as CHAR) as 平均粗利
@@ -338,9 +343,9 @@ $event_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 
-///イベント１日ごとの売上を集計し、平均売上金額ワースト５を取得。順位もつける
+///イベント１日ごとの売上を集計し、平均売上金額ワースト５を取得。rankもつける
 $sql = "SELECT 
-	ROW_NUMBER() OVER (ORDER BY avg(売上金額) ASC) as 順位
+	ROW_NUMBER() OVER (ORDER BY avg(売上金額) ASC) as rank
 	,Event as イベント名
 	,CAST(ROUND(avg(売上金額), 0) as CHAR) as 平均売上
 	,CAST(ROUND(avg(粗利), 0) as CHAR) as 平均粗利
@@ -362,7 +367,8 @@ $event_product_sales_top10 = [];
 
 if (!empty($event_sales_top10_names)) {
 	$sql = "SELECT 
-		ShouhinNM as 商品名
+		ROW_NUMBER() OVER (ORDER BY sum(UriageKin) DESC) as rank
+		,ShouhinNM as 商品名
 		,sum(su) as 売上個数
 		,sum(UriageKin) as 売上金額
 		,sum(UriageKin)-sum(genka) as 粗利
@@ -425,9 +431,9 @@ if (!empty($event_sales_top10_names)) {
 }
 
 
-//商品ごとの売上・粗利の集計。売上金額をトップ１０件降順でソート。順位もつける
+//商品ごとの売上・粗利の集計。売上金額をトップ１０件降順でソート。rankもつける
 $sql = "SELECT 
-	ROW_NUMBER() OVER (ORDER BY sum(UriageKin) DESC) as 順位
+	ROW_NUMBER() OVER (ORDER BY sum(UriageKin) DESC) as rank
 	,ShouhinNM as 商品名
 	,sum(UriageKin) as 売上金額
 	,sum(su) as 売上個数
@@ -446,9 +452,9 @@ $stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
 $stmt->execute();
 $product_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-//商品ごとの売上・粗利の集計。売上金額をワースト１０件昇順でソート。順位もつける
+//商品ごとの売上・粗利の集計。売上金額をワースト１０件昇順でソート。rankもつける
 $sql = "SELECT 
-	ROW_NUMBER() OVER (ORDER BY sum(UriageKin) ASC) as 順位
+	ROW_NUMBER() OVER (ORDER BY sum(UriageKin) ASC) as rank
 	,ShouhinNM as 商品名
 	,sum(UriageKin) as 売上金額
 	,sum(su) as 売上個数
@@ -468,9 +474,9 @@ $stmt->execute();
 $product_sales_worst = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
-//イベント開催住所ごとの平均売上金額を降順でソート。トップ１０件昇順でソート。順位もつける
+//イベント開催住所ごとの平均売上金額を降順でソート。トップ１０件昇順でソート。rankもつける
 $sql = "SELECT 
-	ROW_NUMBER() OVER (ORDER BY avg(売上金額) DESC) as 順位
+	ROW_NUMBER() OVER (ORDER BY avg(売上金額) DESC) as rank
 	,address as イベント開催住所
 	,CAST(ROUND(avg(売上金額), 0) as CHAR) as 平均売上
 	,CAST(ROUND(avg(粗利), 0) as CHAR) as 平均粗利
@@ -487,9 +493,9 @@ $stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
 $stmt->execute();
 $address_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-//イベント開催住所ごとの平均売上金額ワースト５件。順位もつける。
+//イベント開催住所ごとの平均売上金額ワースト５件。rankもつける。
 $sql = "SELECT 
-	ROW_NUMBER() OVER (ORDER BY avg(売上金額) ASC) as 順位
+	ROW_NUMBER() OVER (ORDER BY avg(売上金額) ASC) as rank
 	,address as イベント開催住所
 	,CAST(ROUND(avg(売上金額), 0) as CHAR) as 平均売上
 	,CAST(ROUND(avg(粗利), 0) as CHAR) as 平均粗利
@@ -508,7 +514,7 @@ $address_sales_worst = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 //天気ごとの平均売上金額を降順でソート。weatherが空白の場合は"未計測"と表示し最後尾に表示
 $sql = "SELECT
-	ROW_NUMBER() OVER (ORDER BY avg(売上金額) DESC) as 順位
+	ROW_NUMBER() OVER (ORDER BY avg(売上金額) DESC) as rank
 	, 天気
 	,CAST(ROUND(avg(売上金額), 0) as CHAR) as 平均売上
 	,CAST(ROUND(avg(粗利), 0) as CHAR) as 平均粗利
@@ -584,12 +590,12 @@ $all_stats = [
     '月次売上データ' => $monthly_sales,
     '日次売上データ' => $daily_sales,
 		'季節別売上トップ５' =>$seasonal_product_sales_top5,
-    '商品大分類別売上グラフ用データ' => $category_sales1,
-    '商品大中分類別売上グラフ用データ' => $category_sales2,
-    '商品大中小分類別売上ランキングデータ' => $category_sales3,
+    '大カテゴリー別売上グラフ用データ' => $category_sales1,
+    '中カテゴリー別売上グラフ用データ' => $category_sales2,
+    '小カテゴリー別売上ランキングデータ' => $category_sales3,
     '商品別ABC分析データ' => $abc_data,
     'イベント別平均売上トップ10' => $event_sales,
-		'平均売上トップ10のイベントにおける商品の売上トップ10' => $event_product_sales_top10,
+		'平均売上トップ10イベントの売上トップ10' => $event_product_sales_top10,
     'イベント別平均売上ワースト5' => $event_sales_worst,
     '商品別売上トップ10' => $product_sales,
     '商品別売上ワースト10' => $product_sales_worst,
