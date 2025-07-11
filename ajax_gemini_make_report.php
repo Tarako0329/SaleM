@@ -80,6 +80,8 @@ if($rtn !== true){
 	}
 	
 	if(EXEC_MODE<>"Local"){
+		$report_file = $_SESSION["user_id"]."_gemini_report.html";
+
 		$textParts = [
 			['text' => $user_input]
 		];
@@ -89,7 +91,8 @@ if($rtn !== true){
 		//$msgに$token_countを追加
 		$msg["token_count"] = $token_count;
 		//$msg["result"]の最後の改行を削除して$html_codeにセット
-		$html_code = trim($msg["result"]);
+		//$html_code = trim($msg["result"]);
+		file_put_contents($report_file,trim($msg["result"]),LOCK_EX);
 		
 		log_writer2("\$msg['result']",$msg["emsg"],"lv3");
 
@@ -101,7 +104,8 @@ if($rtn !== true){
 			$user_input = "続きを出力してください";
 			$msg = gemini_api_kaiwa($user_input, "html", "AI_report");
 			log_writer2("\$msg['result']",$msg["emsg"],"lv3");
-			$html_code .= trim($msg["result"]);
+			//$html_code .= trim($msg["result"]);
+			file_put_contents($report_file, trim($msg["result"]),FILE_APPEND | LOCK_EX);
 			$retry_count++;
 		}
 		//gemini_api_kaiwaでhtmlのチェック
@@ -115,9 +119,9 @@ if($rtn !== true){
 	}
 
 	//$answer_type=htmlの場合、$msg["result"]をファイルに上書きで出力する。ファイル名は$_SESSION["user_id"]+_gemini_report.html
-	$report_file = $_SESSION["user_id"]."_gemini_report.html";
-	//file_put_contents($report_file, $msg["result"]);
-	file_put_contents($report_file, $html_code);
+	//$report_file = $_SESSION["user_id"]."_gemini_report.html";
+	
+	//file_put_contents($report_file, $html_code,FILE_APPEND | LOCK_EX);
 	//レポートのURLを$urlにセット
 	$url = ROOT_URL.$report_file;
 
