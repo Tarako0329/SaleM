@@ -398,6 +398,7 @@ if(count($ai_settings) > 0){
 						<div class="mb-3">
 							<label for='mail' class='form-label'>レポート送付先メールアドレス</label>
 							<input type='text' class='form-control' v-model='mail' id='mail'>
+							<small style='color:red;'>※レポートはメールで送付されます。</small>
 						</div>
 						<div class="mb-3">
 							<label for="Product_categories" class="form-label">レポート作成依頼</label>
@@ -416,12 +417,17 @@ if(count($ai_settings) > 0){
 					    上記設定を保存してレポート作成
 					  </label>
 					</div>
-					<div class='d-flex'>
+					<div class='d-flex mb-3'>
 						<button type="button" class="btn btn-primary me-3" @click="get_gemini_response" :disabled="loading">
 							<span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-							{{ loading ? '生成中...' : 'レポート生成' }}
+							{{ loading ? '生成中...' : 'レポート送信' }}
+							<!--紙飛行機のアイコン-->
+							<i class="fa-solid fa-paper-plane fa-lg ms-2"></i>
 						</button>
 						<button type="button" class='btn btn-warning' @click='ai_setting_modosu'>初期値に戻す</button>
+					</div>
+					<div v-html='gemini_response'>
+						
 					</div>
 				</div>
 			</div>
@@ -511,9 +517,11 @@ if(count($ai_settings) > 0){
 						const response = await axios.post('ajax_gemini_make_report.php', form, {headers: {'Content-Type': 'multipart/form-data'}});
 						console_log(response.data)
 						gemini_response.value = response.data.result;
+						//alert('レポートが送信されました。')
+						gemini_response.value = '<p style="color:blue;transition:0.2s ease-in-out;">レポートが送信されました。</p>';
 					} catch (error) {
 						console.error('Error fetching Gemini response:', error);
-						gemini_response.value = '<p style="color:red;">レポートの取得中にエラーが発生しました。</p>';
+						gemini_response.value = '<p style="color:red;">レポートの取得中にエラーが発生しました。時間を空けて、再度実行してみてください</p>';
 					} finally {
 						loading.value = false;
 					}
@@ -564,6 +572,13 @@ if(count($ai_settings) > 0){
 					}
 					get_gemini_response()
 				}
+
+				watch([gemini_response],()=>{
+					//gemini_responseに値が入ったら4秒後にクリアする
+					setTimeout(() => {
+						gemini_response.value = '';
+					}, 4000);
+				})
 
 				onMounted(() => {
 					//get_gemini_response();

@@ -763,7 +763,7 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
             on: 'bottom'
         },
         cancelIcon:{
-            enabled:true
+            enabled:false
         }
     });
 
