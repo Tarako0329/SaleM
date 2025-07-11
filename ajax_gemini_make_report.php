@@ -92,7 +92,7 @@ if($rtn !== true){
 		$msg["token_count"] = $token_count;
 		//$msg["result"]の最後の改行を削除して$html_codeにセット
 		//$html_code = trim($msg["result"]);
-		file_put_contents($report_file,trim($msg["result"]),LOCK_EX);
+		file_put_contents($report_file,trim($msg["result"]));
 		
 		log_writer2("\$msg['result']",$msg["emsg"],"lv3");
 
@@ -105,7 +105,7 @@ if($rtn !== true){
 			$msg = gemini_api_kaiwa($user_input, "html", "AI_report");
 			log_writer2("\$msg['result']",$msg["emsg"],"lv3");
 			//$html_code .= trim($msg["result"]);
-			file_put_contents($report_file, trim($msg["result"]),FILE_APPEND | LOCK_EX);
+			file_put_contents($report_file, trim($msg["result"]),FILE_APPEND );
 			$retry_count++;
 		}
 		//gemini_api_kaiwaでhtmlのチェック

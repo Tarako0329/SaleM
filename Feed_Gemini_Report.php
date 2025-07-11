@@ -292,16 +292,17 @@ $abc_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $total_sales = array_sum(array_column($abc_data, '売上金額'));
 $cumulative_sales = 0;
+$i=1;
 foreach ($abc_data as $key => $row) {
     $cumulative_sales += $row['売上金額'];
     $percentage = ($total_sales > 0) ? ($cumulative_sales / $total_sales) * 100 : 0;
     //$abc_data[$key]['累積売上金額'] = $cumulative_sales;
     $abc_data[$key]['累積構成比'] = round($percentage, 2);
-    if ($percentage <= 40) {
+    if ($percentage <= 40 || $i===1) {//売上１位が全体の40%以上を占めていた場合にA+から外れてしまうため$iを追加
         $abc_data[$key]['ABCランク'] = 'A+';
-    } elseif ($percentage <= 60) {
+    } elseif ($percentage <= 60 || $i===2) {
         $abc_data[$key]['ABCランク'] = 'A';
-    } elseif ($percentage <= 70) {
+    } elseif ($percentage <= 70 || $i===3) {
         $abc_data[$key]['ABCランク'] = 'A-';
     } elseif ($percentage <= 80) {
         $abc_data[$key]['ABCランク'] = 'B+';
@@ -316,6 +317,7 @@ foreach ($abc_data as $key => $row) {
     } else {
         $abc_data[$key]['ABCランク'] = 'C-';
     }
+		$i++;
 }
 //$abc_dataの累積構成比を文字列にキャスト
 foreach ($abc_data as $key => $row) {
@@ -361,7 +363,7 @@ $stmt->bindValue("to_d", $to_d, PDO::PARAM_STR);
 $stmt->execute();
 $event_sales_worst = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-//平均売上トップ10のイベントにおける商品の売り上げトップ10
+//平均売上トップ10イベントにおけるArank商品
 $event_sales_top10_names = array_column($event_sales, 'イベント名');
 $event_product_sales_top10 = [];
 
@@ -375,18 +377,51 @@ if (!empty($event_sales_top10_names)) {
 		from UriageMeisai 
 		where uid=? and UriDate between ? and ? AND Event IN (?)
 		group by  商品名
-		order by 売上金額 desc limit 10";
+		order by 売上金額 desc ";
 
 	$stmt = $pdo_h->prepare($sql);
 	$i=0;
-	foreach($event_sales_top10_names as $item){
+	foreach($event_sales as $row1){
+		$item = $row1['イベント名'];
 		$stmt->bindValue(1, $uid, PDO::PARAM_INT);
     $stmt->bindValue(2, $from_d, PDO::PARAM_STR);
     $stmt->bindValue(3, $to_d, PDO::PARAM_STR);
     $stmt->bindValue(4, $item, PDO::PARAM_STR);
 		$stmt->execute();
 		$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		$event_product_sales_top10[$i] = array("イベント名" => $item, "商品売上トップ10" => $result);
+
+		//$resultをABC分析のArankのみを抽出
+		$total_sales = array_sum(array_column($result, '売上金額'));
+		$cumulative_sales = 0;
+		$j=1;
+		foreach ($result as $key => $row) {
+				$cumulative_sales += $row['売上金額'];
+				$percentage = ($total_sales > 0) ? ($cumulative_sales / $total_sales) * 100 : 0;
+				//$Ev_abc_data[$key]['累積売上金額'] = $cumulative_sales;
+				$result[$key]['累積構成比'] = round($percentage, 2);
+				if ($percentage <= 40 || $j===1) {
+					$result[$key]['ABCランク'] = 'A+';
+				} elseif ($percentage <= 60 || $j===2) {
+					$result[$key]['ABCランク'] = 'A';
+				} elseif ($percentage <= 70 || $j===3) {
+					$result[$key]['ABCランク'] = 'A-';
+				} elseif ($percentage <= 80) {
+					$result[$key]['ABCランク'] = 'B+';
+				} elseif ($percentage <= 85) {
+					//$result[$key]['ABCランク'] = 'B';
+				} elseif ($percentage <= 90) {
+					//$result[$key]['ABCランク'] = 'B-';
+				} elseif ($percentage <= 95) {
+					//$result[$key]['ABCランク'] = 'C+';
+				} elseif ($percentage <= 98) {
+					//$result[$key]['ABCランク'] = 'C';
+				} else {
+					//$result[$key]['ABCランク'] = 'C-';
+				}
+				$j++;
+		}
+				
+		$event_product_sales_top10[$i] = array("イベント名" => $item, "Aランク商品" => $result);
 		$i++;
 	}
 /*
@@ -595,7 +630,7 @@ $all_stats = [
     '小カテゴリー別売上ランキングデータ' => $category_sales3,
     '商品別ABC分析データ' => $abc_data,
     'イベント別平均売上トップ10' => $event_sales,
-		'平均売上トップ10イベントの売上トップ10' => $event_product_sales_top10,
+		'平均売上トップ10イベントにおけるArank商品' => $event_product_sales_top10,
     'イベント別平均売上ワースト5' => $event_sales_worst,
     '商品別売上トップ10' => $product_sales,
     '商品別売上ワースト10' => $product_sales_worst,
