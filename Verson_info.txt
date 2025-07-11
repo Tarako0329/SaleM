@@ -213,6 +213,35 @@ ver3.21.6-000:商品一覧メンテ画面の改良-commited
 	ALTER TABLE ShouhinMS MODIFY `upd_datetime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 ver3.21.6-001:商品一覧メンテ画面の改良-commited
 ver3.21.7-000:A.Iレポート機能
+	CREATE TABLE `analysis_ai_setting` (
+	  `uid` int(11) NOT NULL,
+	  `ai_role` varchar(255) DEFAULT NULL,
+	  `report_name` varchar(255) NOT NULL,
+	  `your_ask` text DEFAULT NULL,
+	  `report_type` text DEFAULT NULL,
+	  `upd_datetime` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+	ALTER TABLE `analysis_ai_setting`  ADD PRIMARY KEY (`uid`,`report_name`);
+	CREATE TABLE `business_info` (
+	  `uid` int(11) NOT NULL,
+	  `app` varchar(20) NOT NULL,
+	  `Product_categories` text DEFAULT NULL COMMENT '取扱商品のジャンル',
+	  `Sales_methods` text DEFAULT NULL COMMENT '販売方法',
+	  `Brand_image` text DEFAULT NULL COMMENT 'ブランドイメージ',
+	  `Monthly_goals` text DEFAULT NULL COMMENT '月毎の目標',
+	  `This_year_goals` text DEFAULT NULL COMMENT '今年度の目標',
+	  `Next_year_goals` text DEFAULT NULL COMMENT '来年度の目標',
+	  `Ideal_5_years` text DEFAULT NULL COMMENT '5年後の理想',
+	  `Customer_targets` text DEFAULT NULL COMMENT '顧客ターゲット',
+	  `Instagram` varchar(10) DEFAULT 'false',
+	  `X_com` varchar(10) DEFAULT 'false',
+	  `facebook` varchar(10) DEFAULT 'false',
+	  `Threads` varchar(10) DEFAULT 'false',
+	  `tiktok` varchar(10) DEFAULT 'false',
+	  `other_SNS` varchar(100) DEFAULT NULL,
+	  `upd_datetime` datetime NOT NULL DEFAULT current_timestamp()
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+	ALTER TABLE `business_info`  ADD PRIMARY KEY (`uid`);
 
 
 verA.BB.C.DDD
