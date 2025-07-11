@@ -409,7 +409,8 @@ if (!empty($event_sales_top10_names)) {
 					$result[$key]['ABCランク'] = 'B+';
 				} elseif ($percentage <= 85) {
 					//$result[$key]['ABCランク'] = 'B';
-				} elseif ($percentage <= 90) {
+					$result[$key]=[];
+				} /*elseif ($percentage <= 90) {
 					//$result[$key]['ABCランク'] = 'B-';
 				} elseif ($percentage <= 95) {
 					//$result[$key]['ABCランク'] = 'C+';
@@ -417,7 +418,7 @@ if (!empty($event_sales_top10_names)) {
 					//$result[$key]['ABCランク'] = 'C';
 				} else {
 					//$result[$key]['ABCランク'] = 'C-';
-				}
+				}*/
 				$j++;
 		}
 				
