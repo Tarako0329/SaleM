@@ -27,21 +27,21 @@ $user_info = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 //ビジネスインフォを取得
 $sql_bi = "SELECT 
-	Product_categories as 取扱商品のジャンル
-	, Sales_methods as 販売方法
-	, Brand_image as ブランドイメージ
-	, Instagram
-	, X_com
-	, facebook
-	, Threads
-	, tiktok
-	, other_SNS
-	, Monthly_goals as 月毎の目標
-	, This_year_goals as 今年度の目標
-	, Next_year_goals as 来年度の目標
-	, Ideal_5_years as 年後の理想
-	, Customer_targets as 顧客ターゲット
-	, uid
+  IFNULL(Product_categories, '') AS 取扱商品のジャンル,
+  IFNULL(Sales_methods, '') AS 販売方法,
+  IFNULL(Brand_image, '') AS ブランドイメージ,
+  IFNULL(Instagram, '') AS Instagram,
+  IFNULL(X_com, '') AS X_com,
+  IFNULL(facebook, '') AS facebook,
+  IFNULL(Threads, '') AS Threads,
+  IFNULL(tiktok, '') AS tiktok,
+  IFNULL(other_SNS, '') AS other_SNS,
+  IFNULL(Monthly_goals, '') AS 月毎の目標,
+  IFNULL(This_year_goals, '') AS 今年度の目標,
+  IFNULL(Next_year_goals, '') AS 来年度の目標,
+  IFNULL(Ideal_5_years, '') AS 年後の理想,
+  IFNULL(Customer_targets, '') AS 顧客ターゲット,
+  uid
 	from business_info where uid=?";
 $stmt = $pdo_h->prepare($sql_bi);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
