@@ -68,5 +68,29 @@
   "orientation": "portrait",
   "categories": [
     "business"
-  ]
+  ],
+  "id": "WebRez+",
+  "screenshots": [
+      {
+          "src": "img/menu_gamen.png",
+          "sizes": "931x1125",
+          "type": "image/png",
+          "form_factor": "wide",
+          "label": "ホーム画面"
+      },
+      {
+          "src": "img/reji_gamen.png",
+          "sizes": "931x1125",
+          "type": "image/png",
+          "form_factor": "wide",
+          "label": "レジ画面サンプル"
+      },
+      {
+          "src": "img/bunseki_gamen.png",
+          "sizes": "1117x1125",
+          "type": "image/png",
+          "form_factor": "wide",
+          "label": "売上分析メニュー画面"
+      }
+    ]
 }
