@@ -242,7 +242,8 @@ ver3.21.7-000:A.Iレポート機能-commited
 	  `upd_datetime` datetime NOT NULL DEFAULT current_timestamp()
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 	ALTER TABLE `business_info`  ADD PRIMARY KEY (`uid`);
-ver3.21.6-001:マニフェスト修正
+ver3.21.6-001:マニフェスト修正-commited
+ver3.22.0-000:SQLLOGの修正-commited
 
 
 verA.BB.C.DDD

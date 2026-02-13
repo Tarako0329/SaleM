@@ -41,7 +41,7 @@ if(csrf_checker(["UriageData_Correct.php"],["C","P","S"])===false){
             $stmt->bindValue("w_shouhinCD", $params["w_shouhinCD"], PDO::PARAM_INT);
             $sqllog .= rtn_sqllog($sql,$params);
             $status = $stmt->execute();
-            $sqllog .= rtn_sqllog("--execute():正常終了",[]);
+            $sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 
 
             $stmt = $pdo_h->prepare( $sql2 );
@@ -50,7 +50,7 @@ if(csrf_checker(["UriageData_Correct.php"],["C","P","S"])===false){
             $stmt->bindValue("w_UriNO", $params["w_UriNO"], PDO::PARAM_INT);
             $sqllog .= rtn_sqllog($sql2,$params);
             $status = $stmt->execute();
-            $sqllog .= rtn_sqllog("--execute():正常終了",[]);
+            $sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 
 
             $pdo_h->commit();

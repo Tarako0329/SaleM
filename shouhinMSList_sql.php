@@ -81,7 +81,7 @@ if($rtn===false){
 		
 			$sqllog .= rtn_sqllog($sqlstr,$params);
 			$status=$stmt->execute();
-			$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+			$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 		}
 		$result="success";
 		$pdo_h->commit();

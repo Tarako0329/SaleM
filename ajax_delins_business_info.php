@@ -53,7 +53,7 @@ if($rtn !== true){
 		$stmt->bindValue("app", $params["app"], PDO::PARAM_STR);
 		$sqllog .= rtn_sqllog($sqlstr,$params);
 		$stmt->execute();
-		$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+		$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 
 		//INSERT
 		$sqlstr="INSERT into business_info(uid,app,Product_categories,Sales_methods,Brand_image,Monthly_goals,This_year_goals,Next_year_goals,Ideal_5_years,Customer_targets,Instagram,X_com,facebook,Threads,tiktok,other_SNS) values(:uid,:app,:Product_categories,:Sales_methods,:Brand_image,:Monthly_goals,:This_year_goals,:Next_year_goals,:Ideal_5_years,:Customer_targets,:Instagram,:X_com,:facebook,:Threads,:tiktok,:other_SNS)";

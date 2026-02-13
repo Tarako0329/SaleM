@@ -53,7 +53,7 @@ if(csrf_checker(["EVregi.php"],["C","P","S"])===false){
                 $stmt->bindValue(3,  $_POST["EV"], PDO::PARAM_INT);
                 $sqllog .= rtn_sqllog($sqlstr,[$_SESSION['user_id'],$_POST["KEIJOUBI"],$_POST["EV"]]);
                 $stmt->execute();
-                $sqllog .= rtn_sqllog("--execute():正常終了",[]);
+                $sqllog .= rtn_sqllog("-- execute():正常終了",[]);
             }
 
             //在庫番号の取得
@@ -85,7 +85,7 @@ if(csrf_checker(["EVregi.php"],["C","P","S"])===false){
                 $stmt->bindValue(8,  $row["GENKA_TANKA"], PDO::PARAM_INT);              //商品名
                 $sqllog .= rtn_sqllog($sqlstr,[$_SESSION['user_id'],$_POST["KEIJOUBI"],$zaikoNO,$_POST["EV"],$row["CD"],$row["NM"],$row["SU"],$row["GENKA_TANKA"]]);
                 $flg=$stmt->execute();
-                $sqllog .= rtn_sqllog("--execute():正常終了",[]);
+                $sqllog .= rtn_sqllog("-- execute():正常終了",[]);
             }
             $pdo_h->commit();
             $sqllog .= rtn_sqllog("commit",[]);

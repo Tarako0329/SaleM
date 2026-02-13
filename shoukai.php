@@ -28,7 +28,7 @@ try{
 
             $sqllog .= rtn_sqllog($sqlstr,[$ShoukaishaCD,$_SESSION["user_id"]]);
             $stmt->execute();
-            $sqllog .= rtn_sqllog("--execute():正常終了",[]);
+            $sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 
             $rowcnt2 = $stmt->rowCount();
             if($rowcnt2==1){

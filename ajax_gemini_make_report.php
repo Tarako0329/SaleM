@@ -58,7 +58,7 @@ if($rtn !== true){
 			$stmt->bindValue("report_name", $params['report_name'], PDO::PARAM_STR);
 			$sqllog .= rtn_sqllog($sqlstr,$params);
 			$stmt->execute();
-			$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+			$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 	
 			$sqlstr="INSERT into analysis_ai_setting(uid,ai_role,report_name,your_ask,report_type) values(:uid,:ai_role,:report_name,:your_ask,:report_type)";
 			$stmt = $pdo_h->prepare($sqlstr);
@@ -69,7 +69,7 @@ if($rtn !== true){
 			$stmt->bindValue("report_type", $params["report_type"], PDO::PARAM_STR);
 			$sqllog .= rtn_sqllog($sqlstr,$params);
 			$stmt->execute();
-			$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+			$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 			$pdo_h->commit();
 			$sqllog .= rtn_sqllog("commit",[]);
 			sqllogger($sqllog,0);

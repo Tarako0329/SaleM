@@ -59,7 +59,7 @@ if($rtn !== true){
 			$stmt->bindValue(2, $_SESSION['user_id'], PDO::PARAM_INT);
 			$sqllog .= rtn_sqllog($sqlstr,[$shouhinCD,$_SESSION['user_id']]);
 			$stmt->execute();
-			$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+			$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 		}
 
 

@@ -372,7 +372,7 @@ try{
 	
 			$sqllog .= rtn_sqllog($sqlstr,$params);
 			$stmt->execute();
-			$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+			$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 		}
 		
 		//返品元売上データに返品先売上NOの登録(update)
@@ -387,7 +387,7 @@ try{
 		$stmt->bindValue("R_NO",  $params["R_NO"], PDO::PARAM_INT);
 		$sqllog .= rtn_sqllog($sqlstr,$params);
 		$stmt->execute();
-		$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+		$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 
 
 		$pdo_h->commit();

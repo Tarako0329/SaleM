@@ -51,7 +51,7 @@ if($rtn !== true){
 			$stmt->bindValue("sub_id", $params["sub_id"], PDO::PARAM_STR);
 			$sqllog .= rtn_sqllog($sqlstr,$params);
 			$status=$stmt->execute();
-			$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+			$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 
 			$sqlstr="insert into Users(uid,mail,password,question,answer,webrez) values(:uid,:mail,:pass,'あなたの花言葉は？','食パンマ','use')";
 			$stmt = $pdo_h->prepare($sqlstr);
@@ -60,7 +60,7 @@ if($rtn !== true){
 			$stmt->bindValue("pass", $params["pass"], PDO::PARAM_STR);
 			$sqllog .= rtn_sqllog($sqlstr,$params);
 			$status=$stmt->execute();
-			$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+			$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 
 			$sqlstr="insert into Users_webrez(uid,yuukoukigen,introducer_id) values(:uid,:yuukoukigen,:introducer_id)";
 			$stmt = $pdo_h->prepare($sqlstr);
@@ -69,7 +69,7 @@ if($rtn !== true){
 			$stmt->bindValue("introducer_id", $params["introducer_id"], PDO::PARAM_STR);
 			$sqllog .= rtn_sqllog($sqlstr,$params);
 			$status=$stmt->execute();
-			$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+			$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 
 			$pdo_h->commit();
 			$sqllog .= rtn_sqllog("commit",[]);

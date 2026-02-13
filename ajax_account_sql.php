@@ -59,7 +59,7 @@ if($rtn !== true){
 				$stmt->bindValue("answer", $_SESSION["P"]["answer"], PDO::PARAM_STR);
 				$sqllog .= rtn_sqllog($sqlstr,$_SESSION["P"]);
 				$status=$stmt->execute();
-				$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+				$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 
 				$sqlstr="insert into Users_webrez(uid,yuukoukigen,introducer_id) values(:uid,:yuukoukigen,:introducer_id)";
 				$stmt = $pdo_h->prepare($sqlstr);
@@ -68,7 +68,7 @@ if($rtn !== true){
 				$stmt->bindValue("introducer_id", $_SESSION["P"]["introducer_id"], PDO::PARAM_STR);
 				$sqllog .= rtn_sqllog($sqlstr,$_SESSION["P"]);
 				$status=$stmt->execute();
-				$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+				$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 				//$count = $stmt->rowCount();
 				
 				if($status){
@@ -84,7 +84,7 @@ if($rtn !== true){
 					$stmt->bindValue("uid", $_SESSION["P"]["uid"], PDO::PARAM_INT);
 					$sqllog .= rtn_sqllog($sqlstr,$_SESSION["P"]);
 					$status=$stmt->execute();
-					$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+					$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 				}else{
 				}
 				//Users の更新
@@ -96,7 +96,7 @@ if($rtn !== true){
 				$stmt->bindValue("uid", $_SESSION["P"]["uid"], PDO::PARAM_INT);
 				$sqllog .= rtn_sqllog($sqlstr_u,$_SESSION["P"]);
 				$status=$stmt->execute();
-				$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+				$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 
 				//Users_webrez の更新
 				$sqlstr_r="update Users_webrez set loginrez=:loginrez,zeihasu=:zeihasu,name=:name,yagou=:yagou,yubin=:yubin,address1=:address1,address2=:address2,address3=:address3,invoice_no=:invoice_no ,inquiry_tel=:inquiry_tel ,inquiry_mail=:inquiry_mail,Accounting_soft=:Accounting_soft where uid=:uid";
@@ -116,7 +116,7 @@ if($rtn !== true){
 				$stmt->bindValue("uid", $_SESSION["P"]["uid"], PDO::PARAM_INT);
 				$sqllog .= rtn_sqllog($sqlstr_r,$_SESSION["P"]);
 				$status=$stmt->execute();
-				$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+				$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 				//$count = 1;
 			}
 

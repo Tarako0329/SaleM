@@ -124,7 +124,7 @@ try{
 
 		$sqllog .= rtn_sqllog($sqlstr,$params);
 		$stmt->execute();
-		$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+		$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 		$ins_cnt++;
 	}
 
@@ -156,7 +156,7 @@ try{
 			
 			$sqllog .= rtn_sqllog($sqlstr_z,$params);
 			$stmt->execute();
-			$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+			$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 			$ins_cnt++;
 		}
 
@@ -183,7 +183,7 @@ try{
 			
 			$sqllog .= rtn_sqllog($sqlstr_c,$params);
 			$stmt->execute();
-			$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+			$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 			$ins_cnt++;
 		}
 	}
@@ -222,7 +222,7 @@ try{
 
 		$sqllog .= rtn_sqllog($sqlstr,$params);
 		$stmt->execute();
-		$sqllog .= rtn_sqllog("--execute():正常終了",[]);
+		$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
 	}else{
 		log_writer2("ajax_EVregi_sql.php","Gio insert skip","lv3");
 	}
