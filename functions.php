@@ -953,4 +953,15 @@ function countGeminiTokensWithCurl(array $parts): ?int
     }
 }
 
+// =========================================================
+// NEW商品CDの生成
+// =========================================================
+function get_new_ShouhinCD($uid){
+    global $db;
+	$sqlstr = "SELECT max(shouhinCD) as MCD from ShouhinMS where uid=:uid group by uid";
+    $rows = $db->SELECT($sqlstr,['uid' => $uid]);
+	$new_shouhinCD = $rows[0]["MCD"]+1;
+    
+    return $new_shouhinCD;
+}
 ?>

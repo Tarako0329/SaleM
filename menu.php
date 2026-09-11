@@ -175,7 +175,8 @@ start(ajax関数名(固定値),ツアー名称(DBに登録する名称),ステ�
 
     $array = [
         'レジ<p style="font-size:11px;margin:0;">マルシェ等、店舗型販売</p>'=>['EVregi.php?mode=evrez&csrf_token='.$token,'rez']
-        ,'個別売上レジ<p style="font-size:11px;margin:0;">受注販売・個人オーダー等</p>'=>['EVregi.php?mode=kobetu&csrf_token='.$token,'k_rez']
+        //,'個別売上レジ<p style="font-size:11px;margin:0;">受注販売・個人オーダー等</p>'=>['EVregi.php?mode=kobetu&csrf_token='.$token,'k_rez']
+        ,'個別売上レジ<p style="font-size:11px;margin:0;">受注販売・個人オーダー等</p>'=>['regi.php?&csrf_token='.$token,'k_rez']
         ,'商品登録'=>['shouhinMSedit.php?csrf_token='.$token,'s_tou']
         ,'商品一覧'=>['shouhinMSList.php?csrf_token='.$token,'s_itiran']
         ,'商品QR作成'=>['shouhinMSQR.php?csrf_token='.$token,'qr_itiran']

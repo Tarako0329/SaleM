@@ -1,7 +1,7 @@
 <?php
 define("VERSION", "ver3.21.6-000");
 define("RELEACE_DATE", "2025-06-25");
-
+ini_set('error_log', __DIR__ . '/.error_log');
 date_default_timezone_set('Asia/Tokyo');
 require "./vendor/autoload.php";
 require_once "functions.php";
@@ -13,6 +13,7 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 define("EXEC_MODE",$_ENV["EXEC_MODE"]);
+define("APP_NAME",EXEC_MODE.":WEBREZ");
 
 define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
 if(!empty($_SERVER['SCRIPT_URI'])){
@@ -25,6 +26,9 @@ if(!empty($_SERVER['SCRIPT_URI'])){
 define("DNS","mysql:host=".$_ENV["SV"].";dbname=".$_ENV["DBNAME"].";charset=utf8");
 define("USER_NAME", $_ENV["DBUSER"]);
 define("PASSWORD", $_ENV["PASS"]);
+
+define("DB_HOST", $_ENV["SV"]);
+define("DB_NAME", $_ENV["DBNAME"]);
 
 //メール送信関連
 define("HOST", $_ENV["HOST"]);
@@ -91,6 +95,25 @@ $_SESSION["tour"]=(empty($_SESSION["tour"])?"":$_SESSION["tour"]);
 // DBとの接続
 $pdo_h = new PDO(DNS, USER_NAME, PASSWORD, get_pdo_options());
 
+spl_autoload_register(function ($className) {
+  // 1. 名前空間のバックスラッシュ '\' を、OS標準のパス区切り文字（通常は '/'）に置換
+  $path = str_replace('\\', DIRECTORY_SEPARATOR, $className);
+  // 2. クラスファイルを探すフルパスを組み立て
+  $file = __DIR__.DIRECTORY_SEPARATOR.$path.'.php';
+  //log_writer2("Autoloading class", $className . " (Path: " . $file . ")", "lv3");
+  // 3. ファイルが存在すれば読み込む
+  if (file_exists($file)) {
+    require_once $file;
+    //log_writer2("Autoloading success", "Class: " . $className . " (Expected Path: " . $file . ")", "lv3");
+  }else{
+    log_writer2("Autoloading failed", "Class: " . $className . " (Expected Path: " . $file . ")", "lv3");
+  }
+});
+
+class_alias('classes\Utilities\Utilities','U');
+use classes\Database\Database;
+
+$db = new Database();
 
 //log_writer("php_header.php _SERVER values ",$_SERVER);
 //log_writer2("php_header.php end > \$_SESSION values ",$_SESSION,"lv3");

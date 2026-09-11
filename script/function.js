@@ -137,9 +137,9 @@ const GET_GUID = () =>{
 }
 
 const GET_QRCODE = (p_string,p_size,p_canvas_id) =>{
-  //p_string:QR化する文字列
-  //p_size：サイズ
-  //p_canvas_id：QRコードを表示するキャンバスID
+//p_string:QR化する文字列
+//p_size：サイズ
+//p_canvas_id：QRコードを表示するキャンバスID
 
   console_log(`GET_QRCODE start`)
   // QRコードの生成

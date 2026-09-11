@@ -365,20 +365,19 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 			order_list.value.forEach((row)=>{
 				console_log(row)
 				console_log(`${row.NM} SU:${row.SU} 税区分:${row.ZEIKBN}`)
-				hontai_index = hontai.value.findIndex(//同一商品・同一税率の注文があった場合、該当レコードのindexを取得。ない場合は[-1]を返す
-					item => Number(item.税区分) === Number(row.ZEIKBN)
-				)
+				//同一商品・同一税率の注文があった場合、該当レコードのindexを取得。ない場合は[-1]を返す
+				hontai_index = hontai.value.findIndex(item => Number(item.税区分) === Number(row.ZEIKBN))
 				console_log(hontai_index)
 				if(hontai_index===-1){
 					console_log("push")
 					hontai.value.push({
-					'税区分':Number(row.ZEIKBN) 
-					,'税区分名':row.ZEIRITUNM 
-					,'税率':Number(row.ZEIRITU)/100
-					,'本体額':Number(row.TANKA) * Number(row.SU)
-					,'調整額':0
-					,'消費税':Number(row.TANKA_ZEI) * Number(row.SU)
-					,'税調整額':0
+						'税区分':Number(row.ZEIKBN) 
+						,'税区分名':row.ZEIRITUNM 
+						,'税率':Number(row.ZEIRITU)/100
+						,'本体額':Number(row.TANKA) * Number(row.SU)
+						,'調整額':0
+						,'消費税':Number(row.TANKA_ZEI) * Number(row.SU)
+						,'税調整額':0
 					})
 					console_log(hontai.value)
 				}else{
@@ -387,7 +386,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 					hontai.value[hontai_index].消費税 = Number(hontai.value[hontai_index].消費税) + (Number(row.TANKA_ZEI) * Number(row.SU))
 				}
 			})
-			
+
 			pay.value=Number(0)
 			kaikei_zei.value=Number(0)
 			if(auto_ajust.value!==true){
@@ -405,8 +404,13 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 					kaikei_zei.value = Number(kaikei_zei.value) + Number(row['消費税']) + Number(row['税調整額']) 	//内消費税
 				})
 			}
+
 			console_log("*****【calculation end】*****")
 		}
+
+
+
+
 
 		const CHOUSEI_TYPE = ref('sougaku')
 		const par = ref(0)

@@ -64,6 +64,7 @@ $msg = array(
 
 //売上登録
 //$logfilename="sid_".$_SESSION['user_id'].".log";
+//U::log("\$POST",$_POST);
 $array = $_POST["ORDERS"];
 $ZeiKbnSummary = $_POST["ZeiKbnSummary"];
 $sqlstr = "";
@@ -96,6 +97,11 @@ try{
 
 	foreach($array as $row){//本体額明細の登録
 		if($row["SU"]==0){continue;}//売上数０はスキップ
+
+		if(!U::exist($row["CD"])){//商品マスタに存在しない場合は登録する
+			$row["CD"] =save_shouhinMS($row);
+		}
+
 		$stmt = $pdo_h->prepare($sqlstr);
 
 		$params["ShouhinCD"] = $row["CD"];
@@ -292,6 +298,38 @@ function shutdown(){
 			echo json_encode($msg, JSON_UNESCAPED_UNICODE);
 		}
 	}
+}
+
+function save_shouhinMS(array $newProductData){
+	global $db;
+	$row = $db->SELECT(
+		"SELECT * from ZeiMS where zeiKBN=:zeiKBN",
+		[":zeiKBN"=>$newProductData["ZEIKBN"]],
+	);
+	$zeikbn = $row[0]["zeiKBN"];
+	$zeiritu= $row[0]["zeiritu"];
+
+	$new_shouhinCD = get_new_ShouhinCD($_SESSION['user_id']);
+
+	$params["uid"] = $_SESSION['user_id'];
+	$params["shouhinCD"]=$new_shouhinCD;
+	$params["shouhinNM"]=$newProductData["NM"];
+	$params["tanka"]=$newProductData["TANKA"] ?? 0;
+	$params["zeitanka"]=$newProductData["SHOUHIZEI"] ?? 0;
+	$params["zeiritu"]=$zeiritu;
+	$params["zeiKBN"]=$zeikbn;
+	$params["utisu"]="";
+	$params["tani"]="";
+	$params["genka_tanka"]=U::exist($newProductData["genka"])? $newProductData["genka"]:0;
+	$params["hyoujiKBN1"]="";
+
+	$sqlstr="INSERT into ShouhinMS(uid,shouhinCD,shouhinNM,tanka,tanka_zei,zeiritu,zeiKBN,utisu,tani,genka_tanka,hyoujiKBN1) values(:uid,:shouhinCD,:shouhinNM,:tanka,:zeitanka,:zeiritu,:zeiKBN,:utisu,:tani,:genka_tanka,:hyoujiKBN1)";
+	$db->UP_DEL_EXEC(
+		$sqlstr,
+		$params
+	);
+
+	return $new_shouhinCD;
 }
 ?>
 
