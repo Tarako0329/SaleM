@@ -576,18 +576,23 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 			}
 			await axios.post(php_name,params,{timeout:p_timeout }) //php側は15秒でタイムアウト
 				.then((response) => {
-					console_log(`on_submit SUCCESS`)
-					//console_log(response.data)
+					console_log(response.data)
 					MSG.value = response.data.MSG
 					alert_status.value[1]=response.data.status
 					csrf.value = response.data.csrf_create
 					rtURL.value = response.data.RyoushuURL
 					if(response.data.status==='alert-success'){
+						console_log(`on_submit SUCCESS`)
 						reset_order()
 						order_panel_show("close")
 						total_area.value.style["fontSize"]="3.3rem"
 						chk_register_show.value = "chk"
 						ZeiChange.value='0'
+					}else{
+						console_log(`on_submit ERROR`)
+						order_panel_show("close")
+						total_area.value.style["fontSize"]="3.3rem"
+						chk_register_show.value = "chk"
 					}
 				})
 				.catch((error) => {
@@ -598,9 +603,7 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 				})
 				.finally(()=>{
 					get_UriageList()
-					//IDD_Write('LocalParameters',[{id:'EventName',EventName:labels.value["EV_input_value"]}])
 					const today = new Date().toLocaleDateString('sv-SE')
-					//IDD_Write('LocalParameters',[{id:'EventName',EventName:EV_input_value.value}])
 					IDD_Write('LocalParameters',[{id:'EventName',EventName:EV_input_value.value,LastUseDate:today}])
 					
 					document.getElementById('main_area').style.paddingTop = '215px'
@@ -732,15 +735,6 @@ const REZ_APP = (p_uid,p_timeout,p_mode) => createApp({
 		const DL_URL = ref('')
 		const send_msg = ref('')	//LINEで領収書を送る時のメッセージ
 		const getGUID = () =>{
-			/*
-			let dt = new Date().getTime();
-			let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-					let r = (dt + Math.random()*16)%16 | 0;
-					dt = Math.floor(dt/16);
-					return (c=='x' ? r :(r&0x3|0x8)).toString(16);
-			});
-			return uuid;
-			*/
 			return GET_GUID()
 		}
 		const QRout = () =>{

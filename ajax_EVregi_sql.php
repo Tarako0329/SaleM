@@ -69,12 +69,15 @@ $array = $_POST["ORDERS"];
 $ZeiKbnSummary = $_POST["ZeiKbnSummary"];
 $sqlstr = "";
 //売上番号の取得
+/*
 $sqlstr = "select max(UriageNO) as UriageNO from UriageData where uid=?";
 $stmt = $pdo_h->prepare($sqlstr);
 $stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
 
 $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+*/
+$row = $db->SELECT("SELECT max(UriageNO) as UriageNO from UriageData where uid=:uid", [":uid"=>$_SESSION['user_id']]);
 if(is_null($row[0]["UriageNO"])){
 	$UriageNO = 1;  //初回売上時は売上NO[1]をセット
 }else{
@@ -90,19 +93,22 @@ $params["Event"] = filter_input(INPUT_POST,'EV');
 $params["TokuisakiNM"] = filter_input(INPUT_POST,'KOKYAKU');
 $sqllog="";
 try{
-	$pdo_h->beginTransaction();
-	$sqllog .= rtn_sqllog("START TRANSACTION",[]);
-	$sqlstr = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zeiKBN,genka_tanka)";
-	$sqlstr = $sqlstr." values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:su,:Utisu,:tanka,:UriageKin,:zeiKBN,:genka_tanka)";
+	//$pdo_h->beginTransaction();
+	//$sqllog .= rtn_sqllog("START TRANSACTION",[]);
+	$db->begin_tran();
+
+	$sqlstr = "INSERT into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,su,Utisu,tanka,UriageKin,zeiKBN,genka_tanka)
+		values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:su,:Utisu,:tanka,:UriageKin,:zeiKBN,:genka_tanka)";
 
 	foreach($array as $row){//本体額明細の登録
 		if($row["SU"]==0){continue;}//売上数０はスキップ
 
+		//$row["CD"] = ""; //test
 		if(!U::exist($row["CD"])){//商品マスタに存在しない場合は登録する
 			$row["CD"] =save_shouhinMS($row);
 		}
 
-		$stmt = $pdo_h->prepare($sqlstr);
+		//$stmt = $pdo_h->prepare($sqlstr);
 
 		$params["ShouhinCD"] = $row["CD"];
 		$params["ShouhinNM"] = $row["NM"];
@@ -112,7 +118,8 @@ try{
 		$params["UriageKin"] = ($row["SU"] * $row["TANKA"]);
 		$params["zeiKBN"] = $row["ZEIKBN"];
 		$params["genka_tanka"] = $row["GENKA_TANKA"];
-
+		$db->UP_DEL_EXEC($sqlstr,$params);
+		/*
 		$stmt->bindValue("uid",  $params["uid"], PDO::PARAM_INT);
 		$stmt->bindValue("UriageNO",  $params["UriageNO"], PDO::PARAM_INT);
 		$stmt->bindValue("UriDate",  $params["UriDate"], PDO::PARAM_STR);
@@ -131,24 +138,27 @@ try{
 		$sqllog .= rtn_sqllog($sqlstr,$params);
 		$stmt->execute();
 		$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
+		*/
 		$ins_cnt++;
 	}
 
 	//インボイス対応（消費税レコードと調整レコードの追加）
-	$sqlstr_z = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,zei,zeiKBN)";
-	$sqlstr_z .= " values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:zei,:zeiKBN)";
-	$sqlstr_c = "insert into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,UriageKin,zeiKBN,zei)";
-	$sqlstr_c .= " values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:UriageKin,:zeiKBN,:zei)";
+	$sqlstr_z = "INSERT into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,zei,zeiKBN)
+		values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:zei,:zeiKBN)";
+	$sqlstr_c = "INSERT into UriageData(uid,UriageNO,UriDate,insDatetime,Event,TokuisakiNM,ShouhinCD,ShouhinNM,UriageKin,zeiKBN,zei)
+		values(:uid,:UriageNO,:UriDate,:insDatetime,:Event,:TokuisakiNM,:ShouhinCD,:ShouhinNM,:UriageKin,:zeiKBN,:zei)";
 
 	foreach($ZeiKbnSummary as $row){
 		if($row["SHOUHIZEI"]!=0){
-			$stmt = $pdo_h->prepare($sqlstr_z);
+			//$stmt = $pdo_h->prepare($sqlstr_z);
 
 			$params["ShouhinCD"] = "Z".substr("000000".$row["ZEIKBN"],-6);
 			$params["ShouhinNM"] = ($row["ZEIRITU"]<>0?$row["ZEIKBNMEI"]." 消費税額":$row["ZEIKBNMEI"]);
 			$params["zei"] = $row["SHOUHIZEI"];
 			$params["zeiKBN"] = $row["ZEIKBN"];
-			
+			$db->UP_DEL_EXEC($sqlstr_z,$params);
+
+			/*
 			$stmt->bindValue("uid",  $params["uid"], PDO::PARAM_INT);
 			$stmt->bindValue("UriageNO",  $params["UriageNO"], PDO::PARAM_INT);
 			$stmt->bindValue("UriDate",  $params["UriDate"], PDO::PARAM_STR);
@@ -163,18 +173,20 @@ try{
 			$sqllog .= rtn_sqllog($sqlstr_z,$params);
 			$stmt->execute();
 			$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
+			*/
 			$ins_cnt++;
 		}
 
 		if($row["CHOUSEIGAKU"]!=0){
-			$stmt = $pdo_h->prepare($sqlstr_c);
+			//$stmt = $pdo_h->prepare($sqlstr_c);
 
 			$params["ShouhinCD"] = "C".substr("000000".$row["ZEIKBN"],-6);
 			$params["ShouhinNM"] = $row["ZEIKBNMEI"]."本体調整額";
 			$params["UriageKin"] = $row["CHOUSEIGAKU"];
 			$params["zeiKBN"] = $row["ZEIKBN"];
 			$params["zei"] = $row["ZEICHOUSEIGAKU"];
-			
+			$db->UP_DEL_EXEC($sqlstr_c,$params);
+			/*
 			$stmt->bindValue("uid",  $params["uid"], PDO::PARAM_INT);
 			$stmt->bindValue("UriageNO",  $params["UriageNO"], PDO::PARAM_INT);
 			$stmt->bindValue("UriDate",  $params["UriDate"], PDO::PARAM_STR);
@@ -190,15 +202,15 @@ try{
 			$sqllog .= rtn_sqllog($sqlstr_c,$params);
 			$stmt->execute();
 			$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
+			*/
 			$ins_cnt++;
 		}
 	}
 	//位置情報、天気情報の付与（uid,売上No,緯度、経度、住所、天気、気温、体感温度、天気アイコンping,無効FLG,insdate,update）
 	if(empty($_POST["nonadd"]) && $ins_cnt>0){
 		$emsg=$emsg."/位置情報、天気情報　処理開始\n";
-		//$sqlstr = "insert into UriageData_GioWeather(uid, UriNo, lat, lon, weather, description, temp, feels_like, icon) values(:uid,:UriNo,:lat,:lon,:weather,:description,:temp,:feels_like,:icon)";
-		//$sqlstr = "insert into UriageData_GioWeather(uid, UriNo, lat, lon,address, weather, description, temp, feels_like, icon) values(:uid,:UriNo,:lat,:lon,:address,:weather,:description,:temp,:feels_like,:icon)";
-		$sqlstr = "insert into UriageData_GioWeather(uid, UriNo, lat, lon,MUNI,address, weather, description, temp, feels_like, icon) values(:uid,:UriNo,:lat,:lon,:MUNI,:address,:weather,:description,:temp,:feels_like,:icon)";
+
+		$sqlstr = "INSERT into UriageData_GioWeather(uid, UriNo, lat, lon,MUNI,address, weather, description, temp, feels_like, icon) values(:uid,:UriNo,:lat,:lon,:MUNI,:address,:weather,:description,:temp,:feels_like,:icon)";
 		$params=[];
 		$params["uid"] = $_SESSION['user_id'];
 		$params["UriNo"] = $UriageNO;
@@ -212,7 +224,9 @@ try{
 		$params["temp"] = $_POST['temp'];
 		$params["feels_like"] = $_POST['feels_like'];
 		$params["icon"] = $_POST['icon'];
+		$db->UP_DEL_EXEC($sqlstr,$params);
 
+		/*
 		$stmt = $pdo_h->prepare($sqlstr);
 		$stmt->bindValue("uid",  $params["uid"], PDO::PARAM_INT);
 		$stmt->bindValue("UriNo",  $params["UriNo"], PDO::PARAM_INT);
@@ -229,13 +243,18 @@ try{
 		$sqllog .= rtn_sqllog($sqlstr,$params);
 		$stmt->execute();
 		$sqllog .= rtn_sqllog("-- execute():正常終了",[]);
+		*/
 	}else{
-		log_writer2("ajax_EVregi_sql.php","Gio insert skip","lv3");
+		log_writer2("ajax_EVregi_sql.php","Gio INSERT skip","lv3");
 	}
+	/*
 	$pdo_h->commit();
 	$sqllog .= rtn_sqllog("commit",[]);
 	sqllogger($sqllog,0);
-	
+	*/
+
+	$db->commit_tran();
+
 	$msg = array(
 		"MSG" => "売上が登録されました。（売上№：".$UriageNO."）"
 		,"status" => "alert-success"
@@ -246,10 +265,12 @@ try{
 	header('Content-type: application/json');
 	echo json_encode($msg, JSON_UNESCAPED_UNICODE);
 
-}catch (Exception $e) {
+}catch (\Throwable $e) {
+	/*
 	$pdo_h->rollBack();
 	$sqllog .= rtn_sqllog("rollBack",[]);
 	sqllogger($sqllog,$e);
+	
 	$emsg = $emsg."/レジ登録でERRORをCATHCしました。：".$e->getMessage();
 	$stmt = null;
 	$pdo_h = null;
@@ -259,6 +280,8 @@ try{
 	}else{
 		log_writer2("ajax.EVreg_sql.php",$emsg,"lv3");
 	}
+	*/
+	$db->Exception_rollback($e,"レジ登録でERRORをCATHCしました。");
 	$msg = array(
 		"MSG" => "登録が失敗しました。再度実行してもエラーとなる場合は、ご迷惑をおかけしますが復旧までお待ちください。エラーは管理者へ自動通知されました。"
 		,"status" => "alert-danger"
