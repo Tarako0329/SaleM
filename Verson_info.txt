@@ -244,7 +244,7 @@ ver3.21.7-000:A.Iレポート機能-commited
 	ALTER TABLE `business_info`  ADD PRIMARY KEY (`uid`);
 ver3.21.6-001:マニフェスト修正-commited
 ver3.22.0-000:SQLLOGの修正-commited
-ver3.23.0-000:個別売上の改造
+ver3.23.0-000:個別売上の改造-commited
 
 
 verA.BB.C.DDD
