@@ -50,8 +50,6 @@
 
 	$token = csrf_create();
 
-	$RG_MODE=(!empty($_GET["mode"])?$_GET["mode"]:"");
-
 	//税区分MSリスト取得
 	$sqlstr="select * from ZeiMS order by zeiKBN;";
 	$stmt = $pdo_h->query($sqlstr);
@@ -66,8 +64,8 @@
 	//共通部分、bootstrap設定、フォントCND、ファビコン等
 	include 'head_bs5.php'
 	?>
-	<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script><!--read QRコードライブラリ-->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.js"></script><!--make QRコードライブラリ-->
+	<!--<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>--><!--read QRコードライブラリ-->
+	<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.js"></script>--><!--make QRコードライブラリ-->
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_EVregi.css?<?php echo $time; ?>' >
 	<TITLE><?php echo TITLE.' レジ';?></TITLE>
@@ -104,8 +102,9 @@
 	<div id='register'>
 	<form method = 'post' id='form1' @submit.prevent='on_submit'>
 		<input :value='csrf' type='hidden' name='csrf_token' >
-		<input :value='order_list' type='hidden' name='ORDERS' >
-		<input :value='order_summary.tax_list' type='hidden' name='ZeiKbnSummary' >
+		<input value='kobetu' type='hidden' name='mode' >
+		<input :value="JSON.stringify(order_list)" type='hidden' name='ORDERS' >
+		<input :value="JSON.stringify(order_summary.tax_list)" type='hidden' name='ZeiKbnSummary' >
 	
 		<header class='header-color common_header' style='display:block'>
 			<div class='title yagou'><a href='menu.php'><?php echo TITLE;?></a></div>
@@ -121,6 +120,17 @@
 		<main class='common_body' id='main_area' style='padding-top:80px;'>
 			<div class="container">
 				<div class='row'>
+					<div class='col-12'>
+						<template v-if='MSG!==""'><!--登録結果ステータス表示+領収書ボタン-->
+							<div :class='alert_status' role='alert' id='msg_alert'>
+								{{MSG}}
+								<button v-if='alert_status[1]==="alert-success"' type='button' class='btn btn-primary' @click='open_R()'> 
+									領収書
+								</button>
+							</div>
+						</template><!--登録結果ステータス表示+領収書ボタン-->
+					</div>
+
 					<div class='col-12'>
 						<label class=''>顧客名　　</label>
 						<input type='text' class='' name='Kokyaku' v-model='Kokyaku' required='required' style='display:none;'>
@@ -146,8 +156,8 @@
 								<template v-for='(list,index) in order_list' :key='list.NM'>
 									<tr class='table-group-divider'>
 										<td><input class='form-control' v-model='list.NM' @Click='set_shouhin_Open(index)'   data-bs-toggle='modal' data-bs-target='#ShouhinSelect'></td>
-										<td><input class='form-control' v-model='list.SU' type='number' min='0'></td>
 										<td><input class='form-control' v-model='list.TANKA' type='number' min='0' step='1'></td>
+										<td><input class='form-control' v-model='list.SU' type='number' min='0'></td>
 										<td class='text-end'>{{(list.TANKA * list.SU)}}</td>
 									</tr>
 									<tr >
@@ -250,6 +260,37 @@
 				<div class='modal-footer'>
 					<button type='button'  class='btn btn-primary' style='font-size: 2.0rem;width:40%;' @click='clear_EV_input_value()'>クリア</button>
 					<button type='button'  class='btn btn-primary' data-bs-dismiss='modal' style='font-size: 2.0rem;width:40%;' @click='set_shouhin_close()'>決定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--領収書-->
+	<div class='modal fade' id='ryoushuu' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
+		<div class='modal-dialog  modal-dialog-centered'>
+			<div class='modal-content' style='font-size: 2rem; font-weight: 600;'>
+				<div class='modal-header'>
+					<div class='modal-title' id='myModalLabel' style='text-align:center;width:100%;'>領収書発行</div>
+				</div>
+				<div class='modal-body text-center'>
+					<label for='oaite' class='form-label'>宛名：</label>
+					<input type='text' class='form-control' id='oaite' v-model='Kokyaku' style='font-size: 2rem;'>
+					
+					<div style='padding:0;margin-top:10px;'>
+						<input type='radio' class='btn-check' name='keishou' value='御中' autocomplete='off' v-model='keishou' id='onchu'>
+						<label class='btn btn-outline-primary' for='onchu' style='border-radius:0;font-size: 2rem;'>御中</label>
+						<input type='radio' class='btn-check' name='keishou' value='様' autocomplete='off' v-model='keishou' id='sama' >
+						<label class='btn btn-outline-warning' for='sama' style='border-radius:0;font-size: 2rem;'>様</label>
+					</div>
+					<div id="qrOutput">
+						<canvas id="qr"></canvas>
+					</div>
+				</div>
+				<div class='modal-footer'>
+					<!--<button type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1' @click='QRout()'><i class="bi bi-qr-code"></i></button>-->
+					<button type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1' @click='prv()'><i class="bi bi-filetype-pdf"></i></button>
+					<a :href='`https://line.me/R/share?text=${send_msg}`' type='button' style='font-size: 2rem;' class='btn btn-outline-primary me-1'>
+						<i class="bi bi-line line-green"></i>
+					</a>
 				</div>
 			</div>
 		</div>

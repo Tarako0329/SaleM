@@ -109,11 +109,11 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 			order_shouhinNM.value = order_list.value[index].NM ?? ''
 		}
 		const set_shouhin_close = () =>{//商品選択モーダルを閉じる＆商品名をorder_listに登録
-			if(shouhinMS_filtered.value.length==1){
+			if(shouhinMS_filtered.value.length==1 && order_shouhinNM.value === shouhinMS_filtered.value[0].shouhinNM){
 				order_list.value[selected_shouhin_index.value].CD = shouhinMS_filtered.value[0].shouhinCD
 				order_list.value[selected_shouhin_index.value].NM = shouhinMS_filtered.value[0].shouhinNM
 				//order_list.value[selected_shouhin_index.value].SU = shouhinMS_filtered.value[0].su
-				order_list.value[selected_shouhin_index.value].UTISU = shouhinMS_filtered.value[0].Utisu
+				order_list.value[selected_shouhin_index.value].UTISU = shouhinMS_filtered.value[0].Utisu ?? 0
 				order_list.value[selected_shouhin_index.value].TANKA = shouhinMS_filtered.value[0].tanka
 				order_list.value[selected_shouhin_index.value].GENKA_TANKA = shouhinMS_filtered.value[0].genka_tanka
 				order_list.value[selected_shouhin_index.value].ZEIKBN = shouhinMS_filtered.value[0].zeiKBN
@@ -146,7 +146,6 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 		})
 
 	
-		const total_area = ref()
 
 		const alert_status = ref(['alert'])
 		const MSG = ref('')
@@ -174,9 +173,36 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 		const on_submit = async(e) => {//登録・submit/
 			console_log('on_submit start')
 			loader.value = true
-	
-		}
+			let form_data = new FormData(e.target)
 
+			await axios.post('ajax_EVregi_sql.php',form_data,{timeout:p_timeout }) //php側は15秒でタイムアウト
+				.then((response) => {
+					console_log(response.data)
+					MSG.value = response.data.MSG
+					alert_status.value[1]=response.data.status
+					csrf.value = response.data.csrf_create
+					rtURL.value = response.data.RyoushuURL
+					if(response.data.status==='alert-success'){
+						clear_order()
+						console_log(`on_submit SUCCESS`)
+						//reset_order()
+						//order_panel_show("close")
+					}else{
+						console_log(`on_submit ERROR`)
+						//order_panel_show("close")
+					}
+				})
+				.catch((error) => {
+					console_log(`on_submit ERROR:${error}`)
+					MSG.value = error.response.data.MSG
+					csrf.value = error.response.data.csrf_create
+					alert_status.value[1]='alert-danger'
+				})
+				.finally(()=>{
+					//const today = new Date().toLocaleDateString('sv-SE')
+					loader.value = false
+				})	
+		}
 
 		const getKokyakuList = () =>{
 			console_log(`*****【 getKokyakuList start 】*****`);
@@ -201,8 +227,42 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 
 		}
 
+		//領収書
+		const keishou = ref('様')
+		//const oaite = ref('上')
+		const URL = ref('')				//領収書用URL
+		const DL_URL = ref('')
+		const send_msg = ref('')	//LINEで領収書を送る時のメッセージ
+		const rtURL = ref('')
+		const prv = () =>{
+			//プレビュー印刷
+			if(confirm("表示する領収書をお客様に発行しますか？")===true){
+				DL_URL.value = URL.value + (`&sb=on&tp=1&k=${keishou.value}&s=${Kokyaku.value}`)
+			}else{
+				DL_URL.value = URL.value + (`&sb=off&tp=1&k=${keishou.value}&s=${Kokyaku.value}`)
+			}
+			window.open(P_ROOT_URL + DL_URL.value, '_blank')
+		}
+
+		const open_R = (setURL) =>{
+			if(setURL!==undefined){
+				URL.value = setURL
+			}else{
+				URL.value = rtURL.value
+			}
+			DL_URL.value = URL.value + (`&sb=on&tp=1&k=${keishou.value}&s=${Kokyaku.value}`)
+			send_msg.value = `${Kokyaku.value}　${keishou.value}\n\nお買い上げ、ありがとうございます。\n領収書はこちらからダウンロードしてください。\n${(D_ROOT_URL+DL_URL.value)}`
+			axios.get(`ajax_rtn_urlencode.php?url=${encodeURIComponent(send_msg.value)}`)
+			.then((response)=>{
+				//console_log(response.data)
+				send_msg.value = response.data
+				const myModal = new bootstrap.Modal(document.getElementById('ryoushuu'), {})
+				myModal.show()
+			})
+		}
+
+
 		onMounted(async() => {
-			//console_log(get_value(1000,0.1,'IN'))
 			console_log('onMounted')
 			try{
 				chk_csrf()
@@ -235,7 +295,13 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 			selected_shouhin_index,
 			set_shouhin_close,
 			order_summary,
-			clear_order
+			clear_order,
+			open_R,
+			prv,
+			URL,
+			DL_URL,
+			keishou,
+			send_msg
 		}
 	}
 })

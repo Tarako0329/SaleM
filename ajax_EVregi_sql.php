@@ -36,7 +36,7 @@ $logfilename="sid_".$_SESSION['user_id'].".log";
 if(EXEC_MODE=="Test")sleep(2);
 if(EXEC_MODE=="Local")sleep(0);
 
-$rtn = csrf_checker(["EVregi.php"],["P","C"]);
+$rtn = csrf_checker(["EVregi.php","regi.php"],["P","C"]);
 if($rtn !== true){
 	$msg = array(
 		"MSG" => $rtn
@@ -49,6 +49,7 @@ if($rtn !== true){
 
 
 $MODE=(!empty($_POST["mode"])?$_POST["mode"]:"");
+$NoAdd = $_POST["nonadd"] ?? ($MODE==="kobetu")?"on":"";	//
 $token = csrf_create();
 
 $emsg="";
@@ -64,9 +65,11 @@ $msg = array(
 
 //売上登録
 //$logfilename="sid_".$_SESSION['user_id'].".log";
-//U::log("\$POST",$_POST);
-$array = $_POST["ORDERS"];
-$ZeiKbnSummary = $_POST["ZeiKbnSummary"];
+U::log("\$POST",$_POST);
+//$array = $_POST["ORDERS"];
+//$ZeiKbnSummary = $_POST["ZeiKbnSummary"];
+$array = is_array($_POST["ORDERS"])?$_POST["ORDERS"]:json_decode($_POST["ORDERS"], true);
+$ZeiKbnSummary = is_array($_POST["ZeiKbnSummary"])?$_POST["ZeiKbnSummary"]:json_decode($_POST["ZeiKbnSummary"], true);
 $sqlstr = "";
 //売上番号の取得
 /*
@@ -90,7 +93,7 @@ $params["UriageNO"] = $UriageNO;
 $params["UriDate"] = filter_input(INPUT_POST,'KEIJOUBI');
 $params["insDatetime"] = date("Y/m/d H:i:s");
 $params["Event"] = filter_input(INPUT_POST,'EV');
-$params["TokuisakiNM"] = filter_input(INPUT_POST,'KOKYAKU');
+$params["TokuisakiNM"] = filter_input(INPUT_POST,'Kokyaku');
 $sqllog="";
 try{
 	//$pdo_h->beginTransaction();
@@ -113,7 +116,7 @@ try{
 		$params["ShouhinCD"] = $row["CD"];
 		$params["ShouhinNM"] = $row["NM"];
 		$params["su"] = $row["SU"];
-		$params["Utisu"] = $row["UTISU"];
+		$params["Utisu"] = $row["UTISU"] ?? 0;
 		$params["tanka"] = $row["TANKA"];
 		$params["UriageKin"] = ($row["SU"] * $row["TANKA"]);
 		$params["zeiKBN"] = $row["ZEIKBN"];
@@ -207,7 +210,8 @@ try{
 		}
 	}
 	//位置情報、天気情報の付与（uid,売上No,緯度、経度、住所、天気、気温、体感温度、天気アイコンping,無効FLG,insdate,update）
-	if(empty($_POST["nonadd"]) && $ins_cnt>0){
+	//if(empty($_POST["nonadd"]) && $ins_cnt>0){
+	if(empty($NoAdd) && $ins_cnt>0){
 		$emsg=$emsg."/位置情報、天気情報　処理開始\n";
 
 		$sqlstr = "INSERT into UriageData_GioWeather(uid, UriNo, lat, lon,MUNI,address, weather, description, temp, feels_like, icon) values(:uid,:UriNo,:lat,:lon,:MUNI,:address,:weather,:description,:temp,:feels_like,:icon)";
