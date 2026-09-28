@@ -19,7 +19,7 @@ define("MAIN_DOMAIN",$_ENV["MAIN_DOMAIN"]);
 if(!empty($_SERVER['SCRIPT_URI'])){
     define("ROOT_URL",substr($_SERVER['SCRIPT_URI'],0,mb_strrpos($_SERVER['SCRIPT_URI'],"/")+1));
 }else{
-    define("ROOT_URL","http://".MAIN_DOMAIN."/");
+    define("ROOT_URL","https://".MAIN_DOMAIN."/");
 }
 
 //DB接続関連

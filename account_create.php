@@ -40,7 +40,7 @@ $token=csrf_create();
 <head>
 	<?php 
 	//共通部分、bootstrap設定、フォントCND、ファビコン等
-	include "head_bs5.php" 
+	include "head_bs5.php"; 
 	?>
 	<!--ページ専用CSS-->
 	<link rel='stylesheet' href='css/style_account_create.css?<?php echo $time; ?>' >
@@ -301,9 +301,3 @@ $token=csrf_create();
 <?php
 $stmt=null;
 $pdo_h=null;
-?>
-
-
-
-
-
