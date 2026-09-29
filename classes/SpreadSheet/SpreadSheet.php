@@ -86,6 +86,7 @@ class SpreadSheet {
  	* @return string 'success' | 'warning' (重複のため作成スキップ) | 'error'
  	*/
 	public function createLogSheet($sheetName):string {
+		//$sheetName = $this->quoteSheetName($sheetName);
 		$body = new \Google\Service\Sheets\BatchUpdateSpreadsheetRequest([
 			'requests' => [['addSheet' => ['properties' => ['title' => $sheetName]]]]
 		]);
@@ -113,6 +114,7 @@ class SpreadSheet {
 	// データ挿入（末尾追加）
 	public function G_INSERT($values,$sheetName) {
 		//log_writer2("G_INSERT",$values,"lv3");
+		$sheetName = $this->quoteSheetName($sheetName);
 		$body = new \Google\Service\Sheets\ValueRange(['values' => $values]);
 		$params = ['valueInputOption' => 'RAW'];
 		return $this->service->spreadsheets_values->append($this->spreadsheetId, $sheetName . '!A1', $body, $params);
@@ -120,6 +122,7 @@ class SpreadSheet {
 
 // SEQを利用して更新
 	public function G_UPDATE($seq, $newValues, $sheetName) {
+		$sheetName = $this->quoteSheetName($sheetName);
 		$rowNumber = $this->findRowBySeq($seq, $sheetName);
 		if (!$rowNumber){
 			log_writer2("G_UPDATE","行が見つかりません","lv3");
@@ -140,6 +143,7 @@ class SpreadSheet {
 	}
 
 	public function G_DELETE($seq, $sheetName) {
+		$sheetName = $this->quoteSheetName($sheetName);
 		// 1. 対象の行番号を取得
 		$rowNumber = $this->findRowBySeq($seq, $sheetName);
 		if (!$rowNumber){
@@ -186,6 +190,7 @@ class SpreadSheet {
 
 	// SEQを利用して削除（行をクリア,空行が残る）
 	public function G_CLEAR($seq, $sheetName) {
+		$sheetName = $this->quoteSheetName($sheetName);
 		$rowNumber = $this->findRowBySeq($seq, $sheetName);
 		if (!$rowNumber) return false;
 
@@ -204,6 +209,7 @@ class SpreadSheet {
  	* @return string 'success' | 'warning' (見つからない) | 'error'
  	*/
 	public function DELETE_SHEET($sheetName) {
+		//$sheetName = $this->quoteSheetName($sheetName);
 		try {
 				// 1. スプレッドシートの全シート情報を取得してIDを探す
 				$spreadsheet = $this->service->spreadsheets->get($this->spreadsheetId);
@@ -244,6 +250,8 @@ class SpreadSheet {
  	* @return string 'success' | 'warning' (重複のため作成スキップ) | 'error'
  	*/
 	public function RENAME_SHEET($sheetName, $sheetName_new):string {
+		//$sheetName = $this->quoteSheetName($sheetName);
+		//$sheetName_new = $this->quoteSheetName($sheetName_new);
 		try {
 			// 1. スプレッドシートの全シート情報を取得してIDを探す
 			$spreadsheet = $this->service->spreadsheets->get($this->spreadsheetId);
@@ -283,8 +291,43 @@ class SpreadSheet {
 		}
 	}
 
+	/**
+	 * 指定した名前のスプレッドシート（ファイル本体）をGoogleドライブから削除する
+	 *
+	 * @param string $fileName 削除したいスプレッドシートのファイル名
+	 * @return bool 成功した場合は true、ファイルが存在しない・エラーの場合は false
+	 */
+	public function DELETE_SPREADSHEET(string $fileName): bool {
+		try {
+			// 1. 指定されたファイル名と同名のスプレッドシート（ゴミ箱以外のもの）を検索
+			$query = "name = '$fileName' and mimeType = 'application/vnd.google-apps.spreadsheet' and trashed = false";
+			$response = $this->driveService->files->listFiles([
+				'q' => $query,
+				'fields' => 'files(id, name)'
+			]);
+
+			// 該当するファイルが見つからない場合は false を返す
+			if (count($response->files) === 0) {
+				log_writer2("DELETE_SPREADSHEET", "削除対象のファイルが見つかりません: {$fileName}", "lv3");
+				return false;
+			}
+
+			// 2. 最初に見つかったファイルのIDを取得して削除を実行
+			$targetFileId = $response->files[0]->id;
+			$this->driveService->files->delete($targetFileId);
+
+			log_writer2("DELETE_SPREADSHEET", "ファイルを削除しました: {$fileName} (ID: {$targetFileId})", "lv3");
+			return true;
+
+		} catch (\Throwable $e) {
+			log_writer2("DELETE_SPREADSHEETでエラーが発生しました", $e->getMessage(), "lv0");
+			return false;
+		}
+	}
+
 	// A列からSEQを探し、行番号（1始まり）を返す
 	private function findRowBySeq($seq, $sheetName) {
+		$sheetName = $this->quoteSheetName($sheetName);
 		$range = $sheetName . '!A:A'; // A列全体を取得
 		$response = $this->service->spreadsheets_values->get($this->spreadsheetId, $range);
 		$values = $response->getValues();
@@ -297,7 +340,34 @@ class SpreadSheet {
 			}
 		}
 		return null;
-	}}
+	}
 
+/**
+ * シート名をGoogle Sheets API用の範囲表記形式（'シート名'）に整形する
+ *
+ * @param string $sheetName
+ * @return string
+ */
+	private function quoteSheetName(string $sheetName): string{
+    // 空文字の場合はそのまま返す
+    if ($sheetName === '') {
+        return '';
+    }
 
+    // 先頭と末尾がすでにシングルクォートで囲まれているかチェック
+    $isAlreadyQuoted = (
+        strlen($sheetName) >= 2 &&
+        str_starts_with($sheetName, "'") &&
+        str_ends_with($sheetName, "'")
+    );
+
+    if ($isAlreadyQuoted) {
+        return $sheetName;
+    }
+
+    // シート名内部のシングルクォートをエスケープ（' -> ''）して全体を囲む
+    $escaped = str_replace("'", "''", $sheetName);
+    return "'{$escaped}'";
+	}	
+}
 ?>

@@ -224,22 +224,31 @@ class Database {
       $this->connect()->commit();
       $this->exec_log();
     }
-    public function rollback_tran($msg=""):void{
+    public function rollback_tran($msg=""):string{
       $msg = var_export($msg, true); //配列やオブジェクトも文字列化してログに出力できるようにする
-      $this->log .= "rollback;\n";
-      $this->log .= "/*ERROR SQL:[".$this->sql.";]*/\n";
+      $return_msg = "";
+      $pdo = $this->connect();
+      if ($pdo->inTransaction()) {
+        $this->log .= "rollback;\n";
+        $this->log .= "/*ERROR SQL:[".$this->sql.";]*/\n";
+        $pdo->rollback();
+      }else{
+        $return_msg = "/*トランザクション中ではないためrollbackはスキップされました。*/\n";
+        $this->log .= $return_msg;
+      }
       $this->log .= "/*".$msg."*/\n";
-      $this->connect()->rollback();
+      //$this->connect()->rollback();
       $this->exec_log();
+      return $return_msg;
     }
     public function Exception_rollback(\Throwable $e,String $msg=""):void{
       //例外が発生した場合のロールバック処理と管理者への通知を行うメソッド
       $msg = (U::exist($msg) ? "$msg\n" : "");
-      $this->rollback_tran($msg."Exception Message:".$e->getMessage());
+      $L_MSG = $this->rollback_tran($msg."Exception Message:".$e->getMessage());
       //メソッドをコールしたファイルを取得
       $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
       $file = isset($backtrace[0]['file']) ? basename($backtrace[0]['file']) : 'unknown';
-      U::send_E($e,"【".EXEC_MODE."】[$file]でExceptionロールバック発生", $msg."ErrorSQL:".$this->sql."\nログ:\n".$this->log);
+      U::send_E($e,"【".EXEC_MODE."】[$file]でExceptionロールバック発生", $L_MSG .$msg."ErrorSQL:".$this->sql."\nログ:\n".$this->log);
     }
 
     private function exec_log():void{
