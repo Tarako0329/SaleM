@@ -245,7 +245,9 @@ ver3.21.7-000:A.Iレポート機能-commited
 ver3.21.6-001:マニフェスト修正-commited
 ver3.22.0-000:SQLLOGの修正-commited
 ver3.23.0-000:個別売上の改造-commited
-ver3.24.0-000:xampp->docker
+ver3.24.0-000:xampp->docker-commited
+ver3.25.0-000:phpMailer&phinx導入&原価計算
+	
 
 
 verA.BB.C.DDD
@@ -258,6 +260,22 @@ DDD：デバッグ・リファクタリング
 商品修正画面から原価の反映機能を考える
 レジの入出金機能を考える
 後から原価反映
+
+マイグレーションコマンド
+#マイグレーションファイルを作る
+php vendor/bin/phinx create [
+    テーブルを作る時: CreateUsersTable
+    テーブルを削除: DropUsersTable
+    カラムを追加する時: AddStatusToUsers
+    カラムを削除する時: RemoveUnusedColumnFromOrders
+    カラム名を変更する時: RenameOldNameInUsers
+    ]
+# 一つ前の状態に戻す（downメソッドが実行される）
+php vendor/bin/phinx rollback
+
+# 履歴確認
+php vendor/bin/phinx status
+
 
 
 ローカルからテスト環境へ

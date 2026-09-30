@@ -63,25 +63,7 @@ if(csrf_checker(["UriageData_Correct.php"],["C","P","S"])===false){
             $reseve_status=true;
             $msg = "削除成功。";
             $alert_status = "alert-success";
-            /*
-            if($status && $count<>0){
-                $pdo_h->commit();
-                $sqllog .= rtn_sqllog("commit",[]);
-                sqllogger($sqllog,0);
-        
-                $reseve_status=true;
-                $msg = "削除成功。";
-                $alert_status = "alert-success";
-                file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,succsess,".$up_sqllog."\n",FILE_APPEND);
-            }else{
-                $pdo_h->rollBack();
-                $sqllog .= rtn_sqllog("rollBack",[]);
-                $reseve_status=true;
-                $msg = "削除失敗。";
-                $alert_status = "alert-danger";
-                file_put_contents("sql_log/".$logfilename,date("Y-m-d H:i:s").",UriageData_sql.php,UPDATE,failed,".$up_sqllog."\n",FILE_APPEND);
-            }
-            */
+
         }catch(Exception $e){
             $pdo_h->rollBack();
             $sqllog .= rtn_sqllog("rollBack",[]);

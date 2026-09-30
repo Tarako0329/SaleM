@@ -5,6 +5,8 @@
         "twbs/bootstrap": "4.1.3",
         "hashids/hashids": "^4.1",
         "dompdf/dompdf": "^3.0",
-        "phpoffice/phpspreadsheet": "^2.1"
+        "phpoffice/phpspreadsheet": "^2.1",
+        "robmorgan/phinx": "^0.16.12",
+        "phpmailer/phpmailer": "^7.1"
     }
 }
