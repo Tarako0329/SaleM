@@ -285,6 +285,8 @@ git reset --hard origin/master
 php load_font.php ipag css/ipag.ttf
 php load_font.php ipagp css/ipagp.ttf
 php load_font.php Kranky css/Kranky-Regular.ttf
+#DBマイグレーション
+php vendor/bin/phinx migrate
 
 cd /home/pcntfsrg/public_html/SaleM/WebRez
 git fetch --all
@@ -292,6 +294,8 @@ git reset --hard origin/master
 php load_font.php ipag css/ipag.ttf
 php load_font.php ipagp css/ipagp.ttf
 php load_font.php Kranky css/Kranky-Regular.ttf
+#DBマイグレーション
+php vendor/bin/phinx migrate
 
 cd /home/pcntfsrg/public_html/SaleM/WebRez_Trial
 git fetch --all
@@ -299,6 +303,8 @@ git reset --hard origin/master
 php load_font.php ipag css/ipag.ttf
 php load_font.php ipagp css/ipagp.ttf
 php load_font.php Kranky css/Kranky-Regular.ttf
+#DBマイグレーション
+php vendor/bin/phinx migrate
 
 
 cd C:\xampp\htdocs\SaleM\

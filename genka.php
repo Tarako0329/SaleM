@@ -27,8 +27,7 @@
 	$rtn=check_session_userid($pdo_h);
 	
 	//ユーザ情報取得
-	//$sql="select yuukoukigen,ZeiHasu from Users where uid=?";
-	$sql="select yuukoukigen,ZeiHasu from Users_webrez where uid=?";
+	$sql="SELECT yuukoukigen,ZeiHasu from Users_webrez where uid=?";
 	$stmt = $pdo_h->prepare($sql);
 	$stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
 	$stmt->execute();
@@ -67,15 +66,11 @@
 	<!--<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>--><!--read QRコードライブラリ-->
 	<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.js"></script>--><!--make QRコードライブラリ-->
 	<!--ページ専用CSS-->
+	<!-- Big.js ライブラリの読み込み (CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/big.js/6.2.1/big.min.js"></script>	
 	<link rel='stylesheet' href='css/style_EVregi.css?<?php echo $time; ?>' >
 	<TITLE><?php echo TITLE.' レジ';?></TITLE>
 	<style>
-		#qrOutput {
-			flex-wrap: wrap;
-			align-items: center;
-			justify-content: space-around;
-			padding: 20px;
-		}
 		.kokyaku_disp{
     	/*INPUT イベント名・店舗名部*/
     	border-right:none;
@@ -112,12 +107,13 @@
 				<div class='row'>.
 					<div class='col-12'>
 						<label class=''>商品名　　</label>
-						<div role='button' class='kokyaku_disp' data-bs-toggle='modal' data-bs-target='#ShouhinSelect'>{{custum_inf.shouhinNM}}</div>
+						<div role='button' class='kokyaku_disp' data-bs-toggle='modal' data-bs-target='#ShouhinSelect'>{{saved_ShouhinMS.shouhinNM}}</div>
 					</div>
 					<div class='col-12'>
 						<table class='table ' style='margin-top:5px;'>
 							<thead class='table-info'>
 								<tr>
+									<th></th>
 									<th style='width:16%;'>製造LOT</th>
 									<th style='width:16%;'>原価単価</th>
 									<th style='width:16%;'>販売LOT</th>
@@ -127,13 +123,23 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr>
-									<td><input class="form-control" type="number" v-model="custum_inf.S_lot"></td>
-									<td>{{custum_inf.SEIZOU_GENKA_TANKA}}</td>
-									<td><input class="form-control" type="number" v-model="custum_inf.H_lot"></td>
-									<td>{{custum_inf.GENKA_TANKA}}</td>
-									<td><input class="form-control" type="number" v-model="custum_inf.G_per"></td>
+								<tr class="table-secondary">
+									<th></th>
+									<td>{{saved_ShouhinMS.S_lot}}</td>
+									<td>{{saved_ShouhinMS.SEIZOU_GENKA_TANKA}}</td>
+									<td>{{saved_ShouhinMS.H_lot}}</td>
+									<td>{{saved_ShouhinMS.GENKA_TANKA}}</td>
+									<td>{{saved_ShouhinMS.G_per}}</td>
 									<td></td>
+								</tr>
+								<tr>
+									<th>NEW</th>
+									<td><input class="form-control" type="number" v-model="edit_ShouhinMS.S_lot"></td>
+									<td>{{edit_S_genka_tanka.toLocaleString()}}</td>
+									<td><input class="form-control" type="number" v-model="edit_ShouhinMS.H_lot"></td>
+									<td>{{edit_H_genka_tanka.toLocaleString()}}</td>
+									<td><input class="form-control" type="number" v-model="edit_ShouhinMS.G_per"></td>
+									<td>{{edit_hanbai_tanka.toLocaleString()}}</td>
 								</tr>
 							</tbody>
 						</table>
@@ -141,47 +147,58 @@
 
 					<div class='col-7'>
 						<table class='table caption-top ' style='margin-top:5px;'>
-							<caption>原材料リスト</caption>
+							<caption><br>原材料リスト</caption>
 							<thead class='table-info'>
 								<tr>
 									<th style='width:auto;'>材料名</th>
 									<th style='width:auto;'>価格(税込)</th>
 									<th style='width:70px;'>税率</th>
-									<th style='width:auto;'>内容量<br>(g,ml,数)</th>
+									<th style='width:auto;'>内容量</th>
+									<th style='width:auto;'>単位</th>
 									<th style='width:55px;'></th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr>
-									<td><input type="text" class="form-control" v-model="new_zairyouMS.hinmei"></td>
-									<td><input type="text" class="form-control" v-model="new_zairyouMS.value"></td>
+									<td><input type="text" class="form-control" v-model="edit_zairyouMS.hinmei"></td>
+									<td><input type="number" class="form-control" v-model="edit_zairyouMS.value"></td>
 									<td>
-										<select class="form-select" v-model="new_zairyouMS.zeikbn">
+										<select class="form-select" v-model="edit_zairyouMS.zeikbn">
 											<option v-for="list in zm" :key="list.税区分" :value="list.税区分">{{list.税区分名}}</option>
 										</select>
 										</td>
-									<td><input type="text" class="form-control" v-model="new_zairyouMS.volum"></td>
+									<td><input type="number" class="form-control" v-model="edit_zairyouMS.volum"></td>
+									<td><input type="text" class="form-control" v-model="edit_zairyouMS.unit"></td>
 									<td><button class="btn btn-primary p-1" @click="add_zairyouMS">登録</button></td>
 								</tr>
-								<tr v-for="list in zairyouMS" :key="list.zairyouCD">
+								<tr v-for="(list,index) in zairyouMS" :key="list.zairyouCD">
 									<td>{{list.hinmei}}</td>
 									<td>{{list.value}}</td>
 									<td>{{list.zeikbn}}</td>
 									<td>{{list.volum}}</td>
+									<td>{{list.unit}}</td>
+									<td><input type="checkbox" class="form-check-input" v-model="list.used" ></td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 					<div class='col-5'>
 						<table class='table caption-top' style='margin-top:5px;'>
-							<caption>１製造LOTに利用する材料</caption>
+							<caption>１製造LOTに利用する材料<br>※使用量の単位は原材料リストに合わせる</caption>
 							<thead class='table-info'>
 								<tr>
 									<th style='width:auto;'>材料名</th>
-									<th style='width:auto;'>使用量(g,ml,コ)</th>
+									<th style='width:auto;'>使用量</th>
 									<th style='width:auto;'>材料費</th>
 								</tr>
 							</thead>
+							<tbody>
+								<tr v-for="list in shouhinMS_zairyou" :key="list.zairyouCD">
+									<td>{{list.hinmei}}</td>
+									<td><input type="text" class="form-control" v-model="list.use_volume"></td>
+									<td>{{list.hiyou}}</td>
+								</tr>
+							</tbody>
 						</table>
 					</div>
 				</div>
@@ -189,6 +206,7 @@
 			</div>
 		</main>
 		<footer class='rezfooter'>
+			<button type='button' class='btn btn-primary' style='width:100%;font-size:2rem;' @click='save_genka()'>登録</button>
 		</footer>
 
 	<div class="loader-wrap" v-show='loader'>
@@ -203,11 +221,11 @@
 					<div class='modal-title' id='myModalLabel' style='text-align:center;width:100%;'>商品名入力 or 検索してリスト選択</div>
 				</div>
 				<div class='modal-body text-center ps-5 pe-5'>
-					<input type='text' class='form-control ps-3' v-model='order_shouhinNM' style='font-size: 2rem;' placeholder="入力 or 検索">
+					<input type='text' class='form-control ps-3' v-model='set_shouhinNM' style='font-size: 2rem;' placeholder="入力 or 検索">
 					<div class='evlist_area text-start ps-1'>
 						<template v-for='(list,index) in shouhinMS_filtered' :key='list.shouhinCD'>
 							<div class="form-check ps-3">
-								<input class='form-check-input' type='radio' name='sh_select' v-model='order_shouhinNM' :value=list.shouhinNM :id='`shouhinCD_${index}`' style='border:0;display:none;'>
+								<input class='form-check-input' type='radio' name='sh_select' v-model='set_shouhinNM' :value=list.shouhinNM :id='`shouhinCD_${index}`' style='border:0;display:none;'>
 								<label class="form-check-label" :for='`shouhinCD_${index}`' style='font-size: 1.8rem;'>{{list.shouhinNM}}</label>
 							</div>
 						</template>

@@ -29,7 +29,11 @@ if($rtn !== true){
 
 		$params["uid"]=$_SESSION['user_id'];
 
-		$sqlst = "SELECT * FROM zairyou_zaiko where `uid` = :uid";
+		$sqlst = "SELECT 
+			*
+			,'false' as used 
+			,0 as use_volume
+			FROM zairyou_zaiko where `uid` = :uid";	//trueがチェック
 		$rows = $db->SELECT($sqlst,$params);
 
 

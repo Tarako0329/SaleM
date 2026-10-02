@@ -14,7 +14,7 @@ U::log("\$_POST",$_POST);
 //セッションのIDがクリアされた場合の再取得処理。
 $rtn=check_session_userid($pdo_h);
 $rtn = csrf_checker(["genka.php"],["P","C","S"]);
-
+$return = "";
 $status = "success";
 if($rtn !== true){
 	$msg = "セッションが不正です";
@@ -32,6 +32,7 @@ if($rtn !== true){
 		$params["value"]=$_POST["value"];
 		$params["zeikbn"]=$_POST["zeikbn"];
 		$params["volum"]=$_POST["volum"];
+		$params["unit"]=$_POST["unit"];
 
 		if($params["zairyouCD"]!=0){//update
 			$sqlstr="UPDATE ShouhinMS set 
@@ -39,12 +40,13 @@ if($rtn !== true){
 				,`value` = :value 
 				,zeikbn = :zeikbn 
 				,volum = :volum 
+				,unit = :unit
 				where `uid` = :uid and zairyouCD = :zairyouCD";
 		}else{//insert
-			$sqlst = "INSERT INTO zairyou_zaiko(`uid`,hinmei,`value`,zeikbn,volum) values(:uid,:hinmei,:value,:zeikbn,:volum)";
+			$sqlst = "INSERT INTO zairyou_zaiko(`uid`,hinmei,`value`,zeikbn,volum,unit) values(:uid,:hinmei,:value,:zeikbn,:volum,:unit)";
 		}
 
-		$db->UP_DEL_EXEC($sqlst,$params);
+		$return = $db->UP_DEL_EXEC($sqlst,$params);
 
 		$db->commit_tran();
 
@@ -59,6 +61,7 @@ $return_sts = array(
 	"MSG" => $msg
 	,"status" => $status
 	,"csrf_token" => $csrf_token
+	,"new_zairyouCD" => $return
 );
 header('Content-type: application/json');
 echo json_encode($return_sts, JSON_UNESCAPED_UNICODE);

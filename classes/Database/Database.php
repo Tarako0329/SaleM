@@ -163,7 +163,7 @@ class Database {
       return $stmt -> execute($filteredData);
     }
 
-    public function UP_DEL_EXEC(string $sql,array $data=[]):bool{
+    public function UP_DEL_EXEC(string $sql,array $data=[]):string|bool{
       /*
       引数サンプル
       $sql = "Update TableName set col1 = :col1 where col2 = :col2";
@@ -212,7 +212,11 @@ class Database {
       }
       //SQL実行
       $stmt = $this->connect()->prepare($sql);
-      return $stmt -> execute($filteredData);
+      $result = $stmt -> execute($filteredData);
+      if ($result === false) {
+        return false;
+      }
+      return (string)$this->connect()->lastInsertId();
     }
 
     public function begin_tran():void{
