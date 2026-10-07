@@ -104,7 +104,7 @@
 
 		<main class='common_body' id='main_area' style='padding-top:80px;'>
 			<div class="container-fluid ps-5 pe-5">
-				<div class='row'>.
+				<div class='row'>
 					<div class='col-12'>
 						<label class=''>商品名　　</label>
 						<div role='button' class='kokyaku_disp' data-bs-toggle='modal' data-bs-target='#ShouhinSelect'>{{saved_ShouhinMS.shouhinNM}}</div>
@@ -113,13 +113,14 @@
 						<table class='table ' style='margin-top:5px;'>
 							<thead class='table-info'>
 								<tr>
-									<th></th>
-									<th style='width:16%;'>製造LOT</th>
-									<th style='width:16%;'>原価単価</th>
-									<th style='width:16%;'>販売LOT</th>
-									<th style='width:16%;'>販売原価</th>
-									<th style='width:16%;'>原価率</th>
-									<th style='width:16%;'>販売価格</th>
+									<th style='width:50px;'></th>
+									<th style='width:auto;'>製造LOT</th>
+									<th style='width:auto;min-width:100px;'>原価単価</th>
+									<th style='width:auto;'>販売LOT</th>
+									<th style='width:auto;min-width:100px;'>販売原価</th>
+									<th style='width:auto;'>原価率</th>
+									<th style='width:auto;min-width:100px;'>販売価格</th>
+									<th style='width:90px;'></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -131,6 +132,7 @@
 									<td>{{saved_ShouhinMS.GENKA_TANKA}}</td>
 									<td>{{saved_ShouhinMS.G_per}}</td>
 									<td></td>
+									<td></td>
 								</tr>
 								<tr>
 									<th>NEW</th>
@@ -140,6 +142,7 @@
 									<td>{{edit_H_genka_tanka.toLocaleString()}}</td>
 									<td><input class="form-control" type="number" v-model="edit_ShouhinMS.G_per"></td>
 									<td>{{edit_hanbai_tanka.toLocaleString()}}</td>
+									<td><button class="btn btn-primary p-1" style='width:80px;' @click="save_ShouhinMS()">登録</button></td>
 								</tr>
 							</tbody>
 						</table>
@@ -148,7 +151,7 @@
 					<div class='col-7'>
 						<table class='table caption-top ' style='margin-top:5px;'>
 							<caption><br>原材料リスト</caption>
-							<thead class='table-info'>
+							<thead class='table-success'>
 								<tr>
 									<th style='width:auto;'>材料名</th>
 									<th style='width:auto;'>価格(税込)</th>
@@ -169,7 +172,7 @@
 										</td>
 									<td><input type="number" class="form-control" v-model="edit_zairyouMS.volum"></td>
 									<td><input type="text" class="form-control" v-model="edit_zairyouMS.unit"></td>
-									<td><button class="btn btn-primary p-1" @click="add_zairyouMS">登録</button></td>
+									<td><button class="btn btn-success p-1" @click="add_zairyouMS">登録</button></td>
 								</tr>
 								<tr v-for="(list,index) in zairyouMS" :key="list.zairyouCD">
 									<td>{{list.hinmei}}</td>
@@ -198,6 +201,9 @@
 									<td><input type="text" class="form-control" v-model="list.use_volume"></td>
 									<td>{{list.hiyou}}</td>
 								</tr>
+								<tr>
+									<td colspan="3" class="text-center"><button class="btn btn-primary p-1" style='width:80px;' @click="save_genka()">登録</button></td>
+								</tr>
 							</tbody>
 						</table>
 					</div>
@@ -205,9 +211,9 @@
 
 			</div>
 		</main>
-		<footer class='rezfooter'>
+		<!--<footer class='rezfooter'>
 			<button type='button' class='btn btn-primary' style='width:100%;font-size:2rem;' @click='save_genka()'>登録</button>
-		</footer>
+		</footer>-->
 
 	<div class="loader-wrap" v-show='loader'>
 		<div class="loader">Loading...</div>

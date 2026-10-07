@@ -50,17 +50,7 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 			,hanbai_tanka:0
 		})
 
-		const edit_ShouhinMS = ref({
-			/*shouhinCD:""
-			,shouhinNM:""
-			,S_lot:0
-			,H_lot:0
-			,SEIZOU_GENKA_TANKA:0
-			,GENKA_TANKA:0
-			,G_per:0.00
-			,gen_gen_tanka:0
-			,hanbai_tanka:0*/
-		})
+		const edit_ShouhinMS = ref({})
 		const edit_S_genka_tanka = computed(()=>{
 			if(edit_ShouhinMS.value.S_lot==0){
 				return 0
@@ -113,7 +103,7 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 		}
 		
 		const shouhinMS_zairyou = computed(()=>{//材料一覧でチェックされた材料の一覧
-			let zairyou = zairyouMS.value.filter(item => (item.used == true))
+			let zairyou = zairyouMS.value.filter(item => (item.used == true || item.used == 'true'))
 			zairyou.forEach(item => {
 				const value = Big(item.value)
 				const volum = Big(item.volum)
@@ -131,22 +121,46 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 			return total_hiyou
 		})
 
-		const save_genka = async() =>{//原価登録
+		const save_genka = async() =>{//商品の原材料リスト登録
 			console_log('save_genka start')
 			const form = new FormData()
-			form.append("shouhinCD",saved_ShouhinMS.value.shouhinCD)
-			form.append("shouhinNM",saved_ShouhinMS.value.shouhinNM)
-			form.append("S_lot",saved_ShouhinMS.value.S_lot)
-			form.append("H_lot",saved_ShouhinMS.value.H_lot)
-			form.append("SEIZOU_GENKA_TANKA",saved_ShouhinMS.value.SEIZOU_GENKA_TANKA)
-			form.append("GENKA_TANKA",saved_ShouhinMS.value.GENKA_TANKA)
-			form.append("G_per",saved_ShouhinMS.value.G_per)
-
-			form.append("shouhinMS_zairyou",JSON.stringify(shouhinMS_zairyou.value))
-
+			form.append("shouhinCD",edit_ShouhinMS.value.shouhinCD)
+			form.append("shouhinNM",edit_ShouhinMS.value.shouhinNM)
+			form.append("zairyou_list",JSON.stringify(shouhinMS_zairyou.value))
 			form.append("csrf_token",csrf.value)
+			axios.post("ajax_delins_shouhinMS_zairyou.php",form)
+			.then((response) =>{
+				alert(response.data.status)
+				console_log(response.data)
+				csrf.value = response.data.csrf_token
+			})
+			.catch((error) =>{
+				alert(error)
+			})
 		}
 
+		const save_ShouhinMS = async() =>{//製造LOTなどの情報登録
+			console_log('save_ShouhinMS start')
+			const form = new FormData()
+			form.append("shouhinCD",edit_ShouhinMS.value.shouhinCD)
+			form.append("shouhinNM",edit_ShouhinMS.value.shouhinNM)
+			form.append("S_lot",edit_ShouhinMS.value.S_lot)
+			form.append("H_lot",edit_ShouhinMS.value.H_lot)
+			form.append("seizou_genka_tanka",edit_ShouhinMS.value.SEIZOU_GENKA_TANKA)
+			form.append("GENKA_TANKA",edit_ShouhinMS.value.GENKA_TANKA)
+			form.append("G_per",edit_ShouhinMS.value.G_per)
+			form.append("csrf_token",csrf.value)
+			let rtn = await axios.post("ajax_upd_shouhinMS_lot.php",form)
+			.then((response) =>{
+				alert(response.data.status)
+				console_log(response.data)
+				csrf.value = response.data.csrf_token
+			})
+			.catch((error) =>{
+				alert(error)
+			})
+		}
+		
 		//商品選択・入力モーダル用
 			const set_shouhinNM = ref('')	//編集する商品の設定用
 			const selected_shouhin_index = ref(null)	//選択された商品のインデックス
@@ -162,9 +176,10 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 			}
 			const set_shouhin_close = () =>{//商品選択モーダルを閉じる＆商品情報をsaved_ShouhinMSとedit_ShouhinMSに登録
 				if(shouhinMS_filtered.value.length==1 && set_shouhinNM.value === shouhinMS_filtered.value[0].shouhinNM){
+					console_log(shouhinMS_filtered.value[0])
 					saved_ShouhinMS.value.shouhinCD = shouhinMS_filtered.value[0].shouhinCD
 					saved_ShouhinMS.value.shouhinNM = shouhinMS_filtered.value[0].shouhinNM
-					saved_ShouhinMS.value.H_lot = shouhinMS_filtered.value[0].Utisu ?? 0	//販売LOT
+					saved_ShouhinMS.value.H_lot = shouhinMS_filtered.value[0].utisu ?? 0	//販売LOT
 					saved_ShouhinMS.value.S_lot = shouhinMS_filtered.value[0].S_lot ?? 0	//製造LOT
 					saved_ShouhinMS.value.G_per = shouhinMS_filtered.value[0].G_per ?? 0.00	//原価率
 					saved_ShouhinMS.value.hanbai_tanka = shouhinMS_filtered.value[0].tanka ?? 0.00	//販売単価
@@ -174,7 +189,21 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 					saved_ShouhinMS.value.gen_tanka = shouhinMS_filtered.value[0].tanka
 					//saved_ShouhinMS.value.ZEIKBN = shouhinMS_filtered.value[0].zeiKBN
 
-					edit_ShouhinMS.value = {...saved_ShouhinMS.value[0]}
+					edit_ShouhinMS.value = {...saved_ShouhinMS.value}
+
+					//材料が登録されている場合は取得
+					const form = new FormData()
+					form.append("shouhinCD",saved_ShouhinMS.value.shouhinCD)
+					form.append("csrf_token",csrf.value)
+					axios.post("ajax_get_shouhinMS_zairyou.php",form)
+					.then((response) =>{
+						console_log(response.data)
+						csrf.value = response.data.csrf_token
+						zairyouMS.value = response.data.zairyou_zaiko
+					})
+					.catch((error) =>{
+						alert(error)
+					})
 
 				}else{
 					//order_list.value[selected_shouhin_index.value].NM = set_shouhinNM.value
@@ -204,10 +233,6 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 			}
 			return 0
 		} 
-
-
-
-
 
 		onMounted(async() => {
 			console_log('onMounted')
@@ -244,6 +269,7 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 			edit_H_genka_tanka,
 			edit_hanbai_tanka,
 			save_genka,
+			save_ShouhinMS,
 		}
 	}
 })
