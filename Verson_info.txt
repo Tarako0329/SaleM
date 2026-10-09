@@ -246,7 +246,8 @@ ver3.21.6-001:マニフェスト修正-commited
 ver3.22.0-000:SQLLOGの修正-commited
 ver3.23.0-000:個別売上の改造-commited
 ver3.24.0-000:xampp->docker-commited
-ver3.25.0-000:phpMailer&phinx導入&原価計算
+ver3.25.0-000:phpMailer&phinx導入&原価計算-commited
+ver3.25.1-000:phpMailer&phinx導入&原価計算
 	
 
 

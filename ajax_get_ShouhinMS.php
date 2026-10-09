@@ -19,7 +19,7 @@ if(!empty($_SESSION["user_id"])){
 		,ZM.hyoujimei as bk_hyoujimei 
 		,false as cate_chk
 		from vw_shouhinms SM inner join ZeiMS ZM on SM.zeiKBN = ZM.zeiKBN where uid = ? order by shouhinNM";*/
-	$sqlstr = "select SM.*
+	$sqlstr = "SELECT SM.*
 		,ZM.hyoujimei
 		,length(ShouhinNM) as nm_bite
 		,tanka+tanka_zei as new_kakaku

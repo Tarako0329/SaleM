@@ -1,6 +1,7 @@
 const { createApp, ref, onMounted, computed, VueCookies, watch,nextTick  } = Vue;
 const REZ_APP = (p_uid,p_timeout) => createApp({
 	setup(){
+		const is_edit_shouhin = ref(false)	//商品マスタの編集モード
 		const zm = ref([//税区分マスタ
 			{税区分:0,税区分名:'非課税',税率:0},
 			{税区分:1001,税区分名:'8%',税率:0.08},
@@ -9,7 +10,7 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 
 		const shouhinMS = ref([])			//商品マスタ
 		const zairyouMS = ref([])			//材料一覧マスタ
-		const edit_zairyouMS = ref({//材料一覧マスタ追加用
+		const edit_zairyouMS = ref({	//材料一覧マスタ追加用
 			zairyouCD:'0',
 			hinmei:'',
 			value:0,
@@ -200,6 +201,7 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 						console_log(response.data)
 						csrf.value = response.data.csrf_token
 						zairyouMS.value = response.data.zairyou_zaiko
+						is_edit_shouhin.value = true
 					})
 					.catch((error) =>{
 						alert(error)
@@ -207,6 +209,7 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 
 				}else{
 					//order_list.value[selected_shouhin_index.value].NM = set_shouhinNM.value
+					is_edit_shouhin.value = false
 				}
 				selected_shouhin_index.value = null
 				set_shouhinNM.value = ''
@@ -247,6 +250,7 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 			}
 		})
 		return{
+			is_edit_shouhin,
 			zm,
 			shouhinMS,
 			loader,

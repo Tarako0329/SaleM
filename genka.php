@@ -110,7 +110,8 @@
 						<div role='button' class='kokyaku_disp' data-bs-toggle='modal' data-bs-target='#ShouhinSelect'>{{saved_ShouhinMS.shouhinNM}}</div>
 					</div>
 					<div class='col-12'>
-						<table class='table ' style='margin-top:5px;'>
+						<table class='table caption-top' style='margin-top:5px;'>
+							<caption>製造原価と原価率から販売価格を「参考販売価格」に算出。</caption>
 							<thead class='table-info'>
 								<tr>
 									<th style='width:50px;'></th>
@@ -119,37 +120,40 @@
 									<th style='width:auto;'>販売LOT</th>
 									<th style='width:auto;min-width:100px;'>販売原価</th>
 									<th style='width:auto;'>原価率</th>
+									<th style='width:auto;min-width:100px;'>参考販売価格</th>
 									<th style='width:auto;min-width:100px;'>販売価格</th>
 									<th style='width:90px;'></th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr class="table-secondary">
-									<th></th>
+									<th>登録<br>内容➡</th>
 									<td>{{saved_ShouhinMS.S_lot}}</td>
 									<td>{{saved_ShouhinMS.SEIZOU_GENKA_TANKA}}</td>
 									<td>{{saved_ShouhinMS.H_lot}}</td>
 									<td>{{saved_ShouhinMS.GENKA_TANKA}}</td>
 									<td>{{saved_ShouhinMS.G_per}}</td>
-									<td></td>
+									<td>-</td>
+									<td>{{saved_ShouhinMS.hanbai_tanka}}</td>
 									<td></td>
 								</tr>
 								<tr>
-									<th>NEW</th>
+									<th>編集<br>内容➡</th>
 									<td><input class="form-control" type="number" v-model="edit_ShouhinMS.S_lot"></td>
 									<td>{{edit_S_genka_tanka.toLocaleString()}}</td>
 									<td><input class="form-control" type="number" v-model="edit_ShouhinMS.H_lot"></td>
 									<td>{{edit_H_genka_tanka.toLocaleString()}}</td>
 									<td><input class="form-control" type="number" v-model="edit_ShouhinMS.G_per"></td>
 									<td>{{edit_hanbai_tanka.toLocaleString()}}</td>
-									<td><button class="btn btn-primary p-1" style='width:80px;' @click="save_ShouhinMS()">登録</button></td>
+									<td><input class="form-control" type="number" v-model="edit_ShouhinMS.hanbai_tanka"></td>
+									<td><button class="btn btn-primary p-1" style='width:80px;' @click="save_ShouhinMS()" :disabled="!is_edit_shouhin">登録</button></td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 
 					<div class='col-7'>
-						<table class='table caption-top ' style='margin-top:5px;'>
+						<table class='table table-sm caption-top ' style='margin-top:5px;'>
 							<caption><br>原材料リスト</caption>
 							<thead class='table-success'>
 								<tr>
@@ -176,9 +180,9 @@
 								</tr>
 								<tr v-for="(list,index) in zairyouMS" :key="list.zairyouCD">
 									<td>{{list.hinmei}}</td>
-									<td>{{list.value}}</td>
+									<td>{{Number(list.value).toLocaleString()}}</td>
 									<td>{{list.zeikbn}}</td>
-									<td>{{list.volum}}</td>
+									<td>{{Number(list.volum).toLocaleString()}}</td>
 									<td>{{list.unit}}</td>
 									<td><input type="checkbox" class="form-check-input" v-model="list.used" ></td>
 								</tr>
@@ -186,7 +190,7 @@
 						</table>
 					</div>
 					<div class='col-5'>
-						<table class='table caption-top' style='margin-top:5px;'>
+						<table class='table table-sm caption-top' style='margin-top:5px;'>
 							<caption>１製造LOTに利用する材料<br>※使用量の単位は原材料リストに合わせる</caption>
 							<thead class='table-info'>
 								<tr>
@@ -202,7 +206,7 @@
 									<td>{{list.hiyou}}</td>
 								</tr>
 								<tr>
-									<td colspan="3" class="text-center"><button class="btn btn-primary p-1" style='width:80px;' @click="save_genka()">登録</button></td>
+									<td colspan="3" class="text-center"><button class="btn btn-primary p-1" style='width:80px;' @click="save_genka()" :disabled="!is_edit_shouhin">登録</button></td>
 								</tr>
 							</tbody>
 						</table>

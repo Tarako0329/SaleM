@@ -1,5 +1,5 @@
 <?php
-define("VERSION", "ver3.23.0");
+define("VERSION", "ver3.25.0");
 define("RELEACE_DATE", "2026-09-14");
 ini_set('error_log', __DIR__ . '/.error_log');
 date_default_timezone_set('Asia/Tokyo');
