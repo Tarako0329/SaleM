@@ -33,6 +33,7 @@ if($rtn !== true){
 		$params["G_Per"]=$_POST["G_per"];
 		$params["genka_tanka"]=$_POST["GENKA_TANKA"];
 		$params["seizou_genka_tanka"]=$_POST["seizou_genka_tanka"];
+		$params["hanbai_tanka"]=$_POST["hanbai_tanka"];
 
 		if($params["shouhinCD"]!=0){//update
 			$sqlstr="UPDATE ShouhinMS set 
@@ -40,6 +41,7 @@ if($rtn !== true){
 				,S_lot = :S_lot
 				,G_Per = :G_Per
 				,`genka_tanka` = :genka_tanka 
+				,`tanka` = :hanbai_tanka 
 				,seizou_genka_tanka = :seizou_genka_tanka
 				where `uid` = :uid and shouhinCD = :shouhinCD";
 		}else{

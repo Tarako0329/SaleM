@@ -7,6 +7,13 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 			{税区分:1001,税区分名:'8%',税率:0.08},
 			{税区分:1101,税区分名:'10%',税率:0.1},
 		])
+		const get_zm_name = (p_zeikbn) => {//税区分コードから税区分名を取得
+			const zm_name = zm.value.find(item => item.税区分 == p_zeikbn)
+			if(zm_name==undefined){
+				return ''
+			}
+			return zm_name.税区分名
+		}
 
 		const shouhinMS = ref([])			//商品マスタ
 		const zairyouMS = ref([])			//材料一覧マスタ
@@ -38,7 +45,15 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 			})
 			return 0;
 		}
-		
+
+		const search_zairyou = ref('')	//材料一覧で検索する材料名
+		const zairyouMS_filtered = computed(()=>{//材料一覧で検索された材料の一覧
+			if(search_zairyou.value==''){
+				return zairyouMS.value
+			}
+			return zairyouMS.value.filter(item => item.hinmei.includes(search_zairyou.value))
+		})
+
 		const saved_ShouhinMS = ref({
 			shouhinCD:""
 			,shouhinNM:""
@@ -53,22 +68,34 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 
 		const edit_ShouhinMS = ref({})
 		const edit_S_genka_tanka = computed(()=>{
-			if(edit_ShouhinMS.value.S_lot==0){
-				return 0
-			}
-			return Number((total_hiyou.value / edit_ShouhinMS.value.S_lot).toFixed(1))
+			let genka_tanka = [0,0,0]
+			genka_tanka.forEach((item,index) => {
+				if(edit_ShouhinMS.value[index].S_lot!=0){
+					genka_tanka[index] = Number((total_hiyou.value / edit_ShouhinMS.value[index].S_lot).toFixed(1))
+				}
+			})
+			
+			return genka_tanka
 		})
 		const edit_H_genka_tanka = computed(()=>{
-			if(edit_ShouhinMS.value.S_lot==0){
-				return 0
-			}
-			return Number((total_hiyou.value / edit_ShouhinMS.value.S_lot * edit_ShouhinMS.value.H_lot).toFixed(1))
+			let genka_tanka = [0,0,0]
+			genka_tanka.forEach((item,index) => {
+				if(edit_ShouhinMS.value[index].S_lot!=0){
+					genka_tanka[index] = Number((total_hiyou.value / edit_ShouhinMS.value[index].S_lot * edit_ShouhinMS.value[index].H_lot).toFixed(1))
+				}
+			})
+			
+			return genka_tanka
 		})
 		const edit_hanbai_tanka = computed(()=>{
-			if(edit_ShouhinMS.value.S_lot==0 || edit_ShouhinMS.value.H_lot==0){
-				return 0
-			}
-			return Number((total_hiyou.value / edit_ShouhinMS.value.S_lot * edit_ShouhinMS.value.H_lot / edit_ShouhinMS.value.G_per).toFixed(1))
+			let genka_tanka = [0,0,0]
+			genka_tanka.forEach((item,index) => {
+				if(edit_ShouhinMS.value[index].S_lot!=0){
+					genka_tanka[index] = Number((total_hiyou.value / edit_ShouhinMS.value[index].S_lot * edit_ShouhinMS.value[index].H_lot / edit_ShouhinMS.value[index].G_per).toFixed(1))
+				}
+			})
+			
+			return genka_tanka
 		})
 
 		const add_zairyouMS = () =>{//材料一覧リストにnew材料を追加(DB登録＋配列追加)
@@ -125,8 +152,8 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 		const save_genka = async() =>{//商品の原材料リスト登録
 			console_log('save_genka start')
 			const form = new FormData()
-			form.append("shouhinCD",edit_ShouhinMS.value.shouhinCD)
-			form.append("shouhinNM",edit_ShouhinMS.value.shouhinNM)
+			form.append("shouhinCD",edit_ShouhinMS.value[0].shouhinCD)
+			form.append("shouhinNM",edit_ShouhinMS.value[0].shouhinNM)
 			form.append("zairyou_list",JSON.stringify(shouhinMS_zairyou.value))
 			form.append("csrf_token",csrf.value)
 			axios.post("ajax_delins_shouhinMS_zairyou.php",form)
@@ -140,41 +167,50 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 			})
 		}
 
-		const save_ShouhinMS = async() =>{//製造LOTなどの情報登録
+		const save_ShouhinMS = async(p_index) =>{//製造LOTなどの情報登録
 			console_log('save_ShouhinMS start')
 			const form = new FormData()
-			form.append("shouhinCD",edit_ShouhinMS.value.shouhinCD)
-			form.append("shouhinNM",edit_ShouhinMS.value.shouhinNM)
-			form.append("S_lot",edit_ShouhinMS.value.S_lot)
-			form.append("H_lot",edit_ShouhinMS.value.H_lot)
-			form.append("seizou_genka_tanka",edit_ShouhinMS.value.SEIZOU_GENKA_TANKA)
-			form.append("GENKA_TANKA",edit_ShouhinMS.value.GENKA_TANKA)
-			form.append("G_per",edit_ShouhinMS.value.G_per)
+			form.append("shouhinCD",edit_ShouhinMS.value[p_index].shouhinCD)
+			form.append("shouhinNM",edit_ShouhinMS.value[p_index].shouhinNM)
+			form.append("S_lot",edit_ShouhinMS.value[p_index].S_lot)
+			form.append("H_lot",edit_ShouhinMS.value[p_index].H_lot)
+			form.append("seizou_genka_tanka",edit_ShouhinMS.value[p_index].SEIZOU_GENKA_TANKA)
+			form.append("GENKA_TANKA",edit_ShouhinMS.value[p_index].GENKA_TANKA)
+			form.append("G_per",edit_ShouhinMS.value[p_index].G_per)
+			form.append("hanbai_tanka",edit_ShouhinMS.value[p_index].hanbai_tanka)
 			form.append("csrf_token",csrf.value)
 			let rtn = await axios.post("ajax_upd_shouhinMS_lot.php",form)
 			.then((response) =>{
 				alert(response.data.status)
 				console_log(response.data)
+				
 				csrf.value = response.data.csrf_token
 			})
 			.catch((error) =>{
 				alert(error)
 			})
+			shouhinMS.value = await GET_SHOUHINMS()
 		}
 		
 		//商品選択・入力モーダル用
 			const set_shouhinNM = ref('')	//編集する商品の設定用
-			const selected_shouhin_index = ref(null)	//選択された商品のインデックス
+			const is_selected = ref(false)	//商品選択モーダルで商品が選択されたかどうか
+			const select = (p_shouhin) =>{//商品選択モーダルで商品が選択された場合に呼ばれる
+				set_shouhinNM.value = p_shouhin
+				is_selected.value = true
+			}
 			const shouhinMS_filtered = computed(()=>{//商品マスタから編集対象商品を抽出
 				if(set_shouhinNM.value==''){
 					return shouhinMS.value
 				}
-				return shouhinMS.value.filter(item => item.shouhinNM.includes(set_shouhinNM.value))
+				if(is_selected.value==true){
+					return shouhinMS.value.filter(item => item.shouhinNM === set_shouhinNM.value)
+				}else{
+					return shouhinMS.value.filter(item => item.shouhinNM.includes(set_shouhinNM.value))
+				}
 			})
-			const set_shouhin_Open = (index) =>{//商品選択モーダルを開く
-				selected_shouhin_index.value = index
-				set_shouhinNM.value = order_list.value[index].NM ?? ''
-			}
+
+
 			const set_shouhin_close = () =>{//商品選択モーダルを閉じる＆商品情報をsaved_ShouhinMSとedit_ShouhinMSに登録
 				if(shouhinMS_filtered.value.length==1 && set_shouhinNM.value === shouhinMS_filtered.value[0].shouhinNM){
 					console_log(shouhinMS_filtered.value[0])
@@ -190,7 +226,9 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 					saved_ShouhinMS.value.gen_tanka = shouhinMS_filtered.value[0].tanka
 					//saved_ShouhinMS.value.ZEIKBN = shouhinMS_filtered.value[0].zeiKBN
 
-					edit_ShouhinMS.value = {...saved_ShouhinMS.value}
+					edit_ShouhinMS.value[0] = {...saved_ShouhinMS.value}
+					edit_ShouhinMS.value[1] = {...saved_ShouhinMS.value}
+					edit_ShouhinMS.value[2] = {...saved_ShouhinMS.value}
 
 					//材料が登録されている場合は取得
 					const form = new FormData()
@@ -208,10 +246,8 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 					})
 
 				}else{
-					//order_list.value[selected_shouhin_index.value].NM = set_shouhinNM.value
 					is_edit_shouhin.value = false
 				}
-				selected_shouhin_index.value = null
 				set_shouhinNM.value = ''
 			}
 		//商品選択・入力モーダル用ここまで
@@ -252,19 +288,24 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 		return{
 			is_edit_shouhin,
 			zm,
+			get_zm_name,
 			shouhinMS,
 			loader,
 			csrf,
 			trush_order,
 			set_shouhinNM,
 			shouhinMS_filtered,
-			set_shouhin_Open,
-			selected_shouhin_index,
+			//set_shouhin_Open,
+			//selected_shouhin_index,
 			set_shouhin_close,
+			is_selected,
+			select,
 
 			saved_ShouhinMS,
 			edit_ShouhinMS,
-			zairyouMS,
+			//zairyouMS,
+			search_zairyou,
+			zairyouMS_filtered,
 			edit_zairyouMS,
 			add_zairyouMS,
 			shouhinMS_zairyou,

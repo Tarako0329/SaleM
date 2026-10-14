@@ -79,18 +79,7 @@
 				</div>
 
 			</div>
-		</div><!--検索条件設定エリア-->
-		<!--修正モードのトグルボタン-->
-		<!--
-		<div style='width:60px;text-align:right;' class='item_2'>
-			<span style='margin-bottom:0px'>修正モード</span>
-			<div class="switchArea">
-				<input v-model='UriageData_Correct_mode' type="checkbox" id="switch1">
-				<label for="switch1" ><span></span></label>
-				<div id="swImg" ></div>
-			</div>
-		</div>-->
-		<!--修正モードのトグルボタン-->
+		</div>
 	</div>
 	</div>
 

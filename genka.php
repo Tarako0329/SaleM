@@ -83,7 +83,7 @@
     	font-weight: 600;
     	color: black;
     	height:35px;
-    	width:16rem;
+    	width:200px;
     	background: #ff838b;
     	/*background:transparent;*/
     	padding-top:5px;
@@ -110,24 +110,24 @@
 						<div role='button' class='kokyaku_disp' data-bs-toggle='modal' data-bs-target='#ShouhinSelect'>{{saved_ShouhinMS.shouhinNM}}</div>
 					</div>
 					<div class='col-12'>
-						<table class='table caption-top' style='margin-top:5px;'>
+						<table class='table table-sm caption-top' style='margin-top:5px;'>
 							<caption>製造原価と原価率から販売価格を「参考販売価格」に算出。</caption>
 							<thead class='table-info'>
 								<tr>
 									<th style='width:50px;'></th>
-									<th style='width:auto;'>製造LOT</th>
-									<th style='width:auto;min-width:100px;'>原価単価</th>
-									<th style='width:auto;'>販売LOT</th>
-									<th style='width:auto;min-width:100px;'>販売原価</th>
-									<th style='width:auto;'>原価率</th>
-									<th style='width:auto;min-width:100px;'>参考販売価格</th>
-									<th style='width:auto;min-width:100px;'>販売価格</th>
+									<th style='width:100px;'>製造LOT</th>
+									<th style='width:100px;min-width:100px;'>原価単価</th>
+									<th style='width:100px;'>販売LOT</th>
+									<th style='width:100px;min-width:100px;'>販売原価</th>
+									<th style='width:100px;'>原価率</th>
+									<th style='width:100px;min-width:100px;'>参考販売価格</th>
+									<th style='width:100px;min-width:100px;'>販売価格</th>
 									<th style='width:90px;'></th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr class="table-secondary">
-									<th>登録<br>内容➡</th>
+									<th>Saved</th>
 									<td>{{saved_ShouhinMS.S_lot}}</td>
 									<td>{{saved_ShouhinMS.SEIZOU_GENKA_TANKA}}</td>
 									<td>{{saved_ShouhinMS.H_lot}}</td>
@@ -137,79 +137,87 @@
 									<td>{{saved_ShouhinMS.hanbai_tanka}}</td>
 									<td></td>
 								</tr>
-								<tr>
-									<th>編集<br>内容➡</th>
-									<td><input class="form-control" type="number" v-model="edit_ShouhinMS.S_lot"></td>
-									<td>{{edit_S_genka_tanka.toLocaleString()}}</td>
-									<td><input class="form-control" type="number" v-model="edit_ShouhinMS.H_lot"></td>
-									<td>{{edit_H_genka_tanka.toLocaleString()}}</td>
-									<td><input class="form-control" type="number" v-model="edit_ShouhinMS.G_per"></td>
-									<td>{{edit_hanbai_tanka.toLocaleString()}}</td>
-									<td><input class="form-control" type="number" v-model="edit_ShouhinMS.hanbai_tanka"></td>
-									<td><button class="btn btn-primary p-1" style='width:80px;' @click="save_ShouhinMS()" :disabled="!is_edit_shouhin">登録</button></td>
+								<tr><td colspan="9"></td></tr>
+								<tr v-for="(list,index) in edit_ShouhinMS" :key="index" >
+									<th>試算 {{Number(index) + Number(1)}}</th>
+									<td><input class="form-control" type="number" v-model="list.S_lot"></td>
+									<td>{{edit_S_genka_tanka[index].toLocaleString()}}</td>
+									<td><input class="form-control" type="number" v-model="list.H_lot"></td>
+									<td>{{edit_H_genka_tanka[index].toLocaleString()}}</td>
+									<td><input class="form-control" type="number" v-model="list.G_per"></td>
+									<td>{{edit_hanbai_tanka[index].toLocaleString()}}</td>
+									<td><input class="form-control" type="number" v-model="list.hanbai_tanka"></td>
+									<td><button class="btn btn-primary p-1" style='width:80px;' @click="save_ShouhinMS(index)" :disabled="!is_edit_shouhin">登録</button></td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 
 					<div class='col-7'>
-						<table class='table table-sm caption-top ' style='margin-top:5px;'>
-							<caption><br>原材料リスト</caption>
-							<thead class='table-success'>
-								<tr>
-									<th style='width:auto;'>材料名</th>
-									<th style='width:auto;'>価格(税込)</th>
-									<th style='width:70px;'>税率</th>
-									<th style='width:auto;'>内容量</th>
-									<th style='width:auto;'>単位</th>
-									<th style='width:55px;'></th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td><input type="text" class="form-control" v-model="edit_zairyouMS.hinmei"></td>
-									<td><input type="number" class="form-control" v-model="edit_zairyouMS.value"></td>
-									<td>
-										<select class="form-select" v-model="edit_zairyouMS.zeikbn">
-											<option v-for="list in zm" :key="list.税区分" :value="list.税区分">{{list.税区分名}}</option>
-										</select>
-										</td>
-									<td><input type="number" class="form-control" v-model="edit_zairyouMS.volum"></td>
-									<td><input type="text" class="form-control" v-model="edit_zairyouMS.unit"></td>
-									<td><button class="btn btn-success p-1" @click="add_zairyouMS">登録</button></td>
-								</tr>
-								<tr v-for="(list,index) in zairyouMS" :key="list.zairyouCD">
-									<td>{{list.hinmei}}</td>
-									<td>{{Number(list.value).toLocaleString()}}</td>
-									<td>{{list.zeikbn}}</td>
-									<td>{{Number(list.volum).toLocaleString()}}</td>
-									<td>{{list.unit}}</td>
-									<td><input type="checkbox" class="form-check-input" v-model="list.used" ></td>
-								</tr>
-							</tbody>
-						</table>
+						<div class="overflow-y-auto border rounded p-2 position-relative" style="height: calc(100vh - 390px);">
+							<input type="text" class="form-control position-absolute top-1" v-model="search_zairyou" placeholder="材料名で検索" style='max-width: 50%;' >
+							<table class='table table-sm caption-top ' style='margin-top:5px;'>
+								<caption><br>原材料リスト</caption>
+								<thead class='sticky-top table-success'>
+									<tr>
+										<th style='width:50%;'>材料名</th>
+										<th style='width:auto;'>価格(税込)</th>
+										<th style='width:70px;'>税率</th>
+										<th style='width:auto;'>内容量</th>
+										<th style='width:50px;'>単位</th>
+										<th style='width:55px;'></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="table-warning">
+										<td><input type="text" class="form-control" v-model="edit_zairyouMS.hinmei"  placeholder="材料名"></td>
+										<td><input type="number" class="form-control" v-model="edit_zairyouMS.value"></td>
+										<td>
+											<select class="form-select" v-model="edit_zairyouMS.zeikbn">
+												<option v-for="list in zm" :key="list.税区分" :value="list.税区分">{{list.税区分名}}</option>
+											</select>
+											</td>
+										<td><input type="number" class="form-control" v-model="edit_zairyouMS.volum"></td>
+										<td><input type="text" class="form-control" v-model="edit_zairyouMS.unit"></td>
+										<td><button class="btn btn-success p-1" @click="add_zairyouMS">登録</button></td>
+									</tr>
+									<tr v-for="(list,index) in zairyouMS_filtered" :key="list.zairyouCD">
+										<td>{{list.hinmei}}</td>
+										<td>{{Number(list.value).toLocaleString()}}</td>
+										<td>{{get_zm_name(list.zeikbn)}}</td>
+										<td>{{Number(list.volum).toLocaleString()}}</td>
+										<td>{{list.unit}}</td>
+										<td><input type="checkbox" class="form-check-input" v-model="list.used" ></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 					</div>
 					<div class='col-5'>
-						<table class='table table-sm caption-top' style='margin-top:5px;'>
-							<caption>１製造LOTに利用する材料<br>※使用量の単位は原材料リストに合わせる</caption>
-							<thead class='table-info'>
-								<tr>
-									<th style='width:auto;'>材料名</th>
-									<th style='width:auto;'>使用量</th>
-									<th style='width:auto;'>材料費</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr v-for="list in shouhinMS_zairyou" :key="list.zairyouCD">
-									<td>{{list.hinmei}}</td>
-									<td><input type="text" class="form-control" v-model="list.use_volume"></td>
-									<td>{{list.hiyou}}</td>
-								</tr>
-								<tr>
-									<td colspan="3" class="text-center"><button class="btn btn-primary p-1" style='width:80px;' @click="save_genka()" :disabled="!is_edit_shouhin">登録</button></td>
-								</tr>
-							</tbody>
-						</table>
+						<div class="overflow-y-auto border rounded p-2" style="height: calc(100vh - 390px);">
+							<table class='table table-sm caption-top' style='margin-top:5px;'>
+								<caption>１製造LOTに利用する材料<br>※使用量の単位は原材料リストに合わせる</caption>
+								<thead class='sticky-top table-info'>
+									<tr>
+										<th style='width:50%;'>材料名</th>
+										<th style='width:20%;'>使用量</th>
+										<th style='width:10%;'></th>
+										<th style='width:20%;'>材料費</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="list in shouhinMS_zairyou" :key="list.zairyouCD">
+										<td>{{list.hinmei}}</td>
+										<td><input type="text" class="form-control" v-model="list.use_volume"></td>
+										<td>{{list.unit}}</td>
+										<td>{{list.hiyou}}</td>
+									</tr>
+									<tr>
+										<td colspan="4" class="text-center"><button class="btn btn-primary p-1" style='width:80px;' @click="save_genka()" :disabled="!is_edit_shouhin">登録</button></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 					</div>
 				</div>
 
@@ -223,7 +231,7 @@
 		<div class="loader">Loading...</div>
 	</div>
 
-	<!--商品登録-->
+	<!--商品選択-->
 	<div class='modal fade' id='ShouhinSelect' tabindex='-1' role='dialog' aria-labelledby='basicModal' aria-hidden='true'>
 		<div class='modal-dialog  modal-dialog-centered modal-sm'>
 			<div class='modal-content' style='font-size: 1.6rem; font-weight: 600;'>
@@ -231,11 +239,12 @@
 					<div class='modal-title' id='myModalLabel' style='text-align:center;width:100%;'>商品名入力 or 検索してリスト選択</div>
 				</div>
 				<div class='modal-body text-center ps-5 pe-5'>
-					<input type='text' class='form-control ps-3' v-model='set_shouhinNM' style='font-size: 2rem;' placeholder="入力 or 検索">
+					<input type='text' class='form-control ps-3' v-model='set_shouhinNM' style='font-size: 2rem;' placeholder="入力 or 検索" @input='is_selected=false'>
 					<div class='evlist_area text-start ps-1'>
 						<template v-for='(list,index) in shouhinMS_filtered' :key='list.shouhinCD'>
 							<div class="form-check ps-3">
-								<input class='form-check-input' type='radio' name='sh_select' v-model='set_shouhinNM' :value=list.shouhinNM :id='`shouhinCD_${index}`' style='border:0;display:none;'>
+								<!--リストを選択すると:valueでセットしている商品名がv-modelのset_shouhinNMにセットされる-->
+								<input class='form-check-input' type='radio' name='sh_select' v-model='set_shouhinNM' :id='`shouhinCD_${index}`' style='border:0;display:none;' @click='select(list.shouhinNM)'>
 								<label class="form-check-label" :for='`shouhinCD_${index}`' style='font-size: 1.8rem;'>{{list.shouhinNM}}</label>
 							</div>
 						</template>
