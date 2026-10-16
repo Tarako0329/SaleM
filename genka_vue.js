@@ -116,6 +116,17 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 				csrf.value = response.data.csrf_token
 				edit_zairyouMS.value.zairyouCD = response.data.new_zairyouCD
 				zairyouMS.value.push({...edit_zairyouMS.value})
+				//初期化
+				edit_zairyouMS.value = {	//材料一覧マスタ追加用
+					zairyouCD:'0',
+					hinmei:'',
+					value:0,
+					zeikbn:'',
+					volum:0,
+					use_volume:0,
+					unit:'',
+					used:false,
+				}
 			})
 			.catch((error) =>{
 				alert(error)
