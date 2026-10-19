@@ -155,12 +155,13 @@
 
 					<div class='col-7'>
 						<div class="overflow-y-auto border rounded p-2 position-relative" style="height: calc(100vh - 390px);">
-							<input type="text" class="form-control position-absolute top-1" v-model="search_zairyou" placeholder="材料名で検索" style='max-width: 50%;' >
-							<table class='table table-sm caption-top ' style='margin-top:5px;'>
-								<caption><br>原材料リスト</caption>
-								<thead class='sticky-top table-success'>
+							<table class='table table-sm caption-top' style='margin-top:5px;'>
+								<caption class="pt-0"><br>原材料登録</caption>
+								<thead class='table-success'>
 									<tr>
-										<th style='width:50%;'>材料名</th>
+										<th style='width:10px;'></th>
+										<th style='width:20%;'>ジャンル</th>
+										<th style='width:30%;'>材料名</th>
 										<th style='width:auto;'>価格(税込)</th>
 										<th style='width:70px;'>税率</th>
 										<th style='width:auto;'>内容量</th>
@@ -170,6 +171,8 @@
 								</thead>
 								<tbody>
 									<tr class="table-warning">
+										<td></td>
+										<td><input type="text" class="form-control" v-model="edit_zairyouMS.bunrui"  placeholder="ジャンル"></td>
 										<td><input type="text" class="form-control" v-model="edit_zairyouMS.hinmei"  placeholder="材料名"></td>
 										<td><input type="number" class="form-control" v-model="edit_zairyouMS.value"></td>
 										<td>
@@ -181,14 +184,55 @@
 										<td><input type="text" class="form-control" v-model="edit_zairyouMS.unit"></td>
 										<td><button class="btn btn-success p-1" @click="add_zairyouMS">登録</button></td>
 									</tr>
-									<tr v-for="(list,index) in zairyouMS_filtered" :key="list.zairyouCD">
-										<td>{{list.hinmei}}</td>
-										<td>{{Number(list.value).toLocaleString()}}</td>
-										<td>{{get_zm_name(list.zeikbn)}}</td>
-										<td>{{Number(list.volum).toLocaleString()}}</td>
-										<td>{{list.unit}}</td>
-										<td><input type="checkbox" class="form-check-input" v-model="list.used" ></td>
+								</tbody>
+
+							<table class='table table-sm caption-top ' style='margin-top:5px;'>
+								<caption class="pt-0"><br>原材料リスト</caption>
+								<thead class='sticky-top table-success'>
+									<tr>
+										<th style='width:10px;'></th>
+										<th style='width:20%;'>ジャンル</th>
+										<th style='width:30%;'>材料名</th>
+										<th style='width:auto;'>価格(税込)</th>
+										<th style='width:70px;'>税率</th>
+										<th style='width:auto;'>内容量</th>
+										<th style='width:50px;'>単位</th>
+										<th style='width:55px;'></th>
 									</tr>
+								</thead>
+								<tbody>
+									<tr class="table-warning">
+										<td></td>
+										<td>
+											<input type="text" class="form-control" v-model="search_zairyou" placeholder="ジャンル絞込" style=''>
+										</td>
+										<td colspan="6" class="text-center">
+											<input type="text" class="form-control" v-model="search_zairyou" placeholder="材料名で検索" style='max-width: 50%;'>
+										</td>
+									</tr>
+									<tr v-for="(list,index) in zairyouMS_filtered" :key="list.zairyouCD">
+										<template v-if="edit_zairyou_CD === list.zairyouCD">
+											<td><i class="bi bi-floppy text-success" role="button" @click="upd_zairyouMS(list.zairyouCD)"></i></td>
+											<td><input type="text" class="form-control" v-model="list.bunrui"  placeholder="ジャンル"></td>
+											<td><input type="text" class="form-control" v-model="list.hinmei"  placeholder="材料名"></td>
+											<td><input type="number" class="form-control" v-model="list.value"></td>
+											<td>{{get_zm_name(list.zeikbn)}}</td>
+											<td><input type="number" class="form-control" v-model="list.volum"></td>
+											<td><input type="text" class="form-control" v-model="list.unit"></td>
+											<td><input type="checkbox" class="form-check-input" v-model="list.used" ></td>
+										</template>
+										<template v-else>
+											<td><i class="bi bi-pencil-square text-success" role="button" @click="edit_zairyou(list.zairyouCD)"></i></td>
+											<td>{{list.bunrui}}</td>
+											<td>{{list.hinmei}}</td>
+											<td>{{Number(list.value).toLocaleString()}}</td>
+											<td>{{get_zm_name(list.zeikbn)}}</td>
+											<td>{{Number(list.volum).toLocaleString()}}</td>
+											<td>{{list.unit}}</td>
+											<td><input type="checkbox" class="form-check-input" v-model="list.used" ></td>
+										</template>
+									</tr>
+
 								</tbody>
 							</table>
 						</div>
@@ -196,7 +240,7 @@
 					<div class='col-5'>
 						<div class="overflow-y-auto border rounded p-2" style="height: calc(100vh - 390px);">
 							<table class='table table-sm caption-top' style='margin-top:5px;'>
-								<caption>１製造LOTに利用する材料<br>※使用量の単位は原材料リストに合わせる</caption>
+								<caption class="pt-0">１製造LOTに利用する材料<br>※使用量の単位は原材料リストに合わせる</caption>
 								<thead class='sticky-top table-info'>
 									<tr>
 										<th style='width:50%;'>材料名</th>

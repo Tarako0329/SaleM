@@ -27,6 +27,7 @@ if($rtn !== true){
 		$db->begin_tran();
 
 		$params["uid"]=$_SESSION['user_id'];
+		$params["bunrui"]=$_POST["bunrui"] ?? null;
 		$params["zairyouCD"]=$_POST["zairyouCD"];
 		$params["hinmei"]=$_POST["hinmei"];
 		$params["value"]=$_POST["value"];
@@ -35,18 +36,20 @@ if($rtn !== true){
 		$params["unit"]=$_POST["unit"];
 
 		if($params["zairyouCD"]!=0){//update
-			$sqlstr="UPDATE ShouhinMS set 
-				hinmei = :hinmei 
+			$sqlstr="UPDATE zairyou_zaiko set 
+				bunrui = :bunrui
+				,hinmei = :hinmei 
 				,`value` = :value 
 				,zeikbn = :zeikbn 
 				,volum = :volum 
 				,unit = :unit
-				where `uid` = :uid and zairyouCD = :zairyouCD";
+				where `uid` = :uid 
+				and zairyouCD = :zairyouCD";
 		}else{//insert
-			$sqlst = "INSERT INTO zairyou_zaiko(`uid`,hinmei,`value`,zeikbn,volum,unit) values(:uid,:hinmei,:value,:zeikbn,:volum,:unit)";
+			$sqlstr = "INSERT INTO zairyou_zaiko(`uid`,bunrui,hinmei,`value`,zeikbn,volum,unit) values(:uid,:bunrui,:hinmei,:value,:zeikbn,:volum,:unit)";
 		}
 
-		$return = $db->UP_DEL_EXEC($sqlst,$params);
+		$return = $db->UP_DEL_EXEC($sqlstr,$params);
 
 		$db->commit_tran();
 

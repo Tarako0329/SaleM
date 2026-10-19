@@ -19,6 +19,7 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 		const zairyouMS = ref([])			//材料一覧マスタ
 		const edit_zairyouMS = ref({	//材料一覧マスタ追加用
 			zairyouCD:'0',
+			bunrui:'',
 			hinmei:'',
 			value:0,
 			zeikbn:'',
@@ -53,6 +54,14 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 			}
 			return zairyouMS.value.filter(item => item.hinmei.includes(search_zairyou.value))
 		})
+		const edit_zairyou_CD = ref(-1)	//材料一覧で編集する材料のindex
+		const edit_zairyou = (p_zairyouCD) =>{//材料一覧で編集する材料を選択
+			if(edit_zairyou_CD.value !== -1){
+				alert('編集結果を保存してから選択してください')
+				return
+			}
+			edit_zairyou_CD.value = p_zairyouCD
+		}
 
 		const saved_ShouhinMS = ref({
 			shouhinCD:""
@@ -102,6 +111,7 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 			console_log('add_zairyouMS start')
 			const form = new FormData()
 			form.append("zairyouCD",edit_zairyouMS.value.zairyouCD)
+			form.append("bunrui",edit_zairyouMS.value.bunrui)
 			form.append("hinmei",edit_zairyouMS.value.hinmei)
 			form.append("value",edit_zairyouMS.value.value)
 			form.append("zeikbn",edit_zairyouMS.value.zeikbn)
@@ -119,6 +129,7 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 				//初期化
 				edit_zairyouMS.value = {	//材料一覧マスタ追加用
 					zairyouCD:'0',
+					bunrui:'',
 					hinmei:'',
 					value:0,
 					zeikbn:'',
@@ -127,6 +138,31 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 					unit:'',
 					used:false,
 				}
+			})
+			.catch((error) =>{
+				alert(error)
+			})
+		}
+		const upd_zairyouMS = (p_zairyouCD) =>{//材料一覧リストにnew材料を追加(DB登録＋配列追加)
+			console_log('upd_zairyouMS start')
+
+			let edit_zairyou = zairyouMS.value.find(item => item.zairyouCD == p_zairyouCD)
+			const form = new FormData()
+			form.append("zairyouCD",edit_zairyou.zairyouCD)
+			form.append("bunrui",edit_zairyou.bunrui)
+			form.append("hinmei",edit_zairyou.hinmei)
+			form.append("value",edit_zairyou.value)
+			form.append("zeikbn",edit_zairyou.zeikbn)
+			form.append("volum",edit_zairyou.volum)
+			form.append("unit",edit_zairyou.unit)
+			form.append("csrf_token",csrf.value)
+
+			axios.post("ajax_insup_zairyouMS.php",form)//,{headers:{'Content-Tyoe':'u\multipart/form-data'}}
+			.then((response) =>{
+				alert(response.data.status)
+				console_log(response.data)
+				csrf.value = response.data.csrf_token
+				edit_zairyou_CD.value = -1
 			})
 			.catch((error) =>{
 				alert(error)
@@ -317,8 +353,11 @@ const REZ_APP = (p_uid,p_timeout) => createApp({
 			//zairyouMS,
 			search_zairyou,
 			zairyouMS_filtered,
+			edit_zairyou_CD,
+			edit_zairyou,
 			edit_zairyouMS,
 			add_zairyouMS,
+			upd_zairyouMS,
 			shouhinMS_zairyou,
 			total_hiyou,
 			edit_S_genka_tanka,

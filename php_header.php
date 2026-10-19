@@ -1,6 +1,6 @@
 <?php
-define("VERSION", "ver3.25.1");
-define("RELEACE_DATE", "2026-09-14");
+define("VERSION", "ver3.25.2");
+define("RELEACE_DATE", "2026-10-19");
 ini_set('error_log', __DIR__ . '/.error_log');
 date_default_timezone_set('Asia/Tokyo');
 require "./vendor/autoload.php";
